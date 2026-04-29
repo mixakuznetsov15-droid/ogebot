@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>ОГЭ География</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body style="font-family: Arial; padding: 20px;">
+
+<h2>ОГЭ География 🌍</h2>
+
+<button onclick="getQuestion()">Получить задание</button>
+
+<div id="question" style="margin-top:20px;"></div>
+
+<script>
+let currentAnswer = ""
+
+function getQuestion() {
+  const questions = [
+    {
+      q: "Какая река самая длинная в России?",
+      options: ["Волга", "Лена", "Енисей"],
+      answer: "Лена"
+    },
+    {
+      q: "Какой климат в Центральной России?",
+      options: ["Тропический", "Умеренно-континентальный", "Арктический"],
+      answer: "Умеренно-континентальный"
+    }
+  ]
+
+  const q = questions[Math.floor(Math.random() * questions.length)]
+  currentAnswer = q.answer
+
+  let html = "<p>" + q.q + "</p>"
+
+  q.options.forEach(opt => {
+    html += `<button onclick="checkAnswer('${opt}')">${opt}</button><br><br>`
+  })
+
+  document.getElementById("question").innerHTML = html
+}
+
+function checkAnswer(ans) {
+  if (ans === currentAnswer) {
+    alert("✅ Правильно")
+  } else {
+    alert("❌ Неправильно. Ответ: " + currentAnswer)
+  }
+}
+</script>
+
+</body>
+</html>
