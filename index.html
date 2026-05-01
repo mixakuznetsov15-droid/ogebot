@@ -1,1372 +1,399 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
-  <title>ОГЭ Подготовка</title>
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <style>
-    :root {
-      --bg: #0b1020;
-      --panel: rgba(15, 23, 42, .92);
-      --panel-2: rgba(17, 24, 39, .92);
-      --card: rgba(255,255,255,.06);
-      --card-2: rgba(255,255,255,.085);
-      --border: rgba(148,163,184,.18);
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --good: #22c55e;
-      --bad: #ef4444;
-      --accent: #60a5fa;
-      --accent-2: #a78bfa;
-      --shadow: 0 20px 60px rgba(0,0,0,.34);
-      --radius: 22px;
-      --max: 1080px;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ГеоПро — Подготовка к ОГЭ</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1c2333;
+  --primary: #58a6ff;
+  --primary2: #3fb950;
+  --text: #f0f6fc;
+  --muted: #8b949e;
+  --danger: #f85149;
+  --gold: #d29922;
+  --border: #ffffff0c;
+  --radius: 18px;
+  --font-h: 'Unbounded', sans-serif;
+  --font-b: 'Onest', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0;
-      background:
-        radial-gradient(900px 500px at 15% 0%, rgba(96,165,250,.16), transparent 55%),
-        radial-gradient(800px 500px at 90% 10%, rgba(167,139,250,.13), transparent 45%),
-        linear-gradient(180deg, #050816 0%, #0b1020 100%);
-      color: var(--text);
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-      overflow-x: hidden;
-    }
+body::before {
+content:''; position:fixed; inset:0;
+background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+pointer-events:none; z-index:0;
+}
 
-    .app {
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 14px 12px 18px;
-    }
+.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; animation:fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-    .shell {
-      width: 100%;
-      max-width: var(--max);
-      display: grid;
-      gap: 14px;
-    }
+.topbar {
+padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
+.sublabel { font-size:10px; color:var(--muted); }
+.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
 
-    .topbar, .panel {
-      background: rgba(2, 6, 23, .42);
-      backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
+.scroll::-webkit-scrollbar { width:3px; }
+.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-    .topbar {
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+.xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
+.xp-icon { font-size:26px; }
+.xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
+.xp-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
+.xp-stats { font-size:11px; color:var(--muted); }
+.xp-title { font-weight:600; font-size:14px; }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
+.actions { display:flex; gap:10px; }
+.btn { flex:1; padding:14px 6px; border-radius:var(--radius); background:var(--card2); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
+.btn:active { transform:scale(.97); }
+.btn.primary { background:linear-gradient(135deg,var(--primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
+.btn.accent { background:linear-gradient(135deg,var(--primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
+.btn-icon { font-size:24px; }
 
-    .brand-badge {
-      width: 46px;
-      height: 46px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 14px 30px rgba(96,165,250,.20);
-      flex: 0 0 auto;
-      font-size: 22px;
-    }
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid-item { background:var(--card2); border-radius:var(--radius); padding:14px; border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
+.grid-item:active { background:#253544; }
 
-    .brand-text { min-width: 0; }
-    .brand-title {
-      margin: 0;
-      font-weight: 900;
-      font-size: 18px;
-      line-height: 1.05;
-      letter-spacing: -.02em;
-    }
-    .brand-subtitle {
-      margin: 4px 0 0;
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+.sec-title { font-family:var(--font-h); font-size:14px; font-weight:700; }
+.back-link { color:var(--primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
 
-    .top-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
+.topic-list { display:flex; flex-direction:column; gap:8px; }
+.topic-item { background:var(--card2); border-radius:var(--radius); padding:12px 14px; border:1px solid var(--border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
+.topic-item:active { background:#253544; }
 
-    .btn {
-      border: 0;
-      cursor: pointer;
-      border-radius: 14px;
-      padding: 11px 14px;
-      color: var(--text);
-      background: rgba(255,255,255,.08);
-      font-weight: 800;
-      transition: transform .14s ease, background .14s ease, opacity .14s ease, box-shadow .14s ease;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
-      -webkit-tap-highlight-color: transparent;
-    }
-    .btn:hover { background: rgba(255,255,255,.12); }
-    .btn:active { transform: translateY(1px); }
-    .btn.primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 14px 34px rgba(96,165,250,.22);
-    }
-    .btn.success {
-      background: rgba(34,197,94,.13);
-      box-shadow: inset 0 0 0 1px rgba(34,197,94,.24);
-    }
-    .btn.danger {
-      background: rgba(239,68,68,.12);
-      box-shadow: inset 0 0 0 1px rgba(239,68,68,.22);
-    }
-    .btn.ghost {
-      background: transparent;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.11);
-    }
-    .btn.small {
-      padding: 9px 11px;
-      font-size: 13px;
-      border-radius: 12px;
-    }
-    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; font-weight:500; cursor:pointer; }
+.nav-item.active { color:var(--primary); }
+.nav-icon { font-size:20px; }
 
-    .content { display: grid; gap: 14px; }
+/* ── AI PANEL ── */
+.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
+.ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
+.ai-header-left { display:flex; align-items:center; gap:10px; }
+.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
+.ai-tagline { font-size:10px; color:var(--muted); }
+.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
+.ai-toggle.open { transform:rotate(180deg); }
 
-    .view { display: none; }
-    .view.active { display: block; animation: fade .18s ease; }
-    @keyframes fade {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+.ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
+.ai-body.open { display:flex; animation:fadeUp .25s ease; }
 
-    .panel { padding: 16px; }
+.ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
+.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
+.ai-prompt-btn:active { background:#58a6ff30; }
 
-    .hero {
-      display: grid;
-      gap: 14px;
-      background: linear-gradient(135deg, rgba(96,165,250,.13), rgba(167,139,250,.10));
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 24px;
-      padding: 18px;
-    }
+.ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
+.ai-messages::-webkit-scrollbar { width:2px; }
+.ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
 
-    .hero-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
+.msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
+.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
+.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
+.msg.loading { color:var(--muted); font-style:italic; }
 
-    .h1, .h2, .section-title {
-      margin: 0;
-      line-height: 1.08;
-      letter-spacing: -.02em;
-    }
-    .h1 { font-size: clamp(24px, 3.8vw, 34px); font-weight: 900; }
-    .h2 { font-size: 22px; font-weight: 900; }
-    .section-title { font-size: 18px; font-weight: 900; }
+.ai-input-row { display:flex; gap:8px; align-items:flex-end; }
+.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
+.ai-input:focus { border-color:#58a6ff60; }
+.ai-input::placeholder { color:var(--muted); }
+.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.ai-send:active { transform:scale(.93); }
+.ai-send:disabled { opacity:.5; cursor:default; }
+.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
 
-    .lead, .muted { margin: 0; color: var(--muted); line-height: 1.5; }
-    .lead { max-width: 880px; color: #cbd5e1; }
+/* ── QUIZ ── */
+.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+.quiz-wrap::-webkit-scrollbar { width:3px; }
+.q-header { display:flex; justify-content:space-between; align-items:center; }
+.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
+.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
+.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+.q-text { font-size:15px; line-height:1.55; font-weight:500; }
+.answers { display:flex; flex-direction:column; gap:8px; }
+.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
+.ans-btn:active { transform:scale(.98); }
+.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
+.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
+.ans-btn.correct .ans-letter { background:var(--primary2); }
+.ans-btn.wrong .ans-letter { background:var(--danger); }
+.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
+.btn-next.show { display:block; animation:fadeUp .3s ease; }
+.btn-next:active { transform:scale(.97); }
 
-    .chips, .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+/* ── RESULT ── */
+.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+.result-emoji { font-size:64px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.result-sub { font-size:14px; color:var(--muted); }
+.ring-wrap { position:relative; width:130px; height:130px; }
+.ring-wrap svg { transform:rotate(-90deg); }
+.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
+.ring-denom { font-size:12px; color:var(--muted); }
+.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
+.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
+.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
+.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
+.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
+.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+.btn-full:active { transform:scale(.97); }
+.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
+.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
+</style>
 
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border: 1px solid rgba(255,255,255,.06);
-      color: #dbeafe;
-      font-size: 12px;
-      font-weight: 800;
-    }
-
-    .progress-block { display: grid; gap: 10px; }
-    .progress-meta {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .progress-bar {
-      height: 12px;
-      border-radius: 999px;
-      overflow: hidden;
-      background: rgba(255,255,255,.08);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
-    }
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--good), #22d3ee);
-      transition: width .24s ease;
-    }
-
-    .grid { display: grid; gap: 14px; }
-    .grid.subjects { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
-    }
-    .card:hover { background: var(--card-2); }
-
-    .subject-card {
-      grid-column: span 6;
-      cursor: pointer;
-      display: grid;
-      gap: 12px;
-      min-height: 176px;
-      transition: transform .14s ease, background .14s ease, border-color .14s ease;
-      border-color: rgba(96,165,250,.18);
-    }
-    .subject-card:hover { transform: translateY(-1px); }
-
-    .subject-top {
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
-    .subject-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 16px;
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,.08);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
-      font-size: 24px;
-      flex: 0 0 auto;
-    }
-    .subject-title {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 900;
-    }
-    .subject-desc {
-      margin: 6px 0 0;
-      color: var(--muted);
-      line-height: 1.45;
-      font-size: 14px;
-    }
-    .subject-footer {
-      margin-top: auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-
-    .breadcrumbs {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .breadcrumbs button {
-      border: 0;
-      background: transparent;
-      color: #cbd5e1;
-      padding: 0;
-      cursor: pointer;
-      font-weight: 800;
-    }
-
-    .two-col {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 14px;
-    }
-
-    .menu-card {
-      background: var(--panel-2);
-      border-radius: 20px;
-      padding: 6px 4px;
-      border: 1px solid rgba(255,255,255,.08);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-    }
-    .menu-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 13px 14px;
-      border-radius: 14px;
-      cursor: pointer;
-      transition: transform .14s ease, background .14s ease;
-      color: var(--text);
-      font-weight: 700;
-      font-size: 14px;
-    }
-    .menu-item:hover { background: rgba(255,255,255,.07); transform: translateX(2px); }
-    .menu-divider {
-      height: 1px;
-      background: rgba(255,255,255,.06);
-      margin: 2px 12px;
-    }
-    .menu-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 14px;
-      display: grid;
-      place-items: center;
-      font-size: 20px;
-      flex: 0 0 auto;
-    }
-    .menu-icon.theory { background: rgba(124,58,237,.18); color: #c4b5fd; }
-    .menu-icon.practice { background: rgba(6,214,160,.16); color: #5eead4; }
-    .menu-icon.maps { background: rgba(59,130,246,.16); color: #93c5fd; }
-    .menu-icon.exam { background: rgba(245,158,11,.16); color: #fbbf24; }
-    .menu-icon.stats { background: rgba(244,63,94,.14); color: #fb7185; }
-    .menu-icon.ai { background: rgba(168,85,247,.16); color: #ddd6fe; }
-    .menu-label { flex: 1; min-width: 0; }
-    .menu-label .title { color: #fff; font-size: 14px; }
-    .menu-label .sub { color: var(--muted); font-size: 11px; margin-top: 2px; font-weight: 600; }
-    .menu-arrow { color: rgba(255,255,255,.32); font-size: 18px; }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 3px 8px;
-      border-radius: 999px;
-      font-size: 10px;
-      font-weight: 900;
-      letter-spacing: .04em;
-      text-transform: uppercase;
-    }
-    .badge-new { background: rgba(6,214,160,.12); color: #5eead4; border: 1px solid rgba(6,214,160,.18); }
-    .badge-hot { background: rgba(244,63,94,.12); color: #fb7185; border: 1px solid rgba(244,63,94,.18); }
-
-    .quiz-box { display: grid; gap: 14px; align-content: start; }
-    .quiz-top {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-    }
-    .quiz-progress { font-size: 13px; color: var(--muted); }
-    .question-card {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.09);
-      border-radius: 20px;
-      padding: 18px;
-      display: grid;
-      gap: 14px;
-    }
-    .question-text {
-      margin: 0;
-      font-size: 18px;
-      font-weight: 900;
-      line-height: 1.35;
-    }
-    .answer-grid { display: grid; gap: 10px; }
-    .answer-btn {
-      width: 100%;
-      text-align: left;
-      padding: 14px 15px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      cursor: pointer;
-      font-weight: 800;
-      line-height: 1.35;
-      transition: transform .12s ease, background .12s ease, border-color .12s ease;
-    }
-    .answer-btn:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
-    .answer-btn.correct { background: rgba(34,197,94,.16); border-color: rgba(34,197,94,.42); }
-    .answer-btn.wrong { background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.42); }
-    .feedback {
-      min-height: 88px;
-      border-radius: 18px;
-      padding: 14px 16px;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.08);
-      line-height: 1.52;
-      color: #dbeafe;
-    }
-    .feedback.good { border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); }
-    .feedback.bad { border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); }
-
-    .topics-list, .history-list { display: grid; gap: 10px; }
-    .topic-item, .history-item {
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 16px;
-      padding: 13px 14px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .topic-name { margin: 0; font-weight: 900; }
-    .topic-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-    .stat-grid {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-    }
-    .stat {
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 18px;
-      padding: 14px;
-    }
-    .stat-value {
-      margin: 0;
-      font-size: 20px;
-      font-weight: 900;
-    }
-    .stat-label { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
-
-    .chat-intro { display: grid; gap: 12px; }
-    .bubble {
-      padding: 14px 16px;
-      border-radius: 18px;
-      line-height: 1.55;
-      border: 1px solid rgba(255,255,255,.08);
-      box-shadow: var(--shadow);
-    }
-    .bubble.bot {
-      background: var(--panel-2);
-      border-bottom-left-radius: 6px;
-    }
-    .bubble.hint {
-      background: rgba(6,214,160,.08);
-      border-color: rgba(6,214,160,.16);
-      text-align: center;
-      color: #d1fae5;
-    }
-
-    .footer-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
-    .empty { color: var(--muted); line-height: 1.5; font-size: 14px; }
-    .hidden { display: none !important; }
-
-    @media (max-width: 900px) {
-      .grid.subjects, .two-col { grid-template-columns: 1fr; }
-      .subject-card { grid-column: span 12; }
-    }
-    @media (max-width: 560px) {
-      .app { padding: 10px 8px 14px; }
-      .panel, .topbar { padding: 14px; }
-      .brand-title { font-size: 17px; }
-      .h1 { font-size: 23px; }
-      .h2 { font-size: 20px; }
-      .question-text { font-size: 17px; }
-      .subject-card { min-height: auto; }
-      .stat-grid { grid-template-columns: 1fr 1fr; }
-    }
-  </style>
 </head>
 <body>
-  <div class="app">
-    <div class="shell">
-      <div class="topbar">
-        <div class="brand">
-          <div class="brand-badge">🌍</div>
-          <div class="brand-text">
-            <p class="brand-title">ОГЭ Подготовка</p>
-            <p class="brand-subtitle" id="appSubtitle">География, прогресс и задел на AI</p>
-          </div>
-        </div>
-        <div class="top-actions">
-          <button class="btn small ghost" id="btnBack" onclick="goHome()" style="display:none;">← Назад</button>
-          <button class="btn small" onclick="showView('stats')">Прогресс</button>
-          <button class="btn small" onclick="showView('ai')">AI</button>
-        </div>
-      </div>
 
-      <div class="content">
-        <section class="view active" id="view-home">
-          <div class="hero">
-            <div class="hero-row">
-              <div>
-                <h1 class="h1">Подготовка к ОГЭ без лишнего шума</h1>
-                <p class="lead" style="margin-top:10px;">
-                  Сейчас активна география: теория, практика, карты, пробник и статистика. Архитектура сразу сделана так,
-                  чтобы потом добавить другие предметы и подключить AI без переделки интерфейса.
-                </p>
-              </div>
-              <div class="chips">
-                <span class="chip">📈 Прогресс сохраняется</span>
-                <span class="chip">🧠 AI-ready</span>
-                <span class="chip">🧩 Модульные предметы</span>
-              </div>
-            </div>
-            <div class="progress-block">
-              <div class="progress-meta">
-                <span id="homeProgressLabel">География: 0/0</span>
-                <span id="homeAccuracyLabel">Точность: —</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" id="homeProgressFill"></div></div>
-            </div>
-          </div>
+<!-- HOME -->
 
-          <div style="height:12px"></div>
-          <div class="grid subjects" id="subjectsGrid"></div>
-
-          <div style="height:12px"></div>
-
-          <div class="chat-intro">
-            <div class="bubble bot">
-              👋 <strong>Привет!</strong> Я помогу довести тебя до <strong>ОГЭ по географии на 4–5</strong>.
-              <br><br>
-              Сначала выбери режим выше, затем решай задания и смотри, где именно ошибаешься. Позже сюда же подключим AI-разборы и персональный план.
-            </div>
-            <div class="bubble hint">
-              💬 Можно будет добавить и другие предметы: достаточно дописать их в один массив данных.
-            </div>
-          </div>
-
-          <div style="height:2px"></div>
-          <div class="footer-note">
-            Интерфейс уже заточен под расширение: новые предметы, новые блоки, AI-объяснения, платные версии и отчёты для родителей.
-          </div>
-        </section>
-
-        <section class="view" id="view-subject">
-          <div class="breadcrumbs">
-            <button onclick="goHome()">Главная</button>
-            <span>›</span>
-            <span id="crumbSubject">География</span>
-          </div>
-
-          <div class="hero" style="margin-top:12px;">
-            <div class="hero-row">
-              <div>
-                <h2 class="h2" id="subjectTitle">География ОГЭ 🌍</h2>
-                <p class="lead" id="subjectDescription" style="margin-top:8px;">
-                  Практика, темы и разбор ошибок с заделом под AI.
-                </p>
-              </div>
-              <div class="chips">
-                <span class="chip" id="subjectStatsChip">0 заданий</span>
-                <span class="chip" id="subjectAccuracyChip">0% точность</span>
-              </div>
-            </div>
-
-            <div class="progress-block">
-              <div class="progress-meta">
-                <span id="subjectProgressLabel">Прогресс</span>
-                <span id="subjectStreakLabel">Серия: 0</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" id="subjectProgressFill"></div></div>
-            </div>
-
-            <div class="chips">
-              <button class="btn primary" id="btnStartQuiz" onclick="startQuiz()">🚀 Начать тренировку</button>
-              <button class="btn" onclick="showTopics()">📘 Темы и режимы</button>
-              <button class="btn" onclick="showView('stats')">📊 Прогресс</button>
-              <button class="btn" onclick="startAiHelper()">🤖 Разобрать с AI</button>
-            </div>
-          </div>
-
-          <div class="two-col" style="margin-top:14px;">
-            <div class="panel quiz-box">
-              <div class="quiz-top">
-                <div>
-                  <div class="section-title" style="font-size:18px;">Последняя тренировка</div>
-                  <div class="quiz-progress" id="lastPracticeInfo">Пока нет попыток</div>
-                </div>
-              </div>
-              <div class="question-card" id="subjectPreviewCard">
-                <div class="empty">
-                  Нажми «Начать тренировку». Здесь будет активная практика, а затем — разбор ошибок и кнопка AI-подсказки.
-                </div>
-              </div>
-            </div>
-
-            <div class="grid" style="gap:14px; align-content:start;">
-              <div class="panel">
-                <div class="section-title">Что внутри</div>
-                <div class="empty" style="margin-top:10px;">
-                  • задания формата ОГЭ<br>
-                  • мгновенная проверка<br>
-                  • объяснение ошибки<br>
-                  • прогресс по темам<br>
-                  • архитектура под AI и новые предметы
-                </div>
-              </div>
-              <div class="panel">
-                <div class="section-title">Темы</div>
-                <div class="topics-list" id="topicsList" style="margin-top:12px;"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-quiz">
-          <div class="breadcrumbs">
-            <button onclick="goHome()">Главная</button>
-            <span>›</span>
-            <button onclick="showSubject(currentSubjectId)"><span id="quizCrumbSubject">География</span></button>
-            <span>›</span>
-            <span>Тренировка</span>
-          </div>
-
-          <div class="two-col" style="margin-top:12px;">
-            <div class="panel quiz-box">
-              <div class="quiz-top">
-                <div>
-                  <div class="section-title" id="quizTitle" style="font-size:18px;">Тренировка</div>
-                  <div class="quiz-progress" id="quizProgress">Вопрос 1 из 10</div>
-                </div>
-                <div class="chip-row">
-                  <span class="chip" id="quizScoreChip">0 / 0</span>
-                  <span class="chip" id="quizTopicChip">Тема: смешанная</span>
-                </div>
-              </div>
-
-              <div class="question-card">
-                <p class="question-text" id="questionText">Вопрос появится здесь.</p>
-                <div class="answer-grid" id="answersGrid"></div>
-              </div>
-
-              <div class="feedback" id="feedbackBox">Выбери ответ, чтобы увидеть проверку и объяснение.</div>
-
-              <div class="chips">
-                <button class="btn" id="btnNext" onclick="nextQuestion()" disabled>Следующий вопрос</button>
-                <button class="btn success" id="btnFinish" onclick="finishQuiz()" disabled>Завершить тренировку</button>
-                <button class="btn danger" onclick="restartQuiz()">Начать заново</button>
-              </div>
-            </div>
-
-            <div class="grid" style="gap:14px; align-content:start;">
-              <div class="panel">
-                <div class="section-title">Памятка</div>
-                <div class="empty" style="margin-top:10px;">
-                  После ответа ты сразу видишь результат и объяснение.
-                  Потом это можно заменить AI-разбором без изменения интерфейса.
-                </div>
-              </div>
-              <div class="panel">
-                <div class="section-title">Как улучшим позже</div>
-                <div class="empty" style="margin-top:10px;">
-                  • генерация новых вопросов<br>
-                  • объяснение ошибок AI<br>
-                  • подбор слабых тем<br>
-                  • ежедневный план подготовки
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-topics">
-          <div class="breadcrumbs">
-            <button onclick="goHome()">Главная</button>
-            <span>›</span>
-            <button onclick="showSubject(currentSubjectId)"><span id="topicsCrumbSubject">География</span></button>
-            <span>›</span>
-            <span>Темы и режимы</span>
-          </div>
-
-          <div class="hero" style="margin-top:12px;">
-            <div class="hero-row">
-              <div>
-                <h2 class="h2" id="topicsTitle">Темы по географии</h2>
-                <p class="lead" style="margin-top:8px;">
-                  Список тем и точка входа для будущего AI-разбора. Добавлять новые темы и предметы можно без переделки интерфейса.
-                </p>
-              </div>
-              <div class="chips">
-                <span class="chip">🧩 Модульная структура</span>
-                <span class="chip">🤖 AI-ready</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="two-col" style="margin-top:14px;">
-            <div class="panel">
-              <div class="section-title">Список тем</div>
-              <div class="topics-list" id="topicsListLarge" style="margin-top:12px;"></div>
-            </div>
-            <div class="panel">
-              <div class="section-title">Логика развития</div>
-              <div class="empty" style="margin-top:10px;">
-                1. Сейчас: фиксированные задания и объяснения.<br>
-                2. Потом: AI-объяснение ошибки.<br>
-                3. Дальше: адаптивная сложность.<br>
-                4. Затем: другие предметы в той же схеме.<br>
-                5. Потом: подписка и отчёты для родителей.
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-stats">
-          <div class="breadcrumbs">
-            <button onclick="goHome()">Главная</button>
-            <span>›</span>
-            <span>Прогресс</span>
-          </div>
-
-          <div class="hero" style="margin-top:12px;">
-            <div class="hero-row">
-              <div>
-                <h2 class="h2">Прогресс по предмету</h2>
-                <p class="lead" style="margin-top:8px;">Пока хранится локально в браузере. Позже перенесём в аккаунт и сервер.</p>
-              </div>
-              <div class="chips">
-                <span class="chip" id="statsAccuracyChip">Точность: —</span>
-                <span class="chip" id="statsSolvedChip">Решено: 0</span>
-                <span class="chip" id="statsStreakChip">Серия: 0</span>
-              </div>
-            </div>
-            <div class="progress-block">
-              <div class="progress-meta">
-                <span id="statsProgressLabel">Прогресс</span>
-                <span id="statsTotalLabel">Всего попыток: 0</span>
-              </div>
-              <div class="progress-bar"><div class="progress-fill" id="statsProgressFill"></div></div>
-            </div>
-          </div>
-
-          <div class="two-col" style="margin-top:14px;">
-            <div class="panel">
-              <div class="section-title">Статистика</div>
-              <div class="stat-grid" style="margin-top:12px;">
-                <div class="stat"><p class="stat-value" id="statCorrect">0</p><p class="stat-label">Правильных ответов</p></div>
-                <div class="stat"><p class="stat-value" id="statWrong">0</p><p class="stat-label">Ошибок</p></div>
-                <div class="stat"><p class="stat-value" id="statAccuracy">0%</p><p class="stat-label">Точность</p></div>
-                <div class="stat"><p class="stat-value" id="statSolved">0</p><p class="stat-label">Решено вопросов</p></div>
-              </div>
-            </div>
-            <div class="panel">
-              <div class="section-title">Последние попытки</div>
-              <div class="history-list" id="historyList" style="margin-top:12px;"></div>
-            </div>
-          </div>
-        </section>
-
-        <section class="view" id="view-ai">
-          <div class="breadcrumbs">
-            <button onclick="goHome()">Главная</button>
-            <span>›</span>
-            <span>AI</span>
-          </div>
-
-          <div class="hero" style="margin-top:12px;">
-            <div class="hero-row">
-              <div>
-                <h2 class="h2">AI-помощник</h2>
-                <p class="lead" style="margin-top:8px;">
-                  Сюда позже подключается модель, которая объясняет ошибки, генерирует новые задания и подбирает слабые темы.
-                </p>
-              </div>
-              <div class="chips">
-                <span class="chip">🧠 Объяснение ошибок</span>
-                <span class="chip">📍 Подсветка слабых тем</span>
-                <span class="chip">📝 Новые задания</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="two-col" style="margin-top:14px;">
-            <div class="panel quiz-box">
-              <div class="section-title">Задать вопрос AI</div>
-              <div class="question-card">
-                <p class="lead">Опиши тему или вставь задание — позже это уйдёт в модель через один endpoint, без изменения интерфейса.</p>
-                <textarea id="aiInput" style="width:100%; min-height:120px; margin-top:12px; resize:vertical; border-radius:16px; border:1px solid rgba(255,255,255,.10); background:rgba(255,255,255,.06); color:var(--text); padding:14px; font:inherit; outline:none;" placeholder="Например: объясни, почему Байкал считается уникальным объектом России"></textarea>
-                <div class="chips">
-                  <button class="btn primary" onclick="askAi()">Отправить</button>
-                  <button class="btn" onclick="fillAiExample()">Пример</button>
-                </div>
-              </div>
-              <div class="feedback" id="aiFeedback">AI пока не подключён. Но точка интеграции уже готова.</div>
-            </div>
-            <div class="panel">
-              <div class="section-title">Что сюда будет приходить</div>
-              <div class="empty" style="margin-top:10px;">
-                • тема, где ученик ошибся<br>
-                • правильный ответ<br>
-                • уровень сложности<br>
-                • история прогресса<br>
-                • запрос на новый вопрос<br><br>
-                Это позволит заменить часть статических объяснений на персональный режим.
-              </div>
-            </div>
-          </div>
-        </section>
+<div class="screen active" id="s-home">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="avatar">🌍</div>
+      <div><div class="username">ГеоПро</div><div class="sublabel">Подготовка к ОГЭ</div></div>
+    </div>
+    <div class="streak">🔥 7 дней</div>
+  </div>
+  <div class="scroll">
+    <div class="xp-panel">
+      <div class="xp-icon">⚡</div>
+      <div style="flex:1">
+        <div class="xp-title">245 / 400 XP · Уровень 4</div>
+        <div class="xp-bar"><div class="xp-fill" style="width:61%"></div></div>
+        <div class="xp-stats">🎯 Цель дня: 12/20 заданий</div>
       </div>
     </div>
+    <div class="actions">
+      <div class="btn primary" onclick="goQuiz()"><span class="btn-icon">🧠</span>Тренировка</div>
+      <div class="btn accent" onclick="goScreen('s-exam')"><span class="btn-icon">🎯</span>Пробник</div>
+      <div class="btn" onclick="goScreen('s-theory')"><span class="btn-icon">📚</span>Учить</div>
+    </div>
+    <div class="sec-title">📂 Разделы</div>
+    <div class="grid">
+      <div class="grid-item" onclick="goScreen('s-maps')"><span style="font-size:26px">🗺️</span>Карты</div>
+      <div class="grid-item" onclick="goScreen('s-stats')"><span style="font-size:26px">📊</span>Прогресс</div>
+      <div class="grid-item" onclick="goScreen('s-hacks')"><span style="font-size:26px">💡</span>Лайфхаки</div>
+      <div class="grid-item" onclick="goScreen('s-daily')"><span style="font-size:26px">🔥</span>Задание дня</div>
+    </div>
+    <div id="ai-home" class="ai-panel"></div>
   </div>
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="goScreen('s-home')"><div class="nav-icon">🏠</div>Главная</div>
+    <div class="nav-item" onclick="goScreen('s-sub')"><div class="nav-icon">💳</div>Подписка</div>
+    <div class="nav-item" onclick="goScreen('s-sched')"><div class="nav-icon">📅</div>Расписание</div>
+    <div class="nav-item" onclick="goScreen('s-friends')"><div class="nav-icon">👥</div>Друзья</div>
+  </nav>
+</div>
 
-  <script>
-    const STORAGE_KEY = "oge_prep_progress_v3";
-    const SUBJECTS = [
-      {
-        id: "geo",
-        title: "География ОГЭ",
-        shortTitle: "География",
-        icon: "🌍",
-        description: "Тренажёр по географии ОГЭ: карты, климат, население, природные зоны и практические задания.",
-        topics: [
-          "Климат и погода",
-          "Реки и озёра",
-          "Природные зоны",
-          "Население России",
-          "Хозяйство России",
-          "Карта и координаты"
-        ],
-        questions: [
-          {
-            topic: "Климат и погода",
-            q: "Какая река является самой длинной в России?",
-            options: ["Волга", "Лена", "Енисей", "Обь"],
-            answer: "Лена",
-            explanation: "Лена считается самой длинной рекой России. На ОГЭ важно знать крупные географические объекты и их признаки."
-          },
-          {
-            topic: "Климат и погода",
-            q: "Какой климат преобладает в Центральной России?",
-            options: ["Тропический", "Умеренно-континентальный", "Арктический", "Муссонный"],
-            answer: "Умеренно-континентальный",
-            explanation: "Центральная Россия находится в умеренном поясе, поэтому здесь преобладает умеренно-континентальный климат."
-          },
-          {
-            topic: "Реки и озёра",
-            q: "Какое озеро является самым глубоким в мире?",
-            options: ["Каспийское море", "Байкал", "Ладожское озеро", "Онежское озеро"],
-            answer: "Байкал",
-            explanation: "Байкал — самое глубокое озеро мира и один из ключевых объектов, которые часто встречаются в ОГЭ."
-          },
-          {
-            topic: "Природные зоны",
-            q: "Какая природная зона находится севернее остальных в России?",
-            options: ["Степь", "Тундра", "Лесостепь", "Смешанные леса"],
-            answer: "Тундра",
-            explanation: "Тундра находится ближе к Арктике, поэтому она расположена севернее других перечисленных зон."
-          },
-          {
-            topic: "Население России",
-            q: "Что показывает плотность населения?",
-            options: ["Количество городов", "Число людей на 1 км²", "Среднюю зарплату", "Количество рек"],
-            answer: "Число людей на 1 км²",
-            explanation: "Плотность населения показывает, сколько людей приходится на единицу площади."
-          },
-          {
-            topic: "Хозяйство России",
-            q: "Какая отрасль относится к первичному сектору экономики?",
-            options: ["Образование", "Торговля", "Сельское хозяйство", "Банковская деятельность"],
-            answer: "Сельское хозяйство",
-            explanation: "Первичный сектор связан с добычей сырья и получением продукции из природы."
-          }
-        ]
-      }
-    ];
+<!-- THEORY -->
 
-    const AI_CONFIG = { enabled: false, endpoint: "" };
+<div class="screen" id="s-theory">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
+  <div class="scroll" id="theory-content"></div>
+</div>
 
-    const state = {
-      currentSubjectId: "geo",
-      currentQuiz: [],
-      currentQuestionIndex: 0,
-      correct: 0,
-      wrong: 0,
-      answered: false,
-      currentQuestion: null,
-      progress: loadProgress()
-    };
+<!-- TOPIC -->
 
-    let currentSubjectId = "geo";
+<div class="screen" id="s-topic">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+  <div class="scroll" id="topic-content"></div>
+</div>
 
-    try {
-      if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        Telegram.WebApp.expand();
-        if (Telegram.WebApp.setHeaderColor) Telegram.WebApp.setHeaderColor("#0b1020");
-        if (Telegram.WebApp.setBackgroundColor) Telegram.WebApp.setBackgroundColor("#0b1020");
-      }
-    } catch (e) {}
+<!-- QUIZ -->
 
-    function getSubject(subjectId) {
-      return SUBJECTS.find(s => s.id === subjectId) || SUBJECTS[0];
-    }
+<div class="screen" id="s-quiz">
+  <div class="topbar">
+    <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
+    <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
+    <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
+  </div>
+  <div class="quiz-wrap">
+    <div class="q-progress"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
+    <div class="q-card">
+      <div class="q-tag" id="q-tag">Задание</div>
+      <div class="q-text" id="q-text">...</div>
+    </div>
+    <div class="answers" id="answers"></div>
+    <div id="ai-quiz" class="ai-panel" style="display:none"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
+  </div>
+</div>
 
-    function getProgressKey(subjectId) {
-      return `subject:${subjectId}`;
-    }
+<!-- RESULT -->
 
-    function defaultSubjectProgress() {
-      return {
-        solved: 0,
-        correct: 0,
-        wrong: 0,
-        streak: 0,
-        bestStreak: 0,
-        lastPractice: "",
-        history: [],
-        byTopic: {}
-      };
-    }
+<div class="screen" id="s-result">
+  <div class="result-wrap">
+    <div class="result-emoji" id="res-emoji">🎉</div>
+    <div class="result-title" id="res-title">Отлично!</div>
+    <div class="result-sub" id="res-sub">Ты справился!</div>
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
+        <circle class="ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
+    </div>
+    <div class="res-stats">
+      <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
+      <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
+      <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-full primary" onclick="goScreen('s-home')">📚 На главную</button>
+      <button class="btn-full sec" onclick="goQuiz()">🔄 Ещё раз</button>
+    </div>
+  </div>
+</div>
 
-    function loadProgress() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        return raw ? JSON.parse(raw) : {};
-      } catch (e) {
-        return {};
-      }
-    }
+<!-- EXAM -->
 
-    function saveProgress() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
-    }
+<div class="screen" id="s-exam">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🎯 Пробник</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="grid">
+      <div class="grid-item" onclick="goQuiz()">🚀 Начать</div>
+      <div class="grid-item" onclick="goQuiz()">📋 Лёгкий</div>
+      <div class="grid-item" onclick="goQuiz()">📋 Средний</div>
+      <div class="grid-item" onclick="goQuiz()">📋 Сложный</div>
+    </div>
+    <div id="ai-exam" class="ai-panel"></div>
+  </div>
+</div>
 
-    function ensureSubjectProgress(subjectId) {
-      const key = getProgressKey(subjectId);
-      if (!state.progress[key]) state.progress[key] = defaultSubjectProgress();
-      return state.progress[key];
-    }
+<!-- MAPS -->
 
-    function calcAccuracy(correct, wrong) {
-      const total = correct + wrong;
-      if (!total) return 0;
-      return Math.round((correct / total) * 100);
-    }
+<div class="screen" id="s-maps">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🗺️ Карты</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="grid"><div class="grid-item">🧭 Координаты</div><div class="grid-item">📐 Топокарта</div><div class="grid-item">🌐 Атлас мира</div><div class="grid-item">📍 Карта России</div></div>
+    <div id="ai-maps" class="ai-panel"></div>
+  </div>
+</div>
 
-    function shuffle(arr) {
-      for (let i = arr.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [arr[i], arr[j]] = [arr[j], arr[i]];
-      }
-      return arr;
-    }
+<!-- STATS -->
 
-    function setSubtitle(text) {
-      document.getElementById("appSubtitle").textContent = text;
-    }
+<div class="screen" id="s-stats">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="xp-panel"><div class="xp-icon">⭐</div><div style="flex:1"><div class="xp-title">Балл: 24 / 31</div><div class="xp-bar"><div class="xp-fill" style="width:77%"></div></div><div class="xp-stats">Заданий: 187 · Точность: 78%</div></div></div>
+    <p style="color:var(--muted);font-size:12px">Слабые темы: климатограммы, часовые пояса.</p>
+    <div id="ai-stats" class="ai-panel"></div>
+  </div>
+</div>
 
-    function showBack(show) {
-      document.getElementById("btnBack").style.display = show ? "inline-flex" : "none";
-    }
+<!-- HACKS -->
 
-    function switchView(name) {
-      ["home", "subject", "quiz", "topics", "stats", "ai"].forEach(v => {
-        document.getElementById(`view-${v}`).classList.remove("active");
-      });
-      document.getElementById(`view-${name}`).classList.add("active");
-      showBack(name !== "home");
+<div class="screen" id="s-hacks">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💡 Лайфхаки</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="grid"><div class="grid-item">🧠 Запоминалки</div><div class="grid-item">✍️ Шаблоны</div><div class="grid-item">🗺️ Карточки</div><div class="grid-item">⏰ Тайминг</div></div>
+    <div id="ai-hacks" class="ai-panel"></div>
+  </div>
+</div>
 
-      try {
-        if (window.Telegram && Telegram.WebApp && Telegram.WebApp.BackButton) {
-          if (name === "home") Telegram.WebApp.BackButton.hide();
-          else {
-            Telegram.WebApp.BackButton.show();
-            Telegram.WebApp.BackButton.onClick(goHome);
-          }
-        }
-      } catch (e) {}
-    }
+<!-- DAILY -->
 
-    function showView(name) {
-      if (name === "stats") renderStats();
-      if (name === "ai") {
-        document.getElementById("aiFeedback").className = "feedback";
-        document.getElementById("aiFeedback").textContent = AI_CONFIG.enabled ? "AI подключён." : "AI пока не подключён. Но точка интеграции уже готова.";
-      }
-      switchView(name);
-    }
+<div class="screen" id="s-daily">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🔥 Задание дня</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="xp-panel"><div class="xp-icon">🌍</div><div><div class="xp-title">Определи страну по контуру!</div><p style="color:var(--muted);font-size:12px">Крупнейшая страна Южной Америки.</p></div></div>
+    <div class="grid"><div class="grid-item" onclick="alert('Правильно! +10 XP')">🇧🇷 Бразилия</div><div class="grid-item" onclick="alert('Неверно')">🇦🇷 Аргентина</div></div>
+    <div id="ai-daily" class="ai-panel"></div>
+  </div>
+</div>
 
-    function goHome() {
-      renderHome();
-      switchView("home");
-      setSubtitle("География, прогресс и задел на AI");
-    }
+<!-- SUB / SCHED / FRIENDS -->
 
-    function showSubject(subjectId) {
-      state.currentSubjectId = subjectId;
-      currentSubjectId = subjectId;
-      const subject = getSubject(subjectId);
-      setSubtitle(`${subject.shortTitle} • ОГЭ 4–5`);
-      renderSubject(subjectId);
-      switchView("subject");
-    }
+<div class="screen" id="s-sub">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Активен до 30.06.2025</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
+</div>
+<div class="screen" id="s-sched">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📅 Расписание</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📆</div><div><div class="xp-title">Сегодня: теория + пробник</div><p style="color:var(--muted);font-size:12px">5 занятий по 25 минут в неделю</p></div></div></div>
+</div>
+<div class="screen" id="s-friends">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👥 Друзья</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">🏆</div><div><div class="xp-title">Рейтинг друзей</div><p style="color:var(--muted);font-size:12px">Ты на 2 месте, 12 баллов до первого</p></div></div><div class="grid"><div class="grid-item">📩 Пригласить</div><div class="grid-item">📊 Рейтинг</div></div></div>
+</div>
 
-    function showTopics() {
-      renderTopics();
-      switchView("topics");
-    }
+<script>
+const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 
-    function resetAll() {
-      if (!confirm("Сбросить весь прогресс?")) return;
-      localStorage.removeItem(STORAGE_KEY);
-      state.progress = {};
-      renderHome();
-      renderSubject(state.currentSubjectId);
-      renderStats();
-      goHome();
-    }
+const theoryData = {
+  s1:{ title:'1. Географическое изучение Земли', topics:['1.1 География – наука о планете Земля','1.2 История географических открытий'] },
+  s2:{ title:'2. Изображения земной поверхности', topics:['2.1 Планы местности. Масштаб','2.2 Географические карты и их виды'] },
+  s3:{ title:'3. Земля – планета Солнечной системы', topics:['3.1 Форма и размеры Земли','3.2 Географические координаты','3.3 Движение Земли'] },
+  s4:{ title:'4. Оболочки Земли', topics:['4.1 Литосфера','4.2 Гидросфера','4.3 Атмосфера и климат','4.4 Биосфера','4.5 Географическая оболочка'] },
+  s5:{ title:'5. Человечество на Земле', topics:['5.1 Население Земли','5.2 Народы и религии мира','5.3 Материки и страны'] },
+  s6:{ title:'6. Природа и общество', topics:['6.1 Природные ресурсы','6.2 Экологические проблемы','6.3 Глобальные проблемы человечества'] },
+  s7:{ title:'7. География России', topics:['7.1 Географическое положение','7.2 Природа России','7.3 Население России','7.4 Хозяйство России','7.5 Регионы России'] }
+};
 
-    function renderHome() {
-      const grid = document.getElementById("subjectsGrid");
-      grid.innerHTML = "";
+const quizQ = [
+  { tag:'Задание 2', text:'Какой тип климата характерен для большей части России?', answers:['Арктический','Умеренно-континентальный','Субтропический','Тропический'], correct:1, topic:'Климат России' },
+  { tag:'Задание 5', text:'В каком направлении в России возрастает континентальность климата?', answers:['С севера на юг','С запада на восток','С юга на север','С востока на запад'], correct:1, topic:'Климат России' },
+  { tag:'Задание 1', text:'Какая река в России является самой длинной?', answers:['Волга','Обь','Енисей','Лена'], correct:3, topic:'Реки России' },
+  { tag:'Задание 3', text:'Какое озеро является самым глубоким в мире?', answers:['Каспийское','Байкал','Ладожское','Онежское'], correct:1, topic:'Озёра мира' },
+  { tag:'Задание 7', text:'Как называется преобладающий тип воспроизводства населения в России?', answers:['Традиционный','Расширенное','Суженное','Нулевой прирост'], correct:2, topic:'Население России' },
+  { tag:'Задание 4', text:'На каком хребте расположена гора Эльбрус?', answers:['Уральские горы','Алтай','Большой Кавказ','Саяны'], correct:2, topic:'Рельеф России' },
+  { tag:'Задание 8', text:'Какой город России является крупнейшим по численности?', answers:['Санкт-Петербург','Новосибирск','Москва','Екатеринбург'], correct:2, topic:'Города России' },
+  { tag:'Задание 12', text:'Какая отрасль является основой экспорта России?', answers:['Машиностроение','Топливно-энергетический комплекс','Лёгкая промышленность','Сельское хозяйство'], correct:1, topic:'Хозяйство России' },
+];
 
-      SUBJECTS.forEach(subject => {
-        const p = ensureSubjectProgress(subject.id);
-        const accuracy = calcAccuracy(p.correct, p.wrong);
-        const solved = p.solved || 0;
+let curQ=0, score=0, answered=false, shuffled=[];
 
-        const card = document.createElement("div");
-        card.className = "card subject-card";
-        card.onclick = () => showSubject(subject.id);
-        card.innerHTML = `
-          <div class="subject-top">
-            <div class="subject-icon">${subject.icon}</div>
-            <div style="min-width:0;">
-              <h3 class="subject-title">${subject.title}</h3>
-              <p class="subject-desc">${subject.description}</p>
-            </div>
-          </div>
-          <div class="subject-footer">
-            <div class="chip-row">
-              <span class="chip">📝 ${subject.topics.length} тем</span>
-              <span class="chip">✅ ${solved} решено</span>
-              <span class="chip">🎯 ${accuracy}%</span>
-            </div>
-            <button class="btn small primary" type="button">Открыть</button>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
 
-      const subject = getSubject(state.currentSubjectId);
-      const p = ensureSubjectProgress(subject.id);
-      const accuracy = calcAccuracy(p.correct, p.wrong);
-      const progressPct = Math.min(100, Math.round((p.solved / Math.max(1, subject.questions.length)) * 100));
-      document.getElementById("homeProgressLabel").textContent = `${subject.shortTitle}: ${p.solved}/${subject.questions.length}`;
-      document.getElementById("homeAccuracyLabel").textContent = `Точность: ${accuracy}%`;
-      document.getElementById("homeProgressFill").style.width = `${progressPct}%`;
-    }
+function goQuiz() {
+  shuffled=[...quizQ].sort(()=>Math.random()-.5).slice(0,5);
+  curQ=0; score=0; answered=false;
+  goScreen('s-quiz');
+  renderQ();
+}
 
-    function renderSubject(subjectId) {
-      const subject = getSubject(subjectId);
-      const p = ensureSubjectProgress(subjectId);
-      const accuracy = calcAccuracy(p.correct, p.wrong);
-      const progressPct = Math.min(100, Math.round((p.solved / Math.max(1, subject.questions.length)) * 100));
+function initTheory() {
+  let html='';
+  for(const [k,s] of Object.entries(theoryData)) {
+    html+=`<div class="topic-item" onclick="showTopic('${k}')">${s.title}</div>`;
+  }
+  document.getElementById('theory-content').innerHTML=`
+    <div class="sec-title">📚 Разделы теории</div>
+    <div class="topic-list">${html}</div>
+    <div id="ai-theory" class="ai-panel"></div>
+  `;
+  initAI('ai-theory','теория по географии для ОГЭ',['🎯 С чего начать?','❓ Что чаще спрашивают?','💡 Дай запоминалку']);
+}
 
-      document.getElementById("crumbSubject").textContent = subject.shortTitle;
-      document.getElementById("quizCrumbSubject").textContent = subject.shortTitle;
-      document.getElementById("topicsCrumbSubject").textContent = subject.shortTitle;
-      document.getElementById("subjectTitle").textContent = `${subject.title} ${subject.icon}`;
-      document.getElementById("subjectDescription").textContent = subject.description;
-      document.getElementById("subjectStatsChip").textContent = `${subject.questions.length} заданий`;
-      document.getElementById("subjectAccuracyChip").textContent = `${accuracy}% точность`;
-      document.getElementById("subjectProgressLabel").textContent = `Прогресс: ${p.solved}/${subject.questions.length}`;
-      document.getElementById("subjectStreakLabel").textContent = `Серия: ${p.streak || 0}`;
-      document.getElementById("subjectProgressFill").style.width = `${progressPct}%`;
-      document.getElementById("lastPracticeInfo").textContent = p.lastPractice ? `Последняя попытка: ${p.lastPractice}` : "Пока нет попыток";
-      document.getElementById("subjectPreviewCard").innerHTML = `
-        <div class="empty">
-          Здесь будет активная практика по теме. После ответа появится объяснение, а прогресс сохранится автоматически.
-          <br><br>
-          Архитектура уже готова для AI-разбора без переписывания интерфейса.
-        </div>
-      `;
-      renderTopicsList("topicsList", subject);
-      renderHome();
-    }
-
-    function renderTopics() {
-      const subject = getSubject(state.currentSubjectId);
-      document.getElementById("topicsTitle").textContent = `Темы по ${subject.shortTitle.toLowerCase()}`;
-      renderTopicsList("topicsListLarge", subject);
-    }
-
-    function renderTopicsList(containerId, subject) {
-      const container = document.getElementById(containerId);
-      if (!container) return;
-      container.innerHTML = "";
-      subject.topics.forEach(topic => {
-        const item = document.createElement("div");
-        item.className = "topic-item";
-        item.innerHTML = `
-          <div>
-            <p class="topic-name">${topic}</p>
-            <div class="topic-meta">Точка расширения для AI-разбора и новых вопросов</div>
-          </div>
-          <button class="btn small" type="button" onclick="startTopicPractice(${JSON.stringify(topic)})">Тренировать</button>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    function startQuiz() {
-      const subject = getSubject(state.currentSubjectId);
-      state.currentQuiz = shuffle([...subject.questions]);
-      state.currentQuestionIndex = 0;
-      state.correct = 0;
-      state.wrong = 0;
-      state.answered = false;
-      state.currentQuestion = null;
-
-      document.getElementById("quizTitle").textContent = `${subject.shortTitle}: тренировка`;
-      document.getElementById("quizTopicChip").textContent = "Тема: смешанная";
-      switchView("quiz");
-      showQuestion();
-    }
-
-    function startTopicPractice(topic) {
-      const subject = getSubject(state.currentSubjectId);
-      const filtered = subject.questions.filter(q => q.topic === topic);
-      state.currentQuiz = filtered.length ? shuffle([...filtered]) : shuffle([...subject.questions]);
-      state.currentQuestionIndex = 0;
-      state.correct = 0;
-      state.wrong = 0;
-      state.answered = false;
-      state.currentQuestion = null;
-
-      document.getElementById("quizTitle").textContent = `${subject.shortTitle}: ${topic}`;
-      document.getElementById("quizTopicChip").textContent = `Тема: ${topic}`;
-      switchView("quiz");
-      showQuestion();
-    }
-
-    function restartQuiz() {
-      startQuiz();
-    }
-
-    function showQuestion() {
-      const question = state.currentQuiz[state.currentQuestionIndex];
-      state.currentQuestion = question;
-      state.answered = false;
-
-      document.getElementById("quizProgress").textContent = `Вопрос ${state.currentQuestionIndex + 1} из ${state.currentQuiz.length}`;
-      document.getElementById("quizScoreChip").textContent = `${state.correct} / ${state.correct + state.wrong}`;
-      document.getElementById("questionText").textContent = question.q;
-
-      const answersGrid = document.getElementById("answersGrid");
-      answersGrid.innerHTML = "";
-      question.options.forEach(opt => {
-        const btn = document.createElement("button");
-        btn.className = "answer-btn";
-        btn.type = "button";
-        btn.textContent = opt;
-        btn.onclick = () => checkAnswer(opt);
-        answersGrid.appendChild(btn);
-      });
-
-      const fb = document.getElementById("feedbackBox");
-      fb.className = "feedback";
-      fb.textContent = "Выбери ответ, чтобы увидеть проверку и объяснение.";
-      document.getElementById("btnNext").disabled = true;
-      document.getElementById("btnFinish").disabled = true;
-    }
-
-    function checkAnswer(answer) {
-      if (state.answered) return;
-      state.answered = true;
-
-      const question = state.currentQuestion;
-      const buttons = Array.from(document.querySelectorAll(".answer-btn"));
-      const isCorrect = answer === question.answer;
-      const p = ensureSubjectProgress(state.currentSubjectId);
-
-      buttons.forEach(btn => {
-        btn.disabled = true;
-        if (btn.textContent === question.answer) btn.classList.add("correct");
-        if (btn.textContent === answer && !isCorrect) btn.classList.add("wrong");
-      });
-
-      if (isCorrect) {
-        state.correct += 1;
-        p.correct += 1;
-        p.streak = (p.streak || 0) + 1;
-        p.bestStreak = Math.max(p.bestStreak || 0, p.streak);
-      } else {
-        state.wrong += 1;
-        p.wrong += 1;
-        p.streak = 0;
-      }
-
-      p.solved += 1;
-      p.lastPractice = new Date().toLocaleString("ru-RU");
-      const topic = question.topic || "Без темы";
-      if (!p.byTopic[topic]) p.byTopic[topic] = { solved: 0, correct: 0, wrong: 0 };
-      p.byTopic[topic].solved += 1;
-      if (isCorrect) p.byTopic[topic].correct += 1; else p.byTopic[topic].wrong += 1;
-      p.history.unshift({
-        q: question.q,
-        selected: answer,
-        correct: question.answer,
-        topic,
-        isCorrect,
-        ts: new Date().toLocaleString("ru-RU")
-      });
-      p.history = p.history.slice(0, 10);
-      saveProgress();
-
-      const fb = document.getElementById("feedbackBox");
-      if (isCorrect) {
-        fb.className = "feedback good";
-        fb.innerHTML = `<b>✅ Верно.</b><br>${question.explanation}`;
-      } else {
-        fb.className = "feedback bad";
-        fb.innerHTML = `<b>❌ Неверно.</b><br>Твой ответ: <b>${answer}</b><br>Правильный ответ: <b>${question.answer}</b><br><br>${question.explanation}`;
-      }
-
-      document.getElementById("quizScoreChip").textContent = `${state.correct} / ${state.correct + state.wrong}`;
-      document.getElementById("btnNext").disabled = false;
-      document.getElementById("btnFinish").disabled = false;
-
-      renderSubject(state.currentSubjectId);
-      renderStats();
-    }
-
-    function nextQuestion() {
-      if (state.currentQuestionIndex < state.currentQuiz.length - 1) {
-        state.currentQuestionIndex += 1;
-        showQuestion();
-      } else {
-        finishQuiz();
-      }
-    }
-
-    function finishQuiz() {
-      const p = ensureSubjectProgress(state.currentSubjectId);
-      p.lastPractice = new Date().toLocaleString("ru-RU");
-      saveProgress();
-      alert(`Тренировка завершена.\nПравильных: ${state.correct}\nОшибок: ${state.wrong}`);
-      renderSubject(state.currentSubjectId);
-      renderStats();
-      showSubject(state.currentSubjectId);
-    }
-
-    function renderStats() {
-      const subject = getSubject(state.currentSubjectId);
-      const p = ensureSubjectProgress(subject.id);
-      const accuracy = calcAccuracy(p.correct, p.wrong);
-      const progressPct = Math.min(100, Math.round((p.solved / Math.max(1, subject.questions.length)) * 100));
-
-      document.getElementById("statsAccuracyChip").textContent = `Точность: ${accuracy}%`;
-      document.getElementById("statsSolvedChip").textContent = `Решено: ${p.solved || 0}`;
-      document.getElementById("statsStreakChip").textContent = `Серия: ${p.streak || 0}`;
-      document.getElementById("statsProgressLabel").textContent = `Прогресс: ${p.solved || 0}/${subject.questions.length}`;
-      document.getElementById("statsTotalLabel").textContent = `Всего попыток: ${p.correct + p.wrong}`;
-      document.getElementById("statsProgressFill").style.width = `${progressPct}%`;
-
-      document.getElementById("statCorrect").textContent = p.correct || 0;
-      document.getElementById("statWrong").textContent = p.wrong || 0;
-      document.getElementById("statAccuracy").textContent = `${accuracy}%`;
-      document.getElementById("statSolved").textContent = p.solved || 0;
-
-      const historyList = document.getElementById("historyList");
-      historyList.innerHTML = "";
-      const history = p.history || [];
-      if (!history.length) {
-        historyList.innerHTML = `<div class="empty">Пока нет попыток. Реши первое задание — и история появится здесь.</div>`;
-        return;
-      }
-
-      history.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "history-item";
-        div.innerHTML = `
-          <div style="min-width:0;">
-            <p class="topic-name">${item.isCorrect ? "✅" : "❌"} ${item.topic}</p>
-            <div class="topic-meta">${item.q}</div>
-            <div class="topic-meta">Твой ответ: ${item.selected} • Правильный: ${item.correct} • ${item.ts}</div>
-          </div>
-        `;
-        historyList.appendChild(div);
-      });
-    }
-
-    async function askAi() {
-      const input = document.getElementById("aiInput").value.trim();
-      const fb = document.getElementById("aiFeedback");
-      if (!input) {
-        fb.className = "feedback bad";
-        fb.textContent = "Сначала напиши вопрос или тему.";
-        return;
-      }
-      if (!AI_CONFIG.enabled || !AI_CONFIG.endpoint) {
-        fb.className = "feedback";
-        fb.innerHTML = `AI пока не подключён, но запрос готов: <b>${escapeHtml(input)}</b>`;
-        return;
-      }
-
-      try {
-        fb.className = "feedback";
-        fb.textContent = "Отправляю запрос...";
-        const res = await fetch(AI_CONFIG.endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            subject: getSubject(state.currentSubjectId).shortTitle,
-            query: input,
-            progress: ensureSubjectProgress(state.currentSubjectId)
-          })
-        });
-        const data = await res.json();
-        fb.innerHTML = data.answer ? escapeHtml(data.answer) : "AI ответил, но формат не тот.";
-      } catch (e) {
-        fb.className = "feedback bad";
-        fb.textContent = "Не удалось получить ответ AI.";
-      }
-    }
-
-    function fillAiExample() {
-      document.getElementById("aiInput").value = "Объясни, почему Байкал считается уникальным объектом России";
-    }
-
-    function startAiHelper() {
-      showView("ai");
-    }
-
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
-
-    function init() {
-      renderHome();
-      renderSubject(state.currentSubjectId);
-      renderStats();
-      setSubtitle("География, прогресс и задел на AI");
-      goHome();
-    }
-
-    init();
-  </script>
-</body>
-</html>
+function showTopic(key) {
+  const s=theoryData[key];
+  document.getElementById('topic-title').textContent=s.title;
+  let html=`<div class="topic-list">`;
+  s.topics.forEach(t=>{html+=`<div class="topic-item">${t}</div>`;});
+  html+=`</div><div id="ai-topic" class="ai-panel"></div>`;
+  document.getElementById('topic-content').innerHTML=html;
+  initAI('ai-topic',s.title,['📖 Объясни простыми словами','❓ Какие задания по этой теме?','
