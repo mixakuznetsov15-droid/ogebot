@@ -26,7 +26,7 @@
 body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
 body::before {
-content:''; position:fixed; inset:0;
+content:’’; position:fixed; inset:0;
 background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
 radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
 pointer-events:none; z-index:0;
@@ -38,62 +38,62 @@ pointer-events:none; z-index:0;
 
 .topbar {
 padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
-background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+background:#0f1620; border-bottom:1px solid var(–border); flex-shrink:0;
 }
-.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
-.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
-.sublabel { font-size:10px; color:var(--muted); }
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(–primary),var(–primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.username { font-family:var(–font-h); font-size:13px; font-weight:700; }
+.sublabel { font-size:10px; color:var(–muted); }
 .streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
 
 .scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
 .scroll::-webkit-scrollbar { width:3px; }
 .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-.xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
+.xp-panel { background:var(–card2); border-radius:var(–radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(–border); }
 .xp-icon { font-size:26px; }
 .xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
-.xp-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
-.xp-stats { font-size:11px; color:var(--muted); }
+.xp-fill { height:100%; background:linear-gradient(90deg,var(–primary),var(–primary2)); border-radius:8px; }
+.xp-stats { font-size:11px; color:var(–muted); }
 .xp-title { font-weight:600; font-size:14px; }
 
 .actions { display:flex; gap:10px; }
-.btn { flex:1; padding:14px 6px; border-radius:var(--radius); background:var(--card2); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
+.btn { flex:1; padding:14px 6px; border-radius:var(–radius); background:var(–card2); border:1px solid var(–border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(–text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
 .btn:active { transform:scale(.97); }
-.btn.primary { background:linear-gradient(135deg,var(--primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
-.btn.accent { background:linear-gradient(135deg,var(--primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
+.btn.primary { background:linear-gradient(135deg,var(–primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
+.btn.accent { background:linear-gradient(135deg,var(–primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
 .btn-icon { font-size:24px; }
 
 .grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.grid-item { background:var(--card2); border-radius:var(--radius); padding:14px; border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
+.grid-item { background:var(–card2); border-radius:var(–radius); padding:14px; border:1px solid var(–border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
 .grid-item:active { background:#253544; }
 
-.sec-title { font-family:var(--font-h); font-size:14px; font-weight:700; }
-.back-link { color:var(--primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+.sec-title { font-family:var(–font-h); font-size:14px; font-weight:700; }
+.back-link { color:var(–primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
 
 .topic-list { display:flex; flex-direction:column; gap:8px; }
-.topic-item { background:var(--card2); border-radius:var(--radius); padding:12px 14px; border:1px solid var(--border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
+.topic-item { background:var(–card2); border-radius:var(–radius); padding:12px 14px; border:1px solid var(–border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
 .topic-item:active { background:#253544; }
 
-.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100; }
-.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; font-weight:500; cursor:pointer; }
-.nav-item.active { color:var(--primary); }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(–border); display:flex; padding:10px 0 22px; z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(–muted); font-size:10px; font-weight:500; cursor:pointer; }
+.nav-item.active { color:var(–primary); }
 .nav-icon { font-size:20px; }
 
-/* AI PANEL */
-.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
+/* ── AI PANEL ── */
+.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(–radius); overflow:hidden; }
 .ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
 .ai-header-left { display:flex; align-items:center; gap:10px; }
-.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
-.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
-.ai-tagline { font-size:10px; color:var(--muted); }
-.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
+.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(–primary),var(–primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.ai-name { font-size:13px; font-weight:700; color:var(–primary); }
+.ai-tagline { font-size:10px; color:var(–muted); }
+.ai-toggle { font-size:18px; color:var(–muted); transition:transform .3s; }
 .ai-toggle.open { transform:rotate(180deg); }
 
 .ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
 .ai-body.open { display:flex; animation:fadeUp .25s ease; }
 
 .ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
-.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
+.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(–primary); cursor:pointer; font-family:var(–font-b); transition:.15s; }
 .ai-prompt-btn:active { background:#58a6ff30; }
 
 .ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
@@ -101,68 +101,70 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 .ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
 
 .msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
-.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
-.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
-.msg.loading { color:var(--muted); font-style:italic; }
+.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(–text); }
+.msg.ai { background:var(–card); border:1px solid var(–border); align-self:flex-start; color:#c8d8e8; }
+.msg.loading { color:var(–muted); font-style:italic; }
 
 .ai-input-row { display:flex; gap:8px; align-items:flex-end; }
-.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
+.ai-input { flex:1; background:var(–card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(–text); font-family:var(–font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
 .ai-input:focus { border-color:#58a6ff60; }
-.ai-input::placeholder { color:var(--muted); }
-.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.ai-input::placeholder { color:var(–muted); }
+.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(–primary),var(–primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
 .ai-send:active { transform:scale(.93); }
 .ai-send:disabled { opacity:.5; cursor:default; }
-.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
+.ai-context { font-size:10px; color:var(–muted); background:var(–card); border:1px solid var(–border); border-radius:8px; padding:4px 8px; }
 
-/* QUIZ */
+/* ── QUIZ ── */
 .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
 .quiz-wrap::-webkit-scrollbar { width:3px; }
 .q-header { display:flex; justify-content:space-between; align-items:center; }
-.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
-.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
-.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
-.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+.q-progress { height:4px; background:var(–card2); border-radius:8px; overflow:hidden; }
+.q-progress-fill { height:100%; background:linear-gradient(90deg,var(–primary),var(–primary2)); transition:width .4s ease; }
+.q-card { background:var(–card2); border:1px solid var(–border); border-radius:var(–radius); padding:18px; }
+.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(–primary); margin-bottom:10px; }
 .q-text { font-size:15px; line-height:1.55; font-weight:500; }
 .answers { display:flex; flex-direction:column; gap:8px; }
-.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
+.ans-btn { background:var(–card2); border:1.5px solid var(–border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(–font-b); font-size:13px; color:var(–text); transition:.15s; }
 .ans-btn:active { transform:scale(.98); }
-.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
-.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+.ans-btn.correct { border-color:var(–primary2); background:rgba(63,185,80,.1); }
+.ans-btn.wrong { border-color:var(–danger); background:rgba(248,81,73,.1); }
 .ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
-.ans-btn.correct .ans-letter { background:var(--primary2); }
-.ans-btn.wrong .ans-letter { background:var(--danger); }
-.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
+.ans-btn.correct .ans-letter { background:var(–primary2); }
+.ans-btn.wrong .ans-letter { background:var(–danger); }
+.btn-next { width:100%; background:linear-gradient(135deg,var(–primary),var(–primary2)); color:#fff; border:none; border-radius:var(–radius); padding:16px; font-family:var(–font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
 .btn-next.show { display:block; animation:fadeUp .3s ease; }
 .btn-next:active { transform:scale(.97); }
 
-/* RESULT */
+/* ── RESULT ── */
 .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
 .result-emoji { font-size:64px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
 @keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
-.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
-.result-sub { font-size:14px; color:var(--muted); }
+.result-title { font-family:var(–font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.result-sub { font-size:14px; color:var(–muted); }
 .ring-wrap { position:relative; width:130px; height:130px; }
 .ring-wrap svg { transform:rotate(-90deg); }
-.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+.ring-bg { fill:none; stroke:var(–card2); stroke-width:10; }
 .ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
 .ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
-.ring-denom { font-size:12px; color:var(--muted); }
+.ring-num { font-family:var(–font-h); font-size:28px; font-weight:800; }
+.ring-denom { font-size:12px; color:var(–muted); }
 .res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
-.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
-.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
-.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
-.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
+.res-stat { background:var(–card2); border:1px solid var(–border); border-radius:14px; padding:12px 8px; text-align:center; }
+.res-num { font-family:var(–font-h); font-size:18px; font-weight:800; }
+.res-num.g{color:var(–primary2)} .res-num.r{color:var(–danger)} .res-num.y{color:var(–gold)}
+.res-label { font-size:10px; color:var(–muted); margin-top:3px; }
 .res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
-.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+.btn-full { width:100%; padding:16px; border-radius:var(–radius); font-family:var(–font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
 .btn-full:active { transform:scale(.97); }
-.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
-.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-full.primary { background:linear-gradient(135deg,var(–primary),var(–primary2)); color:#fff; border:none; }
+.btn-full.sec { background:transparent; color:var(–muted); border:1px solid var(–border); }
 </style>
+
 </head>
 <body>
 
 <!-- HOME -->
+
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -203,18 +205,21 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- THEORY -->
+
 <div class="screen" id="s-theory">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
   <div class="scroll" id="theory-content"></div>
 </div>
 
 <!-- TOPIC -->
+
 <div class="screen" id="s-topic">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
   <div class="scroll" id="topic-content"></div>
 </div>
 
 <!-- QUIZ -->
+
 <div class="screen" id="s-quiz">
   <div class="topbar">
     <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
@@ -234,6 +239,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- RESULT -->
+
 <div class="screen" id="s-result">
   <div class="result-wrap">
     <div class="result-emoji" id="res-emoji">🎉</div>
@@ -260,6 +266,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- EXAM -->
+
 <div class="screen" id="s-exam">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🎯 Пробник</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -274,6 +281,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- MAPS -->
+
 <div class="screen" id="s-maps">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🗺️ Карты</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -283,6 +291,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- STATS -->
+
 <div class="screen" id="s-stats">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -293,6 +302,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- HACKS -->
+
 <div class="screen" id="s-hacks">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💡 Лайфхаки</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -302,6 +312,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- DAILY -->
+
 <div class="screen" id="s-daily">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🔥 Задание дня</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -312,6 +323,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- SUB / SCHED / FRIENDS -->
+
 <div class="screen" id="s-sub">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
   <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Активен до 30.06.2025</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
@@ -332,11 +344,26 @@ const theoryData = {
   s1:{ title:'1. Географическое изучение Земли', topics:['1.1 География – наука о планете Земля','1.2 История географических открытий'] },
   s2:{ title:'2. Изображения земной поверхности', topics:['2.1 Планы местности. Масштаб','2.2 Географические карты и их виды'] },
   s3:{ title:'3. Земля – планета Солнечной системы', topics:['3.1 Форма и размеры Земли','3.2 Географические координаты','3.3 Движение Земли'] },
-  s4:{ title:'4. Оболочки Земли', topics:['4.1 Литосфера','4.2 Гидросфера','4.3 Атмосфера и климат','4.4 Биосфера','4.5 Географическая оболочка'] },
+  s4:{ title:'4. Оболочки Земли', topics:['4.1 Литосфера','4.2 Гидросфера','4.3 Атмосфера и климат ⭐','4.4 Биосфера','4.5 Географическая оболочка'] },
   s5:{ title:'5. Человечество на Земле', topics:['5.1 Население Земли','5.2 Народы и религии мира','5.3 Материки и страны'] },
   s6:{ title:'6. Природа и общество', topics:['6.1 Природные ресурсы','6.2 Экологические проблемы','6.3 Глобальные проблемы человечества'] },
   s7:{ title:'7. География России', topics:['7.1 Географическое положение','7.2 Природа России','7.3 Население России','7.4 Хозяйство России','7.5 Регионы России'] }
 };
+
+// Материалы партнёра — задания 5 и 6 ОГЭ
+const atmosTheory = [
+  { topic:'🌦 Что проверяют задания 5 и 6?', content:'Оба задания выполняются по одной синоптической карте. Задание 5 — про циклон/антициклон (области давления). Задание 6 — про потепление/похолодание (атмосферные фронты). Одна карта — две разные логики решения.' },
+  { topic:'🌀 Циклон и антициклон', content:'Циклон (Н) — область низкого давления. Воздух движется к центру, поднимается, образуются облака и осадки.\n\nАнтициклон (В) — область высокого давления. Воздух опускается, прогревается, погода ясная и сухая.\n\nНа карте обозначаются буквами Н и В с замкнутыми изобарами.' },
+  { topic:'🌡 Тёплый и холодный фронты', content:'Тёплый фронт — линия с полукругами. Прохождение фронта обычно приносит потепление.\n\nХолодный фронт — линия с треугольниками. Прохождение фронта обычно приносит похолодание.\n\nВажно смотреть направление полукругов/треугольников — они указывают, куда движется фронт.' },
+  { topic:'🧭 Алгоритм решения задания 5', content:'1. Прочитай вопрос: «находится в зоне действия циклона/антициклона»\n2. Ищи на карте букву Н (циклон) или В (антициклон)\n3. Найди замкнутые изобары вокруг этой буквы\n4. Проверь, какой из городов находится внутри этой области\n5. Не отвлекайся на фронты, осадки и температуру!' },
+  { topic:'🧭 Алгоритм решения задания 6', content:'1. Прочитай вопрос: «вероятно потепление» или «вероятно похолодание»\n2. Ищи тёплый фронт (полукруги) или холодный фронт (треугольники)\n3. Посмотри, куда направлены полукруги/треугольники — это направление движения фронта\n4. Найди город, к которому фронт приближается (а не тот, который он уже прошёл)\n5. Не смотри на буквы Н/В как на главный ориентир' },
+  { topic:'🗺 Условные знаки на карте', content:'Н — область низкого давления (циклон)\nВ — область высокого давления (антициклон)\nИзобары — замкнутые линии равного давления\nТёплый фронт — линия с полукругами\nХолодный фронт — линия с треугольниками' },
+  { topic:'⚠️ Частые ловушки и ошибки', content:'1. Путать задания 5 и 6: в одном нужна область давления, в другом — фронт\n2. Выбирать город рядом с буквой, но не внутри замкнутых изобар\n3. Не учитывать направление движения фронта\n4. Ориентироваться на значки дождя или температуры' },
+  { topic:'💡 Типовые формулировки вопросов', content:'Задание 5: «Какой из городов находится в зоне действия циклона/антициклона?»\nЗадание 6: «В каком городе на следующий день наиболее вероятно существенное потепление/похолодание?»\n\n✅ Увидел циклон/антициклон → ищи Н/В\n✅ Увидел потепление/похолодание → ищи фронты' },
+];
+
+// Полный контекст для AI по теме атмосферы
+const atmosAIContext = `Задания 5 и 6 ОГЭ выполняются по одной синоптической карте. Задание 5 проверяет умение определять, в зоне действия циклона или антициклона находится город. Задание 6 проверяет умение прогнозировать изменение температуры в связи с прохождением атмосферных фронтов. Циклон — область низкого давления (Н), антициклон — область высокого давления (В). Тёплый фронт — линия с полукругами (потепление), холодный фронт — линия с треугольниками (похолодание). Алгоритм задания 5: найди Н или В, определи замкнутые изобары, найди город внутри области. Алгоритм задания 6: найди нужный фронт, определи направление движения, найди город впереди фронта. Частые ошибки: путаница между заданиями, выбор города позади фронта, ориентация на осадки вместо давления.`;
 
 const quizQ = [
   { tag:'Задание 2', text:'Какой тип климата характерен для большей части России?', answers:['Арктический','Умеренно-континентальный','Субтропический','Тропический'], correct:1, topic:'Климат России' },
@@ -346,7 +373,7 @@ const quizQ = [
   { tag:'Задание 7', text:'Как называется преобладающий тип воспроизводства населения в России?', answers:['Традиционный','Расширенное','Суженное','Нулевой прирост'], correct:2, topic:'Население России' },
   { tag:'Задание 4', text:'На каком хребте расположена гора Эльбрус?', answers:['Уральские горы','Алтай','Большой Кавказ','Саяны'], correct:2, topic:'Рельеф России' },
   { tag:'Задание 8', text:'Какой город России является крупнейшим по численности?', answers:['Санкт-Петербург','Новосибирск','Москва','Екатеринбург'], correct:2, topic:'Города России' },
-  { tag:'Задание 12', text:'Какая отрасль является основой экспорта России?', answers:['Машиностроение','Топливно-энергетический комплекс','Лёгкая промышленность','Сельское хозяйство'], correct:1, topic:'Хозяйство России' }
+  { tag:'Задание 12', text:'Какая отрасль является основой экспорта России?', answers:['Машиностроение','Топливно-энергетический комплекс','Лёгкая промышленность','Сельское хозяйство'], correct:1, topic:'Хозяйство России' },
 ];
 
 let curQ=0, score=0, answered=false, shuffled=[];
@@ -358,7 +385,7 @@ function goScreen(id) {
 }
 
 function goQuiz() {
-  shuffled=[...quizQ].sort(()=>Math.random()-0.5).slice(0,5);
+  shuffled=[...quizQ].sort(()=>Math.random()-.5).slice(0,5);
   curQ=0; score=0; answered=false;
   goScreen('s-quiz');
   renderQ();
@@ -379,13 +406,45 @@ function initTheory() {
 
 function showTopic(key) {
   const s=theoryData[key];
-  document.getElementById('topic-title').textContent=s.title;
-  let html=`<div class="topic-list">`;
-  s.topics.forEach(t=>{html+=`<div class="topic-item">${t}</div>`;});
-  html+=`</div><div id="ai-topic" class="ai-panel"></div>`;
-  document.getElementById('topic-content').innerHTML=html;
-  initAI('ai-topic',s.title,['📖 Объясни простыми словами','❓ Какие задания по этой теме?','🧠 Дай запоминалку','✅ Проверь мои знания'],true);
-  goScreen('s-topic');
+  document.getElementById("topic-title").textContent=s.title;
+  let html="";
+  s.topics.forEach(function(t,i){
+    if(t.includes("4.3")) {
+      html+="<div class=\"topic-item\" style=\"background:linear-gradient(135deg,#0f1e35,#0d1f2d);border-color:#58a6ff30\" onclick=\"showAtmos()\">";
+      html+="<div style=\"font-weight:700;color:var(--primary);margin-bottom:4px\">"+t+"</div>";
+      html+="<div style=\"font-size:11px;color:var(--muted)\">📖 8 карточек · Задания 5 и 6 · Материал репетитора</div></div>";
+    } else {
+      html+="<div class=\"topic-item\" style=\"opacity:.6\">"+t+" <span style=\"font-size:10px;color:var(--muted)\">· скоро</span></div>";
+    }
+  });
+  html+="<div id=\"ai-topic\" class=\"ai-panel\"></div>";
+  document.getElementById("topic-content").innerHTML="<div class=\"topic-list\">"+html+"</div>";
+  initAI("ai-topic",s.title,["📖 Объясни тему","❓ Что спрашивают на ОГЭ?","🧠 Дай запоминалку"]);
+  goScreen("s-topic");
+}
+
+function showAtmos() {
+  document.getElementById("topic-title").textContent="4.3 Атмосфера · Задания 5–6";
+  let html="<div style=\"display:flex;flex-direction:column;gap:12px\">";
+  atmosTheory.forEach(function(card,i){
+    html+="<div style=\"background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden\">";
+    html+="<div style=\"padding:12px 14px;background:#58a6ff08;border-bottom:1px solid #58a6ff20;display:flex;justify-content:space-between;align-items:center;cursor:pointer\" onclick=\"toggleCard(\\"card-"+i+"\\")\">";
+    html+="<div style=\"font-size:13px;font-weight:600\">"+card.topic+"</div>";
+    html+="<div id=\"arr-"+i+"\" style=\"color:var(--muted);font-size:14px\">▼</div></div>";
+    html+="<div id=\"card-"+i+"\" style=\"display:none;padding:14px;font-size:13px;line-height:1.65;color:#c8d8e8;white-space:pre-line\">"+card.content+"</div></div>";
+  });
+  html+="</div><div id=\"ai-atmos\" class=\"ai-panel\" style=\"margin-top:14px\"></div>";
+  document.getElementById("topic-content").innerHTML=html;
+  initAI("ai-atmos",atmosAIContext,["🌀 Объясни задание 5","🌡 Объясни задание 6","⚠️ Частые ошибки?","✅ Проверь знания"],false);
+  goScreen("s-topic");
+}
+
+function toggleCard(id) {
+  var el=document.getElementById(id);
+  var idx=id.split("-")[1];
+  var arr=document.getElementById("arr-"+idx);
+  if(el.style.display==="none"){el.style.display="block";arr.style.transform="rotate(180deg)";}
+  else{el.style.display="none";arr.style.transform="rotate(0deg)";}
 }
 
 function renderQ() {
@@ -453,105 +512,84 @@ function showResult() {
   setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset=339*(1-score/total); },100);
 }
 
-// AI Functions
+// ── AI ──
 function initAI(cid, ctx, prompts=[], autoOpen=false) {
-  const el = document.getElementById(cid);
+  const el=document.getElementById(cid);
   if(!el) return;
-  const escapedCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  el.innerHTML = `
+  el.innerHTML=`
     <div class="ai-header" onclick="toggleAI(this)">
       <div class="ai-header-left">
         <div class="ai-avatar">🤖</div>
         <div><div class="ai-name">AI-репетитор</div><div class="ai-tagline">Спроси — объясню как педагог</div></div>
       </div>
-      <div class="ai-toggle ${autoOpen ? 'open' : ''}">▼</div>
+      <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
     </div>
-    <div class="ai-body ${autoOpen ? 'open' : ''}">
+    <div class="ai-body ${autoOpen?'open':''}">
       <div class="ai-context">📌 ${ctx}</div>
-      <div class="ai-prompts">${prompts.map(p => `<button class="ai-prompt-btn" onclick="sendP('${cid}','${escapedCtx}','${p.replace(/'/g, "\\'")}')">${p}</button>`).join('')}</div>
+      <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="sendP('${cid}','${ctx.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
       <div class="ai-messages" id="msgs-${cid}"></div>
       <div class="ai-input-row">
-        <textarea class="ai-input" id="inp-${cid}" placeholder="Задай вопрос..." rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('${cid}','${escapedCtx}');}"></textarea>
-        <button class="ai-send" id="snd-${cid}" onclick="sendM('${cid}','${escapedCtx}')">➤</button>
-      </div>
-    </div>
-  `;
+        <textarea class="ai-input" id="inp-${cid}" placeholder="Задай вопрос..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('${cid}','${ctx.replace(/'/g,"\\'").replace(/"/g,'&quot;')}');}"></textarea>
+
+```
+    <button class="ai-send" id="snd-${cid}" onclick="sendM('${cid}','${ctx.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">➤</button>
+  </div>
+</div>
+```
+
+`;
 }
 
-function toggleAI(header) {
-  const body = header.nextElementSibling;
-  const toggle = header.querySelector('.ai-toggle');
-  if(body && toggle) {
-    body.classList.toggle('open');
-    toggle.classList.toggle('open');
-  }
+function toggleAI(h) {
+const b=h.nextElementSibling;
+const t=h.querySelector(’.ai-toggle’);
+b.classList.toggle(‘open’);
+t.classList.toggle(‘open’);
 }
 
-function sendP(cid, ctx, text) {
-  const inp = document.getElementById(`inp-${cid}`);
-  if(inp) inp.value = text;
-  sendM(cid, ctx);
+function sendP(cid,ctx,text) {
+document.getElementById(`inp-${cid}`).value=text;
+sendM(cid,ctx);
 }
 
-async function sendM(cid, ctx) {
-  const inp = document.getElementById(`inp-${cid}`);
-  const snd = document.getElementById(`snd-${cid}`);
-  const msgs = document.getElementById(`msgs-${cid}`);
-  if(!inp || !snd || !msgs) return;
-  
-  const text = inp.value.trim();
-  if(!text) return;
-  
-  inp.value = '';
-  if(snd) snd.disabled = true;
-  
-  msgs.innerHTML += `<div class="msg user">${escapeHtml(text)}</div>`;
-  const lid = 'l' + Date.now();
-  msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Думаю...</div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-  
-  try {
-    const response = await fetch(PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: text, context: ctx })
-    });
-    const data = await response.json();
-    const answer = data.answer || 'Не удалось получить ответ';
-    const msgDiv = document.getElementById(lid);
-    if(msgDiv) msgDiv.remove();
-    msgs.innerHTML += `<div class="msg ai">${escapeHtml(answer).replace(/\n/g, '<br>')}</div>`;
-  } catch(e) {
-    const msgDiv = document.getElementById(lid);
-    if(msgDiv) msgDiv.remove();
-    msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`;
-  }
-  
-  if(snd) snd.disabled = false;
-  msgs.scrollTop = msgs.scrollHeight;
+async function sendM(cid,ctx) {
+const inp=document.getElementById(`inp-${cid}`);
+const snd=document.getElementById(`snd-${cid}`);
+const msgs=document.getElementById(`msgs-${cid}`);
+const text=inp.value.trim();
+if(!text) return;
+inp.value=’’;
+snd.disabled=true;
+msgs.innerHTML+=`<div class="msg user">${text}</div>`;
+const lid=‘l’+Date.now();
+msgs.innerHTML+=`<div class="msg ai loading" id="${lid}">⏳ Думаю...</div>`;
+msgs.scrollTop=msgs.scrollHeight;
+try {
+const r=await fetch(PROXY,{method:‘POST’,headers:{‘Content-Type’:‘application/json’},body:JSON.stringify({question:text,context:ctx})});
+const d=await r.json();
+const ans=d.answer||‘Не удалось получить ответ’;
+document.getElementById(lid)?.remove();
+msgs.innerHTML+=`<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+} catch(e) {
+document.getElementById(lid)?.remove();
+msgs.innerHTML+=`<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`;
+}
+snd.disabled=false;
+msgs.scrollTop=msgs.scrollHeight;
 }
 
-function escapeHtml(str) {
-  return str.replace(/[&<>]/g, function(m) {
-    if(m === '&') return '&amp;';
-    if(m === '<') return '&lt;';
-    if(m === '>') return '&gt;';
-    return m;
-  }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
-    return c;
-  });
-}
-
-// Initialize all AI panels
-setTimeout(() => {
-  initAI('ai-home', 'подготовка к ОГЭ по географии', ['🎯 С чего начать подготовку?', '📅 Составь план на неделю', '💡 Частые ошибки на ОГЭ']);
-  initAI('ai-exam', 'пробный вариант ОГЭ по географии', ['🎯 Как решать пробник?', '⏰ Как распределить время?']);
-  initAI('ai-maps', 'работа с картами на ОГЭ', ['🗺️ Как читать топокарту?', '🧭 Как определить координаты?']);
-  initAI('ai-stats', 'слабые темы: климатограммы и часовые пояса', ['📊 Объясни климатограммы', '🕐 Как считать часовые пояса?']);
-  initAI('ai-hacks', 'лайфхаки для ОГЭ по географии', ['🧠 Дай запоминалку', '✍️ Шаблон для ответа']);
-  initAI('ai-daily', 'задание дня — определи страну по контуру', ['❓ Подсказка к заданию', '📖 Расскажи про эту страну']);
-  initTheory();
-}, 50);
+// INIT
+initAI(‘ai-home’,‘подготовка к ОГЭ по географии’,[‘🎯 С чего начать подготовку?’,‘📅 Составь план на неделю’,‘💡 Частые ошибки на ОГЭ’]);
+setTimeout(()=>{
+initAI(‘ai-exam’,‘пробный вариант ОГЭ по географии’,[‘🎯 Как решать пробник?’,‘⏰ Как распределить время?’]);
+initAI(‘ai-maps’,‘работа с картами на ОГЭ’,[‘🗺️ Как читать топокарту?’,‘🧭 Как определить координаты?’]);
+initAI(‘ai-stats’,‘слабые темы: климатограммы и часовые пояса’,[‘📊 Объясни климатограммы’,‘🕐 Как считать часовые пояса?’]);
+initAI(‘ai-hacks’,‘лайфхаки для ОГЭ по географии’,[‘🧠 Дай запоминалку’,‘✍️ Шаблон для ответа’]);
+initAI(‘ai-daily’,‘задание дня — определи страну по контуру’,[‘❓ Подсказка к заданию’,‘📖 Расскажи про эту страну’]);
+initTheory();
+},50);
 </script>
+
 </body>
 </html>
