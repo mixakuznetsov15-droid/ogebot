@@ -1,794 +1,1721 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>География ОГЭ — Бот-помощник | Умскул × Школково</title>
-    <style>
-        :root {
-            --bg: #0f0f1a;
-            --surface: #1a1a2e;
-            --surface2: #222240;
-            --primary: #7c3aed;
-            --primary-light: #a78bfa;
-            --accent: #06d6a0;
-            --accent-glow: #06d6a080;
-            --text: #e2e8f0;
-            --text-secondary: #a0aec0;
-            --danger: #f43f5e;
-            --warning: #f59e0b;
-            --radius: 18px;
-            --radius-sm: 12px;
-            --radius-xs: 8px;
-            --shadow-lg: 0 25px 60px rgba(0, 0, 0, 0.5);
-            --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.35);
-            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <title>ОГЭ Подготовка — География</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --bg: #08101d;
+      --panel: rgba(14, 20, 34, .92);
+      --panel-2: rgba(18, 25, 42, .92);
+      --card: rgba(255,255,255,.06);
+      --card-2: rgba(255,255,255,.085);
+      --border: rgba(148,163,184,.18);
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --good: #22c55e;
+      --bad: #ef4444;
+      --accent: #60a5fa;
+      --accent-2: #a78bfa;
+      --shadow: 0 20px 60px rgba(0,0,0,.34);
+      --radius: 22px;
+      --max: 1080px;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(900px 500px at 15% 0%, rgba(96,165,250,.16), transparent 55%),
+        radial-gradient(800px 500px at 90% 10%, rgba(167,139,250,.13), transparent 45%),
+        linear-gradient(180deg, #050816 0%, #08101d 100%);
+      color: var(--text);
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      overflow-x: hidden;
+    }
 
-        body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            background-image:
-                radial-gradient(ellipse 80% 50% at 50% -20%, #7c3aed30 0%, transparent 70%),
-                radial-gradient(ellipse 60% 40% at 80% 80%, #06d6a020 0%, transparent 70%),
-                radial-gradient(ellipse 50% 30% at 20% 70%, #3b82f620 0%, transparent 60%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-            color: var(--text);
-            -webkit-font-smoothing: antialiased;
-        }
+    .app {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 14px 12px 18px;
+    }
 
-        /* 📱 Telegram Phone Frame */
-        .phone-frame {
-            width: 420px;
-            max-width: 100%;
-            height: 850px;
-            max-height: 95vh;
-            background: var(--surface);
-            border-radius: 32px;
-            box-shadow: var(--shadow-lg), 0 0 0 3px #2d2d50, 0 0 0 6px #1a1a2e;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            border: 1px solid #ffffff10;
-        }
+    .shell {
+      width: 100%;
+      max-width: var(--max);
+      display: grid;
+      gap: 14px;
+    }
 
-        /* 🔝 Header */
-        .chat-header {
-            background: linear-gradient(135deg, #1e1e3a 0%, #252550 100%);
-            padding: 16px 18px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border-bottom: 1px solid #ffffff0a;
-            position: relative;
-            flex-shrink: 0;
-            z-index: 2;
-        }
-        .chat-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, #7c3aed60, #06d6a060, transparent);
-        }
-        .back-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #ffffff08;
-            border: none;
-            color: #fff;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-            flex-shrink: 0;
-        }
-        .back-btn:hover {
-            background: #ffffff18;
-            transform: scale(1.05);
-        }
-        .avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #7c3aed, #06d6a0);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            flex-shrink: 0;
-            box-shadow: 0 4px 15px #7c3aed40;
-        }
-        .header-info {
-            flex: 1;
-            min-width: 0;
-        }
-        .header-name {
-            font-weight: 700;
-            font-size: 16px;
-            letter-spacing: -0.3px;
-            color: #fff;
-        }
-        .header-status {
-            font-size: 12px;
-            color: #06d6a0;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
-        }
-        .header-status .dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            background: #06d6a0;
-            animation: pulse-dot 2s infinite;
-            box-shadow: 0 0 8px #06d6a0;
-        }
-        @keyframes pulse-dot {
-            0%,
-            100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.4;
-            }
-        }
-        .header-actions {
-            display: flex;
-            gap: 4px;
-        }
-        .icon-btn {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: transparent;
-            border: none;
-            color: #a0aec0;
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .icon-btn:hover {
-            background: #ffffff10;
-            color: #fff;
-        }
+    .topbar, .panel {
+      background: rgba(2, 6, 23, .42);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
 
-        /* 💬 Chat Area */
-        .chat-area {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px 14px;
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            background:
-                radial-gradient(ellipse 100% 30% at 50% 0%, #7c3aed08 0%, transparent 50%),
-                var(--surface);
-            scroll-behavior: smooth;
-        }
-        .chat-area::-webkit-scrollbar {
-            width: 3px;
-        }
-        .chat-area::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .chat-area::-webkit-scrollbar-thumb {
-            background: #ffffff15;
-            border-radius: 10px;
-        }
+    .topbar {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-        /* Message bubbles */
-        .message {
-            display: flex;
-            flex-direction: column;
-            max-width: 92%;
-            animation: msg-in 0.4s ease-out;
-        }
-        @keyframes msg-in {
-            from {
-                opacity: 0;
-                transform: translateY(16px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .message.bot {
-            align-self: flex-start;
-        }
-        .message.user {
-            align-self: flex-end;
-        }
-        .msg-bubble {
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 14px;
-            line-height: 1.55;
-            letter-spacing: -0.2px;
-            position: relative;
-            word-break: break-word;
-        }
-        .bot .msg-bubble {
-            background: var(--surface2);
-            border-bottom-left-radius: 6px;
-            color: #e2e8f0;
-            box-shadow: var(--shadow-card);
-            border: 1px solid #ffffff08;
-        }
-        .user .msg-bubble {
-            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
-            border-bottom-right-radius: 6px;
-            color: #fff;
-            box-shadow: 0 4px 18px #7c3aed35;
-        }
-        .msg-time {
-            font-size: 10px;
-            color: #ffffff50;
-            margin-top: 4px;
-            padding: 0 8px;
-        }
-        .user .msg-time {
-            text-align: right;
-            color: #ffffff60;
-        }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
 
-        /* 📋 Menu Card (оставляем для главного меню) */
-        .menu-card {
-            background: var(--surface2);
-            border-radius: var(--radius);
-            padding: 6px 4px;
-            box-shadow: var(--shadow-card);
-            border: 1px solid #ffffff0a;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            overflow: hidden;
-            animation: msg-in 0.5s ease-out;
-            width: 100%;
-        }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 13px 14px;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
-            color: var(--text);
-            position: relative;
-            font-weight: 500;
-            font-size: 14px;
-            letter-spacing: -0.2px;
-        }
-        .menu-item:hover {
-            background: #ffffff0a;
-            transform: translateX(3px);
-        }
-        .menu-item:active {
-            transform: scale(0.98);
-            background: #ffffff12;
-        }
-        .menu-icon {
-            width: 42px;
-            height: 42px;
-            border-radius: var(--radius-sm);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-            position: relative;
-        }
-        .menu-icon.theory {
-            background: linear-gradient(135deg, #7c3aed30, #7c3aed15);
-            color: #a78bfa;
-        }
-        .menu-icon.practice {
-            background: linear-gradient(135deg, #06d6a030, #06d6a015);
-            color: #06d6a0;
-        }
-        .menu-icon.maps {
-            background: linear-gradient(135deg, #3b82f630, #3b82f615);
-            color: #60a5fa;
-        }
-        .menu-icon.exam {
-            background: linear-gradient(135deg, #f59e0b30, #f59e0b15);
-            color: #fbbf24;
-        }
-        .menu-icon.stats {
-            background: linear-gradient(135deg, #f43f5e30, #f43f5e15);
-            color: #fb7185;
-        }
-        .menu-icon.hacks {
-            background: linear-gradient(135deg, #ec489930, #ec489915);
-            color: #f472b6;
-        }
-        .menu-label {
-            flex: 1;
-        }
-        .menu-label .title {
-            font-weight: 600;
-            font-size: 14px;
-            color: #fff;
-        }
-        .menu-label .sub {
-            font-size: 11px;
-            color: #a0aec0;
-            margin-top: 1px;
-        }
-        .menu-arrow {
-            color: #ffffff30;
-            font-size: 14px;
-            transition: var(--transition);
-        }
-        .menu-item:hover .menu-arrow {
-            color: #ffffff70;
-            transform: translateX(4px);
-        }
-        .menu-divider {
-            height: 1px;
-            background: #ffffff08;
-            margin: 2px 12px;
-            border-radius: 1px;
-        }
+    .brand-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 14px 30px rgba(96,165,250,.20);
+      flex: 0 0 auto;
+      font-size: 22px;
+    }
 
-        /* 🏷 Badge */
-        .badge {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 20px;
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: 0.3px;
-            text-transform: uppercase;
-        }
-        .badge-new {
-            background: #06d6a025;
-            color: #06d6a0;
-            border: 1px solid #06d6a030;
-        }
-        .badge-hot {
-            background: #f43f5e20;
-            color: #f43f5e;
-            border: 1px solid #f43f5e30;
-            animation: glow-badge 2s infinite;
-        }
-        @keyframes glow-badge {
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 #f43f5e40;
-            }
-            50% {
-                box-shadow: 0 0 12px 3px #f43f5e30;
-            }
-        }
+    .brand-text { min-width: 0; }
+    .brand-title {
+      margin: 0;
+      font-weight: 900;
+      font-size: 18px;
+      line-height: 1.05;
+      letter-spacing: -.02em;
+    }
+    .brand-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
-        /* 📌 Постоянная Reply-клавиатура (как в Telegram) */
-        .reply-keyboard {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            padding: 10px 12px;
-            background: #1a1a30;
-            border-top: 1px solid #ffffff0a;
-            flex-shrink: 0;
-            justify-content: center;
-        }
-        .reply-btn {
-            background: #252545;
-            border: 1px solid #ffffff10;
-            color: #e2e8f0;
-            padding: 8px 14px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            flex: 0 1 auto;
-            white-space: nowrap;
-            letter-spacing: -0.2px;
-        }
-        .reply-btn.primary {
-            background: #7c3aed;
-            border-color: #7c3aed;
-            color: #fff;
-            box-shadow: 0 4px 12px #7c3aed30;
-        }
-        .reply-btn:hover {
-            background: #7c3aed20;
-            border-color: #7c3aed50;
-            transform: translateY(-1px);
-        }
-        .reply-btn.primary:hover {
-            background: #8b5cf6;
-        }
+    .header-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
 
-        /* 🔽 Bottom input (уменьшенный) */
-        .bottom-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            background: #13132b;
-            border-top: 1px solid #ffffff05;
-            flex-shrink: 0;
-        }
-        .input-field {
-            flex: 1;
-            background: #1f1f40;
-            border: 1px solid #ffffff0c;
-            border-radius: 20px;
-            padding: 8px 14px;
-            color: #fff;
-            font-size: 13px;
-            outline: none;
-            transition: var(--transition);
-            font-family: inherit;
-            height: 36px;
-        }
-        .input-field::placeholder {
-            color: #5b6d88;
-            font-size: 12px;
-        }
-        .input-field:focus {
-            border-color: #7c3aed60;
-            box-shadow: 0 0 0 3px #7c3aed20;
-            background: #232350;
-        }
-        .send-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #7c3aed, #6d28d9);
-            border: none;
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px #7c3aed40;
-            flex-shrink: 0;
-        }
-        .send-btn:hover {
-            transform: scale(1.07);
-            box-shadow: 0 6px 20px #7c3aed55;
-        }
+    .level-badge, .streak-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      color: #dbeafe;
+      font-size: 12px;
+      font-weight: 800;
+    }
 
-        /* Адаптивность */
-        @media (max-width: 460px) {
-            .phone-frame {
-                border-radius: 0;
-                height: 100vh;
-                max-height: 100vh;
-                box-shadow: none;
-                border: none;
-            }
-            body {
-                padding: 0;
-            }
-        }
-        @media (max-width: 380px) {
-            .menu-item {
-                padding: 10px 12px;
-                gap: 8px;
-            }
-            .menu-icon {
-                width: 36px;
-                height: 36px;
-                font-size: 17px;
-                border-radius: 10px;
-            }
-            .reply-btn {
-                padding: 6px 10px;
-                font-size: 11px;
-            }
-        }
-    </style>
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      border-radius: 14px;
+      padding: 11px 14px;
+      color: var(--text);
+      background: rgba(255,255,255,.08);
+      font-weight: 800;
+      transition: transform .14s ease, background .14s ease, opacity .14s ease, box-shadow .14s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.06);
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { background: rgba(255,255,255,.12); }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 14px 34px rgba(96,165,250,.22);
+    }
+    .btn.success {
+      background: rgba(34,197,94,.13);
+      box-shadow: inset 0 0 0 1px rgba(34,197,94,.24);
+    }
+    .btn.danger {
+      background: rgba(239,68,68,.12);
+      box-shadow: inset 0 0 0 1px rgba(239,68,68,.22);
+    }
+    .btn.ghost {
+      background: transparent;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.11);
+    }
+    .btn.small {
+      padding: 9px 11px;
+      font-size: 13px;
+      border-radius: 12px;
+    }
+    .btn:disabled { opacity: .45; cursor: not-allowed; transform: none; }
+
+    .content { display: grid; gap: 14px; }
+
+    .view { display: none; }
+    .view.active { display: block; animation: fade .18s ease; }
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .panel { padding: 16px; }
+
+    .hero {
+      display: grid;
+      gap: 14px;
+      background: linear-gradient(135deg, rgba(96,165,250,.13), rgba(167,139,250,.10));
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 24px;
+      padding: 18px;
+    }
+
+    .hero-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .h1, .h2, .section-title {
+      margin: 0;
+      line-height: 1.08;
+      letter-spacing: -.02em;
+    }
+    .h1 { font-size: clamp(24px, 3.8vw, 34px); font-weight: 900; }
+    .h2 { font-size: 22px; font-weight: 900; }
+    .section-title { font-size: 18px; font-weight: 900; }
+
+    .lead, .muted { margin: 0; color: var(--muted); line-height: 1.5; }
+    .lead { max-width: 880px; color: #cbd5e1; }
+
+    .chips, .chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.06);
+      color: #dbeafe;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .progress-block { display: grid; gap: 10px; }
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .progress-bar {
+      height: 12px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(255,255,255,.08);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.05);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--good), #22d3ee);
+      transition: width .24s ease;
+    }
+
+    .grid { display: grid; gap: 14px; }
+    .grid.subjects { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .card:hover { background: var(--card-2); }
+
+    .subject-card {
+      grid-column: span 12;
+      cursor: pointer;
+      display: grid;
+      gap: 12px;
+      min-height: 176px;
+      transition: transform .14s ease, background .14s ease, border-color .14s ease;
+      border-color: rgba(96,165,250,.18);
+    }
+    .subject-card:hover { transform: translateY(-1px); }
+
+    .subject-top {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .subject-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 16px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.08);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+      font-size: 24px;
+      flex: 0 0 auto;
+    }
+    .subject-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .subject-desc {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.45;
+      font-size: 14px;
+    }
+    .subject-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .menu-card {
+      background: var(--panel-2);
+      border-radius: 20px;
+      padding: 6px 4px;
+      border: 1px solid rgba(255,255,255,.08);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 14px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform .14s ease, background .14s ease;
+      color: var(--text);
+      font-weight: 700;
+      font-size: 14px;
+    }
+    .menu-item:hover { background: rgba(255,255,255,.07); transform: translateX(2px); }
+    .menu-divider {
+      height: 1px;
+      background: rgba(255,255,255,.06);
+      margin: 2px 12px;
+    }
+    .menu-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      font-size: 20px;
+      flex: 0 0 auto;
+    }
+    .menu-icon.theory { background: rgba(124,58,237,.18); color: #c4b5fd; }
+    .menu-icon.practice { background: rgba(6,214,160,.16); color: #5eead4; }
+    .menu-icon.maps { background: rgba(59,130,246,.16); color: #93c5fd; }
+    .menu-icon.exam { background: rgba(245,158,11,.16); color: #fbbf24; }
+    .menu-icon.stats { background: rgba(244,63,94,.14); color: #fb7185; }
+    .menu-icon.ai { background: rgba(168,85,247,.16); color: #ddd6fe; }
+    .menu-label { flex: 1; min-width: 0; }
+    .menu-label .title { color: #fff; font-size: 14px; }
+    .menu-label .sub { color: var(--muted); font-size: 11px; margin-top: 2px; font-weight: 600; }
+    .menu-arrow { color: rgba(255,255,255,.32); font-size: 18px; }
+
+    .breadcrumbs {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .breadcrumbs button {
+      border: 0;
+      background: transparent;
+      color: #cbd5e1;
+      padding: 0;
+      cursor: pointer;
+      font-weight: 800;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1.12fr .88fr;
+      gap: 14px;
+    }
+
+    .quiz-box { display: grid; gap: 14px; align-content: start; }
+    .quiz-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .quiz-progress { font-size: 13px; color: var(--muted); }
+    .question-card {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.09);
+      border-radius: 20px;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+    .question-text {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 900;
+      line-height: 1.35;
+    }
+    .answer-grid { display: grid; gap: 10px; }
+    .answer-btn {
+      width: 100%;
+      text-align: left;
+      padding: 14px 15px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      cursor: pointer;
+      font-weight: 800;
+      line-height: 1.35;
+      transition: transform .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .answer-btn:hover { background: rgba(255,255,255,.1); transform: translateY(-1px); }
+    .answer-btn.correct { background: rgba(34,197,94,.16); border-color: rgba(34,197,94,.42); }
+    .answer-btn.wrong { background: rgba(239,68,68,.16); border-color: rgba(239,68,68,.42); }
+
+    .feedback {
+      min-height: 88px;
+      border-radius: 18px;
+      padding: 14px 16px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      line-height: 1.52;
+      color: #dbeafe;
+    }
+    .feedback.good { border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.10); }
+    .feedback.bad { border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.10); }
+
+    .topics-list, .history-list { display: grid; gap: 10px; }
+    .topic-item, .history-item {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 16px;
+      padding: 13px 14px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .topic-name { margin: 0; font-weight: 900; }
+    .topic-meta { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+    .stat {
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 18px;
+      padding: 14px;
+    }
+    .stat-value {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .stat-label { margin: 4px 0 0; font-size: 12px; color: var(--muted); }
+
+    .bubble {
+      padding: 14px 16px;
+      border-radius: 18px;
+      line-height: 1.55;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+    }
+    .bubble.bot {
+      background: var(--panel-2);
+      border-bottom-left-radius: 6px;
+    }
+    .bubble.hint {
+      background: rgba(6,214,160,.08);
+      border-color: rgba(6,214,160,.16);
+      color: #d1fae5;
+    }
+
+    .footer-note { color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .empty { color: var(--muted); line-height: 1.5; font-size: 14px; }
+
+    .bottom-nav {
+      background: rgba(2, 6, 23, .66);
+      backdrop-filter: blur(16px);
+      padding: 10px 12px;
+      display: flex;
+      justify-content: space-around;
+      align-items: stretch;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      color: #5a6a80;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 4px 8px;
+      min-width: 56px;
+      user-select: none;
+    }
+    .nav-item.active { color: #79c0ff; }
+    .nav-item span:first-child { font-size: 18px; }
+
+    textarea.ai-input {
+      width: 100%;
+      min-height: 120px;
+      resize: vertical;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 14px;
+      font: inherit;
+      outline: none;
+      line-height: 1.5;
+    }
+    textarea.ai-input:focus {
+      border-color: rgba(96,165,250,.45);
+      box-shadow: 0 0 0 3px rgba(96,165,250,.12);
+    }
+
+    .ai-output {
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .mini-kpi {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .grid.subjects, .two-col { grid-template-columns: 1fr; }
+      .subject-card { grid-column: span 12; }
+    }
+    @media (max-width: 560px) {
+      .app { padding: 10px 8px 14px; }
+      .panel, .topbar { padding: 14px; }
+      .brand-title { font-size: 17px; }
+      .h1 { font-size: 23px; }
+      .h2 { font-size: 20px; }
+      .question-text { font-size: 17px; }
+      .subject-card { min-height: auto; }
+      .stat-grid { grid-template-columns: 1fr 1fr; }
+      .bottom-nav {
+        padding: 8px;
+        gap: 4px;
+      }
+      .nav-item {
+        min-width: 0;
+        flex: 1 1 0;
+      }
+    }
+  </style>
 </head>
 <body>
-
-    <!-- 📱 Phone Frame -->
-    <div class="phone-frame" id="phoneFrame">
-        <!-- Header -->
-        <div class="chat-header">
-            <button class="back-btn" title="Назад">←</button>
-            <div class="avatar">🌍</div>
-            <div class="header-info">
-                <div class="header-name">География ОГЭ • Бот</div>
-                <div class="header-status"><span class="dot"></span> онлайн • отвечает мгновенно</div>
-            </div>
-            <div class="header-actions">
-                <button class="icon-btn" title="Поиск">🔍</button>
-                <button class="icon-btn" title="Меню">⋮</button>
-            </div>
+  <div class="app">
+    <div class="shell">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brand-badge">🌍</div>
+          <div class="brand-text">
+            <p class="brand-title">ОГЭ Подготовка</p>
+            <p class="brand-subtitle" id="appSubtitle">География, прогресс и задел на AI</p>
+          </div>
         </div>
 
-        <!-- Chat -->
-        <div class="chat-area" id="chatArea">
-            <!-- Приветственное сообщение -->
-            <div class="message bot" style="animation-delay: 0.1s;">
-                <div class="msg-bubble">
-                    👋 <strong>Привет!</strong> Я твой личный тренажёр для подготовки к <strong>ОГЭ по географии</strong>.
-                    <br>Выбери действие на клавиатуре снизу или в меню ниже 👇
-                </div>
-                <span class="msg-time">10:00</span>
-            </div>
-
-            <!-- Главное меню (карточка) -->
-            <div class="message bot" id="mainMenuWrapper" style="animation-delay: 0.25s; max-width: 96%;">
-                <div class="msg-bubble" style="background: transparent; box-shadow: none; border: none; padding: 0;">
-                    <div class="menu-card" id="mainMenu">
-                        <div class="menu-item" data-section="theory">
-                            <div class="menu-icon theory">📚</div>
-                            <div class="menu-label">
-                                <div class="title">Теория по темам</div>
-                                <div class="sub">Все разделы кодификатора</div>
-                            </div>
-                            <span class="badge badge-new">NEW</span>
-                            <span class="menu-arrow">›</span>
-                        </div>
-                        <div class="menu-divider"></div>
-                        <div class="menu-item" data-section="practice">
-                            <div class="menu-icon practice">📝</div>
-                            <div class="menu-label">
-                                <div class="title">Практика заданий</div>
-                                <div class="sub">Тесты с автопроверкой</div>
-                            </div>
-                            <span class="badge badge-hot">ТОП</span>
-                            <span class="menu-arrow">›</span>
-                        </div>
-                        <div class="menu-divider"></div>
-                        <div class="menu-item" data-section="maps">
-                            <div class="menu-icon maps">🗺️</div>
-                            <div class="menu-label">
-                                <div class="title">Работа с картами</div>
-                                <div class="sub">Атласы, топография</div>
-                            </div>
-                            <span class="menu-arrow">›</span>
-                        </div>
-                        <div class="menu-divider"></div>
-                        <div class="menu-item" data-section="exam">
-                            <div class="menu-icon exam">🎯</div>
-                            <div class="menu-label">
-                                <div class="title">Пробный вариант</div>
-                                <div class="sub">Полный КИМ с таймером</div>
-                            </div>
-                            <span class="badge badge-hot">ГОРЯЧО</span>
-                            <span class="menu-arrow">›</span>
-                        </div>
-                        <div class="menu-divider"></div>
-                        <div class="menu-item" data-section="stats">
-                            <div class="menu-icon stats">📊</div>
-                            <div class="menu-label">
-                                <div class="title">Моя статистика</div>
-                                <div class="sub">Прогресс, баллы</div>
-                            </div>
-                            <span class="menu-arrow">›</span>
-                        </div>
-                        <div class="menu-divider"></div>
-                        <div class="menu-item" data-section="hacks">
-                            <div class="menu-icon hacks">💡</div>
-                            <div class="menu-label">
-                                <div class="title">Лайфхаки и шпоры</div>
-                                <div class="sub">Запоминалки, шаблоны</div>
-                            </div>
-                            <span class="menu-arrow">›</span>
-                        </div>
-                    </div>
-                </div>
-                <span class="msg-time">10:00</span>
-            </div>
-
-            <!-- Контейнер для динамических сообщений (ответы пользователя и бота) -->
-            <div id="dynamicMessages"></div>
+        <div class="header-meta">
+          <div class="level-badge" id="levelBadge">уровень 1</div>
+          <div class="streak-badge" id="streakBadge">🔥 0 дней</div>
         </div>
 
-        <!-- Постоянная клавиатура (ReplyKeyboard) -->
-        <div class="reply-keyboard" id="replyKeyboard">
-            <button class="reply-btn" data-quick="practice">🧠 Тренировка</button>
-            <button class="reply-btn" data-quick="theory">📚 Учить</button>
-            <button class="reply-btn primary" data-quick="exam">🎯 Пробник</button>
-            <button class="reply-btn" data-quick="stats">📊 Прогресс</button>
-            <button class="reply-btn" data-quick="maps">🗺️ Карты</button>
-            <button class="reply-btn" data-quick="hacks">💡 Лайфхаки</button>
+        <div class="top-actions">
+          <button class="btn small ghost" id="btnBack" onclick="goHome()" style="display:none;">← Назад</button>
+          <button class="btn small" onclick="showView('stats')">Прогресс</button>
+          <button class="btn small" onclick="showView('ai')">AI</button>
         </div>
+      </div>
 
-        <!-- Поле ввода (опционально, для редких запросов) -->
-        <div class="bottom-bar">
-            <input type="text" class="input-field" id="messageInput"
-            placeholder="Или напиши свой вопрос..."
-            onkeydown="if(event.key==='Enter')sendCustomMessage()">
-            <button class="send-btn" onclick="sendCustomMessage()">➤</button>
-        </div>
+      <div class="content" id="mainContent"></div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active" data-nav="home"><span>🏠</span><span>Главная</span></div>
+        <div class="nav-item" data-nav="theory"><span>📚</span><span>Теория</span></div>
+        <div class="nav-item" data-nav="practice"><span>📝</span><span>Практика</span></div>
+        <div class="nav-item" data-nav="maps"><span>🗺️</span><span>Карты</span></div>
+        <div class="nav-item" data-nav="ai"><span>🤖</span><span>AI</span></div>
+        <div class="nav-item" data-nav="stats"><span>📊</span><span>Прогресс</span></div>
+      </div>
     </div>
+  </div>
 
-    <script>
-        (function() {
-            // ----- ДАННЫЕ ДЛЯ ОТВЕТОВ -----
-            const botReplies = {
-                theory: {
-                    text: `📚 <strong>Теория по темам ОГЭ</strong><br>Выбери раздел:<br>🔹 Источники географической информации<br>🔹 Природа Земли и человек<br>🔹 Материки, океаны, народы<br>🔹 Природопользование и экология<br>🔹 География России<br>🔹 Хозяйство России`,
-                    menu: ['📖 Источники информации', '🌋 Природа Земли', '🌏 Материки и океаны', '🌿 Экология',
-                        '🇷🇺 География России', '🏭 Хозяйство РФ'
-                    ]
-                },
-                practice: {
-                    text: `📝 <strong>Практика заданий</strong><br>Тренируйся по номерам КИМа:<br>🎯 Задания 1–30 с проверкой<br>📊 3 уровня сложности<br>⏱ Режим «на время» или «без ограничений»<br><br>🔥 Самое популярное: №12 (климатограммы) и №28 (топокарта)`,
-                    menu: ['🎯 Случайные 10 заданий', '📋 По номерам (1-30)', '⏱ Блиц-режим (20 мин)',
-                        '📊 Мои ошибки'
-                    ]
-                },
-                maps: {
-                    text: `🗺️ <strong>Работа с картами</strong><br>🧭 Определять координаты<br>📐 Читать топографическую карту<br>🌐 Работать с атласами 7–9 класс<br>📍 Находить объекты на карте России и мира`,
-                    menu: ['🧭 Координаты и градусная сетка', '📐 Топографическая карта', '🌐 Атлас мира',
-                        '📍 Карта России'
-                    ]
-                },
-                exam: {
-                    text: `🎯 <strong>Пробный вариант ОГЭ</strong><br>Полный КИМ из 30 заданий<br>⏱ 2 часа 30 минут (как на реальном экзамене)<br>📊 Автоматическая проверка и баллы<br><br>⚡ Готов проверить свой уровень?`,
-                    menu: ['🚀 Начать пробник', '📋 Вариант №1 (лёгкий)', '📋 Вариант №2 (средний)',
-                        '📋 Вариант №3 (сложный)', '📊 История пробников'
-                    ]
-                },
-                stats: {
-                    text: `📊 <strong>Моя статистика</strong><br>⭐ Общий балл: 24 / 31<br>🎯 Решено заданий: 187<br>📈 Точность: 78%<br>🔥 Серия правильных: 12 дней<br><br>📉 Слабые темы: климатограммы, часовые пояса, урбанизация`,
-                    menu: ['📈 Детальный отчёт', '🎯 Рекомендации', '🏆 Достижения', '📅 Календарь занятий']
-                },
-                hacks: {
-                    text: `💡 <strong>Лайфхаки и шпоры</strong><br>🧠 Запоминалки: «Саша Артём» — С-А (Северная Америка)<br>✍️ Шаблоны для развёрнутых ответов<br>🗺 Карточки: страны-соседи РФ за 2 минуты<br>⏰ Тайм-менеджмент: как уложиться в 2,5 часа`,
-                    menu: ['🧠 Запоминалки', '✍️ Шаблоны ответов', '🗺 Карточки-шпоры', '⏰ Тайминг экзамена',
-                        '🎁 Чек-лист'
-                    ]
-                }
-            };
+  <script>
+    const YANDEX_PROXY_URL = "https://yandex-proxy.mixakuznetsov15.workers.dev";
+    const AI_SYSTEM_PROMPT = `
+Ты — сильный методист по ОГЭ географии и школьный тьютор.
 
-            const menuLabels = {
-                theory: '📚 Теория по темам',
-                practice: '📝 Практика заданий',
-                maps: '🗺️ Работа с картами',
-                exam: '🎯 Пробный вариант',
-                stats: '📊 Моя статистика',
-                hacks: '💡 Лайфхаки и шпоры'
-            };
+Правила:
+- отвечай по-русски
+- объясняй просто, но без воды
+- сначала давай суть, потом короткое объяснение
+- если видишь ошибку ученика, сначала укажи, где именно ошибка, потом правильный ход мысли
+- ориентируйся на формат ОГЭ
+- не перегружай терминами
+- если вопрос про карту, климат, население, природные зоны или хозяйство России — отвечай строго по школьной географии
+`.trim();
 
-            const chatArea = document.getElementById('chatArea');
-            const dynamicContainer = document.getElementById('dynamicMessages');
+    const STORAGE_KEY = "oge_geo_progress_v4";
 
-            function getTimeStr() {
-                const now = new Date();
-                return now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2,
-                '0');
-            }
+    const THEORY_SECTIONS = [
+      {
+        id: "section1",
+        title: "1. Географическое изучение Земли",
+        topics: [
+          "География — наука о Земле",
+          "История географических открытий",
+          "Источники географической информации"
+        ]
+      },
+      {
+        id: "section2",
+        title: "2. Изображения земной поверхности",
+        topics: [
+          "Планы местности",
+          "Масштаб",
+          "Градусная сетка"
+        ]
+      },
+      {
+        id: "section3",
+        title: "3. Земля — планета Солнечной системы",
+        topics: [
+          "Форма и размеры Земли",
+          "Движение Земли",
+          "День, ночь и времена года"
+        ]
+      },
+      {
+        id: "section4",
+        title: "4. Оболочки Земли",
+        topics: [
+          "Литосфера и рельеф",
+          "Гидросфера и воды суши",
+          "Атмосфера и климат",
+          "Биосфера и почвы",
+          "Географическая оболочка"
+        ]
+      },
+      {
+        id: "section5",
+        title: "5. Человечество на Земле. Материки и страны",
+        topics: [
+          "Распространение людей на Земле",
+          "Народы и религии мира",
+          "Материки и океаны",
+          "Крупные страны мира"
+        ]
+      },
+      {
+        id: "section6",
+        title: "6. Взаимодействие природы и общества",
+        topics: [
+          "Природные ресурсы",
+          "Охрана природы",
+          "Стихийные явления",
+          "Глобальные проблемы человечества"
+        ]
+      },
+      {
+        id: "section7",
+        title: "7. География России",
+        topics: [
+          "Географическое положение России",
+          "Природа России",
+          "Население России",
+          "Хозяйство России",
+          "Регионы России",
+          "Россия в современном мире"
+        ]
+      }
+    ];
 
-            function addBotMessage(html, delay = 0) {
-                const time = getTimeStr();
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message bot';
-                msgDiv.style.animationDelay = delay + 's';
-                msgDiv.innerHTML = `<div class="msg-bubble">${html}</div><span class="msg-time">${time}</span>`;
-                dynamicContainer.appendChild(msgDiv);
-                scrollToBottom();
-                return msgDiv;
-            }
+    const SUBJECTS = [
+      {
+        id: "geo",
+        title: "География ОГЭ",
+        shortTitle: "География",
+        icon: "🌍",
+        description: "Тренажёр по географии ОГЭ: карты, климат, население, природные зоны и практические задания.",
+        topics: [
+          "Климат и погода",
+          "Реки и озёра",
+          "Природные зоны",
+          "Население России",
+          "Хозяйство России",
+          "Карта и координаты"
+        ],
+        questions: [
+          {
+            topic: "Климат и погода",
+            q: "Какая река является самой длинной в России?",
+            options: ["Волга", "Лена", "Енисей", "Обь"],
+            answer: "Лена",
+            explanation: "Лена считается самой длинной рекой России. На ОГЭ важно знать крупные географические объекты и их признаки."
+          },
+          {
+            topic: "Климат и погода",
+            q: "Какой климат преобладает в Центральной России?",
+            options: ["Тропический", "Умеренно-континентальный", "Арктический", "Муссонный"],
+            answer: "Умеренно-континентальный",
+            explanation: "Центральная Россия находится в умеренном поясе, поэтому здесь преобладает умеренно-континентальный климат."
+          },
+          {
+            topic: "Реки и озёра",
+            q: "Какое озеро является самым глубоким в мире?",
+            options: ["Каспийское море", "Байкал", "Ладожское озеро", "Онежское озеро"],
+            answer: "Байкал",
+            explanation: "Байкал — самое глубокое озеро мира и один из ключевых объектов, которые часто встречаются в ОГЭ."
+          },
+          {
+            topic: "Природные зоны",
+            q: "Какая природная зона находится севернее остальных в России?",
+            options: ["Степь", "Тундра", "Лесостепь", "Смешанные леса"],
+            answer: "Тундра",
+            explanation: "Тундра находится ближе к Арктике, поэтому она расположена севернее других перечисленных зон."
+          },
+          {
+            topic: "Население России",
+            q: "Что показывает плотность населения?",
+            options: ["Количество городов", "Число людей на 1 км²", "Среднюю зарплату", "Количество рек"],
+            answer: "Число людей на 1 км²",
+            explanation: "Плотность населения показывает, сколько людей приходится на единицу площади."
+          },
+          {
+            topic: "Хозяйство России",
+            q: "Какая отрасль относится к первичному сектору экономики?",
+            options: ["Образование", "Торговля", "Сельское хозяйство", "Банковская деятельность"],
+            answer: "Сельское хозяйство",
+            explanation: "Первичный сектор связан с добычей сырья и получением продукции из природы."
+          },
+          {
+            topic: "Карта и координаты",
+            q: "Какие линии соединяют точки с одинаковой долготой?",
+            options: ["Параллели", "Меридианы", "Экватор", "Изобаты"],
+            answer: "Меридианы",
+            explanation: "Меридианы показывают долготу. Параллели показывают широту."
+          },
+          {
+            topic: "Карта и координаты",
+            q: "Что такое масштаб карты?",
+            options: ["Высота гор", "Соотношение расстояния на карте к расстоянию на местности", "Направление ветра", "Количество населения"],
+            answer: "Соотношение расстояния на карте к расстоянию на местности",
+            explanation: "Масштаб показывает, во сколько раз расстояние на карте меньше, чем в реальности."
+          },
+          {
+            topic: "Карта и координаты",
+            q: "Какой прибор используют для определения сторон горизонта?",
+            options: ["Термометр", "Барометр", "Компас", "Гигрометр"],
+            answer: "Компас",
+            explanation: "Компас нужен для ориентирования на местности и определения направлений."
+          },
+          {
+            topic: "Природные зоны",
+            q: "Какой ресурс относится к возобновляемым?",
+            options: ["Нефть", "Газ", "Лес", "Уголь"],
+            answer: "Лес",
+            explanation: "Лес можно восстановить при правильном природопользовании, поэтому он относится к возобновляемым ресурсам."
+          }
+        ]
+      }
+    ];
 
-            function addUserMessage(text) {
-                const time = getTimeStr();
-                const msgDiv = document.createElement('div');
-                msgDiv.className = 'message user';
-                msgDiv.innerHTML = `<div class="msg-bubble">${text}</div><span class="msg-time">${time}</span>`;
-                dynamicContainer.appendChild(msgDiv);
-                scrollToBottom();
-                return msgDiv;
-            }
+    const MAP_PROMPTS = {
+      coords: "Объясни координаты, широту и долготу простыми словами для ОГЭ по географии. Дай один короткий пример.",
+      topo: "Разбери топографическую карту для ОГЭ по географии: что показывают условные знаки, горизонтали и профиль местности.",
+      atlas: "Объясни, как быстро работать с атласом на ОГЭ по географии, чтобы находить нужные объекты и не путаться.",
+      russia_map: "Объясни, как ориентироваться по карте России на ОГЭ: моря, горы, реки, города и природные зоны."
+    };
 
-            function scrollToBottom() {
-                setTimeout(() => {
-                    chatArea.scrollTo({ top: chatArea.scrollHeight, behavior: 'smooth' });
-                }, 100);
-            }
+    const state = {
+      currentSubjectId: "geo",
+      currentTheorySectionId: null,
+      currentScreen: "home",
+      currentQuizMode: null,
+      currentQuizTopic: null,
+      currentQuizPool: [],
+      currentQuizIndex: 0,
+      quizAnswered: false,
+      quizSelected: null,
+      timerHandle: null,
+      timerSeconds: 0,
+      progress: loadProgress()
+    };
 
-            // Обработка выбора раздела (из главного меню или быстрых кнопок)
-            function handleSection(section) {
-                const reply = botReplies[section];
-                if (!reply) return;
-                addUserMessage(menuLabels[section] || section);
-                // Ответ бота с подменю
-                const submenuButtons = (reply.menu || []).map(item => 
-                    `<span class="reply-btn" style="margin:2px; display:inline-block; cursor:pointer;" data-sub="${section}" data-value="${item}">${item}</span>`
-                ).join(' ');
-                addBotMessage(`${reply.text}<br><div style="margin-top:8px;">${submenuButtons}</div>`);
-            }
+    try {
+      if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
+        if (Telegram.WebApp.setHeaderColor) Telegram.WebApp.setHeaderColor("#08101d");
+        if (Telegram.WebApp.setBackgroundColor) Telegram.WebApp.setBackgroundColor("#08101d");
+      }
+    } catch (e) {}
 
-            // Обработка нажатий на подменю (кнопки с data-sub)
-            function handleSubMenu(section, value) {
-                addUserMessage(value);
-                // Имитация ответа в зависимости от выбранного пункта
-                const responses = {
-                    theory: '📖 Открываю конспект по теме «' + value + '». Читай внимательно, затем — мини-тест.',
-                    practice: '🎲 Загружаю задания по запросу «' + value + '». Удачи!',
-                    maps: '🗺️ Запускаю интерактивный тренажёр «' + value + '».',
-                    exam: '🎯 Пробник «' + value + '» запущен. У тебя 2,5 часа.',
-                    stats: '📊 Загружаю подробный отчёт по разделу «' + value + '».',
-                    hacks: '💡 Лови лайфхак: «' + value + '» уже у тебя!'
-                };
-                const replyText = responses[section] || 'Ок, сейчас всё покажу 🚀';
-                addBotMessage(replyText);
-            }
+    function getSubject(subjectId) {
+      return SUBJECTS.find(s => s.id === subjectId) || SUBJECTS[0];
+    }
 
-            // Делегирование событий на всём окне приложения
-            document.getElementById('phoneFrame').addEventListener('click', function(e) {
-                // Кнопки главного меню
-                const menuItem = e.target.closest('.menu-item');
-                if (menuItem) {
-                    const section = menuItem.dataset.section;
-                    if (section) handleSection(section);
-                    return;
-                }
-                // Кнопки в ReplyKeyboard (быстрые действия)
-                const quickBtn = e.target.closest('[data-quick]');
-                if (quickBtn) {
-                    const section = quickBtn.dataset.quick;
-                    handleSection(section);
-                    return;
-                }
-                // Кнопки подменю (в сообщениях)
-                const subBtn = e.target.closest('[data-sub]');
-                if (subBtn) {
-                    const section = subBtn.dataset.sub;
-                    const value = subBtn.dataset.value;
-                    handleSubMenu(section, value);
-                    return;
-                }
-            });
+    function getCurrentSubject() {
+      return getSubject(state.currentSubjectId);
+    }
 
-            // Отправка произвольного сообщения (опционально)
-            window.sendCustomMessage = function() {
-                const input = document.getElementById('messageInput');
-                const text = input.value.trim();
-                if (!text) return;
-                addUserMessage(text);
-                input.value = '';
-                const genericReplies = [
-                    '🤔 Хороший вопрос! Советую заглянуть в раздел <strong>📚 Теория</strong> или <strong>📝 Практика</strong>.',
-                    '💡 По этой теме у меня есть лайфхаки в разделе <strong>💡 Лайфхаки</strong>.',
-                    '🎯 Это частая ловушка на ОГЭ! Попробуй <strong>🎯 Пробник</strong>, чтобы проверить себя.',
-                    '🗺️ Если вопрос про карты — тебе в <strong>🗺️ Работа с картами</strong>.'
-                ];
-                const reply = genericReplies[Math.floor(Math.random() * genericReplies.length)];
-                addBotMessage(reply);
-            };
+    function progressKey(subjectId) {
+      return `subject:${subjectId}`;
+    }
 
-            // Прокрутка при загрузке
-            scrollToBottom();
-            console.log('🌍 География ОГЭ — клавиатурный интерфейс активирован.');
-        })();
-    </script>
-</body>
-</html>
+    function defaultSubjectProgress() {
+      return {
+        solved: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        bestStreak: 0,
+        lastPractice: "",
+        history: [],
+        byTopic: {}
+      };
+    }
+
+    function loadProgress() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveProgress() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress));
+    }
+
+    function ensureSubjectProgress(subjectId) {
+      const key = progressKey(subjectId);
+      if (!state.progress[key]) state.progress[key] = defaultSubjectProgress();
+      return state.progress[key];
+    }
+
+    function calcAccuracy(correct, wrong) {
+      const total = correct + wrong;
+      if (!total) return 0;
+      return Math.round((correct / total) * 100);
+    }
+
+    function calcXP(progress) {
+      return (progress.solved || 0) * 10 + (progress.correct || 0) * 5;
+    }
+
+    function calcLevel(xp) {
+      return Math.max(1, Math.floor(xp / 100) + 1);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function formatAiText(text) {
+      return escapeHtml(text).replace(/\n/g, "<br>");
+    }
+
+    function shuffle(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function setSubtitle(text) {
+      const el = document.getElementById("appSubtitle");
+      if (el) el.textContent = text;
+    }
+
+    function updateHeaderMeta() {
+      const p = ensureSubjectProgress(state.currentSubjectId);
+      const xp = calcXP(p);
+      const level = calcLevel(xp);
+      const streak = p.streak || 0;
+
+      const levelBadge = document.getElementById("levelBadge");
+      const streakBadge = document.getElementById("streakBadge");
+      if (levelBadge) levelBadge.textContent = `уровень ${level}`;
+      if (streakBadge) streakBadge.textContent = `🔥 ${streak} дней`;
+    }
+
+    function showBack(show) {
+      const btn = document.getElementById("btnBack");
+      if (btn) btn.style.display = show ? "inline-flex" : "none";
+    }
+
+    function getNavGroup(screen) {
+      if (screen === "stats") return "stats";
+      if (screen === "ai") return "ai";
+      if (screen === "theory") return "theory";
+      if (screen === "practice" || screen === "quiz" || screen === "exam" || screen === "maps") return "practice";
+      return "home";
+    }
+
+    function setActiveNav(screen) {
+      const group = getNavGroup(screen);
+      document.querySelectorAll(".nav-item").forEach(item => {
+        item.classList.toggle("active", item.dataset.nav === group);
+      });
+    }
+
+    function switchScreen(screen, shouldRender = true) {
+      state.currentScreen = screen;
+      setActiveNav(screen);
+      showBack(screen !== "home");
+      if (shouldRender) renderScreen(screen);
+    }
+
+    function renderScreen(screen) {
+      const main = document.getElementById("mainContent");
+      if (!main) return;
+
+      if (screen === "home") main.innerHTML = renderHome();
+      else if (screen === "subject") main.innerHTML = renderSubject();
+      else if (screen === "theory") main.innerHTML = renderTheory();
+      else if (screen === "practice") main.innerHTML = renderPractice();
+      else if (screen === "quiz") main.innerHTML = renderQuiz();
+      else if (screen === "exam") main.innerHTML = renderExam();
+      else if (screen === "maps") main.innerHTML = renderMaps();
+      else if (screen === "stats") main.innerHTML = renderStats();
+      else if (screen === "ai") main.innerHTML = renderAi();
+      else main.innerHTML = renderHome();
+
+      updateHeaderMeta();
+      setSubtitleScreen(screen);
+    }
+
+    function setSubtitleScreen(screen) {
+      const subject = getCurrentSubject();
+      if (screen === "home") setSubtitle("География, прогресс и задел на AI");
+      else if (screen === "subject") setSubtitle(`${subject.shortTitle} • всё обучение в одном месте`);
+      else if (screen === "theory") setSubtitle("Теория по темам и готовность к расширению");
+      else if (screen === "practice") setSubtitle("Практика, темы и тренировка ошибок");
+      else if (screen === "quiz") setSubtitle("Решаем задания и сразу разбираем ошибки");
+      else if (screen === "exam") setSubtitle("Пробник и тайм-режим");
+      else if (screen === "maps") setSubtitle("Работа с картами и координатами");
+      else if (screen === "stats") setSubtitle("Прогресс, слабые темы и история попыток");
+      else if (screen === "ai") setSubtitle("Yandex GPT через твой proxy");
+    }
+
+    function goHome() {
+      state.currentTheorySectionId = null;
+      switchScreen("home");
+    }
+
+    function showSubject(subjectId) {
+      state.currentSubjectId = subjectId;
+      switchScreen("subject");
+    }
+
+    function showView(name) {
+      if (name === "stats") {
+        renderScreen("stats");
+        switchScreen("stats", false);
+        return;
+      }
+      if (name === "ai") {
+        renderScreen("ai");
+        switchScreen("ai", false);
+        return;
+      }
+      if (name === "theory") {
+        state.currentTheorySectionId = null;
+        renderScreen("theory");
+        switchScreen("theory", false);
+        return;
+      }
+      if (name === "practice") {
+        renderScreen("practice");
+        switchScreen("practice", false);
+        return;
+      }
+      if (name === "maps") {
+        renderScreen("maps");
+        switchScreen("maps", false);
+        return;
+      }
+      if (name === "exam") {
+        renderScreen("exam");
+        switchScreen("exam", false);
+        return;
+      }
+      if (name === "subject") {
+        renderScreen("subject");
+        switchScreen("subject", false);
+        return;
+      }
+      goHome();
+    }
+
+    function openTheorySection(sectionId) {
+      state.currentTheorySectionId = sectionId;
+      switchScreen("theory");
+    }
+
+    function backToTheoryList() {
+      state.currentTheorySectionId = null;
+      switchScreen("theory");
+    }
+
+    function startQuiz(mode = "practice", topic = null) {
+      const subject = getCurrentSubject();
+      let pool = subject.questions.slice();
+
+      if (topic) pool = pool.filter(q => q.topic === topic);
+      if (!pool.length) pool = subject.questions.slice();
+
+      if (mode === "practice") {
+        pool = shuffle(pool.slice()).slice(0, Math.min(5, pool.length));
+      } else if (mode === "blitz") {
+        pool = shuffle(pool.slice()).slice(0, Math.min(5, pool.length));
+      } else if (mode === "exam") {
+        pool = shuffle(pool.slice()).slice(0, Math.min(10, pool.length));
+      } else if (mode === "errors") {
+        const p = ensureSubjectProgress(subject.id);
+        const wrongQuestions = (p.history || [])
+          .filter(x => !x.isCorrect)
+          .map(x => subject.questions.find(q => q.q === x.q))
+          .filter(Boolean);
+        pool = wrongQuestions.length ? shuffle(wrongQuestions.slice()).slice(0, Math.min(5, wrongQuestions.length)) : shuffle(subject.questions.slice()).slice(0, Math.min(5, subject.questions.length));
+      }
+
+      state.currentQuizMode = mode;
+      state.currentQuizTopic = topic;
+      state.currentQuizPool = pool;
+      state.currentQuizIndex = 0;
+      state.quizAnswered = false;
+      state.quizSelected = null;
+      clearQuizTimer();
+
+      if (mode === "exam") startQuizTimer(20 * 60);
+      if (mode === "blitz") startQuizTimer(5 * 60);
+
+      switchScreen("quiz");
+    }
+
+    function startTopicPractice(topic) {
+      startQuiz("practice", topic);
+    }
+
+    function startErrorsPractice() {
+      startQuiz("errors");
+    }
+
+    function startExam(mode = "exam") {
+      startQuiz(mode);
+    }
+
+    function clearQuizTimer() {
+      if (state.timerHandle) {
+        clearInterval(state.timerHandle);
+        state.timerHandle = null;
+      }
+      state.timerSeconds = 0;
+    }
+
+    function startQuizTimer(seconds) {
+      clearQuizTimer();
+      state.timerSeconds = seconds;
+      updateTimerChip();
+      state.timerHandle = setInterval(() => {
+        state.timerSeconds -= 1;
+        updateTimerChip();
+        if (state.timerSeconds <= 0) {
+          clearQuizTimer();
+          finishQuiz(true);
+        }
+      }, 1000);
+    }
+
+    function updateTimerChip() {
+      const el = document.getElementById("quizTimerChip");
+      if (!el) return;
+      if (state.timerSeconds > 0) {
+        const m = Math.floor(state.timerSeconds / 60).toString().padStart(2, "0");
+        const s = Math.max(0, state.timerSeconds % 60).toString().padStart(2, "0");
+        el.textContent = `⏳ ${m}:${s}`;
+        el.style.display = "inline-flex";
+      } else {
+        el.style.display = "none";
+      }
+    }
+
+    function nextQuestion() {
+      if (state.currentQuizIndex < state.currentQuizPool.length - 1) {
+        state.currentQuizIndex += 1;
+        state.quizAnswered = false;
+        state.quizSelected = null;
+        switchScreen("quiz");
+      } else {
+        finishQuiz(false);
+      }
+    }
+
+    function finishQuiz(auto = false) {
+      clearQuizTimer();
+
+      const subject = getCurrentSubject();
+      const p = ensureSubjectProgress(subject.id);
+      p.lastPractice = new Date().toLocaleString("ru-RU");
+      saveProgress();
+
+      const title = auto ? "Время вышло" : "Тренировка завершена";
+      alert(`${title}.\nПравильных: ${p.correct}\nОшибок: ${p.wrong}`);
+      state.currentTheorySectionId = null;
+      switchScreen("subject");
+    }
+
+    function checkAnswer(answer) {
+      if (state.quizAnswered) return;
+
+      const subject = getCurrentSubject();
+      const question = state.currentQuizPool[state.currentQuizIndex];
+      const isCorrect = answer === question.answer;
+      const p = ensureSubjectProgress(subject.id);
+
+      state.quizAnswered = true;
+      state.quizSelected = answer;
+
+      if (isCorrect) {
+        p.correct += 1;
+        p.streak = (p.streak || 0) + 1;
+        p.bestStreak = Math.max(p.bestStreak || 0, p.streak);
+      } else {
+        p.wrong += 1;
+        p.streak = 0;
+      }
+
+      p.solved += 1;
+      p.lastPractice = new Date().toLocaleString("ru-RU");
+
+      const topic = question.topic || "Без темы";
+      if (!p.byTopic[topic]) p.byTopic[topic] = { solved: 0, correct: 0, wrong: 0 };
+      p.byTopic[topic].solved += 1;
+      if (isCorrect) p.byTopic[topic].correct += 1;
+      else p.byTopic[topic].wrong += 1;
+
+      p.history.unshift({
+        q: question.q,
+        selected: answer,
+        correct: question.answer,
+        topic,
+        isCorrect,
+        ts: new Date().toLocaleString("ru-RU")
+      });
+      p.history = p.history.slice(0, 12);
+      saveProgress();
+
+      renderScreen("quiz");
+    }
+
+    function renderHome() {
+      const subject = getCurrentSubject();
+      const p = ensureSubjectProgress(subject.id);
+      const accuracy = calcAccuracy(p.correct, p.wrong);
+      const xp = calcXP(p);
+      const xpPct = xp % 100;
+      const solved = p.solved || 0;
+
+      const subjectCards = SUBJECTS.map(s => {
+        const sp = ensureSubjectProgress(s.id);
+        const sAcc = calcAccuracy(sp.correct, sp.wrong);
+        return `
+          <div class="card subject-card" onclick="showSubject('${s.id}')">
+            <div class="subject-top">
+              <div class="subject-icon">${s.icon}</div>
+              <div style="min-width:0;">
+                <h3 class="subject-title">${s.title}</h3>
+                <p class="subject-desc">${s.description}</p>
+              </div>
+            </div>
+            <div class="subject-footer">
+              <div class="chip-row">
+                <span class="chip">📝 ${s.topics.length} тем</span>
+                <span class="chip">✅ ${sp.solved || 0} решено</span>
+                <span class="chip">🎯 ${sAcc}%</span>
+              </div>
+              <button class="btn small primary" type="button">Открыть</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      return `
+        <div class="hero">
+          <div class="hero-row">
+            <div>
+              <h1 class="h1">Подготовка к ОГЭ без лишнего шума</h1>
+              <p class="lead" style="margin-top:10px;">
+                Сейчас активна география: теория, практика, карты, пробник, статистика и AI-объяснения.
+                Архитектура уже сделана так, чтобы потом добавить другие предметы без переделки интерфейса.
+              </p>
+            </div>
+            <div class="chips">
+              <span class="chip">📈 Прогресс сохраняется</span>
+              <span class="chip">🧠 AI-ready</span>
+              <span class="chip">🧩 Модульные предметы</span>
+            </div>
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-meta">
+              <span>География: ${solved}/${subject.questions.length}</span>
+              <span>Точность: ${accuracy}% • XP: ${xp}</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${xpPct}%"></div></div>
+          </div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="grid subjects">
+          ${subjectCards}
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="grid two">
+          <div class="panel">
+            <div class="section-title">Быстрый старт</div>
+            <div class="grid two" style="margin-top:12px;">
+              <div class="card" style="cursor:pointer;" onclick="showSubject('geo')">
+                <div class="menu-icon theory" style="margin-bottom:10px;">🌍</div>
+                <div class="topic-name">География</div>
+                <div class="topic-meta">Открыть основную витрину предмета</div>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="showView('practice')">
+                <div class="menu-icon practice" style="margin-bottom:10px;">📝</div>
+                <div class="topic-name">Практика</div>
+                <div class="topic-meta">Случайные задания и темы</div>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="showView('theory')">
+                <div class="menu-icon theory" style="margin-bottom:10px;">📚</div>
+                <div class="topic-name">Теория</div>
+                <div class="topic-meta">Секции и темы кодификатора</div>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="showView('ai')">
+                <div class="menu-icon ai" style="margin-bottom:10px;">🤖</div>
+                <div class="topic-name">AI-тьютор</div>
+                <div class="topic-meta">Разбор ошибки или темы</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">Задание дня</div>
+            <div class="bubble bot" style="margin-top:12px;">
+              Какая природная зона расположена севернее: <b>тундра</b>, <b>лесостепь</b> или <b>степь</b>?
+              <br><br>
+              Эта логика постоянно встречается в ОГЭ по географии.
+            </div>
+            <div class="chips" style="margin-top:12px;">
+              <button class="btn primary" onclick="startQuiz('practice')">Потренироваться</button>
+              <button class="btn" onclick="openAiWithPrompt('Объясни, как запомнить природные зоны России от севера к югу для ОГЭ')">AI-разбор</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:2px"></div>
+        <div class="footer-note">
+          Интерфейс уже заточен под расширение: новые предметы, новые блоки, AI-объяснения, платные версии и отчёты для родителей.
+        </div>
+      `;
+    }
+
+    function renderSubject() {
+      const subject = getCurrentSubject();
+      const p = ensureSubjectProgress(subject.id);
+      const accuracy = calcAccuracy(p.correct, p.wrong);
+      const xp = calcXP(p);
+      const xpPct = xp % 100;
+      const solved = p.solved || 0;
+
+      const menu = [
+        { icon: "📚", cls: "theory", title: "Теория по темам", sub: "Разделы кодификатора и объяснения", action: "showView('theory')" },
+        { icon: "📝", cls: "practice", title: "Практика заданий", sub: "Тесты, ошибки и тренировка", action: "showView('practice')" },
+        { icon: "🗺️", cls: "maps", title: "Работа с картами", sub: "Координаты, топокарта, атлас", action: "showView('maps')" },
+        { icon: "🎯", cls: "exam", title: "Пробный вариант", sub: "Полный пробник и тайм-режим", action: "showView('exam')" },
+        { icon: "📊", cls: "stats", title: "Моя статистика", sub: "Прогресс, слабые темы, история", action: "showView('stats')" },
+        { icon: "🤖", cls: "ai", title: "AI-тьютор", sub: "Разбор ошибок и генерация объяснений", action: "showView('ai')" }
+      ];
+
+      const menuHtml = menu.map((item, idx) => `
+        <div class="menu-item" onclick="${item.action}">
+          <div class="menu-icon ${item.cls}">${item.icon}</div>
+          <div class="menu-label">
+            <div class="title">${item.title}</div>
+            <div class="sub">${item.sub}</div>
+          </div>
+          <span class="menu-arrow">›</span>
+        </div>
+        ${idx < menu.length - 1 ? '<div class="menu-divider"></div>' : ''}
+      `).join("");
+
+      return `
+        <div class="breadcrumbs">
+          <button onclick="goHome()">Главная</button>
+          <span>›</span>
+          <span>${subject.shortTitle}</span>
+        </div>
+
+        <div class="hero" style="margin-top:12px;">
+          <div class="hero-row">
+            <div>
+              <h2 class="h2">${subject.title} ${subject.icon}</h2>
+              <p class="lead" style="margin-top:8px;">${subject.description}</p>
+            </div>
+            <div class="chips">
+              <span class="chip">${subject.topics.length} тем</span>
+              <span class="chip">✅ ${solved} решено</span>
+              <span class="chip">🎯 ${accuracy}% точность</span>
+            </div>
+          </div>
+
+          <div class="progress-block">
+            <div class="progress-meta">
+              <span>Прогресс: ${solved}/${subject.questions.length}</span>
+              <span>Серия: ${p.streak || 0} • XP: ${xp}</span>
+            </div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${xpPct}%"></div></div>
+          </div>
+
+          <div class="chips">
+            <button class="btn primary" onclick="startQuiz('practice')">🚀 Начать тренировку</button>
+            <button class="btn" onclick="showView('theory')">📘 Темы</button>
+            <button class="btn" onclick="showView('maps')">🗺️ Карты</button>
+            <button class="btn" onclick="showView('ai')">🤖 Разобрать с AI</button>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top:14px;">
+          <div class="panel">
+            <div class="section-title">Главное меню</div>
+            <div class="menu-card" style="margin-top:12px;">
+              ${menuHtml}
+            </div>
+          </div>
+
+          <div class="grid" style="gap:14px; align-content:start;">
+            <div class="panel">
+              <div class="section-title">Последняя тренировка</div>
+              <div class="empty" style="margin-top:10px;">
+                ${p.lastPractice ? `Последняя попытка: <b>${escapeHtml(p.lastPractice)}</b>` : "Пока нет попыток. Нажми «Начать тренировку»."}
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="section-title">Что внутри</div>
+              <div class="empty" style="margin-top:10px;">
+                • задания формата ОГЭ<br>
+                • мгновенная проверка<br>
+                • объяснение ошибки<br>
+                • прогресс по темам<br>
+                • архитектура под AI и новые предметы
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+          <div class="section-title">Темы</div>
+          <div class="topics-list" style="margin-top:12px;">
+            ${subject.topics.map(t => `
+              <div class="topic-item">
+                <div>
+                  <p class="topic-name">${t}</p>
+                  <div class="topic-meta">Можно запустить отдельную тренировку по этой теме</div>
+                </div>
+                <button class="btn small" onclick="startTopicPractice(${JSON.stringify(t)})">Тренировать</button>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderTheory() {
+      const subject = getCurrentSubject();
+      if (state.currentTheorySectionId) {
+        const section = THEORY_SECTIONS.find(s => s.id === state.currentTheorySectionId);
+        if (!section) {
+          state.currentTheorySectionId = null;
+          return renderTheory();
+        }
+
+        return `
+          <div class="breadcrumbs">
+            <button onclick="goHome()">Главная</button>
+            <span>›</span>
+            <button onclick="showView('theory')">${subject.shortTitle}</button>
+            <span>›</span>
+            <span>${section.title}</span>
+          </div>
+
+          <div class="hero" style="margin-top:12px;">
+            <div class="hero-row">
+              <div>
+                <h2 class="h2">${section.title}</h2>
+                <p class="lead" style="margin-top:8px;">Раздел из кодификатора. Здесь удобно добавлять AI-объяснения по каждой теме.</p>
+              </div>
+              <div class="chips">
+                <span class="chip">${section.topics.length} тем</span>
+                <span class="chip">AI-ready</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="two-col" style="margin-top:14px;">
+            <div class="panel">
+              <div class="chips" style="margin-bottom:12px;">
+                <button class="btn ghost" onclick="backToTheoryList()">← К списку разделов</button>
+                <button class="btn" onclick="openAiWithPrompt('Объясни раздел географии: ${escapeHtml(section.title)} простыми словами для ОГЭ. Сначала краткая суть, потом 3 ключевых факта.')">🤖 Объяснить с AI</button>
+              </div>
+
+              <div class="topics-list">
+                ${section.topics.map(topic => `
+                  <div class="topic-item">
+                    <div>
+                      <p class="topic-name">${topic}</p>
+                      <div class="topic-meta">AI-объяснение и практика по этой теме</div>
+                    </div>
+                    <div class="chips">
+                      <button class="btn small" onclick="openAiWithPrompt(${JSON.stringify(`Объясни тему «${topic}» простыми словами для ОГЭ географии. Дай суть, пример и один важный экзаменационный акцент.`)})">🤖 AI</button>
+                      <button class="btn small primary" onclick="startQuiz('practice', ${JSON.stringify(topic)})">📝 Практика</button>
+                    </div>
+                  </div>
+                `).join("")}
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="section-title">Почему это удобно</div>
+              <div class="empty" style="margin-top:10px;">
+                Когда добавишь новые предметы, интерфейс не надо будет переписывать:
+                достаточно расширить массив данных и подать новые темы и вопросы.
+              </div>
+
+              <div class="bubble hint" style="margin-top:12px;">
+                Следующая сильная точка роста — подружить каждую тему с AI-разбором ошибок и персональным планом.
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="breadcrumbs">
+          <button onclick="goHome()">Главная</button>
+          <span>›</span>
+          <span>Теория</span>
+        </div>
+
+        <div class="hero" style="margin-top:12px;">
+          <div class="hero-row">
+            <div>
+              <h2 class="h2">Теория по географии</h2>
+              <p class="lead" style="margin-top:8px;">Сначала смотри раздел, потом открывай тему и при необходимости запускай AI-разбор.</p>
+            </div>
+            <div class="chips">
+              <span class="chip">7 разделов</span>
+              <span class="chip">AI-ready</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="margin-top:14px;">
+          <div class="topics-list">
+            ${THEORY_SECTIONS.map(section => `
+              <div class="topic-item" onclick="openTheorySection(${JSON.stringify(section.id)})">
+                <div>
+                  <p class="topic-name">${section.title}</p>
+                  <div class="topic-meta">${section.topics.length} тем внутри</div>
+                </div>
+                <span class="menu-arrow">›</span>
+              </div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderPractice() {
+      const subject = getCurrentSubject();
+
+      return `
+        <div class="breadcrumbs">
+          <button onclick="goHome()">Главная</button>
+          <span>›</span>
+          <span>Практика</span>
+        </div>
+
+        <div class="hero" style="margin-top:12px;">
+          <div class="hero-row">
+            <div>
+              <h2 class="h2">Практика и тренировка</h2>
+              <p class="lead" style="margin-top:8px;">Сначала выбираешь режим, потом можешь добивать слабые темы отдельно.</p>
+            </div>
+            <div class="chips">
+              <span class="chip">Ошибки</span>
+              <span class="chip">Блиц</span>
+              <span class="chip">По темам</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top:14px;">
+          <div class="panel">
+            <div class="section-title">Режимы</div>
+            <div class="grid two" style="margin-top:12px;">
+              <div class="card" style="cursor:pointer;" onclick="startQuiz('practice')">
+                <div class="menu-icon practice" style="margin-bottom:10px;">🎲</div>
+                <div class="topic-name">Случайные 5</div>
+                <div class="topic-meta">Быстрая разминка</div>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="startQuiz('blitz')">
+                <div class="menu-icon exam" style="margin-bottom:10px;">⏱️</div>
+                <div class="topic-name">Блиц-режим</div>
+                <div class="topic-meta">На время, 5 вопросов</div>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="startErrorsPractice()">
+                <div class="menu-icon stats" style="margin-bottom:10px;">📊</div>
+                <div class="topic-name">Мои ошибки</div>
+                <div class="topic-meta">Повторяем слабые места</div>
+              </div>
+              <div class="card" style="cursor:pointer;" onclick="showView('exam')">
+                <div class="menu-icon exam" style="margin-bottom:10px;">🎯</div>
+                <div class="topic-name">Пробник</div>
+                <div class="topic-meta">Полный формат</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="section-title">Темы для тренировки</div>
+            <div class="topics-list" style="margin-top:12px;">
+              ${subject.topics.map(topic => `
+                <div class="topic-item">
+                  <div>
+                    <p class="topic-name">${topic}</p>
+                    <div class="topic-meta">Запусти тренировку по этой теме</div>
+                  </div>
+                  <button class="btn small primary" onclick="startTopicPractice(${JSON.stringify(topic)})">Начать</button>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderQuiz() {
+      const subject = getCurrentSubject();
+      const question = state.currentQuizPool[state.currentQuizIndex];
+      if (!question) {
+        return `
+          <div class="panel">
+            <div class="empty">Вопросов нет. Вернись назад и выбери другой режим.</div>
+          </div>
+        `;
+      }
+
+      const isLast = state.currentQuizIndex >= state.currentQuizPool.length - 1;
+      const p = ensureSubjectProgress(subject.id);
+      const score = `${p.correct} / ${p.correct + p.wrong}`;
+
+      const buttons = question.options.map(opt => {
+        const selected = state.quizSelected === opt;
+        const isCorrect = opt === question.answer;
+        const classes = [
+          "answer-btn",
+          state.quizAnswered && isCorrect ? "correct" : "",
+          state.quizAnswered && selected && !isCorrect ? "wrong" : ""
+        ].filter(Boolean).join(" ");
+
+        return `<button class="${classes}" ${state.quizAnswered ? "disabled" : ""} onclick="checkAnswer(${JSON.stringify(opt)})">${escapeHtml(opt)}</button>`;
+      }).join("");
+
+      const feedback = !state.quizAnswered
+        ? `<div class="feedback">Выбери ответ, чтобы увидеть проверку и объяснение.</div>`
+        : (() => {
+            const correct = state.quizSelected === question.answer;
+            const aiPrompt = `Разбери мою ошибку по географии ОГЭ.
+Вопрос: ${question.q}
+Мой ответ: ${state.quizSelected}
+Правильный ответ: ${question.answer}
+Объясни простыми словами, укажи, где ошибка, и дай короткую запоминалку.`;
+            return correct
+              ? `<div class="feedback good"><b>✅ Верно.</b><br>${escapeHtml(question.explanation)}</div>`
+              : `
+                <div class="feedback bad">
+                  <b>❌ Неверно.</b><br>
+                  Твой ответ: <b>${escapeHtml(state.quizSelected)}</b><br>
+                  Правильный ответ: <b>${escapeHtml(question.answer)}</b><br><br>
+                  ${escapeHtml(question.explanation)}
+                  <div style="margin-top:12px;">
+                    <button class="btn small primary" onclick='openAiWithPrompt(${JSON.stringify(aiPrompt)})'>🤖 Разобрать с AI</button>
+                  </div>
+                </div>
+              `;
+          })();
+
+      const timerChip = state.timerSeconds > 0 ? `<span class="chip" id="quizTimerChip"></span>` : "";
+      const nextLabel = isLast ? "Завершить" : "Следующий вопрос";
+
+      return `
+        <div class="breadcrumbs">
+          <button onclick="goHome()">Главная</button>
+          <span>›</span>
+          <button onclick="showSubject('${subject.id}')">${subject.shortTitle}</button>
+          <span>›</span>
+          <span>Тренировка</span>
+        </div>
+
+        <div class="two-col" style="margin-top:12px;">
+          <div class="panel quiz-box">
+            <div class="quiz-top">
+              <div>
+                <div class="section-title" style="font-size:18px;">${subject.shortTitle}: тренировка</div>
+                <div class="quiz-progress">Вопрос ${state.currentQuizIndex + 1} из ${state.currentQuizPool.length}</div>
+              </div>
+              <div class="chip-row">
+                <span class="chip" id="quizScoreChip">${score}</span>
+                <span class="chip" id="quizTopicChip">Тема: ${state.currentQuizTopic || "смешанная"}</span>
+                ${timerChip}
+              </div>
+            </div>
+
+            <div class="question-card">
+              <p class="question-text">${escapeHtml(question.q)}</p>
+              <div class="answer-grid">
+                ${buttons}
+              </div>
+            </div>
+
+            ${feedback}
+
+            <div class="chips">
+              <button class="btn" id="btnNext" onclick="nextQuestion()" ${!state.quizAnswered ? "disabled" : ""}>${nextLabel}</button>
+              <button class="btn success" id="btnFinish" onclick="finishQuiz(false)" ${!state.quizAnswered ? "disabled" : ""}>Завершить тренировку</button>
+              <button class="btn danger" onclick="startQuiz(state.currentQuizMode || 'practice', state.currentQuizTopic)">Начать заново</button>
+            </div>
+          </div>
+
+          <div class="grid" style="gap:14px; align-content:start;">
+            <div class="panel">
+              <div class="section-title">Подсказка</div>
+              <div class="empty" style="margin-top:10px;">
+                После ответа ты сразу видишь результат и объяснение.
+                Потом это можно заменять AI-разбором без изменения интерфейса.
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="section-title">Что улучшим позже</div>
+              <div class="empty" style="margin-top:10px;">
+                • генерация новых вопросов<br>
+                • объяснение ошибок AI<br>
+                • подбор слабых тем<br>
+                • ежедневный план подготовки
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderExam() {
+      return `
+        <div class="breadcrumbs">
+          <button onclick="goHome()">Главная</button>
+          <span>›</span>
+          <span>Пробник</span>
+        </div>
+
+        <div class="hero" style="margin-top:12px;">
+          <div class="hero-row">
+            <div>
+              <h2 class="h2">Пробный вариант</h2>
+              <p class="lead" style="margin-top:8px;">Тайм-режим и полноценная проверка. Для демо уже готово, позже можно сделать более строгий экзаменационный сценарий.</p>
+            </div>
+            <div class="chips">
+              <span class="chip">⏱ Таймер</span>
+              <span class="chip">📋 Полный формат</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="two-col" style="margin-top:14px;">
+          <div class="panel">
+            <div class="section-title">Выбери формат</div>
+            <div class="
