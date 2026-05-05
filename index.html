@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -163,6 +164,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 <body>
 
 <!-- HOME -->
+
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -203,24 +205,28 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- THEORY -->
+
 <div class="screen" id="s-theory">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
   <div class="scroll" id="theory-content"></div>
 </div>
 
 <!-- TOPIC -->
+
 <div class="screen" id="s-topic">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
   <div class="scroll" id="topic-content"></div>
 </div>
 
 <!-- TRAINING SCREEN -->
+
 <div class="screen" id="s-training">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🧠 Тренировка</div><div style="width:60px"></div></div>
   <div class="scroll" id="training-content"></div>
 </div>
 
 <!-- QUIZ -->
+
 <div class="screen" id="s-quiz">
   <div class="topbar">
     <span class="back-link" onclick="goLessonSelect()">← Тренировка</span>
@@ -246,6 +252,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- RESULT -->
+
 <div class="screen" id="s-result">
   <div class="result-wrap">
     <div class="result-emoji" id="res-emoji">🎉</div>
@@ -266,26 +273,28 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
     </div>
     <div class="res-btns">
       <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="goQuiz()">🔄 Ещё раз</button>
+      <button class="btn-full sec" onclick="location.reload()">🔄 Ещё раз</button>
     </div>
   </div>
 </div>
 
 <!-- EXAM -->
+
 <div class="screen" id="s-exam">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🎯 Пробник</div><div style="width:60px"></div></div>
   <div class="scroll">
     <div class="grid">
-      <div class="grid-item" onclick="goQuiz()">🚀 Начать</div>
-      <div class="grid-item" onclick="goQuiz()">📋 Лёгкий</div>
-      <div class="grid-item" onclick="goQuiz()">📋 Средний</div>
-      <div class="grid-item" onclick="goQuiz()">📋 Сложный</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">🚀 Начать</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">📋 Лёгкий</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">📋 Средний</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">📋 Сложный</div>
     </div>
     <div id="ai-exam" class="ai-panel"></div>
   </div>
 </div>
 
 <!-- MAPS -->
+
 <div class="screen" id="s-maps">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🗺️ Карты</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -295,6 +304,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- STATS -->
+
 <div class="screen" id="s-stats">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -305,6 +315,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- HACKS -->
+
 <div class="screen" id="s-hacks">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💡 Лайфхаки</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -314,6 +325,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- DAILY -->
+
 <div class="screen" id="s-daily">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🔥 Задание дня</div><div style="width:60px"></div></div>
   <div class="scroll">
@@ -324,6 +336,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 </div>
 
 <!-- SUB / SCHED / FRIENDS -->
+
 <div class="screen" id="s-sub">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
   <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Активен до 30.06.2025</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
@@ -345,7 +358,7 @@ const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogeb
 
 const THEORY_FILES = [
   { key:'topo',       title:'🗺 Топографические карты',    file:'theory_topo.json',       tasks:'Задания 1-4' },
-  { key:'synoptic',   title:'🌀 Синоптические карты',      file:'../theory_student.json',    tasks:'Задания 5-6' },
+  { key:'synoptic',   title:'🌀 Синоптические карты',      file:'theory_student.json',    tasks:'Задания 5-6' },
   { key:'climat',     title:'📊 Климат и климатограммы',   file:'theory_climat.json',     tasks:'Задания 7-8' },
   { key:'timezone',   title:'🕐 Часовые пояса',            file:'theory_timezone.json',   tasks:'Задание 17'  },
   { key:'population', title:'👥 Население России',         file:'theory_population.json', tasks:'Задания 23-25'},
@@ -356,7 +369,7 @@ const THEORY_FILES = [
 
 const QUESTIONS_FILES = [
   { key:'topo',       title:'🗺 Топографические карты',    file:'questions_topo.json',       tasks:'Задания 1-4' },
-  { key:'synoptic',   title:'🌀 Синоптические карты',      file:'theory_gpt_context.json',   tasks:'Задания 5-6' },
+  { key:'synoptic',   title:'🌀 Синоптические карты (5-6)', file:'questions_climat.json',   tasks:'Задания 5-6' },
   { key:'climat',     title:'📊 Климат и климатограммы',   file:'questions_climat.json',     tasks:'Задания 7-8' },
   { key:'timezone',   title:'🕐 Часовые пояса',            file:'questions_timezone.json',   tasks:'Задание 17'  },
   { key:'population', title:'👥 Население России',         file:'questions_population.json', tasks:'Задания 23-25'},
@@ -372,16 +385,20 @@ var lessonsLoaded = [];
 
 // Загрузка JSON с GitHub
 async function fetchJSON(filename) {
-  var url;
-  if (filename.startsWith('../')) {
-    url = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/' + filename.replace('../','') + '?nocache=' + Date.now();
-  } else {
-    url = GITHUB_RAW + filename + '?nocache=' + Date.now();
-  }
+  var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
   var r = await fetch(url);
   if (!r.ok) throw new Error('Ошибка загрузки: ' + filename);
   return await r.json();
 }
+
+// Базовые вопросы на случай, если ничего не загрузится
+const fallbackQuestions = [
+  { tag:'Задание 1', text:'Какая река в России является самой длинной?', answers:['Волга','Обь','Енисей','Лена'], correct:3, hint:'Эта река течёт в Восточной Сибири и впадает в море Лаптевых.' },
+  { tag:'Задание 2', text:'Какое озеро является самым глубоким в мире?', answers:['Каспийское','Байкал','Ладожское','Онежское'], correct:1, hint:'Это озеро в Сибири содержит около 20% мировых запасов пресной воды.' },
+  { tag:'Задание 3', text:'На каком хребте расположена гора Эльбрус?', answers:['Уральские горы','Алтай','Большой Кавказ','Саяны'], correct:2, hint:'Этот хребет на юге России — граница между Европой и Азией.' },
+  { tag:'Задание 4', text:'Какой полуостров является самым крупным в России?', answers:['Камчатка','Таймыр','Кольский','Ямал'], correct:1, hint:'Этот полуостров выдаётся в Северный Ледовитый океан.' },
+  { tag:'Задание 5', text:'Какое море омывает Россию с запада?', answers:['Чёрное','Балтийское','Каспийское','Азовское'], correct:1, hint:'Это море омывает Калининградскую область.' },
+];
 
 // Загрузка всех вопросов для тренировки
 async function loadAllLessons() {
@@ -400,28 +417,17 @@ async function loadAllLessons() {
       }
       if (questions.length > 0) {
         lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions });
+      } else {
+        // Если нет вопросов, добавляем заглушку
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: fallbackQuestions });
       }
     } catch(e) {
       console.warn('Не удалось загрузить', f.file, e);
+      lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: fallbackQuestions });
     }
   }
   return lessonsLoaded;
 }
-
-// Базовые уроки
-const lessons = [
-  {
-    title: '🌍 Географические объекты',
-    tasks: 'Задание 1',
-    questions: [
-      { tag:'Задание 1', text:'Какая река в России является самой длинной?', answers:['Волга','Обь','Енисей','Лена'], correct:3, hint:'Эта река течёт в Восточной Сибири и впадает в море Лаптевых.' },
-      { tag:'Задание 2', text:'Какое озеро является самым глубоким в мире?', answers:['Каспийское','Байкал','Ладожское','Онежское'], correct:1, hint:'Это озеро в Сибири содержит около 20% мировых запасов пресной воды.' },
-      { tag:'Задание 3', text:'На каком хребте расположена гора Эльбрус?', answers:['Уральские горы','Алтай','Большой Кавказ','Саяны'], correct:2, hint:'Этот хребет на юге России — граница между Европой и Азией.' },
-      { tag:'Задание 4', text:'Какой полуостров является самым крупным в России?', answers:['Камчатка','Таймыр','Кольский','Ямал'], correct:1, hint:'Этот полуостров выдаётся в Северный Ледовитый океан.' },
-      { tag:'Задание 5', text:'Какое море омывает Россию с запада?', answers:['Чёрное','Балтийское','Каспийское','Азовское'], correct:1, hint:'Это море омывает Калининградскую область.' },
-    ]
-  },
-];
 
 let curQ=0, score=0, answered=false, shuffled=[];
 let curLesson=0, lives=3, hintUsed=false;
@@ -433,8 +439,9 @@ function goScreen(id) {
 }
 
 function goQuiz(lessonIdx) {
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
   curLesson = (lessonIdx !== undefined) ? lessonIdx : 0;
-  shuffled = lessons[curLesson].questions;
+  shuffled = allLessons[curLesson].questions;
   curQ=0; score=0; answered=false; lives=3; hintUsed=false;
   goScreen('s-quiz');
   renderQ();
@@ -446,7 +453,7 @@ async function goLessonSelect() {
   if (lessonsLoaded.length === 0) {
     await loadAllLessons();
   }
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
   renderTrainingPath(allLessons);
 }
 
@@ -454,8 +461,8 @@ function renderTrainingPath(allLessons) {
   var html = '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-bottom:20px">';
   for (var i = 0; i < allLessons.length; i++) {
     var l = allLessons[i];
-    var done = userProgress.completedLessons[i];
-    var prevDone = i === 0 || userProgress.completedLessons[i-1];
+    var done = userProgress.completedLessons[l.title] || userProgress.completedLessons[i];
+    var prevDone = i === 0 || userProgress.completedLessons[allLessons[i-1].title] || userProgress.completedLessons[i-1];
     var isLocked = !prevDone && i > 0;
     var perfect = done && done.score === done.total;
     var nodeColor = perfect ? 'var(--primary2)' : done ? 'var(--primary)' : isLocked ? 'var(--card2)' : '#f5a623';
@@ -463,19 +470,19 @@ function renderTrainingPath(allLessons) {
     var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
     var opacity = isLocked ? '0.45' : '1';
     var clickable = !isLocked ? 'cursor:pointer' : 'cursor:default';
-    var onclk = isLocked ? '' : ` onclick="goQuizFromLoaded(${i})"`;
+    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded(' + i + ')"';
     if (i > 0) {
-      var connColor = userProgress.completedLessons[i-1] ? 'var(--primary2)' : 'var(--border)';
-      html += `<div style="width:3px;height:28px;background:${connColor};margin:0 auto"></div>`;
+      var connColor = userProgress.completedLessons[allLessons[i-1].title] ? 'var(--primary2)' : 'var(--border)';
+      html += '<div style="width:3px;height:28px;background:' + connColor + ';margin:0 auto"></div>';
     }
     var isRight = i % 2 === 1;
-    html += `<div style="display:flex;align-items:center;gap:14px;width:100%;flex-direction:${isRight ? 'row-reverse' : 'row'};opacity:${opacity}">`;
-    html += `<div${onclk} style="width:64px;height:64px;border-radius:50%;background:${nodeColor};border:${nodeBorder};display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;${clickable}">${nodeIcon}</div>`;
-    html += `<div style="flex:1"><div style="font-weight:700;font-size:14px">${l.title}</div>`;
+    html += '<div style="display:flex;align-items:center;gap:14px;width:100%;flex-direction:' + (isRight ? 'row-reverse' : 'row') + ';opacity:' + opacity + '">';
+    html += '<div' + onclk + ' style="width:64px;height:64px;border-radius:50%;background:' + nodeColor + ';border:' + nodeBorder + ';display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;' + clickable + '">' + nodeIcon + '</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">' + l.title + '</div>';
     if (done) {
-      html += `<div style="font-size:11px;color:var(--primary2);margin-top:3px">${done.score}/${done.total} верно</div>`;
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">' + done.score + '/' + done.total + ' верно</div>';
     } else {
-      html += `<div style="font-size:11px;color:var(--muted);margin-top:3px">${l.questions ? l.questions.length : 0} вопр.</div>`;
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + (l.questions ? l.questions.length : 0) + ' вопр.</div>';
     }
     html += '</div></div>';
   }
@@ -484,9 +491,9 @@ function renderTrainingPath(allLessons) {
 }
 
 function goQuizFromLoaded(idx) {
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
   curLesson = idx;
-  shuffled = allLessons[idx].questions;
+  shuffled = allLessons[curLesson].questions;
   curQ=0; score=0; answered=false; lives=3; hintUsed=false;
   goScreen('s-quiz');
   renderQ();
@@ -496,9 +503,9 @@ function initTheory() {
   var html = '<div class="sec-title">📚 Темы по кодификатору ОГЭ 2026</div><div class="topic-list">';
   for (var i = 0; i < THEORY_FILES.length; i++) {
     var f = THEORY_FILES[i];
-    html += `<div class="topic-item" style="display:flex;align-items:center;justify-content:space-between" onclick="showTopicFromGithub('${f.key}')">`;
-    html += `<div><div style="font-weight:600;font-size:14px">${f.title}</div>`;
-    html += `<div style="font-size:11px;color:var(--muted);margin-top:3px">${f.tasks}</div></div>`;
+    html += '<div class="topic-item" style="display:flex;align-items:center;justify-content:space-between" onclick="showTopicFromGithub(\'' + f.key + '\')">';
+    html += '<div><div style="font-weight:600;font-size:14px">' + f.title + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + f.tasks + '</div></div>';
     html += '<div style="color:var(--primary);font-size:16px">▶</div></div>';
   }
   html += '</div><div id="ai-theory" class="ai-panel"></div>';
@@ -527,10 +534,10 @@ async function showTopicFromGithub(key) {
     for (var i = 0; i < data.length; i++) {
       var card = data[i];
       html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">';
-      html += `<div style="padding:12px 14px;background:#58a6ff08;border-bottom:1px solid #58a6ff20;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCard('card-${i}')">`;
-      html += `<div style="font-size:13px;font-weight:600">${card.topic}</div>`;
-      html += `<div id="arr-${i}" style="color:var(--muted);font-size:14px">▼</div></div>`;
-      html += `<div id="card-${i}" style="display:none;padding:14px;font-size:13px;line-height:1.65;color:#c8d8e8;white-space:pre-line">${card.content}</div></div>`;
+      html += '<div style="padding:12px 14px;background:#58a6ff08;border-bottom:1px solid #58a6ff20;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCard(\'card-' + i + '\')">';
+      html += '<div style="font-size:13px;font-weight:600">' + card.topic + '</div>';
+      html += '<div id="arr-' + i + '" style="color:var(--muted);font-size:14px">▼</div></div>';
+      html += '<div id="card-' + i + '" style="display:none;padding:14px;font-size:13px;line-height:1.65;color:#c8d8e8;white-space:pre-line">' + card.content + '</div></div>';
     }
     html += '</div><div id="ai-topic" class="ai-panel" style="margin-top:14px"></div>';
     document.getElementById('topic-content').innerHTML = html;
@@ -545,24 +552,28 @@ async function showTopicFromGithub(key) {
 function toggleCard(id) {
   var el = document.getElementById(id);
   var idx = id.split("-")[1];
-  var arr = document.getElementById("arr-"+idx);
+  var arr = document.getElementById("arr-" + idx);
   if(el.style.display === "none") {
     el.style.display = "block";
-    arr.style.transform = "rotate(180deg)";
+    if(arr) arr.style.transform = "rotate(180deg)";
   } else {
     el.style.display = "none";
-    arr.style.transform = "rotate(0deg)";
+    if(arr) arr.style.transform = "rotate(0deg)";
   }
 }
 
 function renderQ() {
+  if(!shuffled || shuffled.length === 0) {
+    shuffled = fallbackQuestions;
+  }
   const q = shuffled[curQ];
-  const lesson = lessonsLoaded.length > 0 ? lessonsLoaded[curLesson] : lessons[curLesson];
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  const lesson = allLessons[curLesson];
   answered = false; 
   hintUsed = false;
 
-  document.getElementById('quiz-topic-lbl').textContent = lesson.title;
-  document.getElementById('lesson-badge').textContent = lesson.title + ' · Вопрос ' + (curQ+1) + ' из ' + shuffled.length;
+  document.getElementById('quiz-topic-lbl').textContent = lesson ? lesson.title : 'Тренировка';
+  document.getElementById('lesson-badge').textContent = (lesson ? lesson.title : 'Тренировка') + ' · Вопрос ' + (curQ+1) + ' из ' + shuffled.length;
   document.getElementById('quiz-counter').textContent = (curQ+1) + '/' + shuffled.length;
   document.getElementById('qpf').style.width = ((curQ/shuffled.length)*100) + '%';
   document.getElementById('q-tag').textContent = q.tag;
@@ -590,7 +601,11 @@ function renderQ() {
     const b = document.createElement('button');
     b.className = 'ans-btn';
     b.innerHTML = '<div class="ans-letter">' + letters[i] + '</div><span>' + q.answers[i] + '</span>';
-    b.onclick = (function(idx) { return function() { selectAns(idx, q.correct, q.text, lesson.title, q.hint); }; })(i);
+    b.onclick = (function(idx) { 
+      return function() { 
+        selectAns(idx, q.correct, q.text, lesson ? lesson.title : 'Тренировка', q.hint); 
+      };
+    })(i);
     ans.appendChild(b);
   }
 }
@@ -598,6 +613,7 @@ function renderQ() {
 async function getHint() {
   if(hintUsed) return;
   hintUsed = true;
+  if(!shuffled || shuffled.length === 0) return;
   const q = shuffled[curQ];
   const btn = document.getElementById('btn-hint');
   btn.textContent = '⏳ Думаю...';
@@ -607,18 +623,19 @@ async function getHint() {
   hintBox.textContent = q.hint || 'Подсказка загружается...';
 
   try {
+    var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
     const r = await fetch(PROXY, {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
         question:'Дай короткую подсказку (1-2 предложения, не давай ответ) к вопросу ОГЭ: '+q.text, 
-        context: (lessonsLoaded.length > 0 ? lessonsLoaded[curLesson].title : lessons[curLesson].title)
+        context: allLessons[curLesson] ? allLessons[curLesson].title : 'География ОГЭ'
       })
     });
     const d = await r.json();
     if(d.answer) hintBox.textContent = '💡 '+d.answer;
   } catch(e) {
-    // Оставляем стандартную подсказку
+    console.warn('AI подсказка не доступна');
   }
   btn.textContent = '💡 Подсказка получена';
 }
@@ -644,7 +661,7 @@ function selectAns(idx, correct, qText, topic, hint) {
   }
 
   const aiEl = document.getElementById('ai-quiz');
-  aiEl.style.display = 'block';
+  if(aiEl) aiEl.style.display = 'block';
 
   var autoMsg = idx===correct
     ? 'Правильно! Объясни почему ответ верный на вопрос: '+qText
@@ -686,31 +703,34 @@ function showResult() {
   else if(pct>=40){e='📖';t='Продолжай учиться';}
   document.getElementById('res-emoji').textContent = e;
   document.getElementById('res-title').textContent = t;
-  document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
+  document.getElementById('res-sub').textContent = pct + '% правильных ответов';
   document.getElementById('ring-num').textContent = score;
-  document.getElementById('ring-denom').textContent = `из ${total}`;
+  document.getElementById('ring-denom').textContent = 'из ' + total;
   document.getElementById('res-c').textContent = score;
   document.getElementById('res-w').textContent = total-score;
   var xpGain = score*20 + (score===total ? 50 : 0);
-  document.getElementById('res-xp').textContent = '+'+xpGain;
+  document.getElementById('res-xp').textContent = '+' + xpGain;
   saveLesson(curLesson, score, total);
   updateHomeUI();
   goScreen('s-result');
-  setTimeout(()=>{ 
-    var circumference = 2 * Math.PI * 54; // ~339.29
+  setTimeout(function(){ 
+    var circumference = 2 * Math.PI * 54;
     var offset = circumference * (1 - score/total);
-    document.getElementById('ring-fill').style.strokeDashoffset = offset;
+    var ringFill = document.getElementById('ring-fill');
+    if(ringFill) ringFill.style.strokeDashoffset = offset;
   }, 100);
 }
 
 // AI
-function initAI(cid, ctx, prompts=[], autoOpen=false) {
-  const el=document.getElementById(cid);
+function initAI(cid, ctx, prompts, autoOpen) {
+  prompts = prompts || [];
+  autoOpen = autoOpen || false;
+  const el = document.getElementById(cid);
   if(!el) return;
   var promptsHtml = '';
   for(var i = 0; i < prompts.length; i++) {
     var p = prompts[i];
-    promptsHtml += `<button class="ai-prompt-btn" onclick="sendP('${cid}','${ctx.replace(/'/g,"\\'").replace(/"/g,'&quot;')}','${p.replace(/'/g,"\\'")}')">${p}</button>`;
+    promptsHtml += '<button class="ai-prompt-btn" onclick="sendP(\'' + cid + '\',\'' + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\',\'' + p.replace(/'/g, "\\'") + '\')">' + p + '</button>';
   }
   el.innerHTML = `
     <div class="ai-header" onclick="toggleAI(this)">
@@ -718,16 +738,16 @@ function initAI(cid, ctx, prompts=[], autoOpen=false) {
         <div class="ai-avatar">🤖</div>
         <div><div class="ai-name">AI-репетитор</div><div class="ai-tagline">Спроси — объясню как педагог</div></div>
       </div>
-      <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
+      <div class="ai-toggle ` + (autoOpen ? 'open' : '') + `">▼</div>
     </div>
-    <div class="ai-body ${autoOpen?'open':''}">
-      <div class="ai-context">📌 ${ctx}</div>
-      <div class="ai-prompts">${promptsHtml}</div>
-      <div class="ai-messages" id="msgs-${cid}"></div>
+    <div class="ai-body ` + (autoOpen ? 'open' : '') + `">
+      <div class="ai-context">📌 ` + ctx + `</div>
+      <div class="ai-prompts">` + promptsHtml + `</div>
+      <div class="ai-messages" id="msgs-` + cid + `"></div>
       <div class="ai-input-row">
-        <textarea class="ai-input" id="inp-${cid}" placeholder="Задай вопрос..." rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('${cid}','${ctx.replace(/'/g,"\\'").replace(/"/g,'&quot;')}');}"></textarea>
-        <button class="ai-send" id="snd-${cid}" onclick="sendM('${cid}','${ctx.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">➤</button>
+        <textarea class="ai-input" id="inp-` + cid + `" placeholder="Задай вопрос..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `');}"></textarea>
+        <button class="ai-send" id="snd-` + cid + `" onclick="sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `')">➤</button>
       </div>
     </div>
   `;
@@ -736,46 +756,51 @@ function initAI(cid, ctx, prompts=[], autoOpen=false) {
 function toggleAI(h) {
   const b = h.nextElementSibling;
   const t = h.querySelector('.ai-toggle');
-  b.classList.toggle('open');
-  t.classList.toggle('open');
+  if(b) b.classList.toggle('open');
+  if(t) t.classList.toggle('open');
 }
 
 function sendP(cid,ctx,text) {
-  document.getElementById(`inp-${cid}`).value = text;
+  var inp = document.getElementById('inp-' + cid);
+  if(inp) inp.value = text;
   sendM(cid,ctx);
 }
 
 async function sendM(cid,ctx) {
-  const inp = document.getElementById(`inp-${cid}`);
-  const snd = document.getElementById(`snd-${cid}`);
-  const msgs = document.getElementById(`msgs-${cid}`);
-  const text = inp.value.trim();
+  const inp = document.getElementById('inp-' + cid);
+  const snd = document.getElementById('snd-' + cid);
+  const msgs = document.getElementById('msgs-' + cid);
+  const text = inp ? inp.value.trim() : '';
   if(!text) return;
-  inp.value = '';
-  snd.disabled = true;
-  msgs.innerHTML += `<div class="msg user">${text}</div>`;
-  const lid = 'l'+Date.now();
-  msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Думаю...</div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-  try {
-    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
-    const d = await r.json();
-    const ans = d.answer || 'Не удалось получить ответ';
-    document.getElementById(lid)?.remove();
-    msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
-  } catch(e) {
-    document.getElementById(lid)?.remove();
-    msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`;
+  if(inp) inp.value = '';
+  if(snd) snd.disabled = true;
+  if(msgs) {
+    msgs.innerHTML += '<div class="msg user">' + text + '</div>';
+    const lid = 'l' + Date.now();
+    msgs.innerHTML += '<div class="msg ai loading" id="' + lid + '">⏳ Думаю...</div>';
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+      const d = await r.json();
+      const ans = d.answer || 'Не удалось получить ответ';
+      var loadingEl = document.getElementById(lid);
+      if(loadingEl) loadingEl.remove();
+      msgs.innerHTML += '<div class="msg ai">' + ans.replace(/\n/g,'<br>') + '</div>';
+    } catch(e) {
+      var loadingEl2 = document.getElementById(lid);
+      if(loadingEl2) loadingEl2.remove();
+      msgs.innerHTML += '<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>';
+    }
+    if(snd) snd.disabled = false;
+    msgs.scrollTop = msgs.scrollHeight;
   }
-  snd.disabled = false;
-  msgs.scrollTop = msgs.scrollHeight;
 }
 
 // ПРОГРЕСС — Telegram CloudStorage
 var userProgress = {
-  xp: 0,
-  level: 1,
-  streak: 0,
+  xp: 245,
+  level: 4,
+  streak: 7,
   lastDate: '',
   completedLessons: {},
   totalAnswered: 0,
@@ -799,14 +824,14 @@ function loadProgress(callback) {
       if (!err && val) {
         try { userProgress = JSON.parse(val); } catch(e){}
       }
-      callback();
+      if(callback) callback();
     });
   } else {
     try {
       var saved = localStorage.getItem('geo_progress');
       if (saved) userProgress = JSON.parse(saved);
     } catch(e){}
-    callback();
+    if(callback) callback();
   }
 }
 
@@ -835,7 +860,7 @@ function showXPToast(amount) {
   toast.textContent = '+' + amount + ' XP ⚡';
   toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation:fadeUp .3s ease;';
   document.body.appendChild(toast);
-  setTimeout(function(){ toast.remove(); }, 2000);
+  setTimeout(function(){ if(toast) toast.remove(); }, 2000);
 }
 
 function updateHomeUI() {
@@ -867,7 +892,9 @@ function getDayWord(n) {
 
 function saveLesson(lessonIdx, sc, total) {
   var today = new Date().toISOString().slice(0,10);
-  userProgress.completedLessons[lessonIdx] = { score: sc, total: total, date: today };
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+  userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
   userProgress.totalAnswered += total;
   userProgress.totalCorrect += sc;
   var xpGain = sc * 20 + (sc === total ? 50 : 0);
@@ -882,13 +909,13 @@ if (tg) tg.expand();
 loadProgress(function() {
   checkStreak();
   updateHomeUI();
-  initAI('ai-home','подготовка к ОГЭ по географии',['🎯 С чего начать подготовку?','📅 Составь план на неделю','💡 Частые ошибки на ОГЭ']);
+  initAI('ai-home','подготовка к ОГЭ по географии',['🎯 С чего начать подготовку?','📅 Составь план на неделю','💡 Частые ошибки на ОГЭ'], false);
   setTimeout(function(){
-    initAI('ai-exam','пробный вариант ОГЭ по географии',['🎯 Как решать пробник?','⏰ Как распределить время?']);
-    initAI('ai-maps','работа с картами на ОГЭ',['🗺️ Как читать топокарту?','🧭 Как определить координаты?']);
-    initAI('ai-stats','слабые темы: климатограммы и часовые пояса',['📊 Объясни климатограммы','🕐 Как считать часовые пояса?']);
-    initAI('ai-hacks','лайфхаки для ОГЭ по географии',['🧠 Дай запоминалку','✍️ Шаблон для ответа']);
-    initAI('ai-daily','задание дня — определи страну по контуру',['❓ Подсказка к заданию','📖 Расскажи про эту страну']);
+    initAI('ai-exam','пробный вариант ОГЭ по географии',['🎯 Как решать пробник?','⏰ Как распределить время?'], false);
+    initAI('ai-maps','работа с картами на ОГЭ',['🗺️ Как читать топокарту?','🧭 Как определить координаты?'], false);
+    initAI('ai-stats','слабые темы: климатограммы и часовые пояса',['📊 Объясни климатограммы','🕐 Как считать часовые пояса?'], false);
+    initAI('ai-hacks','лайфхаки для ОГЭ по географии',['🧠 Дай запоминалку','✍️ Шаблон для ответа'], false);
+    initAI('ai-daily','задание дня — определи страну по контуру',['❓ Подсказка к заданию','📖 Расскажи про эту страну'], false);
     initTheory();
   }, 50);
 });
