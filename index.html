@@ -1,929 +1,925 @@
 <!DOCTYPE html>
+
 <html lang="ru">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ГеоПро — Подготовка к ОГЭ</title>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-:root{
-  --bg:#0d1117;
-  --card:#161b22;
-  --card2:#1c2333;
-  --primary:#58a6ff;
-  --primary2:#3fb950;
-  --text:#f0f6fc;
-  --muted:#8b949e;
-  --danger:#f85149;
-  --gold:#d29922;
-  --border:#ffffff0c;
-  --radius:18px;
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1c2333;
+  --primary: #58a6ff;
+  --primary2: #3fb950;
+  --text: #f0f6fc;
+  --muted: #8b949e;
+  --danger: #f85149;
+  --gold: #d29922;
+  --border: #ffffff0c;
+  --radius: 18px;
+  --font-h: 'Unbounded', sans-serif;
+  --font-b: 'Onest', sans-serif;
 }
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;}
-body{font-family:'Segoe UI',system-ui,-apple-system,BlinkMacSystemFont,'Roboto',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
-body::before{content:'';position:fixed;inset:0;background:radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);pointer-events:none;z-index:0;}
-.screen{display:none;flex-direction:column;min-height:100vh;position:relative;z-index:1;}
-.screen.active{display:flex;animation:fadeUp .3s ease;}
-@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-.topbar{padding:16px 18px;display:flex;align-items:center;justify-content:space-between;background:#0f1620;border-bottom:1px solid var(--border);flex-shrink:0;gap:12px;}
-.topbar .left{display:flex;align-items:center;gap:10px;min-width:0;}
-.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
-.username{font-size:13px;font-weight:700;}
-.sublabel{font-size:10px;color:var(--muted);}
-.badge{background:#f8514915;color:#f85149;font-weight:700;font-size:12px;padding:6px 12px;border-radius:20px;white-space:nowrap;}
-.scroll{flex:1;padding:16px;overflow-y:auto;display:flex;flex-direction:column;gap:14px;padding-bottom:92px;}
-.scroll::-webkit-scrollbar{width:3px;}
-.scroll::-webkit-scrollbar-thumb{background:#ffffff15;border-radius:8px;}
-.panel,.card{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);}
-.panel{padding:16px;}
-.xp-panel{background:var(--card2);padding:14px 16px;display:flex;align-items:center;gap:12px;border-radius:var(--radius);}
-.xp-icon{font-size:26px;flex-shrink:0;}
-.xp-bar{height:6px;background:#2d3a55;border-radius:8px;margin:6px 0;overflow:hidden;}
-.xp-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));border-radius:8px;width:0%;}
-.xp-stats{font-size:11px;color:var(--muted);}
-.xp-title{font-weight:600;font-size:14px;}
-.actions{display:flex;gap:10px;}
-.btn{flex:1;padding:14px 8px;border-radius:var(--radius);background:var(--card2);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;gap:5px;color:var(--text);font-weight:600;font-size:12px;cursor:pointer;transition:transform .15s, background .15s;user-select:none;}
-.btn:hover{background:#232c3f;}
-.btn:active{transform:scale(.97);}
-.btn.primary{background:linear-gradient(135deg,var(--primary),#3b8fd9);border:none;box-shadow:0 6px 18px #58a6ff25;}
-.btn.accent{background:linear-gradient(135deg,var(--primary2),#2d8a3e);border:none;box-shadow:0 6px 18px #3fb95025;}
-.btn-icon{font-size:24px;}
-.sec-title{font-size:14px;font-weight:700;}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.grid-item{background:var(--card2);border-radius:var(--radius);padding:14px;border:1px solid var(--border);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;color:#c0c8d0;font-size:12px;font-weight:500;text-align:center;}
-.grid-item:active{background:#253544;}
-.back-link{color:var(--primary);font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
-.topic-list{display:flex;flex-direction:column;gap:8px;}
-.topic-item{background:var(--card2);border-radius:var(--radius);padding:12px 14px;border:1px solid var(--border);cursor:pointer;font-size:13px;color:#c0c8d0;display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.topic-item:active{background:#253544;}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(13,17,23,.96);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;padding:10px 0 22px;z-index:100;}
-.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--muted);font-size:10px;font-weight:500;cursor:pointer;user-select:none;}
-.nav-item.active{color:var(--primary);}
-.nav-icon{font-size:20px;}
-.ai-panel{background:linear-gradient(135deg,#0f1e35,#0d1f2d);border:1px solid #58a6ff30;border-radius:var(--radius);overflow:hidden;}
-.ai-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:#58a6ff0a;border-bottom:1px solid #58a6ff20;cursor:pointer;}
-.ai-header-left{display:flex;align-items:center;gap:10px;}
-.ai-avatar{width:32px;height:32px;border-radius:10px;background:linear-gradient(135deg,var(--primary),var(--primary2));display:flex;align-items:center;justify-content:center;font-size:16px;}
-.ai-name{font-size:13px;font-weight:700;color:var(--primary);}
-.ai-tagline{font-size:10px;color:var(--muted);}
-.ai-toggle{font-size:18px;color:var(--muted);transition:transform .3s;}
-.ai-toggle.open{transform:rotate(180deg);}
-.ai-body{padding:14px;display:none;flex-direction:column;gap:10px;}
-.ai-body.open{display:flex;}
-.ai-prompts{display:flex;flex-wrap:wrap;gap:6px;}
-.ai-prompt-btn{background:#58a6ff15;border:1px solid #58a6ff30;border-radius:20px;padding:6px 12px;font-size:11px;color:var(--primary);cursor:pointer;}
-.ai-messages{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;padding-right:4px;}
-.msg{padding:10px 12px;border-radius:12px;font-size:13px;line-height:1.55;max-width:92%;word-break:break-word;}
-.msg.user{background:#58a6ff20;border:1px solid #58a6ff30;align-self:flex-end;color:var(--text);}
-.msg.ai{background:var(--card);border:1px solid var(--border);align-self:flex-start;color:#c8d8e8;}
-.msg.loading{color:var(--muted);font-style:italic;}
-.ai-input-row{display:flex;gap:8px;align-items:flex-end;}
-.ai-input,.textarea{flex:1;background:var(--card);border:1px solid #58a6ff30;border-radius:12px;padding:10px 12px;color:var(--text);font-size:13px;resize:vertical;min-height:40px;max-height:110px;outline:none;}
-.ai-input:focus,.textarea:focus{border-color:#58a6ff60;}
-.ai-send{width:40px;height:40px;border-radius:12px;flex-shrink:0;background:linear-gradient(135deg,var(--primary),var(--primary2));border:none;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
-.ai-send:active{transform:scale(.93);}
-.ai-send:disabled{opacity:.5;cursor:default;}
-.ai-context{font-size:10px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:8px;padding:4px 8px;}
-.quiz-wrap{flex:1;padding:16px;display:flex;flex-direction:column;gap:14px;padding-bottom:24px;overflow-y:auto;}
-.q-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
-.q-progress{height:4px;background:var(--card2);border-radius:8px;overflow:hidden;flex:1;}
-.q-progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--primary2));transition:width .4s ease;width:0%;}
-.q-card{background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;}
-.q-tag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--primary);margin-bottom:10px;}
-.q-text{font-size:15px;line-height:1.55;font-weight:500;}
-.answers{display:flex;flex-direction:column;gap:8px;}
-.ans-btn{background:var(--card2);border:1.5px solid var(--border);border-radius:14px;padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:var(--text);text-align:left;width:100%;}
-.ans-btn:active{transform:scale(.98);}
-.ans-btn.correct{border-color:var(--primary2);background:rgba(63,185,80,.1);}
-.ans-btn.wrong{border-color:var(--danger);background:rgba(248,81,73,.1);}
-.ans-letter{width:26px;height:26px;border-radius:8px;background:#2a3a55;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
-.ans-btn.correct .ans-letter{background:var(--primary2);}
-.ans-btn.wrong .ans-letter{background:var(--danger);}
-.btn-next{width:100%;background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border:none;border-radius:var(--radius);padding:16px;font-size:13px;font-weight:700;cursor:pointer;display:none;margin-top:4px;}
-.btn-next.show{display:block;}
-.btn-next:active{transform:scale(.97);}
-.result-wrap{flex:1;padding:40px 24px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;overflow-y:auto;padding-bottom:32px;}
-.result-emoji{font-size:64px;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);}
-@keyframes popIn{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-.result-title{font-size:22px;font-weight:800;letter-spacing:-.02em;}
-.result-sub{font-size:14px;color:var(--muted);}
-.ring-wrap{position:relative;width:130px;height:130px;}
-.ring-wrap svg{transform:rotate(-90deg);}
-.ring-bg{fill:none;stroke:var(--card2);stroke-width:10;}
-.ring-fill{fill:none;stroke:url(#rg);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1s ease;}
-.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;}
-.ring-num{font-size:28px;font-weight:800;}
-.ring-denom{font-size:12px;color:var(--muted);}
-.res-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;}
-.res-stat{background:var(--card2);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;}
-.res-num{font-size:18px;font-weight:800;}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+body::before {
+content: ''; position:fixed; inset:0;
+background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+pointer-events:none; z-index:0;
+}
+
+.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; animation:fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+
+.topbar {
+padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
+.sublabel { font-size:10px; color:var(--muted); }
+.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
+
+.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
+.scroll::-webkit-scrollbar { width:3px; }
+.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
+
+.xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
+.xp-icon { font-size:26px; }
+.xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
+.xp-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
+.xp-stats { font-size:11px; color:var(--muted); }
+.xp-title { font-weight:600; font-size:14px; }
+
+.actions { display:flex; gap:10px; }
+.btn { flex:1; padding:14px 6px; border-radius:var(--radius); background:var(--card2); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
+.btn:active { transform:scale(.97); }
+.btn.primary { background:linear-gradient(135deg,var(--primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
+.btn.accent { background:linear-gradient(135deg,var(--primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
+.btn-icon { font-size:24px; }
+
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid-item { background:var(--card2); border-radius:var(--radius); padding:14px; border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
+.grid-item:active { background:#253544; }
+
+.sec-title { font-family:var(--font-h); font-size:14px; font-weight:700; }
+.back-link { color:var(--primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+
+.topic-list { display:flex; flex-direction:column; gap:8px; }
+.topic-item { background:var(--card2); border-radius:var(--radius); padding:12px 14px; border:1px solid var(--border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
+.topic-item:active { background:#253544; }
+
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; font-weight:500; cursor:pointer; }
+.nav-item.active { color:var(--primary); }
+.nav-icon { font-size:20px; }
+
+/* AI PANEL */
+.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
+.ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
+.ai-header-left { display:flex; align-items:center; gap:10px; }
+.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
+.ai-tagline { font-size:10px; color:var(--muted); }
+.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
+.ai-toggle.open { transform:rotate(180deg); }
+
+.ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
+.ai-body.open { display:flex; animation:fadeUp .25s ease; }
+
+.ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
+.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
+.ai-prompt-btn:active { background:#58a6ff30; }
+
+.ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
+.ai-messages::-webkit-scrollbar { width:2px; }
+.ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
+
+.msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
+.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
+.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
+.msg.loading { color:var(--muted); font-style:italic; }
+
+.ai-input-row { display:flex; gap:8px; align-items:flex-end; }
+.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
+.ai-input:focus { border-color:#58a6ff60; }
+.ai-input::placeholder { color:var(--muted); }
+.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.ai-send:active { transform:scale(.93); }
+.ai-send:disabled { opacity:.5; cursor:default; }
+.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
+
+/* QUIZ */
+.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+.quiz-wrap::-webkit-scrollbar { width:3px; }
+.q-header { display:flex; justify-content:space-between; align-items:center; }
+.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
+.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
+.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+.q-text { font-size:15px; line-height:1.55; font-weight:500; }
+.answers { display:flex; flex-direction:column; gap:8px; }
+.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
+.ans-btn:active { transform:scale(.98); }
+.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
+.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
+.ans-btn.correct .ans-letter { background:var(--primary2); }
+.ans-btn.wrong .ans-letter { background:var(--danger); }
+.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
+.btn-next.show { display:block; animation:fadeUp .3s ease; }
+.btn-next:active { transform:scale(.97); }
+
+/* RESULT */
+.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+.result-emoji { font-size:64px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.result-sub { font-size:14px; color:var(--muted); }
+.ring-wrap { position:relative; width:130px; height:130px; }
+.ring-wrap svg { transform:rotate(-90deg); }
+.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
+.ring-denom { font-size:12px; color:var(--muted); }
+.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
+.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
 .res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
-.res-label{font-size:10px;color:var(--muted);margin-top:3px;}
-.res-btns{width:100%;display:flex;flex-direction:column;gap:8px;}
-.btn-full{width:100%;padding:16px;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;}
-.btn-full:active{transform:scale(.97);}
-.btn-full.primary{background:linear-gradient(135deg,var(--primary),var(--primary2));color:#fff;border:none;}
-.btn-full.sec{background:transparent;color:var(--muted);border:1px solid var(--border);}
-.lead{color:#cbd5e1;line-height:1.55;font-size:14px;}
-.hero{background:linear-gradient(135deg,rgba(88,166,255,.11),rgba(63,185,80,.08));border:1px solid rgba(255,255,255,.08);border-radius:22px;padding:18px;display:grid;gap:12px;}
-.hero-row{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-start;}
-.chips{display:flex;flex-wrap:wrap;gap:8px;}
-.chip{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.06);color:#dbeafe;font-size:12px;font-weight:800;}
-.progress-block{display:grid;gap:10px;}
-.progress-meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted);}
-.progress-bar{height:12px;border-radius:999px;overflow:hidden;background:rgba(255,255,255,.08);}
-.progress-fill{height:100%;width:0%;border-radius:999px;background:linear-gradient(90deg,var(--primary2),#22d3ee);transition:width .24s ease;}
-.section-block{display:grid;gap:14px;}
-.module-card{cursor:pointer;}
-.module-title{font-weight:800;font-size:15px;}
-.module-sub{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.45;}
-.small-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
-.small-btn{border:none;border-radius:12px;padding:10px 12px;background:#253347;color:var(--text);font-size:12px;font-weight:700;cursor:pointer;}
-.small-btn.primary{background:linear-gradient(135deg,var(--primary),#3b8fd9);}
-.small-btn.alt{background:linear-gradient(135deg,var(--primary2),#2d8a3e);}
-.feedback{min-height:88px;border-radius:18px;padding:14px 16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);line-height:1.52;color:#dbeafe;}
-.feedback.good{border-color:rgba(34,197,94,.35);background:rgba(34,197,94,.10);}
-.feedback.bad{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.10);}
-.feedback.warn{border-color:#f5a62335;background:#f5a62310;color:#e8d0a0;}
-.map-box{background:#0f1620;border:1px solid var(--border);border-radius:16px;padding:8px;}
-.map-box svg{width:100%;height:auto;display:block;}
-.empty{color:var(--muted);line-height:1.5;font-size:14px;}
-@media (max-width:900px){.grid,.grid-3{grid-template-columns:1fr;}}
-@media (max-width:560px){.scroll{padding:12px;padding-bottom:90px;}.topbar{padding:14px;}}
+.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
+.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
+.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+.btn-full:active { transform:scale(.97); }
+.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
+.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
 </style>
+
 </head>
 <body>
 
+<!-- HOME -->
+
 <div class="screen active" id="s-home">
   <div class="topbar">
-    <div class="left">
+    <div style="display:flex;align-items:center;gap:10px">
       <div class="avatar">🌍</div>
-      <div>
-        <div class="username">ГеоПро</div>
-        <div class="sublabel">Подготовка к ОГЭ</div>
+      <div><div class="username">ГеоПро</div><div class="sublabel">Подготовка к ОГЭ</div></div>
+    </div>
+    <div class="streak">🔥 7 дней</div>
+  </div>
+  <div class="scroll">
+    <div class="xp-panel">
+      <div class="xp-icon">⚡</div>
+      <div style="flex:1">
+        <div class="xp-title">245 / 400 XP · Уровень 4</div>
+        <div class="xp-bar"><div class="xp-fill" style="width:61%"></div></div>
+        <div class="xp-stats">🎯 Цель дня: 12/20 заданий</div>
       </div>
     </div>
-    <div class="badge" id="streak-badge">🔥 0 дней</div>
+    <div class="actions">
+      <div class="btn primary" onclick="goLessonSelect()"><span class="btn-icon">🧠</span>Тренировка</div>
+      <div class="btn accent" onclick="goScreen('s-exam')"><span class="btn-icon">🎯</span>Пробник</div>
+      <div class="btn" onclick="goScreen('s-theory')"><span class="btn-icon">📚</span>Учить</div>
+    </div>
+    <div class="sec-title">📂 Разделы</div>
+    <div class="grid">
+      <div class="grid-item" onclick="goScreen('s-maps')"><span style="font-size:26px">🗺️</span>Карты</div>
+      <div class="grid-item" onclick="goScreen('s-stats')"><span style="font-size:26px">📊</span>Прогресс</div>
+      <div class="grid-item" onclick="goScreen('s-hacks')"><span style="font-size:26px">💡</span>Лайфхаки</div>
+      <div class="grid-item" onclick="goScreen('s-daily')"><span style="font-size:26px">🔥</span>Задание дня</div>
+    </div>
+    <div id="ai-home" class="ai-panel"></div>
   </div>
-  <div class="scroll" id="home-scroll"></div>
   <nav class="bottom-nav">
-    <div class="nav-item active" data-nav="home"><div class="nav-icon">🏠</div>Главная</div>
-    <div class="nav-item" data-nav="theory"><div class="nav-icon">📚</div>Теория</div>
-    <div class="nav-item" data-nav="practice"><div class="nav-icon">🧠</div>Практика</div>
-    <div class="nav-item" data-nav="maps"><div class="nav-icon">🗺️</div>Карты</div>
-    <div class="nav-item" data-nav="exam"><div class="nav-icon">🎯</div>Пробник</div>
-    <div class="nav-item" data-nav="stats"><div class="nav-icon">📊</div>Прогресс</div>
-    <div class="nav-item" data-nav="ai"><div class="nav-icon">🤖</div>AI</div>
+    <div class="nav-item active" onclick="goScreen('s-home')"><div class="nav-icon">🏠</div>Главная</div>
+    <div class="nav-item" onclick="goScreen('s-sub')"><div class="nav-icon">💳</div>Подписка</div>
+    <div class="nav-item" onclick="goScreen('s-sched')"><div class="nav-icon">📅</div>Расписание</div>
+    <div class="nav-item" onclick="goScreen('s-friends')"><div class="nav-icon">👥</div>Друзья</div>
   </nav>
 </div>
 
+<!-- THEORY -->
+
 <div class="screen" id="s-theory">
-  <div class="topbar"><span class="back-link" onclick="goHome()">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
-  <div class="scroll" id="theory-scroll"></div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
+  <div class="scroll" id="theory-content"></div>
 </div>
+
+<!-- TOPIC -->
 
 <div class="screen" id="s-topic">
-  <div class="topbar"><span class="back-link" onclick="goScreen('theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
-  <div class="scroll" id="topic-scroll"></div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+  <div class="scroll" id="topic-content"></div>
 </div>
 
-<div class="screen" id="s-practice">
-  <div class="topbar"><span class="back-link" onclick="goHome()">← Назад</span><div class="sec-title">🧠 Практика</div><div style="width:60px"></div></div>
-  <div class="scroll" id="practice-scroll"></div>
+<!-- TRAINING SCREEN -->
+
+<div class="screen" id="s-training">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🧠 Тренировка</div><div style="width:60px"></div></div>
+  <div class="scroll" id="training-content"></div>
 </div>
 
-<div class="screen" id="s-maps">
-  <div class="topbar"><span class="back-link" onclick="goHome()">← Назад</span><div class="sec-title">🗺️ Карты</div><div style="width:60px"></div></div>
-  <div class="scroll" id="maps-scroll"></div>
-</div>
-
-<div class="screen" id="s-ai">
-  <div class="topbar"><span class="back-link" onclick="goHome()">← Назад</span><div class="sec-title">🤖 AI-тьютор</div><div style="width:60px"></div></div>
-  <div class="scroll" id="ai-scroll"></div>
-</div>
-
-<div class="screen" id="s-stats">
-  <div class="topbar"><span class="back-link" onclick="goHome()">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
-  <div class="scroll" id="stats-scroll"></div>
-</div>
-
-<div class="screen" id="s-exam">
-  <div class="topbar"><span class="back-link" onclick="goHome()">← Назад</span><div class="sec-title">🎯 Пробник</div><div style="width:60px"></div></div>
-  <div class="scroll" id="exam-scroll"></div>
-</div>
+<!-- QUIZ -->
 
 <div class="screen" id="s-quiz">
   <div class="topbar">
-    <span class="back-link" onclick="goHome()">← Выйти</span>
+    <span class="back-link" onclick="goLessonSelect()">← Тренировка</span>
     <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
-    <div id="quiz-counter" style="font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
+    <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
   </div>
-  <div class="quiz-wrap" id="quiz-wrap"></div>
+  <div class="quiz-wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
+      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
+    </div>
+    <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
+    <div class="q-card">
+      <div class="q-tag" id="q-tag">Задание</div>
+      <div class="q-text" id="q-text">...</div>
+    </div>
+    <div class="answers" id="answers"></div>
+    <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">💡 Подсказка от AI</button>
+    <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
+    <div id="ai-quiz" class="ai-panel" style="display:none"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
+  </div>
 </div>
 
+<!-- RESULT -->
+
 <div class="screen" id="s-result">
-  <div class="result-wrap" id="result-wrap"></div>
+  <div class="result-wrap">
+    <div class="result-emoji" id="res-emoji">🎉</div>
+    <div class="result-title" id="res-title">Отлично!</div>
+    <div class="result-sub" id="res-sub">Ты справился!</div>
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
+        <circle class="ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
+    </div>
+    <div class="res-stats">
+      <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
+      <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
+      <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+      <button class="btn-full sec" onclick="location.reload()">🔄 Ещё раз</button>
+    </div>
+  </div>
+</div>
+
+<!-- EXAM -->
+
+<div class="screen" id="s-exam">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🎯 Пробник</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="grid">
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">🚀 Начать</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">📋 Лёгкий</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">📋 Средний</div>
+      <div class="grid-item" onclick="alert('Пробный экзамен в разработке')">📋 Сложный</div>
+    </div>
+    <div id="ai-exam" class="ai-panel"></div>
+  </div>
+</div>
+
+<!-- MAPS -->
+
+<div class="screen" id="s-maps">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🗺️ Карты</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="grid"><div class="grid-item">🧭 Координаты</div><div class="grid-item">📐 Топокарта</div><div class="grid-item">🌐 Атлас мира</div><div class="grid-item">📍 Карта России</div></div>
+    <div id="ai-maps" class="ai-panel"></div>
+  </div>
+</div>
+
+<!-- STATS -->
+
+<div class="screen" id="s-stats">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="xp-panel"><div class="xp-icon">⭐</div><div style="flex:1"><div class="xp-title">Балл: 24 / 31</div><div class="xp-bar"><div class="xp-fill" style="width:77%"></div></div><div class="xp-stats">Заданий: 187 · Точность: 78%</div></div></div>
+    <p style="color:var(--muted);font-size:12px">Слабые темы: климатограммы, часовые пояса.</p>
+    <div id="ai-stats" class="ai-panel"></div>
+  </div>
+</div>
+
+<!-- HACKS -->
+
+<div class="screen" id="s-hacks">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💡 Лайфхаки</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="grid"><div class="grid-item">🧠 Запоминалки</div><div class="grid-item">✍️ Шаблоны</div><div class="grid-item">🗺️ Карточки</div><div class="grid-item">⏰ Тайминг</div></div>
+    <div id="ai-hacks" class="ai-panel"></div>
+  </div>
+</div>
+
+<!-- DAILY -->
+
+<div class="screen" id="s-daily">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🔥 Задание дня</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="xp-panel"><div class="xp-icon">🌍</div><div><div class="xp-title">Определи страну по контуру!</div><p style="color:var(--muted);font-size:12px">Крупнейшая страна Южной Америки.</p></div></div>
+    <div class="grid"><div class="grid-item" onclick="alert('Правильно! +10 XP')">🇧🇷 Бразилия</div><div class="grid-item" onclick="alert('Неверно')">🇦🇷 Аргентина</div></div>
+    <div id="ai-daily" class="ai-panel"></div>
+  </div>
+</div>
+
+<!-- SUB / SCHED / FRIENDS -->
+
+<div class="screen" id="s-sub">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Активен до 30.06.2025</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
+</div>
+<div class="screen" id="s-sched">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📅 Расписание</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📆</div><div><div class="xp-title">Сегодня: теория + пробник</div><p style="color:var(--muted);font-size:12px">5 занятий по 25 минут в неделю</p></div></div></div>
+</div>
+<div class="screen" id="s-friends">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👥 Друзья</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">🏆</div><div><div class="xp-title">Рейтинг друзей</div><p style="color:var(--muted);font-size:12px">Ты на 2 месте, 12 баллов до первого</p></div></div><div class="grid"><div class="grid-item">📩 Пригласить</div><div class="grid-item">📊 Рейтинг</div></div></div>
 </div>
 
 <script>
-// ==================== ДАННЫЕ ====================
-const DATA = {
-  theory_sections: [
-    { id: 'nature', title: '🌿 Природа России', topics: ['Рельеф', 'Климат', 'Внутренние воды', 'Почвы', 'Природные зоны'] },
-    { id: 'population', title: '👥 Население России', topics: ['Численность', 'Размещение', 'Миграции', 'Города', 'Национальный состав'] },
-    { id: 'economy', title: '🏭 Хозяйство России', topics: ['ТЭК', 'Машиностроение', 'Сельское хозяйство', 'Транспорт'] },
-    { id: 'regions', title: '🗺️ Регионы России', topics: ['Европейский Север', 'Центральная Россия', 'Урал', 'Сибирь', 'Дальний Восток'] },
-    { id: 'world', title: '🌐 Страны мира', topics: ['География стран', 'Население мира', 'Мировое хозяйство'] }
-  ],
-  facts: [
-    { module: 'nature', topic: 'Рельеф', term: 'Уральские горы', definition: 'Горы, разделяющие Европу и Азию, протяжённость более 2000 км', prompt: 'Какие горы разделяют Европу и Азию?', explanation: 'Уральские горы — естественная граница между частями света', hint: 'Вспомни границу между Европой и Азией', openPrompt: 'Опишите особенности Уральских гор как границы между Европой и Азией', openAnswer: 'Уральские горы протянулись с севера на юг более чем на 2000 км и являются условной границей между Европой и Азией. Горы невысокие, богаты полезными ископаемыми.' },
-    { module: 'nature', topic: 'Климат', term: 'Муссон', definition: 'Ветер, меняющий направление два раза в год', prompt: 'Как называется ветер, который меняет направление по сезонам?', explanation: 'Муссоны характерны для Дальнего Востока России', hint: 'Этот ветер приносит летом дожди, зимой — сухость', openPrompt: 'Объясните влияние муссонов на климат Дальнего Востока', openAnswer: 'Летом муссон приносит влагу с океана — много осадков и тайфуны. Зимой ветер дует с материка — сухо и морозно.' },
-    { module: 'population', topic: 'Численность', term: 'Урбанизация', definition: 'Рост городов и городского населения', prompt: 'Как называется процесс роста городского населения?', explanation: 'В России урбанизация превышает 70%', hint: 'Связано с переездом людей в города', openPrompt: 'Назовите причины и последствия урбанизации в России', openAnswer: 'Причины: развитие промышленности, лучшие условия жизни. Последствия: экологические проблемы, транспортные заторы, развитие инфраструктуры.' },
-    { module: 'economy', topic: 'ТЭК', term: 'ТЭК', definition: 'Топливно-энергетический комплекс', prompt: 'Что такое ТЭК?', explanation: 'Объединяет добычу и переработку топлива, производство электроэнергии', hint: 'Три буквы — про топливо и энергию', openPrompt: 'Опишите структуру ТЭК России и её значение', openAnswer: 'ТЭК включает нефтяную, газовую, угольную промышленность и электроэнергетику. Обеспечивает страну энергией и даёт доход от экспорта.' },
-    { module: 'regions', topic: 'Сибирь', term: 'Байкал', definition: 'Глубочайшее озеро мира (1642 м)', prompt: 'Какое озеро является самым глубоким в мире?', explanation: 'Байкал содержит 20% мировых запасов пресной воды', hint: 'Находится в Сибири, эндемики — омуль и нерпа', openPrompt: 'Охарактеризуйте уникальность озера Байкал', openAnswer: 'Байкал — самое глубокое озеро (1642 м), древнейшее (25 млн лет), 20% пресной воды мира. Много эндемиков: нерпа, омуль, голомянка.' },
-    { module: 'world', topic: 'Страны мира', term: 'Федерация', definition: 'Форма государственного устройства с субъектами', prompt: 'Как называется государство, состоящее из субъектов?', explanation: 'Россия, США, Германия — федерации', hint: 'Субъекты имеют свои органы власти', openPrompt: 'Сравните федеративное и унитарное устройство', openAnswer: 'В федерации субъекты имеют самостоятельность, есть региональные законы. В унитарном государстве власть централизована.' }
-  ],
-  map_tasks: [
-    { topic: 'Часовые пояса', question: 'Сколько часовых поясов в России?', options: ['8', '9', '10', '11'], answer: '11', explanation: 'Россия расположена в 11 часовых поясах — от Калининградской области до Камчатки.', hint: 'Посчитай от Калининграда до Чукотки', svg: '<svg viewBox="0 0 300 120"><rect x="10" y="30" width="280" height="40" fill="#1a2a4a" rx="4"/><rect x="20" y="40" width="20" height="20" fill="#4a9eff"/><rect x="50" y="40" width="20" height="20" fill="#58a6ff"/><rect x="80" y="40" width="20" height="20" fill="#66b3ff"/><rect x="110" y="40" width="20" height="20" fill="#74c0ff"/><rect x="140" y="40" width="20" height="20" fill="#82cdff"/><rect x="170" y="40" width="20" height="20" fill="#90daff"/><rect x="200" y="40" width="20" height="20" fill="#9ee7ff"/><rect x="230" y="40" width="20" height="20" fill="#acf4ff"/><rect x="260" y="40" width="20" height="20" fill="#baffff"/><text x="30" y="115" fill="#8b949e" font-size="10">2</text><text x="60" y="115" fill="#8b949e" font-size="10">3</text><text x="150" y="115" fill="#8b949e" font-size="10">...</text><text x="270" y="115" fill="#8b949e" font-size="10">12</text></svg>' },
-    { topic: 'Стороны горизонта', question: 'Какой стороне горизонта соответствует азимут 90°?', options: ['Север', 'Юг', 'Запад', 'Восток'], answer: 'Восток', explanation: 'Азимут измеряется от направления на север по часовой стрелке.', hint: 'Север — 0°, восток — 90°', svg: '<svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="50" fill="none" stroke="#58a6ff" stroke-width="1.5"/><line x1="60" y1="10" x2="60" y2="110" stroke="#4a9eff" stroke-width="0.8"/><line x1="10" y1="60" x2="110" y2="60" stroke="#4a9eff" stroke-width="0.8"/><text x="55" y="15" fill="#58a6ff" font-size="10">С</text><text x="55" y="115" fill="#58a6ff" font-size="10">Ю</text><text x="115" y="65" fill="#58a6ff" font-size="10">В</text><text x="5" y="65" fill="#58a6ff" font-size="10">З</text></svg>' }
-  ]
-};
-
-// ==================== УТИЛИТЫ ====================
-const STORAGE_KEY = 'geopro_progress_v3';
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 
-let state = {
-  screen: 'home',
-  currentModule: null,
-  currentTopic: null,
-  questionBank: [],
-  session: [],
-  currentIndex: 0,
-  currentQuestion: null,
-  answered: false,
-  selected: null,
-  sessionTitle: '',
-  sessionMode: 'practice',
-  timerSeconds: 0,
-  timerHandle: null,
-  sessionStats: { correct: 0, wrong: 0, openCorrect: 0, total: 0 }
+// GITHUB DATA CONFIG
+const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
+
+const THEORY_FILES = [
+  { key:'topo',       title:'🗺 Топографические карты',    file:'theory_topo.json',       tasks:'Задания 1-4' },
+  { key:'synoptic',   title:'🌀 Синоптические карты',      file:'theory_student.json',    tasks:'Задания 5-6' },
+  { key:'climat',     title:'📊 Климат и климатограммы',   file:'theory_climat.json',     tasks:'Задания 7-8' },
+  { key:'timezone',   title:'🕐 Часовые пояса',            file:'theory_timezone.json',   tasks:'Задание 17'  },
+  { key:'population', title:'👥 Население России',         file:'theory_population.json', tasks:'Задания 23-25'},
+  { key:'economy',    title:'🏭 Хозяйство России',         file:'theory_economy.json',    tasks:'Задание 27'  },
+  { key:'zones',      title:'🌲 Природные зоны',           file:'theory_zones.json',      tasks:'Задание 28'  },
+  { key:'regions',    title:'🗺 Регионы России',           file:'theory_regions.json',    tasks:'Задания 20-21'},
+];
+
+const QUESTIONS_FILES = [
+  { key:'topo',       title:'🗺 Топографические карты',    file:'questions_topo.json',       tasks:'Задания 1-4' },
+  { key:'synoptic',   title:'🌀 Синоптические карты (5-6)', file:'questions_climat.json',   tasks:'Задания 5-6' },
+  { key:'climat',     title:'📊 Климат и климатограммы',   file:'questions_climat.json',     tasks:'Задания 7-8' },
+  { key:'timezone',   title:'🕐 Часовые пояса',            file:'questions_timezone.json',   tasks:'Задание 17'  },
+  { key:'population', title:'👥 Население России',         file:'questions_population.json', tasks:'Задания 23-25'},
+  { key:'economy',    title:'🏭 Хозяйство России',         file:'questions_economy.json',    tasks:'Задание 27'  },
+  { key:'zones',      title:'🌲 Природные зоны',           file:'questions_zones.json',      tasks:'Задание 28'  },
+  { key:'regions',    title:'🗺 Регионы России',           file:'questions_regions.json',    tasks:'Задания 20-21'},
+];
+
+// Кэш загруженных данных
+var theoryCache = {};
+var questionsCache = {};
+var lessonsLoaded = [];
+
+// Загрузка JSON с GitHub
+async function fetchJSON(filename) {
+  var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
+  var r = await fetch(url);
+  if (!r.ok) throw new Error('Ошибка загрузки: ' + filename);
+  return await r.json();
+}
+
+// Базовые вопросы на случай, если ничего не загрузится
+const fallbackQuestions = [
+  { tag:'Задание 1', text:'Какая река в России является самой длинной?', answers:['Волга','Обь','Енисей','Лена'], correct:3, hint:'Эта река течёт в Восточной Сибири и впадает в море Лаптевых.' },
+  { tag:'Задание 2', text:'Какое озеро является самым глубоким в мире?', answers:['Каспийское','Байкал','Ладожское','Онежское'], correct:1, hint:'Это озеро в Сибири содержит около 20% мировых запасов пресной воды.' },
+  { tag:'Задание 3', text:'На каком хребте расположена гора Эльбрус?', answers:['Уральские горы','Алтай','Большой Кавказ','Саяны'], correct:2, hint:'Этот хребет на юге России — граница между Европой и Азией.' },
+  { tag:'Задание 4', text:'Какой полуостров является самым крупным в России?', answers:['Камчатка','Таймыр','Кольский','Ямал'], correct:1, hint:'Этот полуостров выдаётся в Северный Ледовитый океан.' },
+  { tag:'Задание 5', text:'Какое море омывает Россию с запада?', answers:['Чёрное','Балтийское','Каспийское','Азовское'], correct:1, hint:'Это море омывает Калининградскую область.' },
+];
+
+// Загрузка всех вопросов для тренировки
+async function loadAllLessons() {
+  lessonsLoaded = [];
+  for (var i = 0; i < QUESTIONS_FILES.length; i++) {
+    var f = QUESTIONS_FILES[i];
+    try {
+      var data = await fetchJSON(f.file);
+      var questions = [];
+      if (Array.isArray(data)) {
+        data.forEach(function(item) {
+          if (item.tag && item.text && item.answers) {
+            questions.push(item);
+          }
+        });
+      }
+      if (questions.length > 0) {
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions });
+      } else {
+        // Если нет вопросов, добавляем заглушку
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: fallbackQuestions });
+      }
+    } catch(e) {
+      console.warn('Не удалось загрузить', f.file, e);
+      lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: fallbackQuestions });
+    }
+  }
+  return lessonsLoaded;
+}
+
+let curQ=0, score=0, answered=false, shuffled=[];
+let curLesson=0, lives=3, hintUsed=false;
+
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+function goQuiz(lessonIdx) {
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  curLesson = (lessonIdx !== undefined) ? lessonIdx : 0;
+  shuffled = allLessons[curLesson].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
+}
+
+async function goLessonSelect() {
+  goScreen('s-training');
+  document.getElementById('training-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю темы...</div>';
+  if (lessonsLoaded.length === 0) {
+    await loadAllLessons();
+  }
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  renderTrainingPath(allLessons);
+}
+
+function renderTrainingPath(allLessons) {
+  var html = '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-bottom:20px">';
+  for (var i = 0; i < allLessons.length; i++) {
+    var l = allLessons[i];
+    var done = userProgress.completedLessons[l.title] || userProgress.completedLessons[i];
+    var prevDone = i === 0 || userProgress.completedLessons[allLessons[i-1].title] || userProgress.completedLessons[i-1];
+    var isLocked = !prevDone && i > 0;
+    var perfect = done && done.score === done.total;
+    var nodeColor = perfect ? 'var(--primary2)' : done ? 'var(--primary)' : isLocked ? 'var(--card2)' : '#f5a623';
+    var nodeBorder = perfect ? '2px solid var(--primary2)' : done ? '2px solid var(--primary)' : isLocked ? '2px solid var(--border)' : '2px solid #f5a623';
+    var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var opacity = isLocked ? '0.45' : '1';
+    var clickable = !isLocked ? 'cursor:pointer' : 'cursor:default';
+    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded(' + i + ')"';
+    if (i > 0) {
+      var connColor = userProgress.completedLessons[allLessons[i-1].title] ? 'var(--primary2)' : 'var(--border)';
+      html += '<div style="width:3px;height:28px;background:' + connColor + ';margin:0 auto"></div>';
+    }
+    var isRight = i % 2 === 1;
+    html += '<div style="display:flex;align-items:center;gap:14px;width:100%;flex-direction:' + (isRight ? 'row-reverse' : 'row') + ';opacity:' + opacity + '">';
+    html += '<div' + onclk + ' style="width:64px;height:64px;border-radius:50%;background:' + nodeColor + ';border:' + nodeBorder + ';display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;' + clickable + '">' + nodeIcon + '</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">' + l.title + '</div>';
+    if (done) {
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">' + done.score + '/' + done.total + ' верно</div>';
+    } else {
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + (l.questions ? l.questions.length : 0) + ' вопр.</div>';
+    }
+    html += '</div></div>';
+  }
+  html += '</div>';
+  document.getElementById('training-content').innerHTML = html;
+}
+
+function goQuizFromLoaded(idx) {
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  curLesson = idx;
+  shuffled = allLessons[curLesson].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
+}
+
+function initTheory() {
+  var html = '<div class="sec-title">📚 Темы по кодификатору ОГЭ 2026</div><div class="topic-list">';
+  for (var i = 0; i < THEORY_FILES.length; i++) {
+    var f = THEORY_FILES[i];
+    html += '<div class="topic-item" style="display:flex;align-items:center;justify-content:space-between" onclick="showTopicFromGithub(\'' + f.key + '\')">';
+    html += '<div><div style="font-weight:600;font-size:14px">' + f.title + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + f.tasks + '</div></div>';
+    html += '<div style="color:var(--primary);font-size:16px">▶</div></div>';
+  }
+  html += '</div><div id="ai-theory" class="ai-panel"></div>';
+  document.getElementById('theory-content').innerHTML = html;
+  initAI('ai-theory','теория по географии для ОГЭ 2026',['🎯 С чего начать?','❓ Что чаще спрашивают?','💡 Дай запоминалку']);
+}
+
+async function showTopicFromGithub(key) {
+  var f = THEORY_FILES.find(function(x){ return x.key === key; });
+  if (!f) return;
+
+  document.getElementById('topic-title').textContent = f.title;
+  document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю материал...</div>';
+  goScreen('s-topic');
+
+  try {
+    var data;
+    if (theoryCache[key]) {
+      data = theoryCache[key];
+    } else {
+      data = await fetchJSON(f.file);
+      theoryCache[key] = data;
+    }
+
+    var html = '<div style="display:flex;flex-direction:column;gap:12px">';
+    for (var i = 0; i < data.length; i++) {
+      var card = data[i];
+      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">';
+      html += '<div style="padding:12px 14px;background:#58a6ff08;border-bottom:1px solid #58a6ff20;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCard(\'card-' + i + '\')">';
+      html += '<div style="font-size:13px;font-weight:600">' + card.topic + '</div>';
+      html += '<div id="arr-' + i + '" style="color:var(--muted);font-size:14px">▼</div></div>';
+      html += '<div id="card-' + i + '" style="display:none;padding:14px;font-size:13px;line-height:1.65;color:#c8d8e8;white-space:pre-line">' + card.content + '</div></div>';
+    }
+    html += '</div><div id="ai-topic" class="ai-panel" style="margin-top:14px"></div>';
+    document.getElementById('topic-content').innerHTML = html;
+
+    var aiCtx = f.title + '. ' + f.tasks + ' ОГЭ по географии';
+    initAI('ai-topic', aiCtx, ['📖 Объясни главное','❓ Что спрашивают на ОГЭ?','🧠 Дай запоминалку','✅ Проверь знания'], false);
+  } catch(e) {
+    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;color:var(--danger)">⚠️ Ошибка загрузки. Проверь интернет.</div>';
+  }
+}
+
+function toggleCard(id) {
+  var el = document.getElementById(id);
+  var idx = id.split("-")[1];
+  var arr = document.getElementById("arr-" + idx);
+  if(el.style.display === "none") {
+    el.style.display = "block";
+    if(arr) arr.style.transform = "rotate(180deg)";
+  } else {
+    el.style.display = "none";
+    if(arr) arr.style.transform = "rotate(0deg)";
+  }
+}
+
+function renderQ() {
+  if(!shuffled || shuffled.length === 0) {
+    shuffled = fallbackQuestions;
+  }
+  const q = shuffled[curQ];
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  const lesson = allLessons[curLesson];
+  answered = false; 
+  hintUsed = false;
+
+  document.getElementById('quiz-topic-lbl').textContent = lesson ? lesson.title : 'Тренировка';
+  document.getElementById('lesson-badge').textContent = (lesson ? lesson.title : 'Тренировка') + ' · Вопрос ' + (curQ+1) + ' из ' + shuffled.length;
+  document.getElementById('quiz-counter').textContent = (curQ+1) + '/' + shuffled.length;
+  document.getElementById('qpf').style.width = ((curQ/shuffled.length)*100) + '%';
+  document.getElementById('q-tag').textContent = q.tag;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('ai-quiz').style.display = 'none';
+  document.getElementById('hint-box').style.display = 'none';
+  document.getElementById('btn-hint').style.display = 'flex';
+  document.getElementById('btn-hint').disabled = false;
+  document.getElementById('btn-hint').textContent = '💡 Подсказка от AI';
+
+  var livesEl = document.getElementById('lives-row');
+  livesEl.innerHTML = '';
+  for(var i=0;i<3;i++){
+    livesEl.innerHTML += '<span>' + (i<lives ? '❤️' : '🖤') + '</span>';
+  }
+
+  const btn = document.getElementById('btn-next');
+  btn.classList.remove('show');
+  btn.textContent = curQ < shuffled.length-1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
+
+  const ans = document.getElementById('answers');
+  ans.innerHTML = '';
+  var letters = ['А','Б','В','Г'];
+  for(var i = 0; i < q.answers.length; i++) {
+    const b = document.createElement('button');
+    b.className = 'ans-btn';
+    b.innerHTML = '<div class="ans-letter">' + letters[i] + '</div><span>' + q.answers[i] + '</span>';
+    b.onclick = (function(idx) { 
+      return function() { 
+        selectAns(idx, q.correct, q.text, lesson ? lesson.title : 'Тренировка', q.hint); 
+      };
+    })(i);
+    ans.appendChild(b);
+  }
+}
+
+async function getHint() {
+  if(hintUsed) return;
+  hintUsed = true;
+  if(!shuffled || shuffled.length === 0) return;
+  const q = shuffled[curQ];
+  const btn = document.getElementById('btn-hint');
+  btn.textContent = '⏳ Думаю...';
+  btn.disabled = true;
+  const hintBox = document.getElementById('hint-box');
+  hintBox.style.display = 'block';
+  hintBox.textContent = q.hint || 'Подсказка загружается...';
+
+  try {
+    var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+    const r = await fetch(PROXY, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        question:'Дай короткую подсказку (1-2 предложения, не давай ответ) к вопросу ОГЭ: '+q.text, 
+        context: allLessons[curLesson] ? allLessons[curLesson].title : 'География ОГЭ'
+      })
+    });
+    const d = await r.json();
+    if(d.answer) hintBox.textContent = '💡 '+d.answer;
+  } catch(e) {
+    console.warn('AI подсказка не доступна');
+  }
+  btn.textContent = '💡 Подсказка получена';
+}
+
+function selectAns(idx, correct, qText, topic, hint) {
+  if(answered) return;
+  answered = true;
+
+  const btns = document.querySelectorAll('.ans-btn');
+  btns[idx].classList.add(idx===correct ? 'correct' : 'wrong');
+  if(idx!==correct){
+    btns[correct].classList.add('correct');
+    lives--;
+  }
+  if(idx===correct) score++;
+
+  document.getElementById('btn-hint').style.display = 'none';
+
+  var livesEl = document.getElementById('lives-row');
+  livesEl.innerHTML = '';
+  for(var i=0;i<3;i++){
+    livesEl.innerHTML += '<span>' + (i<lives ? '❤️' : '🖤') + '</span>';
+  }
+
+  const aiEl = document.getElementById('ai-quiz');
+  if(aiEl) aiEl.style.display = 'block';
+
+  var autoMsg = idx===correct
+    ? 'Правильно! Объясни почему ответ верный на вопрос: '+qText
+    : 'Ученик ошибся. Объясни правильный ответ на вопрос: '+qText+'. Объясни доступно, помоги запомнить.';
+
+  initAI('ai-quiz','Вопрос ОГЭ: '+qText,
+    idx===correct
+      ?['🤔 Почему именно это?','📖 Расскажи подробнее','🔗 Что ещё нужно знать?']
+      :['❓ Объясни правильный ответ','🧠 Как это запомнить?','📖 Дай похожие задания'],
+    true);
+
+  setTimeout(function(){
+    var inp = document.getElementById('inp-ai-quiz');
+    if(inp){ 
+      inp.value = autoMsg; 
+      sendM('ai-quiz','Вопрос ОГЭ по теме '+topic+': '+qText); 
+    }
+  }, 400);
+
+  document.getElementById('btn-next').classList.add('show');
+
+  if(lives <= 0) {
+    document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
+  }
+}
+
+function nextQ() {
+  curQ++;
+  if(curQ >= shuffled.length) showResult();
+  else renderQ();
+}
+
+function showResult() {
+  const total = shuffled.length;
+  const pct = Math.round(score/total*100);
+  let e = '😔', t = 'Нужно повторить';
+  if(pct>=80){e='🏆';t='Отлично!';}
+  else if(pct>=60){e='👍';t='Хороший результат!';}
+  else if(pct>=40){e='📖';t='Продолжай учиться';}
+  document.getElementById('res-emoji').textContent = e;
+  document.getElementById('res-title').textContent = t;
+  document.getElementById('res-sub').textContent = pct + '% правильных ответов';
+  document.getElementById('ring-num').textContent = score;
+  document.getElementById('ring-denom').textContent = 'из ' + total;
+  document.getElementById('res-c').textContent = score;
+  document.getElementById('res-w').textContent = total-score;
+  var xpGain = score*20 + (score===total ? 50 : 0);
+  document.getElementById('res-xp').textContent = '+' + xpGain;
+  saveLesson(curLesson, score, total);
+  updateHomeUI();
+  goScreen('s-result');
+  setTimeout(function(){ 
+    var circumference = 2 * Math.PI * 54;
+    var offset = circumference * (1 - score/total);
+    var ringFill = document.getElementById('ring-fill');
+    if(ringFill) ringFill.style.strokeDashoffset = offset;
+  }, 100);
+}
+
+// AI
+function initAI(cid, ctx, prompts, autoOpen) {
+  prompts = prompts || [];
+  autoOpen = autoOpen || false;
+  const el = document.getElementById(cid);
+  if(!el) return;
+  var promptsHtml = '';
+  for(var i = 0; i < prompts.length; i++) {
+    var p = prompts[i];
+    promptsHtml += '<button class="ai-prompt-btn" onclick="sendP(\'' + cid + '\',\'' + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\',\'' + p.replace(/'/g, "\\'") + '\')">' + p + '</button>';
+  }
+  el.innerHTML = `
+    <div class="ai-header" onclick="toggleAI(this)">
+      <div class="ai-header-left">
+        <div class="ai-avatar">🤖</div>
+        <div><div class="ai-name">AI-репетитор</div><div class="ai-tagline">Спроси — объясню как педагог</div></div>
+      </div>
+      <div class="ai-toggle ` + (autoOpen ? 'open' : '') + `">▼</div>
+    </div>
+    <div class="ai-body ` + (autoOpen ? 'open' : '') + `">
+      <div class="ai-context">📌 ` + ctx + `</div>
+      <div class="ai-prompts">` + promptsHtml + `</div>
+      <div class="ai-messages" id="msgs-` + cid + `"></div>
+      <div class="ai-input-row">
+        <textarea class="ai-input" id="inp-` + cid + `" placeholder="Задай вопрос..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `');}"></textarea>
+        <button class="ai-send" id="snd-` + cid + `" onclick="sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `')">➤</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAI(h) {
+  const b = h.nextElementSibling;
+  const t = h.querySelector('.ai-toggle');
+  if(b) b.classList.toggle('open');
+  if(t) t.classList.toggle('open');
+}
+
+function sendP(cid,ctx,text) {
+  var inp = document.getElementById('inp-' + cid);
+  if(inp) inp.value = text;
+  sendM(cid,ctx);
+}
+
+async function sendM(cid,ctx) {
+  const inp = document.getElementById('inp-' + cid);
+  const snd = document.getElementById('snd-' + cid);
+  const msgs = document.getElementById('msgs-' + cid);
+  const text = inp ? inp.value.trim() : '';
+  if(!text) return;
+  if(inp) inp.value = '';
+  if(snd) snd.disabled = true;
+  if(msgs) {
+    msgs.innerHTML += '<div class="msg user">' + text + '</div>';
+    const lid = 'l' + Date.now();
+    msgs.innerHTML += '<div class="msg ai loading" id="' + lid + '">⏳ Думаю...</div>';
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+      const d = await r.json();
+      const ans = d.answer || 'Не удалось получить ответ';
+      var loadingEl = document.getElementById(lid);
+      if(loadingEl) loadingEl.remove();
+      msgs.innerHTML += '<div class="msg ai">' + ans.replace(/\n/g,'<br>') + '</div>';
+    } catch(e) {
+      var loadingEl2 = document.getElementById(lid);
+      if(loadingEl2) loadingEl2.remove();
+      msgs.innerHTML += '<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>';
+    }
+    if(snd) snd.disabled = false;
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+// ПРОГРЕСС — Telegram CloudStorage
+var userProgress = {
+  xp: 245,
+  level: 4,
+  streak: 7,
+  lastDate: '',
+  completedLessons: {},
+  totalAnswered: 0,
+  totalCorrect: 0,
 };
 
-function loadProgress() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      return JSON.parse(raw);
-    }
-  } catch(e) {}
-  return { xp: 0, level: 1, streak: 0, lastDate: '', totalAnswered: 0, totalCorrect: 0, totalWrong: 0, moduleStats: {}, topicStats: {}, history: [] };
-}
+var tg = window.Telegram && window.Telegram.WebApp;
 
 function saveProgress() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.progress)); } catch(e) {}
+  var data = JSON.stringify(userProgress);
+  if (tg && tg.CloudStorage) {
+    tg.CloudStorage.setItem('progress', data, function(){});
+  } else {
+    try { localStorage.setItem('geo_progress', data); } catch(e){}
+  }
 }
 
-state.progress = loadProgress();
+function loadProgress(callback) {
+  if (tg && tg.CloudStorage) {
+    tg.CloudStorage.getItem('progress', function(err, val) {
+      if (!err && val) {
+        try { userProgress = JSON.parse(val); } catch(e){}
+      }
+      if(callback) callback();
+    });
+  } else {
+    try {
+      var saved = localStorage.getItem('geo_progress');
+      if (saved) userProgress = JSON.parse(saved);
+    } catch(e){}
+    if(callback) callback();
+  }
+}
 
-function updateStreak() {
-  const today = new Date().toISOString().slice(0,10);
-  if (state.progress.lastDate === today) return;
-  const yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
-  if (state.progress.lastDate === yesterday) state.progress.streak = (state.progress.streak || 0) + 1;
-  else state.progress.streak = 1;
-  state.progress.lastDate = today;
+function addXP(amount) {
+  userProgress.xp += amount;
+  userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+  saveProgress();
+  showXPToast(amount);
+}
+
+function checkStreak() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDate === today) return;
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (userProgress.lastDate === yesterday) {
+    userProgress.streak++;
+  } else if (userProgress.lastDate !== today) {
+    userProgress.streak = 1;
+  }
+  userProgress.lastDate = today;
   saveProgress();
 }
 
-function calcLevel(xp) { return Math.max(1, Math.floor((xp || 0) / 200) + 1); }
-
-function addXP(points) {
-  state.progress.xp = (state.progress.xp || 0) + points;
-  state.progress.level = calcLevel(state.progress.xp);
-  saveProgress();
+function showXPToast(amount) {
+  var toast = document.createElement('div');
+  toast.textContent = '+' + amount + ' XP ⚡';
+  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation:fadeUp .3s ease;';
+  document.body.appendChild(toast);
+  setTimeout(function(){ if(toast) toast.remove(); }, 2000);
 }
 
-function shuffle(arr) { const a=[...arr]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
-function sample(arr, n) { return shuffle(arr).slice(0, n); }
-function pickWrong(pool, right, n) { return shuffle(pool.filter(x => x !== right)).slice(0, n); }
-function uniq(arr) { return [...new Set(arr)]; }
-function normalize(s) { return String(s || '').toLowerCase().replace(/ё/g, 'е').replace(/[^a-zа-я0-9\s]/gi, ' ').replace(/\s+/g, ' ').trim(); }
-function escapeHtml(s) { return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function updateHomeUI() {
+  var xpInLevel = userProgress.xp % 200;
+  var pct = Math.round((xpInLevel / 200) * 100);
+  var xpEl = document.querySelector('.xp-fill');
+  if (xpEl) xpEl.style.width = pct + '%';
 
-function extractKeywords(text) {
-  const stop = new Set(['это','так','как','что','для','или','если','тоже','еще','ещё','при','над','под','между']);
-  return uniq(normalize(text).split(' ').filter(w => w.length > 4 && !stop.has(w)));
-}
+  var xpTitle = document.querySelector('.xp-title');
+  if (xpTitle) xpTitle.textContent = userProgress.xp + ' XP · Уровень ' + userProgress.level;
 
-function scoreOpenAnswer(user, answer) {
-  const u = normalize(user);
-  const kws = extractKeywords(answer);
-  if (!kws.length) return u.length > 0 ? 0.5 : 0;
-  let hits = 0;
-  kws.forEach(k => { if (u.includes(k)) hits += 1; });
-  return hits / kws.length;
+  var xpStats = document.querySelector('.xp-stats');
+  if (xpStats) {
+    var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect / userProgress.totalAnswered) * 100) : 0;
+    xpStats.textContent = '🎯 Заданий: ' + userProgress.totalAnswered + ' · Точность: ' + acc + '%';
+  }
+
+  var streakEl = document.querySelector('.streak');
+  if (streakEl && userProgress.streak > 0) {
+    streakEl.textContent = '🔥 ' + userProgress.streak + ' ' + getDayWord(userProgress.streak);
+  }
 }
 
 function getDayWord(n) {
   if (n % 10 === 1 && n % 100 !== 11) return 'день';
-  if ([2,3,4].includes(n % 10) && ![12,13,14].includes(n % 100)) return 'дня';
+  if ([2,3,4].includes(n%10) && ![12,13,14].includes(n%100)) return 'дня';
   return 'дней';
 }
 
-function calcAccuracy(correct, wrong) {
-  const total = (correct || 0) + (wrong || 0);
-  return total ? Math.round((correct || 0) / total * 100) : 0;
-}
-
-function calcAccuracyForModule(moduleId) {
-  const s = state.progress.moduleStats[moduleId];
-  if (!s) return 0;
-  return calcAccuracy(s.correct || 0, s.wrong || 0);
-}
-
-function moduleCount(moduleId) {
-  return state.questionBank.filter(q => q.module === moduleId).length;
-}
-
-// ==================== ПОСТРОЕНИЕ БАНКА ВОПРОСОВ ====================
-function buildQuestionBank() {
-  const bank = [];
-  DATA.facts.forEach((f, idx) => {
-    let topic = f.topic;
-    let moduleId = f.module;
-    let termPool = DATA.facts.filter(x => x.module === moduleId).map(x => x.term).filter(x => x !== f.term);
-    let defPool = DATA.facts.filter(x => x.module === moduleId).map(x => x.definition).filter(x => x !== f.definition);
-    
-    bank.push({
-      id: `${moduleId}-${idx}-t`,
-      type: 'mcq',
-      module: moduleId,
-      topic: topic,
-      q: f.prompt,
-      options: shuffle([f.term, ...pickWrong(termPool, f.term, 3)]),
-      answer: f.term,
-      explanation: f.explanation,
-      hint: f.hint
-    });
-    
-    bank.push({
-      id: `${moduleId}-${idx}-d`,
-      type: 'mcq',
-      module: moduleId,
-      topic: topic,
-      q: `Что означает: ${f.term}?`,
-      options: shuffle([f.definition, ...pickWrong(defPool, f.definition, 3)]),
-      answer: f.definition,
-      explanation: f.explanation,
-      hint: f.hint
-    });
-    
-    bank.push({
-      id: `${moduleId}-${idx}-o`,
-      type: 'open',
-      module: moduleId,
-      topic: topic,
-      q: f.openPrompt,
-      answer: f.openAnswer,
-      explanation: f.explanation,
-      hint: f.hint
-    });
-  });
-  
-  DATA.map_tasks.forEach((m, idx) => {
-    bank.push({
-      id: `map-${idx}`,
-      type: 'map',
-      module: 'maps',
-      topic: m.topic,
-      q: m.question,
-      options: shuffle(m.options),
-      answer: m.answer,
-      explanation: m.explanation,
-      hint: m.hint,
-      svg: m.svg
-    });
-  });
-  
-  return shuffle(bank);
-}
-
-// ==================== НАВИГАЦИЯ ====================
-function setActiveNav(name) {
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.classList.toggle('active', el.dataset.nav === name);
-  });
-}
-
-function switchScreen(name) {
-  state.screen = name;
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  const el = document.getElementById(`s-${name}`);
-  if (el) el.classList.add('active');
-  const bottom = document.querySelector('.bottom-nav');
-  if (bottom) bottom.style.display = (name === 'quiz' || name === 'result') ? 'none' : 'flex';
-  setActiveNav(name === 'quiz' || name === 'result' ? 'home' : name);
-  renderScreen(name);
-}
-
-function goHome() { 
-  stopTimer();
-  state.currentModule = null;
-  state.currentTopic = null;
-  switchScreen('home');
-}
-
-function goScreen(name) {
-  if (name === 'home') return goHome();
-  switchScreen(name);
-}
-
-function openModule(moduleId) {
-  state.currentModule = moduleId;
-  renderTopicScreen(moduleId);
-  switchScreen('topic');
-}
-
-function renderScreen(name) {
-  if (name === 'home') renderHome();
-  else if (name === 'theory') renderTheory();
-  else if (name === 'practice') renderPractice();
-  else if (name === 'maps') renderMaps();
-  else if (name === 'ai') renderAI();
-  else if (name === 'stats') renderStats();
-  else if (name === 'exam') renderExam();
-  else if (name === 'quiz') renderQuiz();
-  else if (name === 'result') renderResult();
-}
-
-// ==================== ОСНОВНЫЕ ЭКРАНЫ ====================
-function renderHome() {
-  const p = state.progress;
-  const xp = p.xp || 0;
-  const level = p.level || 1;
-  const acc = calcAccuracy(p.totalCorrect, p.totalWrong);
-  const fill = ((xp % 200) / 200 * 100).toFixed(0);
-  
-  const moduleCards = DATA.theory_sections.map(sec => `
-    <div class="card module-card" onclick="openModule('${sec.id}')">
-      <div class="module-title">${sec.title}</div>
-      <div class="module-sub">${sec.topics.join(' • ')}</div>
-      <div class="module-sub" style="margin-top:8px;color:#79c0ff;">${moduleCount(sec.id)} заданий · точность ${calcAccuracyForModule(sec.id)}%</div>
-    </div>
-  `).join('');
-  
-  document.getElementById('home-scroll').innerHTML = `
-    <div class="hero">
-      <div class="hero-row">
-        <div>
-          <div class="sec-title" style="font-size:22px;">ГеоПро — подготовка к ОГЭ</div>
-          <p class="lead" style="margin-top:8px;">Теория, 20+ заданий, карты, развёрнутые ответы и AI-тьютор.</p>
-        </div>
-        <div class="chips">
-          <span class="chip">🎯 Точность ${acc}%</span>
-          <span class="chip">⚡ ${xp} XP</span>
-          <span class="chip">🏅 Уровень ${level}</span>
-        </div>
-      </div>
-      <div class="progress-block">
-        <div class="progress-meta">
-          <span>Прогресс</span>
-          <span>${xp % 200}/200 XP до уровня ${level + 1}</span>
-        </div>
-        <div class="progress-bar"><div class="progress-fill" style="width:${fill}%"></div></div>
-      </div>
-    </div>
-    <div class="actions">
-      <div class="btn primary" onclick="goScreen('practice')"><span class="btn-icon">🧠</span>Практика</div>
-      <div class="btn accent" onclick="goScreen('exam')"><span class="btn-icon">🎯</span>Пробник</div>
-      <div class="btn" onclick="goScreen('theory')"><span class="btn-icon">📚</span>Теория</div>
-    </div>
-    <div class="grid">
-      <div class="grid-item" onclick="goScreen('maps')"><span style="font-size:26px">🗺️</span>Карты</div>
-      <div class="grid-item" onclick="goScreen('stats')"><span style="font-size:26px">📊</span>Прогресс</div>
-      <div class="grid-item" onclick="goScreen('ai')"><span style="font-size:26px">🤖</span>AI</div>
-      <div class="grid-item" onclick="startMixedPractice()"><span style="font-size:26px">🎲</span>Смешанная</div>
-    </div>
-    <div class="panel">
-      <div class="sec-title">Разделы кодификатора</div>
-      <div class="section-block" style="margin-top:10px;">${moduleCards}</div>
-    </div>
-  `;
-  updateBadge();
-}
-
-function renderTheory() {
-  const items = DATA.theory_sections.map(sec => `
-    <div class="card module-card" onclick="openModule('${sec.id}')">
-      <div class="module-title">${sec.title}</div>
-      <div class="module-sub">${sec.topics.join(' • ')}</div>
-    </div>
-  `).join('');
-  document.getElementById('theory-scroll').innerHTML = `
-    <div class="hero">
-      <div class="hero-row">
-        <div><div class="sec-title" style="font-size:20px;">Теория по кодификатору</div></div>
-      </div>
-    </div>
-    <div class="section-block">${items}</div>
-  `;
-}
-
-function renderTopicScreen(moduleId) {
-  const sec = DATA.theory_sections.find(x => x.id === moduleId);
-  if (!sec) return;
-  const topicItems = sec.topics.map(t => `
-    <div class="topic-item">
-      <div><div style="font-weight:700;font-size:14px">${t}</div></div>
-      <div class="small-actions" style="margin-top:0;">
-        <button class="small-btn primary" onclick="startTopicPractice('${moduleId}','${escapeHtml(t)}')">🧠 Практика</button>
-      </div>
-    </div>
-  `).join('');
-  document.getElementById('topic-title').textContent = sec.title;
-  document.getElementById('topic-scroll').innerHTML = `
-    <div class="hero">
-      <div class="hero-row">
-        <div><div class="sec-title" style="font-size:20px;">${sec.title}</div></div>
-      </div>
-      <div class="small-actions">
-        <button class="small-btn primary" onclick="startModulePractice('${moduleId}')">Начать раздел</button>
-      </div>
-    </div>
-    <div class="section-block">${topicItems}</div>
-  `;
-}
-
-function renderPractice() {
-  const cards = DATA.theory_sections.map(sec => `
-    <div class="card module-card" onclick="startModulePractice('${sec.id}')">
-      <div class="module-title">${sec.title}</div>
-      <div class="module-sub">${moduleCount(sec.id)} заданий · точность ${calcAccuracyForModule(sec.id)}%</div>
-    </div>
-  `).join('');
-  document.getElementById('practice-scroll').innerHTML = `
-    <div class="hero"><div class="hero-row"><div><div class="sec-title" style="font-size:20px;">Практика</div></div></div></div>
-    <div class="section-block">${cards}</div>
-  `;
-}
-
-function renderMaps() {
-  const cards = DATA.map_tasks.map(m => `
-    <div class="card">
-      <div class="module-title">${m.topic}</div>
-      <div class="module-sub">${m.question}</div>
-      <div class="map-box" style="margin-top:10px;">${m.svg}</div>
-    </div>
-  `).join('');
-  document.getElementById('maps-scroll').innerHTML = `
-    <div class="hero"><div class="hero-row"><div><div class="sec-title" style="font-size:20px;">Карты и схемы</div></div></div></div>
-    <div class="section-block">${cards}</div>
-  `;
-}
-
-function renderAI() {
-  document.getElementById('ai-scroll').innerHTML = `
-    <div class="hero"><div class="hero-row"><div><div class="sec-title" style="font-size:20px;">AI-тьютор</div></div></div></div>
-    <div class="panel"><div class="sec-title">Написать вопрос</div>
-    <textarea id="ai-input" class="textarea" placeholder="Задай вопрос по географии..."></textarea>
-    <div class="small-actions"><button class="small-btn primary" onclick="sendAI()">Отправить</button></div>
-    <div id="ai-output" class="feedback warn">Ответ появится здесь.</div></div>
-  `;
-}
-
-function renderStats() {
-  const p = state.progress;
-  const acc = calcAccuracy(p.totalCorrect, p.totalWrong);
-  const fill = ((p.xp || 0) % 200) / 2;
-  document.getElementById('stats-scroll').innerHTML = `
-    <div class="hero"><div class="hero-row"><div><div class="sec-title" style="font-size:20px;">Прогресс</div></div></div></div>
-    <div class="grid-3">
-      <div class="card"><div class="module-title">${p.totalAnswered || 0}</div><div class="module-sub">Всего ответов</div></div>
-      <div class="card"><div class="module-title">${p.totalCorrect || 0}</div><div class="module-sub">Правильных</div></div>
-      <div class="card"><div class="module-title">${p.totalWrong || 0}</div><div class="module-sub">Ошибок</div></div>
-    </div>
-    <div class="progress-block">
-      <div class="progress-meta"><span>XP ${p.xp || 0} · Уровень ${p.level || 1}</span><span>Серия ${p.streak || 0} ${getDayWord(p.streak || 0)}</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${fill}%"></div></div>
-    </div>
-    <div class="panel"><div class="sec-title">Точность</div><div class="empty" style="margin-top:8px;">${acc}% правильных ответов</div></div>
-  `;
-}
-
-function renderExam() {
-  document.getElementById('exam-scroll').innerHTML = `
-    <div class="hero"><div class="hero-row"><div><div class="sec-title" style="font-size:20px;">Пробник ОГЭ</div></div></div></div>
-    <div class="panel"><div class="small-actions"><button class="small-btn primary" onclick="startExam()">Начать пробник</button></div></div>
-  `;
-}
-
-// ==================== СЕССИИ (ТРЕНИРОВКИ) ====================
-function startSession(title, questions, mode, timerSeconds = 0) {
-  state.sessionTitle = title;
-  state.sessionMode = mode;
-  state.session = shuffle([...questions]);
-  state.currentIndex = 0;
-  state.currentQuestion = state.session[0] || null;
-  state.answered = false;
-  state.selected = null;
-  state.sessionStats = { correct: 0, wrong: 0, openCorrect: 0, total: state.session.length };
-  stopTimer();
-  if (timerSeconds > 0) startTimer(timerSeconds);
-  switchScreen('quiz');
-}
-
-function startTimer(seconds) {
-  state.timerSeconds = seconds;
-  state.timerHandle = setInterval(() => {
-    state.timerSeconds--;
-    if (state.timerSeconds <= 0) {
-      stopTimer();
-      finishSession();
-    } else {
-      updateQuizHeader();
-    }
-  }, 1000);
-}
-
-function stopTimer() {
-  if (state.timerHandle) clearInterval(state.timerHandle);
-  state.timerHandle = null;
-  state.timerSeconds = 0;
-}
-
-function updateQuizHeader() {
-  const total = state.session.length;
-  const idx = state.currentIndex + 1;
-  const counter = document.getElementById('quiz-counter');
-  if (counter) counter.textContent = state.timerSeconds > 0 ? formatTime(state.timerSeconds) : `${idx}/${total}`;
-}
-
-function formatTime(sec) {
-  const m = Math.floor(sec / 60).toString().padStart(2,'0');
-  const s = (sec % 60).toString().padStart(2,'0');
-  return `${m}:${s}`;
-}
-
-function startModulePractice(moduleId) {
-  const sec = DATA.theory_sections.find(x => x.id === moduleId);
-  const q = sample(state.questionBank.filter(item => item.module === moduleId), 10);
-  startSession(`Практика: ${sec ? sec.title : moduleId}`, q, 'practice');
-}
-
-function startTopicPractice(moduleId, topic) {
-  const q = sample(state.questionBank.filter(item => item.topic === topic), 8);
-  startSession(`Тема: ${topic}`, q, 'practice');
-}
-
-function startMixedPractice() {
-  startSession('Смешанная практика', sample(state.questionBank, 12), 'practice');
-}
-
-function startMapPractice() {
-  const q = sample(state.questionBank.filter(item => item.type === 'map'), 6);
-  startSession('Карты и схемы', q, 'maps');
-}
-
-function buildExamPaper() {
-  const mcq = state.questionBank.filter(q => q.type === 'mcq');
-  const map = state.questionBank.filter(q => q.type === 'map');
-  const open = state.questionBank.filter(q => q.type === 'open');
-  return shuffle([...sample(mcq, 8), ...sample(map, 3), ...sample(open, 4)]).slice(0, 15);
-}
-
-function startExam() {
-  startSession('Пробник ОГЭ', buildExamPaper(), 'exam', 30 * 60);
-}
-
-function logAttempt(question, correct, userAnswer) {
-  state.progress.totalAnswered = (state.progress.totalAnswered || 0) + 1;
-  if (correct) state.progress.totalCorrect = (state.progress.totalCorrect || 0) + 1;
-  else state.progress.totalWrong = (state.progress.totalWrong || 0) + 1;
-  
-  const mod = question.module || 'misc';
-  if (!state.progress.moduleStats[mod]) state.progress.moduleStats[mod] = { answered: 0, correct: 0, wrong: 0 };
-  state.progress.moduleStats[mod].answered++;
-  if (correct) state.progress.moduleStats[mod].correct++;
-  else state.progress.moduleStats[mod].wrong++;
-  
-  state.progress.history = state.progress.history || [];
-  state.progress.history.unshift({
-    ts: new Date().toLocaleString('ru-RU'),
-    module: mod,
-    topic: question.topic,
-    q: question.q,
-    correct: question.answer,
-    user: userAnswer,
-    ok: correct
-  });
-  state.progress.history = state.progress.history.slice(0, 20);
+function saveLesson(lessonIdx, sc, total) {
+  var today = new Date().toISOString().slice(0,10);
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+  userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
+  userProgress.totalAnswered += total;
+  userProgress.totalCorrect += sc;
+  var xpGain = sc * 20 + (sc === total ? 50 : 0);
+  addXP(xpGain);
+  checkStreak();
   saveProgress();
 }
 
-function answerMCQ(choice) {
-  if (state.answered) return;
-  state.answered = true;
-  state.selected = choice;
-  const q = state.currentQuestion;
-  const ok = choice === q.answer;
-  if (ok) state.sessionStats.correct++;
-  else state.sessionStats.wrong++;
-  logAttempt(q, ok, choice);
-  addXP(ok ? 10 : 2);
-  renderQuiz();
-}
+// INIT
+if (tg) tg.expand();
 
-function submitOpenAnswer() {
-  if (state.answered) return;
-  const ta = document.getElementById('open-answer');
-  const user = ta ? ta.value.trim() : '';
-  if (!user) return;
-  state.answered = true;
-  state.selected = user;
-  const q = state.currentQuestion;
-  const score = scoreOpenAnswer(user, q.answer);
-  const ok = score >= 0.4;
-  if (ok) state.sessionStats.openCorrect++;
-  else state.sessionStats.wrong++;
-  logAttempt(q, ok, user);
-  addXP(ok ? 12 : 3);
-  renderQuiz();
-}
-
-function useHint() {
-  const q = state.currentQuestion;
-  const hintBox = document.getElementById('hint-box');
-  if (!q || !hintBox) return;
-  hintBox.style.display = 'block';
-  hintBox.className = 'feedback warn';
-  hintBox.textContent = q.hint || 'Подумай о ключевом признаке темы.';
-}
-
-function nextQuestion() {
-  if (state.currentIndex < state.session.length - 1) {
-    state.currentIndex++;
-    state.currentQuestion = state.session[state.currentIndex];
-    state.answered = false;
-    state.selected = null;
-    renderQuiz();
-  } else {
-    finishSession();
-  }
-}
-
-function finishSession() {
-  stopTimer();
-  const total = state.session.length;
-  const correct = (state.sessionStats.correct || 0) + (state.sessionStats.openCorrect || 0);
-  const wrong = state.sessionStats.wrong || 0;
-  const acc = Math.round(correct / total * 100);
-  addXP(correct * 10 + (acc >= 80 ? 40 : 0));
-  state.progress.level = calcLevel(state.progress.xp);
-  saveProgress();
-  state.resultData = { total, correct, wrong, acc, title: state.sessionTitle };
-  switchScreen('result');
-}
-
-function renderQuiz() {
-  const q = state.currentQuestion;
-  if (!q) { document.getElementById('quiz-wrap').innerHTML = '<div class="empty">Нет вопросов</div>'; return; }
-  const total = state.session.length;
-  const idx = state.currentIndex + 1;
-  updateQuizHeader();
-  
-  let html = `<div class="q-top"><div class="q-progress"><div class="q-progress-fill" style="width:${((idx-1)/total*100)}%"></div></div></div>
-    <div class="q-card"><div class="q-tag">${q.type === 'open' ? 'Развёрнутый ответ' : q.type === 'map' ? 'Карты' : 'Задание'}</div>
-    <div class="q-text">${escapeHtml(q.q)}</div></div>`;
-  
-  if (q.type === 'map' && q.svg) html += `<div class="map-box">${q.svg}</div>`;
-  
-  if (q.type === 'open') {
-    html += `<div class="panel"><textarea id="open-answer" class="textarea" placeholder="Напиши ответ..."></textarea>
-      <div class="small-actions"><button class="small-btn primary" onclick="submitOpenAnswer()">Проверить</button></div></div>`;
-  } else {
-    html += `<div class="answers">`;
-    q.options.forEach((opt, i) => {
-      const letters = ['А','Б','В','Г'];
-      const cls = state.answered ? (opt === q.answer ? 'ans-btn correct' : (state.selected === opt ? 'ans-btn wrong' : 'ans-btn')) : 'ans-btn';
-      html += `<button class="${cls}" ${state.answered ? 'disabled' : ''} onclick="answerMCQ(${JSON.stringify(opt)})"><div class="ans-letter">${letters[i]}</div><span>${escapeHtml(opt)}</span></button>`;
-    });
-    html += `</div><button onclick="useHint()" style="margin-top:12px;background:transparent;border:1px solid #f5a623;border-radius:14px;padding:10px;color:#f5a623;cursor:pointer;">💡 Подсказка</button>`;
-  }
-  
-  if (state.answered) {
-    const ok = q.type === 'open' ? scoreOpenAnswer(state.selected, q.answer) >= 0.4 : state.selected === q.answer;
-    html += `<div id="hint-box" class="feedback ${ok ? 'good' : 'bad'}"><b>${ok ? '✅ Верно' : '❌ Неверно'}</b><br>${escapeHtml(q.explanation)}</div>`;
-    html += `<button class="btn-next show" onclick="nextQuestion()">${idx < total ? 'Следующий вопрос →' : 'Завершить →'}</button>`;
-  } else {
-    html += `<div id="hint-box" class="feedback warn" style="display:none;"></div>`;
-  }
-  
-  document.getElementById('quiz-wrap').innerHTML = html;
-}
-
-function renderResult() {
-  const r = state.resultData || { total: 0, correct: 0, wrong: 0, acc: 0 };
-  const bonus = r.correct * 20 + (r.acc >= 80 ? 40 : 0);
-  const emoji = r.acc >= 80 ? '🏆' : r.acc >= 60 ? '👍' : '📖';
-  const headline = r.acc >= 80 ? 'Отличный результат!' : r.acc >= 60 ? 'Неплохо' : 'Нужно повторить';
-  
-  document.getElementById('result-wrap').innerHTML = `
-    <div class="result-emoji">${emoji}</div>
-    <div class="result-title">${headline}</div>
-    <div class="result-sub">${r.title || ''} · ${r.correct} из ${r.total} · ${r.acc}%</div>
-    <div class="ring-wrap"><svg width="130" height="130" viewBox="0 0 130 130">
-      <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
-      <circle class="ring-bg" cx="65" cy="65" r="54"></circle>
-      <circle id="ring-fill" class="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"></circle>
-    </svg><div class="ring-text"><div class="ring-num">${r.correct}</div><div class="ring-denom">из ${r.total}</div></div></div>
-    <div class="res-stats"><div class="res-stat"><div class="res-num g">${r.correct}</div><div class="res-label">Верно</div></div>
-    <div class="res-stat"><div class="res-num r">${r.wrong}</div><div class="res-label">Ошибки</div></div>
-    <div class="res-stat"><div class="res-num y">+${bonus}</div><div class="res-label">XP</div></div></div>
-    <div class="res-btns"><button class="btn-full primary" onclick="goHome()">🏠 На главную</button>
-    <button class="btn-full sec" onclick="startMixedPractice()">🔄 Ещё раз</button></div>
-  `;
-  
-  setTimeout(() => {
-    const ring = document.getElementById('ring-fill');
-    if (ring) {
-      const circumference = 2 * Math.PI * 54;
-      const offset = circumference * (1 - r.correct / Math.max(1, r.total));
-      ring.style.strokeDashoffset = offset;
-    }
-  }, 80);
-}
-
-function updateBadge() {
-  const el = document.getElementById('streak-badge');
-  if (el) el.textContent = `🔥 ${state.progress.streak || 0} ${getDayWord(state.progress.streak || 0)}`;
-}
-
-// ==================== AI ФУНКЦИИ ====================
-async function sendAI() {
-  const input = document.getElementById('ai-input');
-  const output = document.getElementById('ai-output');
-  if (!input || !output) return;
-  const prompt = input.value.trim();
-  if (!prompt) { output.textContent = 'Напиши вопрос!'; return; }
-  output.textContent = 'Думаю...';
-  try {
-    const res = await fetch(PROXY, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ question: prompt, messages: [{ role: 'system', text: 'Ты педагог по географии для ОГЭ. Отвечай кратко, по делу.' }, { role: 'user', text: prompt }] })
-    });
-    const data = await res.json();
-    const answer = data.answer || data.text || JSON.stringify(data);
-    output.className = 'feedback good';
-    output.innerHTML = escapeHtml(answer).replace(/\n/g,'<br>');
-  } catch(e) {
-    output.className = 'feedback bad';
-    output.textContent = 'Ошибка связи с AI';
-  }
-}
-
-// ==================== ИНИЦИАЛИЗАЦИЯ ====================
-function init() {
-  state.questionBank = buildQuestionBank();
-  updateStreak();
-  renderHome();
-  renderTheory();
-  renderPractice();
-  renderMaps();
-  renderAI();
-  renderStats();
-  renderExam();
-  
-  document.querySelectorAll('.nav-item').forEach(el => {
-    el.addEventListener('click', () => goScreen(el.dataset.nav));
-  });
-  
-  try {
-    if (window.Telegram?.WebApp) {
-      Telegram.WebApp.ready();
-      Telegram.WebApp.expand();
-    }
-  } catch(e) {}
-}
-
-window.goHome = goHome;
-window.goScreen = goScreen;
-window.openModule = openModule;
-window.startModulePractice = startModulePractice;
-window.startTopicPractice = startTopicPractice;
-window.startMixedPractice = startMixedPractice;
-window.startMapPractice = startMapPractice;
-window.startExam = startExam;
-window.answerMCQ = answerMCQ;
-window.submitOpenAnswer = submitOpenAnswer;
-window.nextQuestion = nextQuestion;
-window.useHint = useHint;
-window.sendAI = sendAI;
-
-init();
+loadProgress(function() {
+  checkStreak();
+  updateHomeUI();
+  initAI('ai-home','подготовка к ОГЭ по географии',['🎯 С чего начать подготовку?','📅 Составь план на неделю','💡 Частые ошибки на ОГЭ'], false);
+  setTimeout(function(){
+    initAI('ai-exam','пробный вариант ОГЭ по географии',['🎯 Как решать пробник?','⏰ Как распределить время?'], false);
+    initAI('ai-maps','работа с картами на ОГЭ',['🗺️ Как читать топокарту?','🧭 Как определить координаты?'], false);
+    initAI('ai-stats','слабые темы: климатограммы и часовые пояса',['📊 Объясни климатограммы','🕐 Как считать часовые пояса?'], false);
+    initAI('ai-hacks','лайфхаки для ОГЭ по географии',['🧠 Дай запоминалку','✍️ Шаблон для ответа'], false);
+    initAI('ai-daily','задание дня — определи страну по контуру',['❓ Подсказка к заданию','📖 Расскажи про эту страну'], false);
+    initTheory();
+  }, 50);
+});
 </script>
+
 </body>
 </html>
