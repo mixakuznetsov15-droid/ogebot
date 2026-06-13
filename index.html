@@ -179,7 +179,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
       <div style="flex:1">
         <div class="xp-title">245 / 400 XP · Уровень 4</div>
         <div class="xp-bar"><div class="xp-fill" style="width:61%"></div></div>
-        <div class="xp-stats">🎯 Цель дня: 12/20 заданий</div>
+        <div class="xp-stats">🎯 Решено: 0 заданий</div>
       </div>
     </div>
     <div class="actions">
@@ -193,6 +193,8 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
       <div class="grid-item" onclick="goScreen('s-stats')"><span style="font-size:26px">📊</span>Прогресс</div>
       <div class="grid-item" onclick="goScreen('s-hacks')"><span style="font-size:26px">💡</span>Лайфхаки</div>
       <div class="grid-item" onclick="goScreen('s-daily')"><span style="font-size:26px">🔥</span>Задание дня</div>
+      <div class="grid-item" onclick="goMistakes()">
+  <span style="font-size:26px">🔴</span> Ошибки </div>
     </div>
     <div id="ai-home" class="ai-panel"></div>
   </div>
@@ -339,7 +341,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 
 <div class="screen" id="s-sub">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
-  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Активен до 30.06.2025</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Пробный период</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
 </div>
 <div class="screen" id="s-sched">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📅 Расписание</div><div style="width:60px"></div></div>
@@ -349,7 +351,15 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👥 Друзья</div><div style="width:60px"></div></div>
   <div class="scroll"><div class="xp-panel"><div class="xp-icon">🏆</div><div><div class="xp-title">Рейтинг друзей</div><p style="color:var(--muted);font-size:12px">Ты на 2 месте, 12 баллов до первого</p></div></div><div class="grid"><div class="grid-item">📩 Пригласить</div><div class="grid-item">📊 Рейтинг</div></div></div>
 </div>
+<div class="screen" id="s-mistakes">
+  <div class="topbar">
+    <span class="back-link" onclick="goScreen('s-home')">← Назад</span>
+    <div class="sec-title">🔴 Мои ошибки</div>
+    <div style="width:60px"></div>
+  </div>
 
+  <div class="scroll" id="mistakes-content"></div>
+</div>
 <script>
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 
@@ -650,7 +660,10 @@ function selectAns(idx, correct, qText, topic, hint) {
     btns[correct].classList.add('correct');
     lives--;
   }
-  if(idx===correct) score++;
+ if(idx===correct){
+  score++;
+  addXP(10);
+}
 
   document.getElementById('btn-hint').style.display = 'none';
 
@@ -683,15 +696,25 @@ function selectAns(idx, correct, qText, topic, hint) {
 
   document.getElementById('btn-next').classList.add('show');
 
-  if(lives <= 0) {
-    document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
-  }
+ if(lives <= 0) {
+  document.getElementById('btn-next').textContent = '📊 Посмотреть результат';
+}
 }
 
 function nextQ() {
+
+  if(lives <= 0){
+    showResult();
+    return;
+  }
+
   curQ++;
-  if(curQ >= shuffled.length) showResult();
-  else renderQ();
+
+  if(curQ >= shuffled.length){
+    showResult();
+  } else {
+    renderQ();
+  }
 }
 
 function showResult() {
@@ -805,6 +828,8 @@ var userProgress = {
   completedLessons: {},
   totalAnswered: 0,
   totalCorrect: 0,
+
+  mistakes: []
 };
 
 var tg = window.Telegram && window.Telegram.WebApp;
@@ -897,8 +922,10 @@ function saveLesson(lessonIdx, sc, total) {
   userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
   userProgress.totalAnswered += total;
   userProgress.totalCorrect += sc;
-  var xpGain = sc * 20 + (sc === total ? 50 : 0);
-  addXP(xpGain);
+  if(sc === total){
+  addXP(50);
+}
+  
   checkStreak();
   saveProgress();
 }
