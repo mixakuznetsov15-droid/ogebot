@@ -831,6 +831,9 @@ var userProgress = {
   totalAnswered: 0,
   totalCorrect: 0,
 
+  isPremium: true,
+  daysLeft: 10,
+
   mistakes: {},
 
   trialStart: '',
@@ -913,6 +916,19 @@ function updateHomeUI() {
   if (streakEl && userProgress.streak > 0) {
     streakEl.textContent = '🔥 ' + userProgress.streak + ' ' + getDayWord(userProgress.streak);
   }
+  
+  var subTitle = document.querySelector('#s-sub .xp-title');
+
+if(subTitle){
+  if(userProgress.isPremium){
+    subTitle.textContent = 'Премиум активен';
+  } else {
+    subTitle.textContent =
+      'Пробный период: ' +
+      (userProgress.daysLeft || 7) +
+      ' дн.';
+  }
+ }
 }
 
 function getDayWord(n) {
@@ -936,6 +952,28 @@ function saveLesson(lessonIdx, sc, total) {
   saveProgress();
 }
 
+  function checkAccess() {
+
+  if(!userProgress.trialStart){
+    return;
+  }
+
+  var start = new Date(userProgress.trialStart);
+  var today = new Date();
+
+  var diffDays = Math.floor(
+    (today - start) / (1000 * 60 * 60 * 24)
+  );
+
+  var daysLeft = 7 - diffDays;
+
+  userProgress.daysLeft = daysLeft;
+
+  if(daysLeft < 0){
+    userProgress.daysLeft = 0;
+  }
+}
+  
 // INIT
 if (tg) tg.expand();
 
@@ -945,6 +983,8 @@ loadProgress(function() {
   userProgress.trialStart = new Date().toISOString().slice(0,10);
   saveProgress();
 }
+   checkAccess();
+  
   updateHomeUI();
   initAI('ai-home','подготовка к ОГЭ по географии',['🎯 С чего начать подготовку?','📅 Составь план на неделю','💡 Частые ошибки на ОГЭ'], false);
   setTimeout(function(){
