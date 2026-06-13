@@ -916,7 +916,7 @@ function updateHomeUI() {
   if (streakEl && userProgress.streak > 0) {
     streakEl.textContent = '🔥 ' + userProgress.streak + ' ' + getDayWord(userProgress.streak);
   }
-  
+  console.log(userProgress);
   var subTitle = document.querySelector('#s-sub .xp-title');
 
 if(subTitle){
