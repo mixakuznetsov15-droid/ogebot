@@ -1,288 +1,329 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ГеоПро — Экспедиция</title>
-    <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg: #0d1117;
-            --card: #161b22;
-            --card2: #1c2333;
-            --primary: #00c2ff;
-            --primary2: #00e5a0;
-            --text: #f0f6fc;
-            --muted: #8ba4c7;
-            --danger: #f85149;
-            --gold: #ffd166;
-            --border: #ffffff0c;
-            --radius: 18px;
-            --font-h: 'Unbounded', sans-serif;
-            --font-b: 'Onest', sans-serif;
-        }
-        * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-        body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
-        body::before {
-            content: ''; position:fixed; inset:0;
-            background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
-                        radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
-            pointer-events:none; z-index:0;
-        }
-        .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
-        .screen.active { display:flex; animation:fadeUp .3s ease; }
-        @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ГеоПро — Подготовка к ОГЭ</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1c2333;
+  --primary: #58a6ff;
+  --primary2: #3fb950;
+  --text: #f0f6fc;
+  --muted: #8b949e;
+  --danger: #f85149;
+  --gold: #d29922;
+  --border: #ffffff0c;
+  --radius: 18px;
+  --font-h: 'Unbounded', sans-serif;
+  --font-b: 'Onest', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-        /* Expedition top bar */
-        .topbar-expedition {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 12px 18px; background: rgba(15,22,32,0.85); backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border); flex-shrink: 0;
-        }
-        .exp-level { display: flex; flex-direction: column; }
-        .exp-xp-bar { height: 4px; background: #2d3a55; border-radius: 4px; margin: 4px 0; width: 130px; }
-        .exp-xp-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--primary2)); border-radius: 4px; }
-        .exp-stats { display: flex; gap: 14px; font-size: 13px; color: var(--text); }
+body::before {
+content: ''; position:fixed; inset:0;
+background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+pointer-events:none; z-index:0;
+}
 
-        .scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:120px; }
-        .scroll::-webkit-scrollbar { width:3px; }
-        .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
+.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; animation:fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-        /* Expedition path nodes */
-        .exp-node {
-            display: flex; align-items: center; gap: 14px; width: 100%;
-            background: rgba(18,34,54,0.7); backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08); border-radius: 20px;
-            padding: 14px; margin-bottom: 8px; transition: all 0.25s ease;
-        }
-        .exp-node.completed {
-            background: linear-gradient(135deg, rgba(0,229,160,0.12), rgba(0,194,255,0.06));
-            border-color: rgba(0,229,160,0.35);
-            box-shadow: 0 0 16px rgba(0,229,160,0.15);
-        }
-        .exp-node.perfect {
-            background: linear-gradient(135deg, rgba(255,209,102,0.2), rgba(0,229,160,0.15));
-            border-color: rgba(255,209,102,0.5);
-            box-shadow: 0 0 18px rgba(255,209,102,0.35);
-        }
-        .exp-node.locked {
-            opacity: 0.45; filter: blur(1.5px);
-            background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.12);
-        }
-        .exp-node.current {
-            background: linear-gradient(135deg, rgba(0,194,255,0.2), rgba(0,128,255,0.1));
-            border: 1px solid rgba(0,194,255,0.4);
-            box-shadow: 0 0 20px rgba(0,194,255,0.35);
-            animation: pulse-glow 2.2s infinite;
-        }
-        @keyframes pulse-glow {
-            0% { box-shadow: 0 0 12px rgba(0,194,255,0.25); }
-            50% { box-shadow: 0 0 22px rgba(0,194,255,0.55); }
-            100% { box-shadow: 0 0 12px rgba(0,194,255,0.25); }
-        }
-        .exp-node-icon {
-            width: 54px; height: 54px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 24px; flex-shrink: 0;
-            background: rgba(255,255,255,0.06);
-        }
-        .exp-node-info { flex:1; }
-        .exp-node-title { font-weight: 700; font-size: 14px; }
-        .exp-node-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.topbar {
+padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
+.sublabel { font-size:10px; color:var(--muted); }
+.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
 
-        /* Bottom nav */
-        .bottom-nav {
-            position:fixed; bottom:0; left:0; right:0;
-            background: rgba(13,17,23,0.96); backdrop-filter: blur(20px);
-            border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100;
-        }
-        .nav-item {
-            flex:1; display:flex; flex-direction:column; align-items:center; gap:3px;
-            color:var(--muted); font-size:10px; font-weight:500; cursor:pointer;
-        }
-        .nav-item.active { color:var(--primary); }
-        .nav-icon { font-size:20px; }
+.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
+.scroll::-webkit-scrollbar { width:3px; }
+.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-        /* Quiz etc. (preserved styles) */
-        .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
-        .q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
-        .q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
-        .q-text { font-size:15px; line-height:1.55; font-weight:500; }
-        .answers { display:flex; flex-direction:column; gap:8px; }
-        .ans-btn {
-            background:var(--card2); border:1.5px solid var(--border); border-radius:14px;
-            padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer;
-            font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s;
-        }
-        .ans-btn.correct { border-color:var(--primary2); background:rgba(0,229,160,0.1); }
-        .ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
-        .btn-next {
-            width:100%; background:linear-gradient(135deg,var(--primary),#0080ff);
-            color:#fff; border:none; border-radius:var(--radius); padding:16px;
-            font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer;
-            display:none; transition:transform .15s; margin-top:4px;
-        }
-        .btn-next.show { display:block; animation:fadeUp .3s ease; }
+.xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
+.xp-icon { font-size:26px; }
+.xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
+.xp-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
+.xp-stats { font-size:11px; color:var(--muted); }
+.xp-title { font-weight:600; font-size:14px; }
 
-        /* AI overlay */
-        .overlay {
-            position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;
-            display:flex; justify-content:center; align-items:flex-end;
-        }
-        .overlay.hidden { display:none; }
-        .bottom-sheet {
-            background:var(--card); border-radius:20px 20px 0 0;
-            width:100%; max-width:600px; max-height:70vh;
-            overflow-y:auto; padding:24px 20px 40px;
-            animation:slideUp .3s ease;
-            box-shadow:0 -10px 30px rgba(0,0,0,.5);
-        }
-        @keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-    </style>
+.actions { display:flex; gap:10px; }
+.btn { flex:1; padding:14px 6px; border-radius:var(--radius); background:var(--card2); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
+.btn:active { transform:scale(.97); }
+.btn.primary { background:linear-gradient(135deg,var(--primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
+.btn.accent { background:linear-gradient(135deg,var(--primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
+.btn-icon { font-size:24px; }
+
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid-item { background:var(--card2); border-radius:var(--radius); padding:14px; border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
+.grid-item:active { background:#253544; }
+
+.sec-title { font-family:var(--font-h); font-size:14px; font-weight:700; }
+.back-link { color:var(--primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+
+.topic-list { display:flex; flex-direction:column; gap:8px; }
+.topic-item { background:var(--card2); border-radius:var(--radius); padding:12px 14px; border:1px solid var(--border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
+.topic-item:active { background:#253544; }
+
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; font-weight:500; cursor:pointer; }
+.nav-item.active { color:var(--primary); }
+.nav-icon { font-size:20px; }
+
+/* AI PANEL */
+.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
+.ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
+.ai-header-left { display:flex; align-items:center; gap:10px; }
+.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
+.ai-tagline { font-size:10px; color:var(--muted); }
+.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
+.ai-toggle.open { transform:rotate(180deg); }
+
+.ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
+.ai-body.open { display:flex; animation:fadeUp .25s ease; }
+
+.ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
+.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
+.ai-prompt-btn:active { background:#58a6ff30; }
+
+.ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
+.ai-messages::-webkit-scrollbar { width:2px; }
+.ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
+
+.msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
+.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
+.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
+.msg.loading { color:var(--muted); font-style:italic; }
+
+.ai-input-row { display:flex; gap:8px; align-items:flex-end; }
+.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
+.ai-input:focus { border-color:#58a6ff60; }
+.ai-input::placeholder { color:var(--muted); }
+.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.ai-send:active { transform:scale(.93); }
+.ai-send:disabled { opacity:.5; cursor:default; }
+.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
+
+/* QUIZ */
+.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+.quiz-wrap::-webkit-scrollbar { width:3px; }
+.q-header { display:flex; justify-content:space-between; align-items:center; }
+.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
+.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
+.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+.q-text { font-size:15px; line-height:1.55; font-weight:500; }
+.answers { display:flex; flex-direction:column; gap:8px; }
+.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
+.ans-btn:active { transform:scale(.98); }
+.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
+.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
+.ans-btn.correct .ans-letter { background:var(--primary2); }
+.ans-btn.wrong .ans-letter { background:var(--danger); }
+.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
+.btn-next.show { display:block; animation:fadeUp .3s ease; }
+.btn-next:active { transform:scale(.97); }
+
+/* RESULT */
+.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+.result-emoji { font-size:64px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.result-sub { font-size:14px; color:var(--muted); }
+.ring-wrap { position:relative; width:130px; height:130px; }
+.ring-wrap svg { transform:rotate(-90deg); }
+.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
+.ring-denom { font-size:12px; color:var(--muted); }
+.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
+.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
+.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
+.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
+.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
+.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+.btn-full:active { transform:scale(.97); }
+.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
+.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
+
+/* OVERLAY */
+.overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;
+  display:flex; justify-content:center; align-items:flex-end;
+}
+.overlay.hidden { display:none; }
+.bottom-sheet {
+  background:var(--card); border-radius:20px 20px 0 0;
+  width:100%; max-width:600px; max-height:70vh;
+  overflow-y:auto; padding:24px 20px 40px;
+  animation:slideUp .3s ease;
+  box-shadow:0 -10px 30px rgba(0,0,0,.5);
+}
+@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
+.bottom-sheet .msg { margin:8px 0; }
+.bottom-sheet .btn-full { margin-top:16px; }
+</style>
 </head>
 <body>
 
-<!-- ГЛАВНЫЙ ЭКРАН – ЭКСПЕДИЦИЯ -->
+<!-- HOME SCREEN -->
 <div class="screen active" id="s-home">
-    <div class="topbar-expedition">
-        <div class="exp-level">
-            <span id="exp-level-text" style="font-weight:700; font-size:14px;">🔰 Ур. 7</span>
-            <div class="exp-xp-bar"><div class="exp-xp-fill" id="exp-fill-home" style="width:61%"></div></div>
-            <span style="font-size:10px; color:var(--muted)">245 / 400 XP</span>
-        </div>
-        <div class="exp-stats">
-            <span id="exp-stars">⭐ 42</span>
-            <span id="exp-streak">🔥 9 дн.</span>
-        </div>
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="avatar">🌍</div>
+      <div><div class="username">ГеоПро</div><div class="sublabel">Подготовка к ОГЭ</div></div>
     </div>
-    <div class="scroll" id="expedition-content">
-        <div style="text-align:center;color:var(--muted);padding:40px">Загрузка карты экспедиции...</div>
+    <div class="streak">🔥 7 дней</div>
+  </div>
+  <div class="scroll">
+    <div class="xp-panel">
+      <div class="xp-icon">⚡</div>
+      <div style="flex:1">
+        <div class="xp-title">245 / 400 XP · Уровень 4</div>
+        <div class="xp-bar"><div class="xp-fill" style="width:61%"></div></div>
+        <div class="xp-stats">🎯 Решено: 0 заданий</div>
+      </div>
     </div>
-    <div style="position:fixed; bottom:100px; right:16px; z-index:90;">
-        <div id="daily-btn" style="background:linear-gradient(135deg,#FF7A3D,#FFD166); border-radius:20px; padding:10px 16px; color:#fff; font-weight:700; font-size:13px; cursor:pointer; box-shadow:0 4px 15px rgba(255,122,61,0.4)" onclick="alert('Ежедневное задание скоро появится')">
-            📅 Задание дня
-        </div>
+    <div class="actions">
+      <div class="btn primary" onclick="goLessonSelect()"><span class="btn-icon">🧠</span>Тренировка</div>
+      <div class="btn accent" onclick="alert('Пробный экзамен в разработке')"><span class="btn-icon">🎯</span>Пробник</div>
+      <div class="btn" onclick="goScreen('s-theory')"><span class="btn-icon">📚</span>Учить</div>
     </div>
-    <nav class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('s-home', this)"><div class="nav-icon">🧭</div>Экспедиции</div>
-        <div class="nav-item" onclick="switchTab('s-stats', this)"><div class="nav-icon">🏆</div>Достижения</div>
-        <div class="nav-item" onclick="switchTab('s-sub', this)"><div class="nav-icon">💳</div>База</div>
-    </nav>
+    <div class="sec-title">📂 Разделы</div>
+    <div class="grid">
+      <div class="grid-item" onclick="alert('В разработке')"><span style="font-size:26px">🗺️</span>Карты</div>
+      <div class="grid-item" onclick="goScreen('s-stats')"><span style="font-size:26px">📊</span>Прогресс</div>
+      <div class="grid-item" onclick="alert('В разработке')"><span style="font-size:26px">💡</span>Лайфхаки</div>
+      <div class="grid-item" onclick="alert('В разработке')"><span style="font-size:26px">🔥</span>Задание дня</div>
+      <div class="grid-item" onclick="goMistakes()"><span style="font-size:26px">🔴</span> Ошибки </div>
+    </div>
+    <div id="ai-home" class="ai-panel"></div>
+  </div>
+  <nav class="bottom-nav">
+    <div class="nav-item active" onclick="goScreen('s-home')"><div class="nav-icon">🏠</div>Главная</div>
+    <div class="nav-item" onclick="goScreen('s-stats')"><div class="nav-icon">📊</div>Прогресс</div>
+    <div class="nav-item" onclick="goScreen('s-sub')"><div class="nav-icon">💳</div>Подписка</div>
+  </nav>
 </div>
 
-<!-- ЭКРАН ТЕОРИИ (сохраняется) -->
+<!-- THEORY SCREEN -->
 <div class="screen" id="s-theory">
-    <div class="topbar-expedition">
-        <span class="back-link" style="color:var(--primary);cursor:pointer" onclick="goScreen('s-home')">← Назад</span>
-        <div class="sec-title">📚 Теория</div><div style="width:60px"></div>
-    </div>
-    <div class="scroll" id="theory-content"></div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
+  <div class="scroll" id="theory-content"></div>
 </div>
 
-<!-- ЭКРАН ТЕМЫ (статья) -->
+<!-- TOPIC SCREEN -->
 <div class="screen" id="s-topic">
-    <div class="topbar-expedition">
-        <span class="back-link" style="color:var(--primary);cursor:pointer" onclick="goScreen('s-theory')">← Назад</span>
-        <div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div>
-    </div>
-    <div class="scroll" id="topic-content"></div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+  <div class="scroll" id="topic-content"></div>
 </div>
 
-<!-- ЭКРАН КВИЗА -->
+<!-- TRAINING SCREEN -->
+<div class="screen" id="s-training">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🧠 Тренировка</div><div style="width:60px"></div></div>
+  <div class="scroll" id="training-content"></div>
+</div>
+
+<!-- QUIZ SCREEN -->
 <div class="screen" id="s-quiz">
-    <div class="topbar-expedition">
-        <span class="back-link" style="color:var(--primary);cursor:pointer" onclick="closeAIOverlay(); goScreen('s-home')">← Экспедиция</span>
-        <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
-        <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
+  <div class="topbar">
+    <span class="back-link" onclick="goLessonSelect()">← Тренировка</span>
+    <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
+    <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
+  </div>
+  <div class="quiz-wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
+      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
     </div>
-    <div class="quiz-wrap">
-        <div style="display:flex;align-items:center;gap:10px">
-            <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
-            <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
-        </div>
-        <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
-        <div class="q-card">
-            <div class="q-tag" id="q-tag">Задание</div>
-            <div class="q-text" id="q-text">...</div>
-        </div>
-        <div class="answers" id="answers"></div>
-        <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">💡 Подсказка от AI</button>
-        <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
-        <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
+    <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
+    <div class="q-card">
+      <div class="q-tag" id="q-tag">Задание</div>
+      <div class="q-text" id="q-text">...</div>
     </div>
+    <div class="answers" id="answers"></div>
+    <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">💡 Подсказка от AI</button>
+    <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
+  </div>
 </div>
 
-<!-- РЕЗУЛЬТАТ -->
+<!-- RESULT SCREEN -->
 <div class="screen" id="s-result">
-    <div class="result-wrap">
-        <div class="result-emoji" id="res-emoji">🎉</div>
-        <div class="result-title" id="res-title">Отлично!</div>
-        <div class="result-sub" id="res-sub">Ты справился!</div>
-        <div class="ring-wrap">
-            <svg width="130" height="130" viewBox="0 0 130 130">
-                <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
-                <circle class="ring-bg" cx="65" cy="65" r="54"/>
-                <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
-            </svg>
-            <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
-        </div>
-        <div class="res-stats">
-            <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
-            <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
-            <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
-        </div>
-        <div class="res-btns">
-            <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На карту</button>
-            <button class="btn-full sec" onclick="location.reload()">🔄 Ещё раз</button>
-        </div>
+  <div class="result-wrap">
+    <div class="result-emoji" id="res-emoji">🎉</div>
+    <div class="result-title" id="res-title">Отлично!</div>
+    <div class="result-sub" id="res-sub">Ты справился!</div>
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
+        <circle class="ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
     </div>
+    <div class="res-stats">
+      <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
+      <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
+      <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+      <button class="btn-full sec" onclick="location.reload()">🔄 Ещё раз</button>
+    </div>
+  </div>
 </div>
 
-<!-- СТАТИСТИКА -->
+<!-- STATS SCREEN -->
 <div class="screen" id="s-stats">
-    <div class="topbar-expedition">
-        <span class="back-link" style="color:var(--primary);cursor:pointer" onclick="goScreen('s-home')">← Назад</span>
-        <div class="sec-title">🏆 Достижения</div><div style="width:60px"></div>
-    </div>
-    <div class="scroll">
-        <div class="xp-panel"><div class="xp-icon">⭐</div><div style="flex:1"><div class="xp-title">Балл: 24 / 31</div><div class="xp-bar"><div class="xp-fill" style="width:77%"></div></div><div class="xp-stats">Заданий: 187 · Точность: 78%</div></div></div>
-        <p style="color:var(--muted);font-size:12px">Слабые темы: климатограммы, часовые пояса.</p>
-        <div id="ai-stats" class="ai-panel"></div>
-    </div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
+  <div class="scroll">
+    <div class="xp-panel"><div class="xp-icon">⭐</div><div style="flex:1"><div class="xp-title">Балл: 24 / 31</div><div class="xp-bar"><div class="xp-fill" style="width:77%"></div></div><div class="xp-stats">Заданий: 187 · Точность: 78%</div></div></div>
+    <p style="color:var(--muted);font-size:12px">Слабые темы: климатограммы, часовые пояса.</p>
+    <div id="ai-stats" class="ai-panel"></div>
+  </div>
 </div>
 
-<!-- ПОДПИСКА -->
+<!-- SUBSCRIPTION SCREEN -->
 <div class="screen" id="s-sub">
-    <div class="topbar-expedition">
-        <span class="back-link" style="color:var(--primary);cursor:pointer" onclick="goScreen('s-home')">← Назад</span>
-        <div class="sec-title">💳 Подписка</div><div style="width:60px"></div>
-    </div>
-    <div class="scroll">
-        <div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Пробный период</p></div></div>
-        <div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div>
-    </div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
+  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Пробный период</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
 </div>
 
-<!-- ОШИБКИ -->
+<!-- MISTAKES SCREEN -->
 <div class="screen" id="s-mistakes">
-    <div class="topbar-expedition">
-        <span class="back-link" style="color:var(--primary);cursor:pointer" onclick="goScreen('s-home')">← Назад</span>
-        <div class="sec-title">🔴 Мои ошибки</div><div style="width:60px"></div>
-    </div>
-    <div class="scroll" id="mistakes-content"></div>
+  <div class="topbar">
+    <span class="back-link" onclick="goScreen('s-home')">← Назад</span>
+    <div class="sec-title">🔴 Мои ошибки</div>
+    <div style="width:60px"></div>
+  </div>
+  <div class="scroll" id="mistakes-content"></div>
 </div>
 
-<!-- AI OVERLAY -->
+<!-- AI OVERLAY (bottom sheet) -->
 <div id="ai-overlay" class="overlay hidden">
-    <div class="bottom-sheet" id="ai-overlay-content">
-        <div style="font-weight:600;margin-bottom:12px;color:var(--primary)">🤖 AI-репетитор</div>
-        <div id="ai-overlay-text" class="msg ai">Загружаю объяснение...</div>
-        <button class="btn-full primary" onclick="closeAIOverlay()">Понял, дальше</button>
-    </div>
+  <div class="bottom-sheet" id="ai-overlay-content">
+    <div style="font-weight:600;margin-bottom:12px;color:var(--primary)">🤖 AI-репетитор</div>
+    <div id="ai-overlay-text" class="msg ai">Загружаю объяснение...</div>
+    <button class="btn-full primary" onclick="closeAIOverlay()">Понял, дальше</button>
+  </div>
 </div>
 
 <script>
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
+
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 
 const THEORY_FILES = [
@@ -345,11 +386,13 @@ function goScreen(id) {
   window.scrollTo(0,0);
 }
 
-function switchTab(screenId, navItem) {
-  goScreen(screenId);
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  if (navItem) navItem.classList.add('active');
-  if (screenId === 's-home') loadExpeditionMap();
+function goQuiz(lessonIdx) {
+  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  curLesson = (lessonIdx !== undefined) ? lessonIdx : 0;
+  shuffled = allLessons[curLesson].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
 }
 
 async function loadAllLessons() {
@@ -361,7 +404,9 @@ async function loadAllLessons() {
       var questions = [];
       if (Array.isArray(data)) {
         data.forEach(function(item) {
-          if (item.tag && item.text && item.answers) questions.push(item);
+          if (item.tag && item.text && item.answers) {
+            questions.push(item);
+          }
         });
       }
       lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions.length ? questions : fallbackQuestions });
@@ -373,19 +418,18 @@ async function loadAllLessons() {
   return lessonsLoaded;
 }
 
-async function loadExpeditionMap() {
-  var container = document.getElementById('expedition-content');
-  if (!container) return;
-  container.innerHTML = '<div style="text-align:center;color:var(--muted);padding:40px">Загрузка маршрута...</div>';
-  if (lessonsLoaded.length === 0) await loadAllLessons();
+async function goLessonSelect() {
+  goScreen('s-training');
+  document.getElementById('training-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю темы...</div>';
+  if (lessonsLoaded.length === 0) {
+    await loadAllLessons();
+  }
   var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
-  renderExpeditionPath(allLessons);
+  renderTrainingPath(allLessons);
 }
 
-function renderExpeditionPath(allLessons) {
-  var container = document.getElementById('expedition-content');
-  if (!container) return;
-  var html = '';
+function renderTrainingPath(allLessons) {
+  var html = '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-bottom:20px">';
   for (var i = 0; i < allLessons.length; i++) {
     var l = allLessons[i];
     var lessonKey = l.title;
@@ -394,29 +438,27 @@ function renderExpeditionPath(allLessons) {
     var prevDone = i === 0 || userProgress.completedLessons[prevKey];
     var isLocked = !prevDone && i > 0;
     var perfect = done && done.score === done.total;
-
-    var nodeClass = 'exp-node';
-    if (perfect) nodeClass += ' perfect';
-    else if (done) nodeClass += ' completed';
-    else if (isLocked) nodeClass += ' locked';
-    else nodeClass += ' current';
-
-    var icon = perfect ? '🏁' : (done ? '✅' : (isLocked ? '🔒' : '▶'));
-    var clickAction = isLocked ? '' : 'onclick="goQuizFromLoaded('+i+')"';
-    var cursorStyle = isLocked ? 'cursor:not-allowed' : 'cursor:pointer';
-
-    html += '<div class="'+nodeClass+'" style="'+cursorStyle+'" '+clickAction+'>';
-    html += '<div class="exp-node-icon">'+icon+'</div>';
-    html += '<div class="exp-node-info">';
-    html += '<div class="exp-node-title">'+l.title+'</div>';
+    var nodeColor = perfect ? 'var(--primary2)' : done ? 'var(--primary)' : isLocked ? 'var(--card2)' : '#f5a623';
+    var nodeBorder = perfect ? '2px solid var(--primary2)' : done ? '2px solid var(--primary)' : isLocked ? '2px solid var(--border)' : '2px solid #f5a623';
+    var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var opacity = isLocked ? '0.45' : '1';
+    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded(' + i + ')"';
+    if (i > 0) {
+      var connColor = prevDone ? 'var(--primary2)' : 'var(--border)';
+      html += '<div style="width:3px;height:28px;background:' + connColor + ';margin:0 auto"></div>';
+    }
+    html += '<div style="display:flex;align-items:center;gap:14px;width:100%;opacity:' + opacity + '">';
+    html += '<div' + onclk + ' style="width:64px;height:64px;border-radius:50%;background:' + nodeColor + ';border:' + nodeBorder + ';display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">' + l.title + '</div>';
     if (done) {
-      html += '<div class="exp-node-sub">'+done.score+'/'+done.total+' верно</div>';
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">' + done.score + '/' + done.total + ' верно</div>';
     } else {
-      html += '<div class="exp-node-sub">'+l.tasks+' · '+(l.questions ? l.questions.length : '?')+' вопр.</div>';
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + (l.questions ? l.questions.length : 0) + ' вопр.</div>';
     }
     html += '</div></div>';
   }
-  container.innerHTML = html;
+  html += '</div>';
+  document.getElementById('training-content').innerHTML = html;
 }
 
 function goQuizFromLoaded(idx) {
@@ -428,12 +470,78 @@ function goQuizFromLoaded(idx) {
   renderQ();
 }
 
+function initTheory() {
+  var html = '<div class="sec-title">📚 Темы по кодификатору ОГЭ 2026</div><div class="topic-list">';
+  for (var i = 0; i < THEORY_FILES.length; i++) {
+    var f = THEORY_FILES[i];
+    html += '<div class="topic-item" style="display:flex;align-items:center;justify-content:space-between" onclick="showTopicFromGithub(\'' + f.key + '\')">';
+    html += '<div><div style="font-weight:600;font-size:14px">' + f.title + '</div>';
+    html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + f.tasks + '</div></div>';
+    html += '<div style="color:var(--primary);font-size:16px">▶</div></div>';
+  }
+  html += '</div><div id="ai-theory" class="ai-panel"></div>';
+  document.getElementById('theory-content').innerHTML = html;
+  initAI('ai-theory','теория по географии для ОГЭ 2026',['🎯 С чего начать?','❓ Что чаще спрашивают?','💡 Дай запоминалку']);
+}
+
+async function showTopicFromGithub(key) {
+  var f = THEORY_FILES.find(function(x){ return x.key === key; });
+  if (!f) return;
+
+  document.getElementById('topic-title').textContent = f.title;
+  document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю материал...</div>';
+  goScreen('s-topic');
+
+  try {
+    var data;
+    if (theoryCache[key]) {
+      data = theoryCache[key];
+    } else {
+      data = await fetchJSON(f.file);
+      theoryCache[key] = data;
+    }
+
+    var html = '<div style="display:flex;flex-direction:column;gap:12px">';
+    for (var i = 0; i < data.length; i++) {
+      var card = data[i];
+      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">';
+      html += '<div style="padding:12px 14px;background:#58a6ff08;border-bottom:1px solid #58a6ff20;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCard(\'card-' + i + '\')">';
+      html += '<div style="font-size:13px;font-weight:600">' + card.topic + '</div>';
+      html += '<div id="arr-' + i + '" style="color:var(--muted);font-size:14px">▼</div></div>';
+      html += '<div id="card-' + i + '" style="display:none;padding:14px;font-size:13px;line-height:1.65;color:#c8d8e8;white-space:pre-line">' + card.content + '</div></div>';
+    }
+    html += '</div><div id="ai-topic" class="ai-panel" style="margin-top:14px"></div>';
+    document.getElementById('topic-content').innerHTML = html;
+
+    var aiCtx = f.title + '. ' + f.tasks + ' ОГЭ по географии';
+    initAI('ai-topic', aiCtx, ['📖 Объясни главное','❓ Что спрашивают на ОГЭ?','🧠 Дай запоминалку','✅ Проверь знания'], false);
+  } catch(e) {
+    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;color:var(--danger)">⚠️ Ошибка загрузки. Проверь интернет.</div>';
+  }
+}
+
+function toggleCard(id) {
+  var el = document.getElementById(id);
+  var idx = id.split("-")[1];
+  var arr = document.getElementById("arr-" + idx);
+  if(el.style.display === "none") {
+    el.style.display = "block";
+    if(arr) arr.style.transform = "rotate(180deg)";
+  } else {
+    el.style.display = "none";
+    if(arr) arr.style.transform = "rotate(0deg)";
+  }
+}
+
 function renderQ() {
-  if(!shuffled || shuffled.length === 0) shuffled = fallbackQuestions;
+  if(!shuffled || shuffled.length === 0) {
+    shuffled = fallbackQuestions;
+  }
   const q = shuffled[curQ];
   var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
   const lesson = allLessons[curLesson];
-  answered = false; hintUsed = false;
+  answered = false; 
+  hintUsed = false;
 
   document.getElementById('quiz-topic-lbl').textContent = lesson ? lesson.title : 'Тренировка';
   document.getElementById('lesson-badge').textContent = (lesson ? lesson.title : 'Тренировка') + ' · Вопрос ' + (curQ+1) + ' из ' + shuffled.length;
@@ -511,6 +619,7 @@ function selectAns(idx, correct, qText, topic, hint) {
   if(idx!==correct){
     btns[correct].classList.add('correct');
     lives--;
+    // сохраняем ошибку
     if (!userProgress.mistakes[topic]) userProgress.mistakes[topic] = [];
     userProgress.mistakes[topic].push({ question: qText, correctAnswer: btns[correct] ? btns[correct].textContent : '', date: new Date().toISOString().slice(0,10) });
     saveProgress();
@@ -528,6 +637,7 @@ function selectAns(idx, correct, qText, topic, hint) {
     livesEl.innerHTML += '<span>' + (i<lives ? '❤️' : '🖤') + '</span>';
   }
 
+  // Показываем модальное объяснение
   showAIOverlay(qText, topic, idx===correct);
 
   document.getElementById('btn-next').classList.add('show');
@@ -536,6 +646,7 @@ function selectAns(idx, correct, qText, topic, hint) {
   }
 }
 
+// ----- AI overlay -----
 function showAIOverlay(questionText, topic, isCorrect) {
   const overlay = document.getElementById('ai-overlay');
   const textDiv = document.getElementById('ai-overlay-text');
@@ -564,8 +675,10 @@ function closeAIOverlay() {
   document.getElementById('ai-overlay').classList.add('hidden');
 }
 
+// ----- Конец overlay -----
+
 function nextQ() {
-  closeAIOverlay();
+  closeAIOverlay();  // на всякий случай
   if(lives <= 0){
     showResult();
     return;
@@ -595,7 +708,7 @@ function showResult() {
   var xpGain = score*20 + (score===total ? 50 : 0);
   document.getElementById('res-xp').textContent = '+' + xpGain;
   saveLesson(curLesson, score, total);
-  updateAllStats();
+  updateHomeUI();
   goScreen('s-result');
   setTimeout(function(){ 
     var circumference = 2 * Math.PI * 54;
@@ -605,7 +718,82 @@ function showResult() {
   }, 100);
 }
 
-// ---------- PROGRESS ----------
+// AI функции
+function initAI(cid, ctx, prompts, autoOpen) {
+  prompts = prompts || [];
+  autoOpen = autoOpen || false;
+  const el = document.getElementById(cid);
+  if(!el) return;
+  var promptsHtml = '';
+  for(var i = 0; i < prompts.length; i++) {
+    var p = prompts[i];
+    promptsHtml += '<button class="ai-prompt-btn" onclick="sendP(\'' + cid + '\',\'' + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\',\'' + p.replace(/'/g, "\\'") + '\')">' + p + '</button>';
+  }
+  el.innerHTML = `
+    <div class="ai-header" onclick="toggleAI(this)">
+      <div class="ai-header-left">
+        <div class="ai-avatar">🤖</div>
+        <div><div class="ai-name">AI-репетитор</div><div class="ai-tagline">Спроси — объясню как педагог</div></div>
+      </div>
+      <div class="ai-toggle ` + (autoOpen ? 'open' : '') + `">▼</div>
+    </div>
+    <div class="ai-body ` + (autoOpen ? 'open' : '') + `">
+      <div class="ai-context">📌 ` + ctx + `</div>
+      <div class="ai-prompts">` + promptsHtml + `</div>
+      <div class="ai-messages" id="msgs-` + cid + `"></div>
+      <div class="ai-input-row">
+        <textarea class="ai-input" id="inp-` + cid + `" placeholder="Задай вопрос..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `');}"></textarea>
+        <button class="ai-send" id="snd-` + cid + `" onclick="sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `')">➤</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAI(h) {
+  const b = h.nextElementSibling;
+  const t = h.querySelector('.ai-toggle');
+  if(b) b.classList.toggle('open');
+  if(t) t.classList.toggle('open');
+}
+
+function sendP(cid,ctx,text) {
+  var inp = document.getElementById('inp-' + cid);
+  if(inp) inp.value = text;
+  sendM(cid,ctx);
+}
+
+async function sendM(cid,ctx) {
+  const inp = document.getElementById('inp-' + cid);
+  const snd = document.getElementById('snd-' + cid);
+  const msgs = document.getElementById('msgs-' + cid);
+  const text = inp ? inp.value.trim() : '';
+  if(!text) return;
+  if(inp) inp.value = '';
+  if(snd) snd.disabled = true;
+  if(msgs) {
+    msgs.innerHTML += '<div class="msg user">' + text + '</div>';
+    const lid = 'l' + Date.now();
+    msgs.innerHTML += '<div class="msg ai loading" id="' + lid + '">⏳ Думаю...</div>';
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+      const d = await r.json();
+      const ans = d.answer || 'Не удалось получить ответ';
+      var loadingEl = document.getElementById(lid);
+      if(loadingEl) loadingEl.remove();
+      msgs.innerHTML += '<div class="msg ai">' + ans.replace(/\n/g,'<br>') + '</div>';
+    } catch(e) {
+      var loadingEl2 = document.getElementById(lid);
+      if(loadingEl2) loadingEl2.remove();
+      msgs.innerHTML += '<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>';
+    }
+    if(snd) snd.disabled = false;
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+}
+
+// PROGRESS
 var userProgress = {
   xp: 245,
   level: 4,
@@ -672,18 +860,36 @@ function checkStreak() {
 function showXPToast(amount) {
   var toast = document.createElement('div');
   toast.textContent = '+' + amount + ' XP ⚡';
-  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#00c2ff,#00e5a0);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation:fadeUp .3s ease;';
+  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation:fadeUp .3s ease;';
   document.body.appendChild(toast);
   setTimeout(function(){ if(toast) toast.remove(); }, 2000);
 }
 
-function updateAllStats() {
+function updateHomeUI() {
   var xpInLevel = userProgress.xp % 200;
   var pct = Math.round((xpInLevel / 200) * 100);
-  document.getElementById('exp-fill-home').style.width = pct + '%';
-  document.getElementById('exp-level-text').textContent = '🔰 Ур. ' + userProgress.level;
-  document.getElementById('exp-stars').textContent = '⭐ ' + (userProgress.totalCorrect || 0);
-  document.getElementById('exp-streak').textContent = '🔥 ' + userProgress.streak + ' ' + getDayWord(userProgress.streak);
+  var xpEl = document.querySelector('.xp-fill');
+  if (xpEl) xpEl.style.width = pct + '%';
+  var xpTitle = document.querySelector('.xp-title');
+  if (xpTitle) xpTitle.textContent = userProgress.xp + ' XP · Уровень ' + userProgress.level;
+  var xpStats = document.querySelector('.xp-stats');
+  if (xpStats) {
+    var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect / userProgress.totalAnswered) * 100) : 0;
+    var mistakesCount = Object.values(userProgress.mistakes).reduce(function(sum, arr){ return sum + arr.length; }, 0);
+    xpStats.textContent = '🎯 Заданий: ' + userProgress.totalAnswered + ' · Точность: ' + acc + '% · Ошибок: ' + mistakesCount;
+  }
+  var streakEl = document.querySelector('.streak');
+  if (streakEl && userProgress.streak > 0) {
+    streakEl.textContent = '🔥 ' + userProgress.streak + ' ' + getDayWord(userProgress.streak);
+  }
+  var subTitle = document.querySelector('#s-sub .xp-title');
+  if(subTitle){
+    if(userProgress.isPremium){
+      subTitle.textContent = 'Премиум активен';
+    } else {
+      subTitle.textContent = 'Пробный период: ' + (userProgress.daysLeft || 7) + ' дн.';
+    }
+  }
 }
 
 function getDayWord(n) {
@@ -715,34 +921,50 @@ function checkAccess() {
   userProgress.daysLeft = daysLeft > 0 ? daysLeft : 0;
 }
 
-// Теория (вызывается при переходе)
-function initTheory() {
-  var html = '<div class="sec-title">📚 Темы по кодификатору ОГЭ 2026</div><div class="topic-list">';
-  for (var i = 0; i < THEORY_FILES.length; i++) {
-    var f = THEORY_FILES[i];
-    html += '<div class="topic-item" style="display:flex;align-items:center;justify-content:space-between" onclick="showTopicFromGithub(\'' + f.key + '\')">';
-    html += '<div><div style="font-weight:600;font-size:14px">' + f.title + '</div><div style="font-size:11px;color:var(--muted);margin-top:3px">' + f.tasks + '</div></div>';
-    html += '<div style="color:var(--primary);font-size:16px">▶</div></div>';
+function goMistakes() {
+  goScreen('s-mistakes');
+  var content = document.getElementById('mistakes-content');
+  if (!content) return;
+  var allMistakes = userProgress.mistakes;
+  var html = '';
+  var topics = Object.keys(allMistakes);
+  if (topics.length === 0) {
+    html = '<p style="color:var(--muted)">Пока нет ошибок. Продолжай тренироваться!</p>';
+  } else {
+    for (var i = 0; i < topics.length; i++) {
+      var topic = topics[i];
+      var items = allMistakes[topic];
+      html += '<div class="sec-title">' + topic + '</div>';
+      for (var j = 0; j < items.length; j++) {
+        var m = items[j];
+        html += '<div style="background:var(--card2);border-radius:12px;padding:12px;margin-bottom:6px;border:1px solid var(--border)">';
+        html += '<div style="font-size:13px;margin-bottom:4px">❌ ' + m.question + '</div>';
+        html += '<div style="font-size:11px;color:var(--muted)">Правильный: ' + (m.correctAnswer || 'неизвестно') + ' | ' + (m.date || '') + '</div>';
+        html += '</div>';
+      }
+    }
   }
-  html += '</div>';
-  document.getElementById('theory-content').innerHTML = html;
+  content.innerHTML = html;
 }
 
-async function showTopicFromGithub(key) { /* ... */ }
-
-// Инициализация при загрузке
+// INIT
 if (tg) tg.expand();
 
 loadProgress(function() {
-  checkStreak();
+  checkStreak(); 
   if(!userProgress.trialStart){
     userProgress.trialStart = new Date().toISOString().slice(0,10);
     saveProgress();
   }
   checkAccess();
-  updateAllStats();
-  loadExpeditionMap();
+  updateHomeUI();
+  initAI('ai-home','подготовка к ОГЭ по географии',['🎯 С чего начать подготовку?','📅 Составь план на неделю','💡 Частые ошибки на ОГЭ'], false);
+  setTimeout(function(){
+    initAI('ai-stats','слабые темы: климатограммы и часовые пояса',['📊 Объясни климатограммы','🕐 Как считать часовые пояса?'], false);
+    initTheory();
+  }, 50);
 });
 </script>
+
 </body>
 </html>
