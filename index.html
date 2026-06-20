@@ -25,19 +25,19 @@
 body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
 body::before {
-content: ''; position:fixed; inset:0;
-background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
-radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
-pointer-events:none; z-index:0;
+  content:''; position:fixed; inset:0;
+  background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+              radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+  pointer-events:none; z-index:0;
 }
 
 .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
-.screen.active { display:flex; animation:fadeUp .3s ease; }
+.screen.active { display:flex; animation: fadeUp .3s ease; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
 .topbar {
-padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
-background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 }
 .avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
 .username { font-family:var(--font-h); font-size:13px; font-weight:700; }
@@ -78,7 +78,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 .nav-item.active { color:var(--primary); }
 .nav-icon { font-size:20px; }
 
-/* AI PANEL */
+/* ── AI PANEL ── */
 .ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
 .ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
 .ai-header-left { display:flex; align-items:center; gap:10px; }
@@ -89,7 +89,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 .ai-toggle.open { transform:rotate(180deg); }
 
 .ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
-.ai-body.open { display:flex; animation:fadeUp .25s ease; }
+.ai-body.open { display:flex; animation: fadeUp .25s ease; }
 
 .ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
 .ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
@@ -113,7 +113,7 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 .ai-send:disabled { opacity:.5; cursor:default; }
 .ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
 
-/* QUIZ */
+/* ── QUIZ ── */
 .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
 .quiz-wrap::-webkit-scrollbar { width:3px; }
 .q-header { display:flex; justify-content:space-between; align-items:center; }
@@ -131,12 +131,12 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 .ans-btn.correct .ans-letter { background:var(--primary2); }
 .ans-btn.wrong .ans-letter { background:var(--danger); }
 .btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
-.btn-next.show { display:block; animation:fadeUp .3s ease; }
+.btn-next.show { display:block; animation: fadeUp .3s ease; }
 .btn-next:active { transform:scale(.97); }
 
-/* RESULT */
+/* ── RESULT ── */
 .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
-.result-emoji { font-size:64px; animation:popIn .5s cubic-bezier(.34,1.56,.64,1); }
+.result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
 @keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
 .result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
 .result-sub { font-size:14px; color:var(--muted); }
@@ -158,88 +158,97 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
 .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
 
-/* OVERLAY */
-.overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200;
-  display:flex; justify-content:center; align-items:flex-end;
+/* ── PATH (главный экран — путь заданий) ── */
+.path-progress-card {
+  background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px; margin-bottom:6px;
 }
-.overlay.hidden { display:none; }
-.bottom-sheet {
-  background:var(--card); border-radius:20px 20px 0 0;
-  width:100%; max-width:600px; max-height:70vh;
-  overflow-y:auto; padding:24px 20px 40px;
-  animation:slideUp .3s ease;
-  box-shadow:0 -10px 30px rgba(0,0,0,.5);
+.path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.path-progress-label { font-size:13px; font-weight:600; }
+.path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
+.path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
+.path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
+
+.continue-card {
+  background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
+  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
 }
-@keyframes slideUp { from{transform:translateY(100%)} to{transform:translateY(0)} }
-.bottom-sheet .msg { margin:8px 0; }
-.bottom-sheet .btn-full { margin-top:16px; }
+.continue-card:active { transform:scale(.98); }
+.continue-icon { font-size:32px; flex-shrink:0; }
+.continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.continue-title { font-size:15px; font-weight:700; margin-top:2px; }
+.continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
+
+.path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
+.path-connector { width:3px; height:24px; margin:0 auto; }
+
+.node-circle {
+  width:56px; height:56px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
+.node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
+.node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
+.node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
+@keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
+
+.boss-node {
+  width:72px; height:72px; border-radius:20px; flex-shrink:0;
+  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+}
+.boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
+
+/* ── PROFILE ── */
+.profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
+.profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+.profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
+.profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
+
+.profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
+.profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
+.profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
+
+.badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
+.badge-item-p.locked { opacity:.3; }
+.badge-icon-p { font-size:22px; margin-bottom:4px; }
+.badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
+
+.sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
+.sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
 </style>
 </head>
 <body>
 
-<!-- HOME SCREEN -->
+<!-- HOME = ПУТЬ ЗАДАНИЙ (главный экран) -->
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
       <div class="avatar">🌍</div>
-      <div><div class="username">ГеоПро</div><div class="sublabel">Подготовка к ОГЭ</div></div>
+      <div><div class="username">ГеоПро</div><div class="sublabel" id="home-sublabel">Подготовка к ОГЭ</div></div>
     </div>
-    <div class="streak">🔥 7 дней</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="streak" id="home-streak">🔥 0</div>
+      <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
+    </div>
   </div>
-  <div class="scroll">
-    <div class="xp-panel">
-      <div class="xp-icon">⚡</div>
-      <div style="flex:1">
-        <div class="xp-title">245 / 400 XP · Уровень 4</div>
-        <div class="xp-bar"><div class="xp-fill" style="width:61%"></div></div>
-        <div class="xp-stats">🎯 Решено: 0 заданий</div>
-      </div>
-    </div>
-    <div class="actions">
-      <div class="btn primary" onclick="goLessonSelect()"><span class="btn-icon">🧠</span>Тренировка</div>
-      <div class="btn accent" onclick="alert('Пробный экзамен в разработке')"><span class="btn-icon">🎯</span>Пробник</div>
-      <div class="btn" onclick="goScreen('s-theory')"><span class="btn-icon">📚</span>Учить</div>
-    </div>
-    <div class="sec-title">📂 Разделы</div>
-    <div class="grid">
-      <div class="grid-item" onclick="alert('В разработке')"><span style="font-size:26px">🗺️</span>Карты</div>
-      <div class="grid-item" onclick="goScreen('s-stats')"><span style="font-size:26px">📊</span>Прогресс</div>
-      <div class="grid-item" onclick="alert('В разработке')"><span style="font-size:26px">💡</span>Лайфхаки</div>
-      <div class="grid-item" onclick="alert('В разработке')"><span style="font-size:26px">🔥</span>Задание дня</div>
-      <div class="grid-item" onclick="goMistakes()"><span style="font-size:26px">🔴</span> Ошибки </div>
-    </div>
-    <div id="ai-home" class="ai-panel"></div>
+  <div class="scroll" id="home-content" style="padding-top:8px">
+    <div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>
   </div>
-  <nav class="bottom-nav">
-    <div class="nav-item active" onclick="goScreen('s-home')"><div class="nav-icon">🏠</div>Главная</div>
-    <div class="nav-item" onclick="goScreen('s-stats')"><div class="nav-icon">📊</div>Прогресс</div>
-    <div class="nav-item" onclick="goScreen('s-sub')"><div class="nav-icon">💳</div>Подписка</div>
-  </nav>
 </div>
 
-<!-- THEORY SCREEN -->
-<div class="screen" id="s-theory">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📚 Теория</div><div style="width:60px"></div></div>
-  <div class="scroll" id="theory-content"></div>
-</div>
-
-<!-- TOPIC SCREEN -->
+<!-- TOPIC (для будущих карточек теории, не используется в основном потоке) -->
 <div class="screen" id="s-topic">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-theory')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
   <div class="scroll" id="topic-content"></div>
 </div>
 
-<!-- TRAINING SCREEN -->
-<div class="screen" id="s-training">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">🧠 Тренировка</div><div style="width:60px"></div></div>
-  <div class="scroll" id="training-content"></div>
-</div>
-
-<!-- QUIZ SCREEN -->
+<!-- QUIZ -->
 <div class="screen" id="s-quiz">
   <div class="topbar">
-    <span class="back-link" onclick="goLessonSelect()">← Тренировка</span>
+    <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
     <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
     <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
   </div>
@@ -256,11 +265,12 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
     <div class="answers" id="answers"></div>
     <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">💡 Подсказка от AI</button>
     <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
+    <div id="ai-quiz" class="ai-panel" style="display:none"></div>
     <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
   </div>
 </div>
 
-<!-- RESULT SCREEN -->
+<!-- RESULT -->
 <div class="screen" id="s-result">
   <div class="result-wrap">
     <div class="result-emoji" id="res-emoji">🎉</div>
@@ -281,87 +291,83 @@ background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
     </div>
     <div class="res-btns">
       <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="location.reload()">🔄 Ещё раз</button>
+      <button class="btn-full sec" onclick="replayLesson()">🔄 Ещё раз</button>
     </div>
   </div>
 </div>
 
-<!-- STATS SCREEN -->
-<div class="screen" id="s-stats">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">📊 Прогресс</div><div style="width:60px"></div></div>
-  <div class="scroll">
-    <div class="xp-panel"><div class="xp-icon">⭐</div><div style="flex:1"><div class="xp-title">Балл: 24 / 31</div><div class="xp-bar"><div class="xp-fill" style="width:77%"></div></div><div class="xp-stats">Заданий: 187 · Точность: 78%</div></div></div>
-    <p style="color:var(--muted);font-size:12px">Слабые темы: климатограммы, часовые пояса.</p>
-    <div id="ai-stats" class="ai-panel"></div>
+<!-- ФИНАЛЬНЫЙ БОСС (большой тест по всем темам) -->
+<div class="screen" id="s-boss-result">
+  <div class="result-wrap">
+    <div class="result-emoji">👑</div>
+    <div class="result-title">Финальный босс пройден!</div>
+    <div class="result-sub" id="boss-sub">Ты прошёл все темы ОГЭ</div>
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle class="ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+    </div>
   </div>
 </div>
 
-<!-- SUBSCRIPTION SCREEN -->
-<div class="screen" id="s-sub">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">💳 Подписка</div><div style="width:60px"></div></div>
-  <div class="scroll"><div class="xp-panel"><div class="xp-icon">📦</div><div><div class="xp-title">Премиум доступ</div><p style="color:var(--muted);font-size:12px">Пробный период</p></div></div><div class="grid"><div class="grid-item">⚙️ Управлять</div><div class="grid-item">📄 История</div></div></div>
-</div>
-
-<!-- MISTAKES SCREEN -->
-<div class="screen" id="s-mistakes">
-  <div class="topbar">
-    <span class="back-link" onclick="goScreen('s-home')">← Назад</span>
-    <div class="sec-title">🔴 Мои ошибки</div>
-    <div style="width:60px"></div>
-  </div>
-  <div class="scroll" id="mistakes-content"></div>
-</div>
-
-<!-- AI OVERLAY (bottom sheet) -->
-<div id="ai-overlay" class="overlay hidden">
-  <div class="bottom-sheet" id="ai-overlay-content">
-    <div style="font-weight:600;margin-bottom:12px;color:var(--primary)">🤖 AI-репетитор</div>
-    <div id="ai-overlay-text" class="msg ai">Загружаю объяснение...</div>
-    <button class="btn-full primary" onclick="closeAIOverlay()">Понял, дальше</button>
-  </div>
+<!-- PROFILE (объединяет прогресс + подписку + достижения) -->
+<div class="screen" id="s-profile">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
+  <div class="scroll" id="profile-content"></div>
 </div>
 
 <script>
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 
+// ═══════════════════════════════════════════
+//  GITHUB DATA CONFIG
+// ═══════════════════════════════════════════
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 
 const THEORY_FILES = [
-  { key:'topo',       title:'🗺 Топографические карты',    file:'theory_topo.json',       tasks:'Задания 1-4' },
-  { key:'synoptic',   title:'🌀 Синоптические карты',      file:'theory_student.json',    tasks:'Задания 5-6' },
-  { key:'climat',     title:'📊 Климат и климатограммы',   file:'theory_climat.json',     tasks:'Задания 7-8' },
-  { key:'timezone',   title:'🕐 Часовые пояса',            file:'theory_timezone.json',   tasks:'Задание 17'  },
-  { key:'population', title:'👥 Население России',         file:'theory_population.json', tasks:'Задания 23-25'},
-  { key:'economy',    title:'🏭 Хозяйство России',         file:'theory_economy.json',    tasks:'Задание 27'  },
-  { key:'zones',      title:'🌲 Природные зоны',           file:'theory_zones.json',      tasks:'Задание 28'  },
-  { key:'regions',    title:'🗺 Регионы России',           file:'theory_regions.json',    tasks:'Задания 20-21'},
-  { key:'ecology',    title:'🌿 Экология',                 file:'theory_ecology.json',    tasks:'Задание 15'  },
-  { key:'geopos',     title:'📍 Географическое положение', file:'theory_geopos.json',     tasks:'Задания 1,21' },
-  { key:'hydro',      title:'💧 Гидросфера',               file:'theory_hydro.json',      tasks:'Задание 12'  },
-  { key:'lithosphere',title:'⛰ Литосфера',                file:'theory_lithosphere.json',tasks:'Задание 10'  },
-  { key:'world',      title:'🌐 Мировое хозяйство',        file:'theory_world.json',      tasks:'Задание 26'  }
+  { key:'topo',          title:'🗺 Топографические карты',          file:'theory_topo.json',          tasks:'Задания 1-4'  },
+  { key:'synoptic',      title:'🌀 Синоптические карты',            file:'theory_student.json',       tasks:'Задания 5-6'  },
+  { key:'climat',        title:'📊 Климат и климатограммы',         file:'theory_climat.json',        tasks:'Задания 7-8'  },
+  { key:'nature_russia', title:'🌋 Природа России',                 file:'theory_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'timezone',      title:'🕐 Часовые пояса',                  file:'theory_timezone.json',      tasks:'Задание 17'   },
+  { key:'zones',         title:'🌲 Природные зоны',                 file:'theory_zones.json',         tasks:'Задание 28'   },
+  { key:'population',    title:'👥 Население России',               file:'theory_population.json',    tasks:'Задания 23-25'},
+  { key:'economy',       title:'🏭 Хозяйство России',               file:'theory_economy.json',       tasks:'Задание 27'   },
+  { key:'regions',       title:'📍 Регионы России',                 file:'theory_regions.json',       tasks:'Задания 20-21'},
+  { key:'world',         title:'🌍 Страны и материки',              file:'theory_world.json',         tasks:'Задания 20-21'},
+  { key:'litosphere',    title:'⛰ Литосфера и рельеф',             file:'theory_litosphere.json',    tasks:'Задание 22'   },
+  { key:'hydro',         title:'💧 Гидросфера',                     file:'theory_hydro.json',         tasks:'Задание 22'   },
+  { key:'ecology',       title:'🌱 Экология',                       file:'theory_ecology.json',       tasks:'Задание 15'   },
+  { key:'geopos',        title:'📍 Географическое положение России', file:'theory_geopos.json',       tasks:'Задание 26'   },
 ];
 
 const QUESTIONS_FILES = [
-  { key:'topo',       title:'🗺 Топографические карты',    file:'questions_topo.json',       tasks:'Задания 1-4' },
-  { key:'synoptic',   title:'🌀 Синоптические карты (5-6)', file:'questions_climat.json',   tasks:'Задания 5-6' },
-  { key:'climat',     title:'📊 Климат и климатограммы',   file:'questions_climat.json',     tasks:'Задания 7-8' },
-  { key:'timezone',   title:'🕐 Часовые пояса',            file:'questions_timezone.json',   tasks:'Задание 17'  },
-  { key:'population', title:'👥 Население России',         file:'questions_population.json', tasks:'Задания 23-25'},
-  { key:'economy',    title:'🏭 Хозяйство России',         file:'questions_economy.json',    tasks:'Задание 27'  },
-  { key:'zones',      title:'🌲 Природные зоны',           file:'questions_zones.json',      tasks:'Задание 28'  },
-  { key:'regions',    title:'🗺 Регионы России',           file:'questions_regions.json',    tasks:'Задания 20-21'},
-  { key:'ecology',    title:'🌿 Экология',                 file:'questions_ecology.json',    tasks:'Задание 15'  },
-  { key:'geopos',     title:'📍 Географическое положение', file:'questions_geopos.json',     tasks:'Задания 1,21' },
-  { key:'hydro',      title:'💧 Гидросфера',               file:'questions_hydro.json',      tasks:'Задание 12'  },
-  { key:'lithosphere',title:'⛰ Литосфера',                file:'questions_lithosphere.json',tasks:'Задание 10'  },
-  { key:'world',      title:'🌐 Мировое хозяйство',        file:'questions_world.json',      tasks:'Задание 26'  }
+  { key:'topo',          title:'🗺 Топографические карты',          file:'questions_topo.json',          tasks:'Задания 1-4'  },
+  { key:'climat',        title:'📊 Климат и климатограммы',         file:'questions_climat.json',        tasks:'Задания 7-8'  },
+  { key:'nature_russia', title:'🌋 Природа России',                 file:'questions_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'ecology',       title:'🌱 Экология',                       file:'questions_ecology.json',       tasks:'Задание 15'   },
+  { key:'timezone',      title:'🕐 Часовые пояса',                  file:'questions_timezone.json',      tasks:'Задание 17'   },
+  { key:'world',         title:'🌍 Страны и материки',              file:'questions_world.json',         tasks:'Задания 20-21'},
+  { key:'regions',       title:'📍 Регионы России',                 file:'questions_regions.json',       tasks:'Задания 20-21'},
+  { key:'litosphere',    title:'⛰ Литосфера и рельеф',             file:'questions_litosphere.json',    tasks:'Задание 22'   },
+  { key:'hydro',         title:'💧 Гидросфера',                     file:'questions_hydro.json',         tasks:'Задание 22'   },
+  { key:'population',    title:'👥 Население России',               file:'questions_population.json',    tasks:'Задания 23-25'},
+  { key:'geopos',        title:'📍 Геогр. положение России',        file:'questions_geopos.json',        tasks:'Задание 26'   },
+  { key:'economy',       title:'🏭 Хозяйство России',               file:'questions_economy.json',       tasks:'Задание 27'   },
+  { key:'zones',         title:'🌲 Природные зоны',                 file:'questions_zones.json',         tasks:'Задание 28'   },
 ];
 
+// Кэш загруженных данных
 var theoryCache = {};
 var questionsCache = {};
 var lessonsLoaded = [];
 
+// Загрузка JSON с GitHub
 async function fetchJSON(filename) {
   var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
   var r = await fetch(url);
@@ -369,32 +375,7 @@ async function fetchJSON(filename) {
   return await r.json();
 }
 
-const fallbackQuestions = [
-  { tag:'Задание 1', text:'Какая река в России является самой длинной?', answers:['Волга','Обь','Енисей','Лена'], correct:3, hint:'Эта река течёт в Восточной Сибири и впадает в море Лаптевых.' },
-  { tag:'Задание 2', text:'Какое озеро является самым глубоким в мире?', answers:['Каспийское','Байкал','Ладожское','Онежское'], correct:1, hint:'Это озеро в Сибири содержит около 20% мировых запасов пресной воды.' },
-  { tag:'Задание 3', text:'На каком хребте расположена гора Эльбрус?', answers:['Уральские горы','Алтай','Большой Кавказ','Саяны'], correct:2, hint:'Этот хребет на юге России — граница между Европой и Азией.' },
-  { tag:'Задание 4', text:'Какой полуостров является самым крупным в России?', answers:['Камчатка','Таймыр','Кольский','Ямал'], correct:1, hint:'Этот полуостров выдаётся в Северный Ледовитый океан.' },
-  { tag:'Задание 5', text:'Какое море омывает Россию с запада?', answers:['Чёрное','Балтийское','Каспийское','Азовское'], correct:1, hint:'Это море омывает Калининградскую область.' },
-];
-
-let curQ=0, score=0, answered=false, shuffled=[];
-let curLesson=0, lives=3, hintUsed=false;
-
-function goScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
-}
-
-function goQuiz(lessonIdx) {
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
-  curLesson = (lessonIdx !== undefined) ? lessonIdx : 0;
-  shuffled = allLessons[curLesson].questions;
-  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
-  goScreen('s-quiz');
-  renderQ();
-}
-
+// Загрузка всех вопросов для тренировки
 async function loadAllLessons() {
   lessonsLoaded = [];
   for (var i = 0; i < QUESTIONS_FILES.length; i++) {
@@ -409,146 +390,246 @@ async function loadAllLessons() {
           }
         });
       }
-      lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions.length ? questions : fallbackQuestions });
+      if (questions.length > 0) {
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions });
+      }
     } catch(e) {
       console.warn('Не удалось загрузить', f.file, e);
-      lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: fallbackQuestions });
     }
   }
   return lessonsLoaded;
 }
 
-async function goLessonSelect() {
-  goScreen('s-training');
-  document.getElementById('training-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю темы...</div>';
-  if (lessonsLoaded.length === 0) {
-    await loadAllLessons();
-  }
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
-  renderTrainingPath(allLessons);
+// Глобальный массив-заглушка, если ничего не загружено
+const lessons = [];
+
+// Вспомогательная функция для получения актуального списка уроков
+function getAllLessons() {
+  return lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
 }
 
-function renderTrainingPath(allLessons) {
-  var html = '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-bottom:20px">';
+let curQ=0, score=0, answered=false, shuffled=[];
+let curLesson=0, lives=3, hintUsed=false;
+
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 's-home') renderHomePath();
+  if (id === 's-profile') renderProfile();
+}
+
+// ═══════════════════════════════════════════
+//  ГЛАВНЫЙ ЭКРАН = ПУТЬ ЗАДАНИЙ
+// ═══════════════════════════════════════════
+async function renderHomePath() {
+  var container = document.getElementById('home-content');
+
+  if (lessonsLoaded.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
+    await loadAllLessons();
+  }
+
+  var allLessons = getAllLessons();
+  if (allLessons.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания. Проверь интернет.</div>';
+    return;
+  }
+
+  // Найти первую не пройденную тему (или последнюю если все пройдены)
+  var nextIdx = 0;
   for (var i = 0; i < allLessons.length; i++) {
-    var l = allLessons[i];
-    var lessonKey = l.title;
-    var done = userProgress.completedLessons[lessonKey];
-    var prevKey = i > 0 ? allLessons[i-1].title : '';
+    var key = allLessons[i].title;
+    if (!userProgress.completedLessons[key]) { nextIdx = i; break; }
+    if (i === allLessons.length - 1) nextIdx = allLessons.length;
+  }
+
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var totalCount = allLessons.length;
+  var pct = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
+  var allDone = completedCount >= totalCount;
+
+  var html = '';
+
+  html += '<div class="path-progress-card">';
+  html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по ОГЭ</span><span class="path-progress-pct">'+pct+'%</span></div>';
+  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
+  html += '</div>';
+
+  if (!allDone) {
+    var nextLesson = allLessons[nextIdx];
+    html += '<div class="continue-card" onclick="goQuizFromLoaded('+nextIdx+')">';
+    html += '<div class="continue-icon">'+(nextLesson.title.match(/^\S+/)?nextLesson.title.match(/^\S+/)[0]:'▶')+'</div>';
+    html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">'+nextLesson.title.replace(/^\S+\s*/,'')+'</div></div>';
+    html += '<div class="continue-arrow">→</div></div>';
+  } else {
+    html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+    html += '<div class="continue-icon">👑</div>';
+    html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс — все темы</div></div>';
+    html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+  }
+
+  // Путь по темам
+  html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
+  allLessons.forEach(function(l, i) {
+    var done = userProgress.completedLessons[l.title];
+    var prevKey = i > 0 ? allLessons[i-1].title : null;
     var prevDone = i === 0 || userProgress.completedLessons[prevKey];
     var isLocked = !prevDone && i > 0;
+    var isCurrent = !isLocked && !done;
     var perfect = done && done.score === done.total;
-    var nodeColor = perfect ? 'var(--primary2)' : done ? 'var(--primary)' : isLocked ? 'var(--card2)' : '#f5a623';
-    var nodeBorder = perfect ? '2px solid var(--primary2)' : done ? '2px solid var(--primary)' : isLocked ? '2px solid var(--border)' : '2px solid #f5a623';
+
+    var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
     var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
-    var opacity = isLocked ? '0.45' : '1';
-    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded(' + i + ')"';
+    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded('+i+')"';
+
     if (i > 0) {
-      var connColor = prevDone ? 'var(--primary2)' : 'var(--border)';
-      html += '<div style="width:3px;height:28px;background:' + connColor + ';margin:0 auto"></div>';
+      var connDone = userProgress.completedLessons[allLessons[i-1].title];
+      html += '<div class="path-connector" style="background:'+(connDone?'var(--primary2)':'var(--border)')+'"></div>';
     }
-    html += '<div style="display:flex;align-items:center;gap:14px;width:100%;opacity:' + opacity + '">';
-    html += '<div' + onclk + ' style="width:64px;height:64px;border-radius:50%;background:' + nodeColor + ';border:' + nodeBorder + ';display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
-    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">' + l.title + '</div>';
+
+    var isRight = i % 2 === 1;
+    html += '<div class="path-node-row" style="flex-direction:'+(isRight?'row-reverse':'row')+';opacity:'+(isLocked?'0.45':'1')+'">';
+    html += '<div class="node-circle '+stateClass+'"'+onclk+' style="cursor:'+(isLocked?'default':'pointer')+'">'+nodeIcon+'</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">'+l.title+'</div>';
     if (done) {
-      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">' + done.score + '/' + done.total + ' верно</div>';
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">'+done.score+'/'+done.total+' верно</div>';
     } else {
-      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + (l.questions ? l.questions.length : 0) + ' вопр.</div>';
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(l.questions?l.questions.length:0)+' вопр.'+(l.tasks?' · '+l.tasks:'')+'</div>';
     }
     html += '</div></div>';
-  }
+  });
+
+  // Финальный босс
+  html += '<div class="path-connector" style="background:'+(allDone?'var(--primary2)':'var(--border)')+'"></div>';
+  html += '<div class="path-node-row">';
+  html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="goBossLevel()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
+  html += '<div style="flex:1"><div style="font-weight:800;font-size:15px;color:'+(allDone?'#d29922':'var(--muted)')+'">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(allDone?'Тест по всем темам — открыт!':'Пройди все темы чтобы открыть')+'</div></div>';
   html += '</div>';
-  document.getElementById('training-content').innerHTML = html;
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
+  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+}
+
+function goQuiz(lessonIdx) {
+  curLesson = (lessonIdx !== undefined) ? lessonIdx : 0;
+  shuffled = lessons[curLesson].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
 }
 
 function goQuizFromLoaded(idx) {
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  var allLessons = getAllLessons();
   curLesson = idx;
+  shuffled = allLessons[idx].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
+}
+
+function replayLesson() {
+  // Если босс-режим активен или урок не выбран (curLesson < 0) – запускаем босса
+  if (isBossMode || curLesson < 0) {
+    goBossLevel();
+    return;
+  }
+  var allLessons = getAllLessons();
   shuffled = allLessons[curLesson].questions;
   curQ=0; score=0; answered=false; lives=3; hintUsed=false;
   goScreen('s-quiz');
   renderQ();
 }
 
-function initTheory() {
-  var html = '<div class="sec-title">📚 Темы по кодификатору ОГЭ 2026</div><div class="topic-list">';
-  for (var i = 0; i < THEORY_FILES.length; i++) {
-    var f = THEORY_FILES[i];
-    html += '<div class="topic-item" style="display:flex;align-items:center;justify-content:space-between" onclick="showTopicFromGithub(\'' + f.key + '\')">';
-    html += '<div><div style="font-weight:600;font-size:14px">' + f.title + '</div>';
-    html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + f.tasks + '</div></div>';
-    html += '<div style="color:var(--primary);font-size:16px">▶</div></div>';
-  }
-  html += '</div><div id="ai-theory" class="ai-panel"></div>';
-  document.getElementById('theory-content').innerHTML = html;
-  initAI('ai-theory','теория по географии для ОГЭ 2026',['🎯 С чего начать?','❓ Что чаще спрашивают?','💡 Дай запоминалку']);
+// ═══════════════════════════════════════════
+//  ФИНАЛЬНЫЙ БОСС — тест по всем темам
+// ═══════════════════════════════════════════
+var isBossMode = false;
+
+function goBossLevel() {
+  var allLessons = getAllLessons();
+  var allQuestions = [];
+  allLessons.forEach(function(l) {
+    if (l.questions) allQuestions = allQuestions.concat(l.questions);
+  });
+  allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
+
+  isBossMode = true;
+  shuffled = allQuestions;
+  curLesson = -1;
+  curQ=0; score=0; answered=false; lives=999; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
 }
 
-async function showTopicFromGithub(key) {
-  var f = THEORY_FILES.find(function(x){ return x.key === key; });
-  if (!f) return;
+// ═══════════════════════════════════════════
+//  ПРОФИЛЬ
+// ═══════════════════════════════════════════
+function renderProfile() {
+  var allLessons = getAllLessons();
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect/userProgress.totalAnswered)*100) : 0;
 
-  document.getElementById('topic-title').textContent = f.title;
-  document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю материал...</div>';
-  goScreen('s-topic');
+  var html = '';
+  html += '<div class="profile-header-card">';
+  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
+  html += '<div><div class="profile-name-big">Ученик ГеоПро</div>';
+  html += '<div class="profile-level-big">⚡ Уровень '+userProgress.level+' · '+userProgress.xp+' XP</div></div>';
+  html += '</div>';
 
-  try {
-    var data;
-    if (theoryCache[key]) {
-      data = theoryCache[key];
-    } else {
-      data = await fetchJSON(f.file);
-      theoryCache[key] = data;
-    }
+  html += '<div class="profile-stats-grid">';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+completedCount+'/'+allLessons.length+'</div><div class="profile-stat-label">Тем пройдено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+acc+'%</div><div class="profile-stat-label">Точность</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
+  html += '</div>';
 
-    var html = '<div style="display:flex;flex-direction:column;gap:12px">';
-    for (var i = 0; i < data.length; i++) {
-      var card = data[i];
-      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden">';
-      html += '<div style="padding:12px 14px;background:#58a6ff08;border-bottom:1px solid #58a6ff20;display:flex;justify-content:space-between;align-items:center;cursor:pointer" onclick="toggleCard(\'card-' + i + '\')">';
-      html += '<div style="font-size:13px;font-weight:600">' + card.topic + '</div>';
-      html += '<div id="arr-' + i + '" style="color:var(--muted);font-size:14px">▼</div></div>';
-      html += '<div id="card-' + i + '" style="display:none;padding:14px;font-size:13px;line-height:1.65;color:#c8d8e8;white-space:pre-line">' + card.content + '</div></div>';
-    }
-    html += '</div><div id="ai-topic" class="ai-panel" style="margin-top:14px"></div>';
-    document.getElementById('topic-content').innerHTML = html;
+  var badges = [
+    { icon:'🌍', name:'Первые шаги', unlocked: completedCount >= 1 },
+    { icon:'🔥', name:'3 дня подряд', unlocked: (userProgress.streak||0) >= 3 },
+    { icon:'⚡', name:'500 XP', unlocked: userProgress.xp >= 500 },
+    { icon:'🏆', name:'Первая 5/5', unlocked: Object.values(userProgress.completedLessons).some(function(l){return l.score===l.total;}) },
+    { icon:'📚', name:'5 тем пройдено', unlocked: completedCount >= 5 },
+    { icon:'💯', name:'90% точности', unlocked: acc >= 90 },
+    { icon:'👑', name:'Финальный босс', unlocked: !!userProgress.bossCompleted },
+    { icon:'🎯', name:'Все темы', unlocked: completedCount >= allLessons.length && allLessons.length>0 },
+  ];
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
+  html += '<div class="badges-grid-profile">';
+  badges.forEach(function(b) {
+    html += '<div class="badge-item-p'+(b.unlocked?'':' locked')+'"><div class="badge-icon-p">'+b.icon+'</div><div class="badge-name-p">'+b.name+'</div></div>';
+  });
+  html += '</div>';
 
-    var aiCtx = f.title + '. ' + f.tasks + ' ОГЭ по географии';
-    initAI('ai-topic', aiCtx, ['📖 Объясни главное','❓ Что спрашивают на ОГЭ?','🧠 Дай запоминалку','✅ Проверь знания'], false);
-  } catch(e) {
-    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;color:var(--danger)">⚠️ Ошибка загрузки. Проверь интернет.</div>';
-  }
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+
+  document.getElementById('profile-content').innerHTML = html;
 }
 
-function toggleCard(id) {
-  var el = document.getElementById(id);
-  var idx = id.split("-")[1];
-  var arr = document.getElementById("arr-" + idx);
-  if(el.style.display === "none") {
-    el.style.display = "block";
-    if(arr) arr.style.transform = "rotate(180deg)";
-  } else {
-    el.style.display = "none";
-    if(arr) arr.style.transform = "rotate(0deg)";
-  }
+// Безопасное получение названия текущей темы (для босса – "Финальный босс")
+function getCurrentTopicTitle() {
+  if (isBossMode) return 'Финальный босс';
+  var all = getAllLessons();
+  return (all[curLesson] && all[curLesson].title) || 'Тренировка';
 }
 
 function renderQ() {
-  if(!shuffled || shuffled.length === 0) {
-    shuffled = fallbackQuestions;
-  }
   const q = shuffled[curQ];
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
-  const lesson = allLessons[curLesson];
-  answered = false; 
-  hintUsed = false;
+  const topicTitle = getCurrentTopicTitle();
 
-  document.getElementById('quiz-topic-lbl').textContent = lesson ? lesson.title : 'Тренировка';
-  document.getElementById('lesson-badge').textContent = (lesson ? lesson.title : 'Тренировка') + ' · Вопрос ' + (curQ+1) + ' из ' + shuffled.length;
-  document.getElementById('quiz-counter').textContent = (curQ+1) + '/' + shuffled.length;
-  document.getElementById('qpf').style.width = ((curQ/shuffled.length)*100) + '%';
+  answered=false; hintUsed=false;
+
+  document.getElementById('quiz-topic-lbl').textContent = topicTitle;
+  document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(curQ+1)+' из '+shuffled.length;
+  document.getElementById('quiz-counter').textContent = (curQ+1)+'/'+shuffled.length;
+  document.getElementById('qpf').style.width = ((curQ/shuffled.length)*100)+'%';
   document.getElementById('q-tag').textContent = q.tag;
   document.getElementById('q-text').textContent = q.text;
+  document.getElementById('ai-quiz').style.display = 'none';
   document.getElementById('hint-box').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'flex';
   document.getElementById('btn-hint').disabled = false;
@@ -556,8 +637,8 @@ function renderQ() {
 
   var livesEl = document.getElementById('lives-row');
   livesEl.innerHTML = '';
-  for(var i=0;i<3;i++){
-    livesEl.innerHTML += '<span>' + (i<lives ? '❤️' : '🖤') + '</span>';
+  for (var i=0; i<3; i++) {
+    livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>';
   }
 
   const btn = document.getElementById('btn-next');
@@ -566,24 +647,18 @@ function renderQ() {
 
   const ans = document.getElementById('answers');
   ans.innerHTML = '';
-  var letters = ['А','Б','В','Г'];
-  for(var i = 0; i < q.answers.length; i++) {
+  ['А','Б','В','Г'].forEach(function(l, i){
     const b = document.createElement('button');
     b.className = 'ans-btn';
-    b.innerHTML = '<div class="ans-letter">' + letters[i] + '</div><span>' + q.answers[i] + '</span>';
-    b.onclick = (function(idx) { 
-      return function() { 
-        selectAns(idx, q.correct, q.text, lesson ? lesson.title : 'Тренировка', q.hint); 
-      };
-    })(i);
+    b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
+    b.onclick = function(){ selectAns(i, q.correct, q.text, topicTitle, q.hint); };
     ans.appendChild(b);
-  }
+  });
 }
 
 async function getHint() {
-  if(hintUsed) return;
+  if (hintUsed) return;
   hintUsed = true;
-  if(!shuffled || shuffled.length === 0) return;
   const q = shuffled[curQ];
   const btn = document.getElementById('btn-hint');
   btn.textContent = '⏳ Думаю...';
@@ -593,158 +668,123 @@ async function getHint() {
   hintBox.textContent = q.hint || 'Подсказка загружается...';
 
   try {
-    var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
-    const r = await fetch(PROXY, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        question:'Дай короткую подсказку (1-2 предложения, не давай ответ) к вопросу ОГЭ: '+q.text, 
-        context: allLessons[curLesson] ? allLessons[curLesson].title : 'География ОГЭ'
-      })
-    });
+    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question:'Дай короткую подсказку (1-2 предложения, не давай ответ) к вопросу ОГЭ: '+q.text, context: getCurrentTopicTitle()})});
     const d = await r.json();
-    if(d.answer) hintBox.textContent = '💡 '+d.answer;
+    if (d.answer) hintBox.textContent = '💡 '+d.answer;
   } catch(e) {
-    console.warn('AI подсказка не доступна');
+    hintBox.textContent = '💡 '+q.hint;
   }
   btn.textContent = '💡 Подсказка получена';
 }
 
 function selectAns(idx, correct, qText, topic, hint) {
-  if(answered) return;
+  if (answered) return;
   answered = true;
 
   const btns = document.querySelectorAll('.ans-btn');
-  btns[idx].classList.add(idx===correct ? 'correct' : 'wrong');
-  if(idx!==correct){
+  btns[idx].classList.add(idx===correct?'correct':'wrong');
+  if (idx !== correct) {
     btns[correct].classList.add('correct');
     lives--;
-    // сохраняем ошибку
-    if (!userProgress.mistakes[topic]) userProgress.mistakes[topic] = [];
-    userProgress.mistakes[topic].push({ question: qText, correctAnswer: btns[correct] ? btns[correct].textContent : '', date: new Date().toISOString().slice(0,10) });
-    saveProgress();
   }
-  if(idx===correct){
-    score++;
-    addXP(10);
-  }
+  if (idx === correct) score++;
 
   document.getElementById('btn-hint').style.display = 'none';
 
   var livesEl = document.getElementById('lives-row');
   livesEl.innerHTML = '';
-  for(var i=0;i<3;i++){
-    livesEl.innerHTML += '<span>' + (i<lives ? '❤️' : '🖤') + '</span>';
+  for (var i=0; i<3; i++) {
+    livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>';
   }
 
-  // Показываем модальное объяснение
-  showAIOverlay(qText, topic, idx===correct);
+  const aiEl = document.getElementById('ai-quiz');
+  aiEl.style.display = 'block';
+
+  var autoMsg = idx === correct
+    ? 'Правильно! Объясни почему ответ верный на вопрос: '+qText
+    : 'Ученик ошибся. Объясни правильный ответ на вопрос: '+qText+'. Объясни доступно, помоги запомнить.';
+
+  initAI('ai-quiz', 'Вопрос ОГЭ: '+qText,
+    idx === correct
+      ? ['🤔 Почему именно это?','📖 Расскажи подробнее','🔗 Что ещё нужно знать?']
+      : ['❓ Объясни правильный ответ','🧠 Как это запомнить?','📖 Дай похожие задания'],
+    true);
+
+  setTimeout(function(){
+    var inp = document.getElementById('inp-ai-quiz');
+    if (inp) { inp.value = autoMsg; sendM('ai-quiz','Вопрос ОГЭ по теме '+topic+': '+qText); }
+  }, 400);
 
   document.getElementById('btn-next').classList.add('show');
-  if(lives <= 0) {
-    document.getElementById('btn-next').textContent = '📊 Посмотреть результат';
+
+  if (lives <= 0) {
+    document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
   }
 }
-
-// ----- AI overlay -----
-function showAIOverlay(questionText, topic, isCorrect) {
-  const overlay = document.getElementById('ai-overlay');
-  const textDiv = document.getElementById('ai-overlay-text');
-  overlay.classList.remove('hidden');
-  textDiv.innerHTML = '⏳ Загружаю объяснение...';
-  
-  var prompt = isCorrect
-    ? 'Объясни кратко, почему ответ правильный, на вопрос: ' + questionText
-    : 'Объясни правильный ответ на вопрос: ' + questionText + '. Объясни доступно, помоги запомнить.';
-    
-  fetch(PROXY, {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({question: prompt, context: topic})
-  })
-  .then(r => r.json())
-  .then(d => {
-    textDiv.innerHTML = (d.answer || 'Ответ не получен').replace(/\n/g,'<br>');
-  })
-  .catch(e => {
-    textDiv.innerHTML = '⚠️ Ошибка загрузки объяснения.';
-  });
-}
-
-function closeAIOverlay() {
-  document.getElementById('ai-overlay').classList.add('hidden');
-}
-
-// ----- Конец overlay -----
 
 function nextQ() {
-  closeAIOverlay();  // на всякий случай
-  if(lives <= 0){
-    showResult();
-    return;
-  }
   curQ++;
-  if(curQ >= shuffled.length){
-    showResult();
-  } else {
-    renderQ();
-  }
+  if (curQ >= shuffled.length) showResult();
+  else renderQ();
 }
 
 function showResult() {
   const total = shuffled.length;
   const pct = Math.round(score/total*100);
-  let e = '😔', t = 'Нужно повторить';
-  if(pct>=80){e='🏆';t='Отлично!';}
-  else if(pct>=60){e='👍';t='Хороший результат!';}
-  else if(pct>=40){e='📖';t='Продолжай учиться';}
+
+  if (isBossMode) {
+    userProgress.bossCompleted = true;
+    saveProgress();
+    document.getElementById('boss-sub').textContent = score+'/'+total+' правильных ответов ('+pct+'%)';
+    document.getElementById('boss-num').textContent = score;
+    document.getElementById('boss-denom').textContent = 'из ' + total;
+    goScreen('s-boss-result');
+    setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
+    isBossMode = false;
+    return;
+  }
+
+  let e='😔', t='Нужно повторить';
+  if (pct>=80) { e='🏆'; t='Отлично!'; }
+  else if (pct>=60) { e='👍'; t='Хороший результат!'; }
+  else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
   document.getElementById('res-emoji').textContent = e;
   document.getElementById('res-title').textContent = t;
-  document.getElementById('res-sub').textContent = pct + '% правильных ответов';
+  document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
   document.getElementById('ring-num').textContent = score;
-  document.getElementById('ring-denom').textContent = 'из ' + total;
+  document.getElementById('ring-denom').textContent = `из ${total}`;
   document.getElementById('res-c').textContent = score;
   document.getElementById('res-w').textContent = total-score;
   var xpGain = score*20 + (score===total ? 50 : 0);
-  document.getElementById('res-xp').textContent = '+' + xpGain;
+  document.getElementById('res-xp').textContent = '+'+xpGain;
   saveLesson(curLesson, score, total);
-  updateHomeUI();
   goScreen('s-result');
-  setTimeout(function(){ 
-    var circumference = 2 * Math.PI * 54;
-    var offset = circumference * (1 - score/total);
-    var ringFill = document.getElementById('ring-fill');
-    if(ringFill) ringFill.style.strokeDashoffset = offset;
-  }, 100);
+  setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
 }
 
-// AI функции
-function initAI(cid, ctx, prompts, autoOpen) {
-  prompts = prompts || [];
-  autoOpen = autoOpen || false;
+// ── AI ──
+function initAI(cid, ctx, prompts=[], autoOpen=false) {
   const el = document.getElementById(cid);
-  if(!el) return;
-  var promptsHtml = '';
-  for(var i = 0; i < prompts.length; i++) {
-    var p = prompts[i];
-    promptsHtml += '<button class="ai-prompt-btn" onclick="sendP(\'' + cid + '\',\'' + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + '\',\'' + p.replace(/'/g, "\\'") + '\')">' + p + '</button>';
-  }
+  if (!el) return;
+  // Экранируем контекст для безопасной вставки в атрибуты
+  const escCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
   el.innerHTML = `
     <div class="ai-header" onclick="toggleAI(this)">
       <div class="ai-header-left">
         <div class="ai-avatar">🤖</div>
         <div><div class="ai-name">AI-репетитор</div><div class="ai-tagline">Спроси — объясню как педагог</div></div>
       </div>
-      <div class="ai-toggle ` + (autoOpen ? 'open' : '') + `">▼</div>
+      <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
     </div>
-    <div class="ai-body ` + (autoOpen ? 'open' : '') + `">
-      <div class="ai-context">📌 ` + ctx + `</div>
-      <div class="ai-prompts">` + promptsHtml + `</div>
-      <div class="ai-messages" id="msgs-` + cid + `"></div>
+    <div class="ai-body ${autoOpen?'open':''}">
+      <div class="ai-context">📌 ${ctx}</div>
+      <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="sendP('${cid}','${escCtx}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
+      <div class="ai-messages" id="msgs-${cid}"></div>
       <div class="ai-input-row">
-        <textarea class="ai-input" id="inp-` + cid + `" placeholder="Задай вопрос..." rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `');}"></textarea>
-        <button class="ai-send" id="snd-` + cid + `" onclick="sendM('` + cid + `','` + ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;') + `')">➤</button>
+        <textarea class="ai-input" id="inp-${cid}" placeholder="Задай вопрос..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('${cid}','${escCtx}');}"></textarea>
+        <button class="ai-send" id="snd-${cid}" onclick="sendM('${cid}','${escCtx}')">➤</button>
       </div>
     </div>
   `;
@@ -753,60 +793,53 @@ function initAI(cid, ctx, prompts, autoOpen) {
 function toggleAI(h) {
   const b = h.nextElementSibling;
   const t = h.querySelector('.ai-toggle');
-  if(b) b.classList.toggle('open');
-  if(t) t.classList.toggle('open');
+  b.classList.toggle('open');
+  t.classList.toggle('open');
 }
 
-function sendP(cid,ctx,text) {
-  var inp = document.getElementById('inp-' + cid);
-  if(inp) inp.value = text;
-  sendM(cid,ctx);
+function sendP(cid, ctx, text) {
+  document.getElementById(`inp-${cid}`).value = text;
+  sendM(cid, ctx);
 }
 
-async function sendM(cid,ctx) {
-  const inp = document.getElementById('inp-' + cid);
-  const snd = document.getElementById('snd-' + cid);
-  const msgs = document.getElementById('msgs-' + cid);
-  const text = inp ? inp.value.trim() : '';
-  if(!text) return;
-  if(inp) inp.value = '';
-  if(snd) snd.disabled = true;
-  if(msgs) {
-    msgs.innerHTML += '<div class="msg user">' + text + '</div>';
-    const lid = 'l' + Date.now();
-    msgs.innerHTML += '<div class="msg ai loading" id="' + lid + '">⏳ Думаю...</div>';
-    msgs.scrollTop = msgs.scrollHeight;
-    try {
-      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
-      const d = await r.json();
-      const ans = d.answer || 'Не удалось получить ответ';
-      var loadingEl = document.getElementById(lid);
-      if(loadingEl) loadingEl.remove();
-      msgs.innerHTML += '<div class="msg ai">' + ans.replace(/\n/g,'<br>') + '</div>';
-    } catch(e) {
-      var loadingEl2 = document.getElementById(lid);
-      if(loadingEl2) loadingEl2.remove();
-      msgs.innerHTML += '<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>';
-    }
-    if(snd) snd.disabled = false;
-    msgs.scrollTop = msgs.scrollHeight;
+async function sendM(cid, ctx) {
+  const inp = document.getElementById(`inp-${cid}`);
+  const snd = document.getElementById(`snd-${cid}`);
+  const msgs = document.getElementById(`msgs-${cid}`);
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  snd.disabled = true;
+  msgs.innerHTML += `<div class="msg user">${text}</div>`;
+  const lid = 'l'+Date.now();
+  msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Думаю...</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  try {
+    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+    const d = await r.json();
+    const ans = d.answer || 'Не удалось получить ответ';
+    document.getElementById(lid)?.remove();
+    msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+  } catch(e) {
+    document.getElementById(lid)?.remove();
+    msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`;
   }
+  snd.disabled = false;
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
-// PROGRESS
+// ═══════════════════════════════════════════
+//  ПРОГРЕСС — Telegram CloudStorage
+// ═══════════════════════════════════════════
+
 var userProgress = {
-  xp: 245,
-  level: 4,
-  streak: 7,
+  xp: 0,
+  level: 1,
+  streak: 0,
   lastDate: '',
   completedLessons: {},
   totalAnswered: 0,
   totalCorrect: 0,
-  isPremium: true,
-  daysLeft: 10,
-  mistakes: {},
-  trialStart: '',
-  subscriptionUntil: '',
 };
 
 var tg = window.Telegram && window.Telegram.WebApp;
@@ -826,14 +859,14 @@ function loadProgress(callback) {
       if (!err && val) {
         try { userProgress = JSON.parse(val); } catch(e){}
       }
-      if(callback) callback();
+      callback();
     });
   } else {
     try {
       var saved = localStorage.getItem('geo_progress');
       if (saved) userProgress = JSON.parse(saved);
     } catch(e){}
-    if(callback) callback();
+    callback();
   }
 }
 
@@ -860,36 +893,9 @@ function checkStreak() {
 function showXPToast(amount) {
   var toast = document.createElement('div');
   toast.textContent = '+' + amount + ' XP ⚡';
-  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation:fadeUp .3s ease;';
+  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
   document.body.appendChild(toast);
-  setTimeout(function(){ if(toast) toast.remove(); }, 2000);
-}
-
-function updateHomeUI() {
-  var xpInLevel = userProgress.xp % 200;
-  var pct = Math.round((xpInLevel / 200) * 100);
-  var xpEl = document.querySelector('.xp-fill');
-  if (xpEl) xpEl.style.width = pct + '%';
-  var xpTitle = document.querySelector('.xp-title');
-  if (xpTitle) xpTitle.textContent = userProgress.xp + ' XP · Уровень ' + userProgress.level;
-  var xpStats = document.querySelector('.xp-stats');
-  if (xpStats) {
-    var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect / userProgress.totalAnswered) * 100) : 0;
-    var mistakesCount = Object.values(userProgress.mistakes).reduce(function(sum, arr){ return sum + arr.length; }, 0);
-    xpStats.textContent = '🎯 Заданий: ' + userProgress.totalAnswered + ' · Точность: ' + acc + '% · Ошибок: ' + mistakesCount;
-  }
-  var streakEl = document.querySelector('.streak');
-  if (streakEl && userProgress.streak > 0) {
-    streakEl.textContent = '🔥 ' + userProgress.streak + ' ' + getDayWord(userProgress.streak);
-  }
-  var subTitle = document.querySelector('#s-sub .xp-title');
-  if(subTitle){
-    if(userProgress.isPremium){
-      subTitle.textContent = 'Премиум активен';
-    } else {
-      subTitle.textContent = 'Пробный период: ' + (userProgress.daysLeft || 7) + ' дн.';
-    }
-  }
+  setTimeout(function(){ toast.remove(); }, 2000);
 }
 
 function getDayWord(n) {
@@ -900,71 +906,26 @@ function getDayWord(n) {
 
 function saveLesson(lessonIdx, sc, total) {
   var today = new Date().toISOString().slice(0,10);
-  var allLessons = lessonsLoaded.length > 0 ? lessonsLoaded : [{ title: 'Тренировка', questions: fallbackQuestions }];
+  var allLessons = getAllLessons();
   var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
   userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
   userProgress.totalAnswered += total;
   userProgress.totalCorrect += sc;
-  if(sc === total){
-    addXP(50);
-  }
+  var xpGain = sc * 20 + (sc === total ? 50 : 0);
+  addXP(xpGain);
   checkStreak();
   saveProgress();
 }
 
-function checkAccess() {
-  if(!userProgress.trialStart) return;
-  var start = new Date(userProgress.trialStart);
-  var today = new Date();
-  var diffDays = Math.floor((today - start) / (1000 * 60 * 60 * 24));
-  var daysLeft = 7 - diffDays;
-  userProgress.daysLeft = daysLeft > 0 ? daysLeft : 0;
-}
-
-function goMistakes() {
-  goScreen('s-mistakes');
-  var content = document.getElementById('mistakes-content');
-  if (!content) return;
-  var allMistakes = userProgress.mistakes;
-  var html = '';
-  var topics = Object.keys(allMistakes);
-  if (topics.length === 0) {
-    html = '<p style="color:var(--muted)">Пока нет ошибок. Продолжай тренироваться!</p>';
-  } else {
-    for (var i = 0; i < topics.length; i++) {
-      var topic = topics[i];
-      var items = allMistakes[topic];
-      html += '<div class="sec-title">' + topic + '</div>';
-      for (var j = 0; j < items.length; j++) {
-        var m = items[j];
-        html += '<div style="background:var(--card2);border-radius:12px;padding:12px;margin-bottom:6px;border:1px solid var(--border)">';
-        html += '<div style="font-size:13px;margin-bottom:4px">❌ ' + m.question + '</div>';
-        html += '<div style="font-size:11px;color:var(--muted)">Правильный: ' + (m.correctAnswer || 'неизвестно') + ' | ' + (m.date || '') + '</div>';
-        html += '</div>';
-      }
-    }
-  }
-  content.innerHTML = html;
-}
-
-// INIT
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
 if (tg) tg.expand();
 
 loadProgress(function() {
-  checkStreak(); 
-  if(!userProgress.trialStart){
-    userProgress.trialStart = new Date().toISOString().slice(0,10);
-    saveProgress();
-  }
-  checkAccess();
-  updateHomeUI();
-  initAI('ai-home','подготовка к ОГЭ по географии',['🎯 С чего начать подготовку?','📅 Составь план на неделю','💡 Частые ошибки на ОГЭ'], false);
-  setTimeout(function(){
-    initAI('ai-stats','слабые темы: климатограммы и часовые пояса',['📊 Объясни климатограммы','🕐 Как считать часовые пояса?'], false);
-    initTheory();
-  }, 50);
+  checkStreak();
+  renderHomePath();
 });
 </script>
-
 </body>
 </html>
