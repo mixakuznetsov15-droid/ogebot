@@ -219,7 +219,7 @@ body::before {
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
 
-/* ── МОДАЛЬНОЕ ОКНО (DAILY REWARD / CHEST) ── */
+/* ── МОДАЛЬНОЕ ОКНО ── */
 .modal-overlay {
   position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
   display:flex; align-items:center; justify-content:center;
@@ -253,10 +253,8 @@ body::before {
 </head>
 <body>
 
-<!-- Модальные окна (рендерятся динамически) -->
 <div id="modal-container"></div>
 
-<!-- HOME = ПУТЬ ЗАДАНИЙ (главный экран) -->
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -273,13 +271,11 @@ body::before {
   </div>
 </div>
 
-<!-- TOPIC (для будущих карточек теории, не используется в основном потоке) -->
 <div class="screen" id="s-topic">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
   <div class="scroll" id="topic-content"></div>
 </div>
 
-<!-- QUIZ -->
 <div class="screen" id="s-quiz">
   <div class="topbar">
     <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
@@ -306,7 +302,6 @@ body::before {
   </div>
 </div>
 
-<!-- RESULT -->
 <div class="screen" id="s-result">
   <div class="result-wrap">
     <div class="result-emoji" id="res-emoji">🎉</div>
@@ -332,7 +327,6 @@ body::before {
   </div>
 </div>
 
-<!-- ФИНАЛЬНЫЙ БОСС (большой тест по всем темам) -->
 <div class="screen" id="s-boss-result">
   <div class="result-wrap">
     <div class="result-emoji">👑</div>
@@ -352,7 +346,6 @@ body::before {
   </div>
 </div>
 
-<!-- PROFILE (объединяет прогресс + подписку + достижения) -->
 <div class="screen" id="s-profile">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
   <div class="scroll" id="profile-content"></div>
@@ -360,51 +353,45 @@ body::before {
 
 <script>
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
-
-// ═══════════════════════════════════════════
-//  GITHUB DATA CONFIG
-// ═══════════════════════════════════════════
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 
 const THEORY_FILES = [
-  { key:'topo',          title:'🗺 Топографические карты',          file:'theory_topo.json',          tasks:'Задания 1-4'  },
-  { key:'synoptic',      title:'🌀 Синоптические карты',            file:'theory_student.json',       tasks:'Задания 5-6'  },
-  { key:'climat',        title:'📊 Климат и климатограммы',         file:'theory_climat.json',        tasks:'Задания 7-8'  },
-  { key:'nature_russia', title:'🌋 Природа России',                 file:'theory_nature_russia.json', tasks:'Задания 13-16'},
-  { key:'timezone',      title:'🕐 Часовые пояса',                  file:'theory_timezone.json',      tasks:'Задание 17'   },
-  { key:'zones',         title:'🌲 Природные зоны',                 file:'theory_zones.json',         tasks:'Задание 28'   },
-  { key:'population',    title:'👥 Население России',               file:'theory_population.json',    tasks:'Задания 23-25'},
-  { key:'economy',       title:'🏭 Хозяйство России',               file:'theory_economy.json',       tasks:'Задание 27'   },
-  { key:'regions',       title:'📍 Регионы России',                 file:'theory_regions.json',       tasks:'Задания 20-21'},
-  { key:'world',         title:'🌍 Страны и материки',              file:'theory_world.json',         tasks:'Задания 20-21'},
-  { key:'litosphere',    title:'⛰ Литосфера и рельеф',             file:'theory_litosphere.json',    tasks:'Задание 22'   },
-  { key:'hydro',         title:'💧 Гидросфера',                     file:'theory_hydro.json',         tasks:'Задание 22'   },
-  { key:'ecology',       title:'🌱 Экология',                       file:'theory_ecology.json',       tasks:'Задание 15'   },
-  { key:'geopos',        title:'📍 Географическое положение России', file:'theory_geopos.json',       tasks:'Задание 26'   },
+  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo.json', tasks:'Задания 1-4' },
+  { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_student.json', tasks:'Задания 5-6' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'timezone', title:'🕐 Часовые пояса', file:'theory_timezone.json', tasks:'Задание 17' },
+  { key:'zones', title:'🌲 Природные зоны', file:'theory_zones.json', tasks:'Задание 28' },
+  { key:'population', title:'👥 Население России', file:'theory_population.json', tasks:'Задания 23-25'},
+  { key:'economy', title:'🏭 Хозяйство России', file:'theory_economy.json', tasks:'Задание 27' },
+  { key:'regions', title:'📍 Регионы России', file:'theory_regions.json', tasks:'Задания 20-21'},
+  { key:'world', title:'🌍 Страны и материки', file:'theory_world.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
+  { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
+  { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' },
 ];
 
 const QUESTIONS_FILES = [
-  { key:'topo',          title:'🗺 Топографические карты',          file:'questions_topo.json',          tasks:'Задания 1-4'  },
-  { key:'climat',        title:'📊 Климат и климатограммы',         file:'questions_climat.json',        tasks:'Задания 7-8'  },
-  { key:'nature_russia', title:'🌋 Природа России',                 file:'questions_nature_russia.json', tasks:'Задания 13-16'},
-  { key:'ecology',       title:'🌱 Экология',                       file:'questions_ecology.json',       tasks:'Задание 15'   },
-  { key:'timezone',      title:'🕐 Часовые пояса',                  file:'questions_timezone.json',      tasks:'Задание 17'   },
-  { key:'world',         title:'🌍 Страны и материки',              file:'questions_world.json',         tasks:'Задания 20-21'},
-  { key:'regions',       title:'📍 Регионы России',                 file:'questions_regions.json',       tasks:'Задания 20-21'},
-  { key:'litosphere',    title:'⛰ Литосфера и рельеф',             file:'questions_litosphere.json',    tasks:'Задание 22'   },
-  { key:'hydro',         title:'💧 Гидросфера',                     file:'questions_hydro.json',         tasks:'Задание 22'   },
-  { key:'population',    title:'👥 Население России',               file:'questions_population.json',    tasks:'Задания 23-25'},
-  { key:'geopos',        title:'📍 Геогр. положение России',        file:'questions_geopos.json',        tasks:'Задание 26'   },
-  { key:'economy',       title:'🏭 Хозяйство России',               file:'questions_economy.json',       tasks:'Задание 27'   },
-  { key:'zones',         title:'🌲 Природные зоны',                 file:'questions_zones.json',         tasks:'Задание 28'   },
+  { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'ecology', title:'🌱 Экология', file:'questions_ecology.json', tasks:'Задание 15' },
+  { key:'timezone', title:'🕐 Часовые пояса', file:'questions_timezone.json', tasks:'Задание 17' },
+  { key:'world', title:'🌍 Страны и материки', file:'questions_world.json', tasks:'Задания 20-21'},
+  { key:'regions', title:'📍 Регионы России', file:'questions_regions.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'questions_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'questions_hydro.json', tasks:'Задание 22' },
+  { key:'population', title:'👥 Население России', file:'questions_population.json', tasks:'Задания 23-25'},
+  { key:'geopos', title:'📍 Геогр. положение России', file:'questions_geopos.json', tasks:'Задание 26' },
+  { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json', tasks:'Задание 27' },
+  { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
 ];
 
-// Кэш загруженных данных
 var theoryCache = {};
 var questionsCache = {};
 var lessonsLoaded = [];
 
-// Загрузка JSON с GitHub
 async function fetchJSON(filename) {
   var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
   var r = await fetch(url);
@@ -412,7 +399,6 @@ async function fetchJSON(filename) {
   return await r.json();
 }
 
-// Загрузка всех вопросов для тренировки
 async function loadAllLessons() {
   lessonsLoaded = [];
   for (var i = 0; i < QUESTIONS_FILES.length; i++) {
@@ -437,19 +423,16 @@ async function loadAllLessons() {
   return lessonsLoaded;
 }
 
-// Глобальный массив-заглушка, если ничего не загружено
 const lessons = [];
 
-// Вспомогательная функция для получения актуального списка уроков
 function getAllLessons() {
   return lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
 }
 
 let curQ=0, score=0, answered=false, shuffled=[];
 let curLesson=0, lives=3, hintUsed=false;
-let lastExplainText = ''; // хранит последнее AI-объяснение для чата
+let lastExplainText = '';
 
-// Ранговая система
 function getRank(xp) {
   if (xp >= 10000) return 'Легенда';
   if (xp >= 5000) return 'Мастер';
@@ -466,9 +449,6 @@ function goScreen(id) {
   if (id === 's-profile') renderProfile();
 }
 
-// ═══════════════════════════════════════════
-//  УДЕРЖАНИЕ: обратный отсчёт до ОГЭ и прогноз балла
-// ═══════════════════════════════════════════
 function getDaysUntilOGE() {
   const today = new Date(); today.setHours(0,0,0,0);
   const currentYear = today.getFullYear();
@@ -490,9 +470,15 @@ function getPredictedGrade() {
   return '2';
 }
 
-// ═══════════════════════════════════════════
-//  ГЛАВНЫЙ ЭКРАН = ПУТЬ ЗАДАНИЙ
-// ═══════════════════════════════════════════
+// Telegram detection
+const tgApp = window.Telegram?.WebApp;
+const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
+
+if (isTelegram) {
+  tgApp.ready();
+  tgApp.expand();
+}
+
 async function renderHomePath() {
   var container = document.getElementById('home-content');
 
@@ -524,16 +510,40 @@ async function renderHomePath() {
 
   var html = '';
 
-  // Обратный отсчёт и прогноз балла
   html += '<div class="path-progress-card" style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--text)">'+daysLeft+'</span> <span style="font-size:12px;color:var(--muted)">'+getDayWord(daysLeft)+' до ОГЭ</span></div>';
   html += '<div style="text-align:right"><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--gold)">'+predictedGrade+'</span> <span style="font-size:12px;color:var(--muted)">твоя оценка</span></div>';
   html += '</div>';
 
-  // Прогресс
   html += '<div class="path-progress-card">';
   html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по ОГЭ</span><span class="path-progress-pct">'+pct+'%</span></div>';
   html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
+  html += '</div>';
+
+  // Ежедневные задания
+  updateDailyTasks();
+  var tasks = userProgress.dailyTasks || {};
+  var tasksDate = userProgress.dailyTasksDate;
+  var today = new Date().toISOString().slice(0,10);
+  if (tasksDate !== today) {
+    // сброшены в updateDailyTasks
+    tasks = { solve10: false, earn50XP: false, loginToday: true };
+  }
+  var tasksCompleted = (tasks.solve10?1:0) + (tasks.earn50XP?1:0) + (tasks.loginToday?1:0);
+  var tasksAllDone = tasksCompleted === 3;
+
+  html += '<div class="path-progress-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.solve10?'var(--primary2)':'var(--muted)')+'">'+(tasks.solve10?'✅':'⬜')+'</span> Решить 10 вопросов</div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.earn50XP?'var(--primary2)':'var(--muted)')+'">'+(tasks.earn50XP?'✅':'⬜')+'</span> Получить 50 XP</div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.loginToday?'var(--primary2)':'var(--muted)')+'">'+(tasks.loginToday?'✅':'⬜')+'</span> Зайти сегодня</div>';
+  html += '</div>';
+  if (tasksAllDone) {
+    html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">🎉 Все задания выполнены! +100 XP и сундук</div>';
+  } else {
+    html += '<div style="margin-top:8px;font-size:12px;color:var(--muted)">За каждое задание +20 XP</div>';
+  }
   html += '</div>';
 
   if (!allDone) {
@@ -549,7 +559,7 @@ async function renderHomePath() {
     html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
   }
 
-  // Путь по темам
+  // Остальной путь
   html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
   allLessons.forEach(function(l, i) {
     var done = userProgress.completedLessons[l.title];
@@ -594,14 +604,6 @@ async function renderHomePath() {
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 }
 
-function goQuiz(lessonIdx) {
-  curLesson = (lessonIdx !== undefined) ? lessonIdx : 0;
-  shuffled = lessons[curLesson].questions;
-  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
-  goScreen('s-quiz');
-  renderQ();
-}
-
 function goQuizFromLoaded(idx) {
   var allLessons = getAllLessons();
   curLesson = idx;
@@ -623,9 +625,6 @@ function replayLesson() {
   renderQ();
 }
 
-// ═══════════════════════════════════════════
-//  ФИНАЛЬНЫЙ БОСС — тест по всем темам
-// ═══════════════════════════════════════════
 var isBossMode = false;
 
 function goBossLevel() {
@@ -635,7 +634,6 @@ function goBossLevel() {
     if (l.questions) allQuestions = allQuestions.concat(l.questions);
   });
   allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
-
   isBossMode = true;
   shuffled = allQuestions;
   curLesson = -1;
@@ -644,15 +642,13 @@ function goBossLevel() {
   renderQ();
 }
 
-// ═══════════════════════════════════════════
-//  ПРОФИЛЬ
-// ═══════════════════════════════════════════
 function renderProfile() {
   var allLessons = getAllLessons();
   var completedCount = Object.keys(userProgress.completedLessons).length;
   var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect/userProgress.totalAnswered)*100) : 0;
   var predictedGrade = getPredictedGrade();
   var rank = getRank(userProgress.xp);
+  var chestCount = (userProgress.chests || []).length;
 
   var html = '';
   html += '<div class="profile-header-card">';
@@ -674,21 +670,30 @@ function renderProfile() {
   html += '</div>';
 
   // Сундуки
-  var chestCount = (userProgress.chests || []).length;
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div><div style="font-size:12px;color:var(--muted);margin-top:3px">'+chestCount+' шт.</div></div>';
+  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
+  if (chestCount > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">'+chestCount+' шт.</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Нет доступных сундуков</div>';
+  }
+  html += '</div>';
   html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer"'+(chestCount===0?' disabled':'')+'>Открыть</button>';
   html += '</div>';
 
   // Напоминания
-  var notifConnected = !!(window.Telegram && Telegram.WebApp && Telegram.WebApp.initDataUnsafe && Telegram.WebApp.initDataUnsafe.user);
+  var notifText = isTelegram
+    ? '✅ Подключены'
+    : '❌ Не подключены';
+  var notifDesc = isTelegram
+    ? 'Напоминания о заданиях будут приходить в Telegram.'
+    : 'Для получения уведомлений открой приложение через Telegram.';
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
   html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
-  html += '<div style="font-size:13px;color:'+(notifConnected?'var(--primary2)':'var(--danger)')+';margin-top:6px">'+(notifConnected?'✅ Подключены':'❌ Не подключены')+'</div>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+(notifConnected?'Напоминания о заданиях будут приходить в Telegram.':'Открой приложение через Telegram для подключения.')+'</div>';
+  html += '<div style="font-size:13px;color:'+(isTelegram?'var(--primary2)':'var(--danger)')+';margin-top:6px">'+notifText+'</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+notifDesc+'</div>';
   html += '</div>';
 
-  // Класс и приглашение
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
@@ -793,8 +798,8 @@ function selectAns(idx, correct, qText, topic, hint) {
   if (answered) return;
   answered = true;
 
-  if (idx === correct && window.Telegram && Telegram.WebApp && Telegram.WebApp.HapticFeedback) {
-    try { Telegram.WebApp.HapticFeedback.notificationOccurred('success'); } catch(e){}
+  if (idx === correct && isTelegram && tgApp.HapticFeedback) {
+    try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){}
   }
 
   const btns = document.querySelectorAll('.ans-btn');
@@ -819,6 +824,8 @@ function selectAns(idx, correct, qText, topic, hint) {
   if (lives <= 0) {
     document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
   }
+
+  updateDailyTasks();
 }
 
 async function requestAIExplanation(isCorrect, qText, topic) {
@@ -886,6 +893,7 @@ function showResult() {
     goScreen('s-boss-result');
     setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
     isBossMode = false;
+    updateDailyTasks();
     return;
   }
 
@@ -905,9 +913,10 @@ function showResult() {
   saveLesson(curLesson, score, total);
   goScreen('s-result');
   setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
+  updateDailyTasks();
 }
 
-// ── AI ──
+// AI
 function initAI(cid, ctx, prompts=[], autoOpen=false) {
   const el = document.getElementById(cid);
   if (!el) return;
@@ -971,28 +980,110 @@ async function sendM(cid, ctx) {
   msgs.scrollTop = msgs.scrollHeight;
 }
 
-// ═══════════════════════════════════════════
-//  ПРИГЛАШЕНИЕ ДРУЗЕЙ
-// ═══════════════════════════════════════════
+// Приглашение
 function inviteFriend() {
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.');
+  const inviteUrl = 'https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.';
+  if (isTelegram) {
+    tgApp.openTelegramLink(inviteUrl);
   } else {
-    window.open('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.', '_blank');
+    window.open(inviteUrl, '_blank');
   }
   if (!userProgress.invitedFriend) {
     userProgress.invitedFriend = true;
     addXP(50);
+    saveProgress();
   }
 }
 
-// ═══════════════════════════════════════════
-//  ЕЖЕДНЕВНАЯ НАГРАДА
-// ═══════════════════════════════════════════
+// Ежедневные задания
+function updateDailyTasks() {
+  var today = new Date().toISOString().slice(0,10);
+  if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
+    userProgress.dailyTasksDate = today;
+    userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
+    // loginToday сразу выполнено
+    if (!userProgress.dailyTasksCollected) {
+      userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
+    }
+    userProgress.dailyTasksCollected.loginToday = false;
+    saveProgress();
+  }
+  var tasks = userProgress.dailyTasks || {};
+  var collected = userProgress.dailyTasksCollected || {};
+
+  // Проверка условий
+  var dailyXP = (userProgress.dailyXP || 0);
+  var dailyQuestions = (userProgress.dailyQuestions || 0);
+  if (dailyQuestions >= 10 && !tasks.solve10) {
+    tasks.solve10 = true;
+    if (!collected.solve10) {
+      collected.solve10 = true;
+      addXP(20);
+    }
+  }
+  if (dailyXP >= 50 && !tasks.earn50XP) {
+    tasks.earn50XP = true;
+    if (!collected.earn50XP) {
+      collected.earn50XP = true;
+      addXP(20);
+    }
+  }
+  if (!tasks.loginToday) {
+    tasks.loginToday = true;
+    if (!collected.loginToday) {
+      collected.loginToday = true;
+      addXP(20);
+    }
+  }
+
+  // Все задания выполнены?
+  if (tasks.solve10 && tasks.earn50XP && tasks.loginToday) {
+    if (!userProgress.allDailyTasksDone) {
+      userProgress.allDailyTasksDone = true;
+      addXP(100);
+      // сундук
+      if (!userProgress.chests) userProgress.chests = [];
+      userProgress.chests.push({ type: 'common' });
+      showToast('🎁 Сундук за все задания дня!');
+    }
+  }
+
+  saveProgress();
+}
+
+// При ответах и получении XP нужно увеличивать daily счетчики
+function incrementDailyCounters(questionsCount, xpAmount) {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.dailyTasksDate !== today) {
+    userProgress.dailyTasksDate = today;
+    userProgress.dailyQuestions = 0;
+    userProgress.dailyXP = 0;
+  }
+  userProgress.dailyQuestions = (userProgress.dailyQuestions || 0) + questionsCount;
+  userProgress.dailyXP = (userProgress.dailyXP || 0) + xpAmount;
+  saveProgress();
+  updateDailyTasks();
+}
+
+// Переопределим saveLesson и addXP, чтобы они вызывали инкремент
+var originalAddXP = addXP;
+addXP = function(amount) {
+  originalAddXP(amount);
+  if (amount > 0) {
+    incrementDailyCounters(0, amount);
+  }
+};
+
+var originalSaveLesson = saveLesson;
+saveLesson = function(lessonIdx, sc, total) {
+  originalSaveLesson(lessonIdx, sc, total);
+  incrementDailyCounters(total, sc * 20 + (sc === total ? 50 : 0));
+};
+
+// Ежедневная награда (Daily Reward)
 function checkDailyReward() {
   const today = new Date().toISOString().slice(0,10);
-  if (userProgress.lastDailyRewardDate === today) return; // уже получена
-
+  if (userProgress.lastDailyRewardDate === today) return;
   let day = userProgress.dailyRewardDay || 1;
   const lastDate = userProgress.lastDailyRewardDate;
   if (lastDate) {
@@ -1002,9 +1093,8 @@ function checkDailyReward() {
       day = 1;
     } else if (diffDays === 1) {
       day = Math.min(day + 1, 7);
-    } // else today == lastDate (уже обработано)
+    }
   }
-
   showDailyRewardModal(day);
 }
 
@@ -1013,14 +1103,13 @@ function showDailyRewardModal(day) {
   const reward = rewards[day];
   const title = day === 7 ? '🎁 Сундук!' : `🔥 День ${day}`;
   const sub = day === 7 ? 'Ты получаешь сундук с сюрпризом!' : `Ты получаешь +${reward} XP`;
-  const btnText = 'Забрать';
   const modalHtml = `
     <div class="modal-overlay" id="daily-modal">
       <div class="modal-card">
         <div class="modal-title">${title}</div>
         <div class="modal-sub">${sub}</div>
         <div class="modal-reward">${day===7?'🎁':'+'+reward+' XP'}</div>
-        <button class="modal-btn" onclick="claimDailyReward(${day})">${btnText}</button>
+        <button class="modal-btn" onclick="claimDailyReward(${day})">Забрать</button>
       </div>
     </div>`;
   document.getElementById('modal-container').innerHTML = modalHtml;
@@ -1032,32 +1121,34 @@ function claimDailyReward(day) {
   const today = new Date().toISOString().slice(0,10);
   userProgress.lastDailyRewardDate = today;
   userProgress.dailyRewardDay = day;
-
   if (reward === 'chest') {
-    userProgress.chests = userProgress.chests || [];
-    userProgress.chests.push({type:'common'}); // можно добавить тип, пока обычный
-    addXP(0);
+    if (!userProgress.chests) userProgress.chests = [];
+    userProgress.chests.push({ type: 'common' });
     showToast('🎁 Сундук добавлен в профиль!');
   } else {
     addXP(reward);
   }
-
   saveProgress();
   document.getElementById('modal-container').innerHTML = '';
   renderHomePath();
 }
 
-// ═══════════════════════════════════════════
-//  СУНДУКИ
-// ═══════════════════════════════════════════
+// Сундуки
 function openChest() {
   if (!userProgress.chests || userProgress.chests.length === 0) return;
-  const chest = userProgress.chests.shift();
+  userProgress.chests.shift();
   saveProgress();
 
-  // Случайная награда в зависимости от типа (пока все обычные)
-  const pool = chest.type === 'common' ? [20,50,100] : chest.type === 'rare' ? [200,300] : [500];
-  const reward = pool[Math.floor(Math.random() * pool.length)];
+  // Случайная награда с шансами
+  const rand = Math.random();
+  let reward;
+  if (rand < 0.70) {
+    reward = [20, 50, 100][Math.floor(Math.random() * 3)];
+  } else if (rand < 0.95) {
+    reward = [200, 300][Math.floor(Math.random() * 2)];
+  } else {
+    reward = 500;
+  }
 
   const modalHtml = `
     <div class="modal-overlay" id="chest-modal">
@@ -1078,22 +1169,17 @@ function closeChestModal(reward) {
   renderProfile();
 }
 
-// ═══════════════════════════════════════════
-//  SHARE BOSS RESULT
-// ═══════════════════════════════════════════
 function shareBossResult() {
   const total = shuffled.length;
   const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+score+'/'+total+'! Попробуй и ты!';
-  if (window.Telegram && Telegram.WebApp) {
-    Telegram.WebApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text));
+  if (isTelegram) {
+    tgApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text));
   } else {
     prompt('Скопируй текст для друзей:', text);
   }
 }
 
-// ═══════════════════════════════════════════
-//  ПРОГРЕСС
-// ═══════════════════════════════════════════
+// User Progress
 var userProgress = {
   xp: 0,
   level: 1,
@@ -1109,22 +1195,26 @@ var userProgress = {
   lastDailyRewardDate: '',
   chests: [],
   invitedFriend: false,
+  dailyTasksDate: '',
+  dailyTasks: { solve10: false, earn50XP: false, loginToday: false },
+  dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
+  allDailyTasksDone: false,
+  dailyQuestions: 0,
+  dailyXP: 0,
 };
-
-var tg = window.Telegram && Telegram.WebApp;
 
 function saveProgress() {
   var data = JSON.stringify(userProgress);
-  if (tg && Telegram.WebApp.CloudStorage) {
-    Telegram.WebApp.CloudStorage.setItem('progress', data, function(){});
+  if (isTelegram && tgApp.CloudStorage) {
+    tgApp.CloudStorage.setItem('progress', data, function(){});
   } else {
     try { localStorage.setItem('geo_progress', data); } catch(e){}
   }
 }
 
 function loadProgress(callback) {
-  if (tg && Telegram.WebApp.CloudStorage) {
-    Telegram.WebApp.CloudStorage.getItem('progress', function(err, val) {
+  if (isTelegram && tgApp.CloudStorage) {
+    tgApp.CloudStorage.getItem('progress', function(err, val) {
       if (!err && val) {
         try { userProgress = JSON.parse(val); } catch(e){}
       }
@@ -1170,7 +1260,6 @@ function addXP(amount) {
 function checkStreak() {
   var today = new Date().toISOString().slice(0,10);
   if (userProgress.lastDate === today) return;
-
   var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
   if (userProgress.lastDate === yesterday) {
     userProgress.streak++;
@@ -1222,18 +1311,12 @@ function saveLesson(lessonIdx, sc, total) {
   saveProgress();
 }
 
-// ═══════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════
-if (window.Telegram && Telegram.WebApp) {
-  Telegram.WebApp.ready();
-  Telegram.WebApp.expand();
-}
-
+// INIT
 loadProgress(function() {
   checkStreak();
   renderHomePath();
   checkDailyReward();
+  updateDailyTasks();
 });
 </script>
 </body>
