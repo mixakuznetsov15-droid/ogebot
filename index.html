@@ -265,6 +265,8 @@ body::before {
     <div class="answers" id="answers"></div>
     <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">💡 Подсказка от AI</button>
     <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
+    <div id="ai-explain" style="display:none;background:#58a6ff0a;border:1px solid #58a6ff20;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#c8d8e8;margin-top:8px"></div>
+    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="openAIChat()">💬 Обсудить с AI</button>
     <div id="ai-quiz" class="ai-panel" style="display:none"></div>
     <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
   </div>
@@ -411,6 +413,7 @@ function getAllLessons() {
 
 let curQ=0, score=0, answered=false, shuffled=[];
 let curLesson=0, lives=3, hintUsed=false;
+let lastExplainText = ''; // хранит последнее AI-объяснение для чата
 
 function goScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
@@ -461,7 +464,6 @@ async function renderHomePath() {
     return;
   }
 
-  // Найти первую не пройденную тему (или последнюю если все пройдены)
   var nextIdx = 0;
   for (var i = 0; i < allLessons.length; i++) {
     var key = allLessons[i].title;
@@ -479,10 +481,10 @@ async function renderHomePath() {
 
   var html = '';
 
-  // Обратный отсчёт и прогноз балла
+  // Обратный отсчёт и прогноз балла (улучшенная формулировка)
   html += '<div class="path-progress-card" style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--text)">'+daysLeft+'</span> <span style="font-size:12px;color:var(--muted)">'+getDayWord(daysLeft)+' до ОГЭ</span></div>';
-  html += '<div style="text-align:right"><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--gold)">'+predictedGrade+'</span> <span style="font-size:12px;color:var(--muted)">прогноз балла</span></div>';
+  html += '<div style="text-align:right"><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--gold)">'+predictedGrade+'</span> <span style="font-size:12px;color:var(--muted)">твоя оценка</span></div>';
   html += '</div>';
 
   // Прогресс
@@ -491,12 +493,11 @@ async function renderHomePath() {
   html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
   html += '</div>';
 
-  // Напоминания
+  // Напоминания (переработанная логика)
   html += '<div style="margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:8px;color:var(--primary);font-size:13px;font-weight:600" onclick="enableReminders()">';
   html += '<span>🔔</span><span id="reminder-text">Включить напоминания</span>';
   html += '</div>';
 
-  // Карточка "Продолжить"
   if (!allDone) {
     var nextLesson = allLessons[nextIdx];
     html += '<div class="continue-card" onclick="goQuizFromLoaded('+nextIdx+')">';
@@ -541,7 +542,6 @@ async function renderHomePath() {
     html += '</div></div>';
   });
 
-  // Финальный босс
   html += '<div class="path-connector" style="background:'+(allDone?'var(--primary2)':'var(--border)')+'"></div>';
   html += '<div class="path-node-row">';
   html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="goBossLevel()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
@@ -622,11 +622,10 @@ function renderProfile() {
   html += '<div class="profile-level-big">⚡ Уровень '+userProgress.level+' · '+userProgress.xp+' XP</div></div>';
   html += '</div>';
 
-  // Прогноз балла
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
   html += '<div style="font-size:32px">🎯</div>';
-  html += '<div><div style="font-weight:700;font-size:15px">Прогноз балла на ОГЭ</div>';
-  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты получишь <span style="color:var(--gold);font-weight:800">'+predictedGrade+'</span></div></div>';
+  html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">'+predictedGrade+'</span></div></div>';
   html += '</div>';
 
   html += '<div class="profile-stats-grid">';
@@ -635,7 +634,6 @@ function renderProfile() {
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  // Сравнение с друзьями
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
@@ -665,7 +663,6 @@ function renderProfile() {
   document.getElementById('profile-content').innerHTML = html;
 }
 
-// Безопасное получение названия текущей темы
 function getCurrentTopicTitle() {
   if (isBossMode) return 'Финальный босс';
   var all = getAllLessons();
@@ -677,6 +674,7 @@ function renderQ() {
   const topicTitle = getCurrentTopicTitle();
 
   answered=false; hintUsed=false;
+  lastExplainText = '';
 
   document.getElementById('quiz-topic-lbl').textContent = topicTitle;
   document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(curQ+1)+' из '+shuffled.length;
@@ -685,6 +683,8 @@ function renderQ() {
   document.getElementById('q-tag').textContent = q.tag;
   document.getElementById('q-text').textContent = q.text;
   document.getElementById('ai-quiz').style.display = 'none';
+  document.getElementById('ai-explain').style.display = 'none';
+  document.getElementById('btn-ask-ai').style.display = 'none';
   document.getElementById('hint-box').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'flex';
   document.getElementById('btn-hint').disabled = false;
@@ -720,15 +720,17 @@ async function getHint() {
   btn.disabled = true;
   const hintBox = document.getElementById('hint-box');
   hintBox.style.display = 'block';
-  hintBox.textContent = q.hint || 'Подсказка загружается...';
+  hintBox.textContent = q.hint || 'Анализирую вопрос...';
 
   try {
+    // Улучшенный промпт, чтобы AI давал содержательную подсказку, а не перефразировку
+    const prompt = `Ты — репетитор по географии. Ученик решает задание ОГЭ: «${q.text}». Дай КОРОТКУЮ подсказку (1-2 предложения), которая реально поможет понять, как подойти к решению, вспомнить нужное правило или закономерность. Не перефразируй вопрос, не давай прямого ответа.`;
     const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question:'Дай короткую подсказку (1-2 предложения, не давай ответ) к вопросу ОГЭ: '+q.text, context: getCurrentTopicTitle()})});
+      body: JSON.stringify({question: prompt, context: getCurrentTopicTitle()})});
     const d = await r.json();
-    if (d.answer) hintBox.textContent = '💡 '+d.answer;
+    if (d.answer) hintBox.textContent = '💡 ' + d.answer;
   } catch(e) {
-    hintBox.textContent = '💡 '+q.hint;
+    hintBox.textContent = '💡 ' + (q.hint || 'Подумай, какое правило можно применить.');
   }
   btn.textContent = '💡 Подсказка получена';
 }
@@ -758,28 +760,65 @@ function selectAns(idx, correct, qText, topic, hint) {
     livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>';
   }
 
-  const aiEl = document.getElementById('ai-quiz');
-  aiEl.style.display = 'block';
-
-  var autoMsg = idx === correct
-    ? 'Правильно! Объясни почему ответ верный на вопрос: '+qText
-    : 'Ученик ошибся. Объясни правильный ответ на вопрос: '+qText+'. Объясни доступно, помоги запомнить.';
-
-  initAI('ai-quiz', 'Вопрос ОГЭ: '+qText,
-    idx === correct
-      ? ['🤔 Почему именно это?','📖 Расскажи подробнее','🔗 Что ещё нужно знать?']
-      : ['❓ Объясни правильный ответ','🧠 Как это запомнить?','📖 Дай похожие задания'],
-    true);
-
-  setTimeout(function(){
-    var inp = document.getElementById('inp-ai-quiz');
-    if (inp) { inp.value = autoMsg; sendM('ai-quiz','Вопрос ОГЭ по теме '+topic+': '+qText); }
-  }, 400);
+  // Показываем компактное AI-объяснение, не открывая громоздкий чат
+  requestAIExplanation(idx===correct, qText, topic);
 
   document.getElementById('btn-next').classList.add('show');
-
   if (lives <= 0) {
     document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
+  }
+}
+
+async function requestAIExplanation(isCorrect, qText, topic) {
+  const explainBox = document.getElementById('ai-explain');
+  const askBtn = document.getElementById('btn-ask-ai');
+  explainBox.style.display = 'block';
+  askBtn.style.display = 'block';
+  explainBox.textContent = '⏳ Объяснение...';
+
+  const prompt = isCorrect
+    ? `Ученик правильно ответил на вопрос ОГЭ: «${qText}». Объясни, почему ответ верный, выделив ключевую закономерность или правило. Будь краток (2-3 предложения).`
+    : `Ученик ошибся в вопросе ОГЭ: «${qText}». Дай КОРОТКОЕ объяснение правильного ответа, указав на типичную ошибку и как её избежать. 2-3 предложения.`;
+
+  try {
+    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question: prompt, context: topic})});
+    const d = await r.json();
+    const ans = d.answer || 'Подумай, какое правило здесь работает.';
+    explainBox.textContent = '📘 ' + ans;
+    lastExplainText = ans;
+  } catch(e) {
+    explainBox.textContent = '📘 ' + (isCorrect ? 'Отлично! Ты знаешь материал.' : 'Обрати внимание на это правило.');
+    lastExplainText = explainBox.textContent;
+  }
+}
+
+function openAIChat() {
+  const aiPanel = document.getElementById('ai-quiz');
+  const topic = getCurrentTopicTitle();
+  const ctx = 'Вопрос ОГЭ: ' + (shuffled[curQ]?.text || '');
+  // Инициализируем чат, если ещё не инициализирован, и показываем
+  if (!aiPanel.dataset.initialized) {
+    initAI('ai-quiz', ctx, [], false);
+    aiPanel.dataset.initialized = '1';
+  }
+  aiPanel.style.display = 'block';
+  // Если есть готовое объяснение, можно добавить его как первое сообщение
+  if (lastExplainText && lastExplainText.trim() && aiPanel.querySelector('.ai-body')?.classList.contains('open')) {
+    // уже открыт
+  } else {
+    // Автоматически открываем чат и вставляем объяснение как сообщение от AI
+    const body = aiPanel.querySelector('.ai-body');
+    if (body) {
+      body.classList.add('open');
+      const msgs = document.getElementById('msgs-ai-quiz');
+      if (msgs && lastExplainText.trim()) {
+        msgs.innerHTML = '';
+        msgs.innerHTML += `<div class="msg ai">${lastExplainText.replace(/\n/g,'<br>')}</div>`;
+      }
+    }
+    const toggle = aiPanel.querySelector('.ai-toggle');
+    if (toggle) toggle.classList.add('open');
   }
 }
 
@@ -892,10 +931,25 @@ async function sendM(cid, ctx) {
 // ═══════════════════════════════════════════
 function enableReminders() {
   if (window.Telegram && window.Telegram.WebApp) {
-    window.Telegram.WebApp.sendData('enable_reminders');
-    document.getElementById('reminder-text').textContent = '🔔 Напоминания включены';
+    const userId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+    if (!userId) {
+      alert('Не удалось получить ID пользователя. Откройте приложение из Telegram.');
+      return;
+    }
+    // Отправляем запрос на серверный обработчик
+    fetch(PROXY, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ action: 'enable_reminders', userId: userId })
+    }).then(r => r.json()).then(data => {
+      document.getElementById('reminder-text').textContent = '🔔 Напоминания включены';
+      showXPToast(0); // используем тост для сообщения
+    }).catch(err => {
+      // fallback — просто сообщение
+      document.getElementById('reminder-text').textContent = '🔔 Напоминания включены (локально)';
+    });
   } else {
-    alert('Эта функция доступна только в Telegram');
+    alert('Эта функция доступна только в Telegram. Откройте мини-приложение.');
   }
 }
 
@@ -929,8 +983,8 @@ var userProgress = {
   totalAnswered: 0,
   totalCorrect: 0,
   bossCompleted: false,
-  freezes: 1,               // заморозка стрика (1 в неделю)
-  lastFreezeMonday: ''      // понедельник последней выданной заморозки
+  freezes: 1,
+  lastFreezeMonday: ''
 };
 
 var tg = window.Telegram && window.Telegram.WebApp;
@@ -950,7 +1004,6 @@ function loadProgress(callback) {
       if (!err && val) {
         try { userProgress = JSON.parse(val); } catch(e){}
       }
-      // Восстановление заморозки раз в неделю
       refreshFreeze();
       callback();
     });
@@ -968,7 +1021,7 @@ function getMonday(date) {
   var d = new Date(date);
   d.setHours(0,0,0,0);
   var day = d.getDay();
-  var diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+  var diff = d.getDate() - day + (day === 0 ? -6 : 1);
   return new Date(d.setDate(diff)).toISOString().slice(0,10);
 }
 
@@ -996,13 +1049,12 @@ function checkStreak() {
   if (userProgress.lastDate === yesterday) {
     userProgress.streak++;
   } else if (userProgress.lastDate !== today) {
-    // Пропуск > 1 дня — пробуем использовать заморозку
     if (userProgress.freezes > 0) {
       userProgress.freezes = 0;
-      userProgress.lastFreezeMonday = getMonday(new Date()); // отмечаем использование
-      userProgress.streak++; // сохраняем стрик
+      userProgress.lastFreezeMonday = getMonday(new Date());
+      userProgress.streak++;
     } else {
-      userProgress.streak = 1; // сброс
+      userProgress.streak = 1;
     }
   }
   userProgress.lastDate = today;
@@ -1011,7 +1063,7 @@ function checkStreak() {
 
 function showXPToast(amount) {
   var toast = document.createElement('div');
-  toast.textContent = '+' + amount + ' XP ⚡';
+  toast.textContent = amount ? '+' + amount + ' XP ⚡' : '✅ Запрос отправлен';
   toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
   document.body.appendChild(toast);
   setTimeout(function(){ toast.remove(); }, 2000);
