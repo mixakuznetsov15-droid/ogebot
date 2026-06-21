@@ -1,169 +1,1283 @@
-import asyncio
-import os
-from aiogram import Bot, Dispatcher, F
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
-from aiogram.filters import CommandStart, Command
-from aiogram.enums import ParseMode
-from aiogram.client.default import DefaultBotProperties
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ГеоПро — Подготовка к ОГЭ</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1c2333;
+  --primary: #58a6ff;
+  --primary2: #3fb950;
+  --text: #f0f6fc;
+  --muted: #8b949e;
+  --danger: #f85149;
+  --gold: #d29922;
+  --border: #ffffff0c;
+  --radius: 18px;
+  --font-h: 'Unbounded', sans-serif;
+  --font-b: 'Onest', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
-WEBAPP_URL = os.getenv("WEBAPP_URL")  # твоя ссылка на Vercel
+body::before {
+  content:''; position:fixed; inset:0;
+  background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+              radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
 
-bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
-dp = Dispatcher()
+.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-# — Хранилище доступа (в памяти, для старта достаточно) —
-allowed_users: set[int] = set()
+.topbar {
+  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
+.sublabel { font-size:10px; color:var(--muted); }
+.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
 
-# /start
-@dp.message(CommandStart())
-async def cmd_start(message: Message):
-    user_id = message.from_user.id
-    name = message.from_user.first_name
+.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
+.scroll::-webkit-scrollbar { width:3px; }
+.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-    if user_id in allowed_users or user_id == ADMIN_ID:
-        await send_app_menu(message)
-    else:
-        await send_welcome(message, name)
+.xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
+.xp-icon { font-size:26px; }
+.xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
+.xp-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
+.xp-stats { font-size:11px; color:var(--muted); }
+.xp-title { font-weight:600; font-size:14px; }
 
-async def send_welcome(message: Message, name: str):
-    text = (
-        f"👋  Привет, <b>{name}</b>!\n\n"
-    f"🗺 <b>ГеоПро</b> — твой AI-репетитор по географии\n\n"
-    f"Забудь про скучные учебники. Здесь:\n"
-    f"🔥  Задания как в реальном ОГЭ\n"
-    f"🤖  AI объясняет каждую ошибку\n"
-    f"🏆 Геймификация — учёба как игра\n"
-    f"📈  Карта прогресса по всем темам\n\n"
-    f"💰 Полный доступ — <b>500 руб/месяц</b>\n\n"
-    f"👇 Попробуй демо бесплатно прямо сейчас"
-    )
+.actions { display:flex; gap:10px; }
+.btn { flex:1; padding:14px 6px; border-radius:var(--radius); background:var(--card2); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
+.btn:active { transform:scale(.97); }
+.btn.primary { background:linear-gradient(135deg,var(--primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
+.btn.accent { background:linear-gradient(135deg,var(--primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
+.btn-icon { font-size:24px; }
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Получить доступ", callback_data="buy")]
-    ])
+.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+.grid-item { background:var(--card2); border-radius:var(--radius); padding:14px; border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
+.grid-item:active { background:#253544; }
 
-    await message.answer(text, reply_markup=kb)
+.sec-title { font-family:var(--font-h); font-size:14px; font-weight:700; }
+.back-link { color:var(--primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
 
-async def send_app_menu(message: Message):
-    text = (
-        f"Добро пожаловать!\n\n"
-        f"Твой доступ активен. Нажми кнопку ниже чтобы открыть приложение"
-    )
+.topic-list { display:flex; flex-direction:column; gap:8px; }
+.topic-item { background:var(--card2); border-radius:var(--radius); padding:12px 14px; border:1px solid var(--border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
+.topic-item:active { background:#253544; }
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Открыть GeoPro", web_app={"url": WEBAPP_URL})]
-    ])
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100; }
+.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; font-weight:500; cursor:pointer; }
+.nav-item.active { color:var(--primary); }
+.nav-icon { font-size:20px; }
 
-    await message.answer(text, reply_markup=kb)
+/* ── AI PANEL (Профессор Гео) ── */
+.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
+.ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
+.ai-header-left { display:flex; align-items:center; gap:10px; }
+.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
+.ai-tagline { font-size:10px; color:var(--muted); }
+.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
+.ai-toggle.open { transform:rotate(180deg); }
 
-# Кнопка "Получить доступ"
-@dp.callback_query(F.data == "buy")
-async def cb_buy(call: CallbackQuery):
-    text = (
-        f"<b>Оформление доступа</b>\n\n"
-        f"Стоимость: <b>500 руб/месяц</b>\n\n"
-        f"Переведи на карту:\n"
-        f"<code>2200 0000 0000 0000</code> (Сбер, Михаил)\n\n"
-        f"В комментарии к переводу укажи свой <b>Telegram ID</b>:\n"
-        f"<code>{call.from_user.id}</code>\n\n"
-        f"После оплаты нажми кнопку - мы проверим и откроем доступ в течение часа"
-    )
+.ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
+.ai-body.open { display:flex; animation: fadeUp .25s ease; }
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="Я оплатил", callback_data="paid")],
-        [InlineKeyboardButton(text="Назад", callback_data="back")],
-    ])
+.ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
+.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
+.ai-prompt-btn:active { background:#58a6ff30; }
 
-    await call.message.edit_text(text, reply_markup=kb)
+.ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
+.ai-messages::-webkit-scrollbar { width:2px; }
+.ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
 
-# Кнопка "Я оплатил"
-@dp.callback_query(F.data == "paid")
-async def cb_paid(call: CallbackQuery):
-    user = call.from_user
+.msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
+.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
+.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
+.msg.loading { color:var(--muted); font-style:italic; }
 
-    # Уведомление админу
-    await bot.send_message(
-        ADMIN_ID,
-        f"<b>Новая заявка на оплату!</b>\n\n"
-        f"{user.full_name}\n"
-        f"ID <code>{user.id}</code>\n"
-        f"@{user.username or 'нет username'}\n\n"
-        f"<b>Доступ открыт!</b>\n\n"
-        f"Нажми /start чтобы войти в приложение"
-    )
+.ai-input-row { display:flex; gap:8px; align-items:flex-end; }
+.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
+.ai-input:focus { border-color:#58a6ff60; }
+.ai-input::placeholder { color:var(--muted); }
+.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.ai-send:active { transform:scale(.93); }
+.ai-send:disabled { opacity:.5; cursor:default; }
+.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
 
-    try:
-        await call.message.edit_text("✅ Заявка отправлена! Администратор проверит оплату и откроет доступ в течение часа.")
-    except:
-        pass
+/* ── QUIZ ── */
+.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+.quiz-wrap::-webkit-scrollbar { width:3px; }
+.q-header { display:flex; justify-content:space-between; align-items:center; }
+.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
+.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
+.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+.q-text { font-size:15px; line-height:1.55; font-weight:500; }
+.answers { display:flex; flex-direction:column; gap:8px; }
+.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
+.ans-btn:active { transform:scale(.98); }
+.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
+.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
+.ans-btn.correct .ans-letter { background:var(--primary2); }
+.ans-btn.wrong .ans-letter { background:var(--danger); }
+.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
+.btn-next.show { display:block; animation: fadeUp .3s ease; }
+.btn-next:active { transform:scale(.97); }
 
-# Кнопка "Назад"
-@dp.callback_query(F.data == "back")
-async def cb_back(call: CallbackQuery):
-    await cmd_start(call.message)
+/* ── RESULT ── */
+.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+.result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.result-sub { font-size:14px; color:var(--muted); }
+.ring-wrap { position:relative; width:130px; height:130px; }
+.ring-wrap svg { transform:rotate(-90deg); }
+.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
+.ring-denom { font-size:12px; color:var(--muted); }
+.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
+.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
+.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
+.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
+.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
+.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+.btn-full:active { transform:scale(.97); }
+.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
+.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
 
-# Команда для админа: выдать доступ
-@dp.message(Command("grant"))
-async def cmd_grant(message: Message):
-    if message.from_user.id != ADMIN_ID:
-        return
-    parts = message.text.split()
-    if len(parts) < 2:
-        await message.answer("Использование: /grant USER_ID")
-        return
-    uid = int(parts[1])
-    allowed_users.add(uid)
-    await message.answer(f"Доступ открыт для {uid}")
+/* ── PATH (главный экран) ── */
+.path-progress-card {
+  background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px; margin-bottom:6px;
+}
+.path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.path-progress-label { font-size:13px; font-weight:600; }
+.path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
+.path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
+.path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
 
-# Команда для админа: закрыть доступ
-@dp.message(Command("revoke"))
-async def cmd_revoke(message: Message):
-    if message.from_user.id != ADMIN_ID:
-        return
-    parts = message.text.split()
-    if len(parts) < 2:
-        await message.answer("Использование: /revoke USER_ID")
-        return
-    uid = int(parts[1])
-    allowed_users.discard(uid)
-    await message.answer(f"Доступ закрыт для {uid}")
+.continue-card {
+  background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
+  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
+}
+.continue-card:active { transform:scale(.98); }
+.continue-icon { font-size:32px; flex-shrink:0; }
+.continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.continue-title { font-size:15px; font-weight:700; margin-top:2px; }
+.continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
 
-# Команда для админа: список пользователей
-@dp.message(Command("users"))
-async def cmd_users(message: Message):
-    if message.from_user.id != ADMIN_ID:
-        return
-    if not allowed_users:
-        await message.answer("Пока нет активных пользователей")
-        return
-    ids = "\n".join(str(u) for u in allowed_users)
-    await message.answer(f"Активные пользователи ({len(allowed_users)}):\n{ids}")
+.path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
+.path-connector { width:3px; height:24px; margin:0 auto; }
 
-# Любое другое сообщение
-@dp.message()
-async def any_message(message: Message):
-    user_id = message.from_user.id
-    if user_id in allowed_users or user_id == ADMIN_ID:
-        await send_app_menu(message)
-    else:
-        kb = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Получить доступ", callback_data="buy")],
-            [InlineKeyboardButton(text="Попробовать демо", callback_data="demo")]
-        ])
-        await message.answer(
-            "Привет! Чтобы начать подготовку к ОГЭ – получи доступ",
-            reply_markup=kb
-        )
+.node-circle {
+  width:56px; height:56px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
+.node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
+.node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
+.node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
+@keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
 
-# Демо-кнопка (заглушка)
-@dp.callback_query(F.data == "demo")
-async def cb_demo(call: CallbackQuery):
-    await call.answer("Демо-режим скоро появится!", show_alert=True)
+.boss-node {
+  width:72px; height:72px; border-radius:20px; flex-shrink:0;
+  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+}
+.boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
 
-async def main():
-    await dp.start_polling(bot)
+/* ── PROFILE ── */
+.profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
+.profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+.profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
+.profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
 
-if __name__ == "__main__":
-    asyncio.run(main())
+.profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
+.profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
+.profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
+
+.badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
+.badge-item-p.locked { opacity:.3; }
+.badge-icon-p { font-size:22px; margin-bottom:4px; }
+.badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
+
+.sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
+.sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
+
+/* ── МОДАЛЬНОЕ ОКНО ── */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
+  display:flex; align-items:center; justify-content:center;
+  animation: fadeIn .2s ease;
+}
+.modal-card {
+  background:var(--card2); border:1px solid var(--border); border-radius:24px;
+  padding:24px; width:90%; max-width:340px; text-align:center; display:flex; flex-direction:column; gap:16px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.5);
+  animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+}
+.modal-title { font-family:var(--font-h); font-size:18px; font-weight:800; }
+.modal-sub { font-size:13px; color:var(--muted); }
+.modal-reward { font-family:var(--font-h); font-size:28px; font-weight:800; color:var(--gold); }
+.modal-btn { width:100%; padding:14px; border:none; border-radius:var(--radius); font-family:var(--font-h); font-size:14px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; }
+.modal-btn:active { transform:scale(.97); }
+button:disabled { opacity:0.5; background:gray !important; color:#fff; }
+
+.chest-anim {
+  width:80px; height:80px; margin:0 auto;
+  background: linear-gradient(135deg, #d29922, #b8860b);
+  border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:40px;
+  animation: chestBounce 0.6s ease-in-out;
+}
+@keyframes chestBounce {
+  0% { transform: scale(0.3) rotate(-10deg); opacity:0; }
+  50% { transform: scale(1.1) rotate(3deg); opacity:1; }
+  70% { transform: scale(0.9) rotate(-2deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+</style>
+</head>
+<body>
+
+<div id="modal-container"></div>
+
+<div class="screen active" id="s-home">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="avatar">🌍</div>
+      <div><div class="username">ГеоПро</div><div class="sublabel" id="home-sublabel">Подготовка к ОГЭ</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <div class="streak" id="home-streak">🔥 0</div>
+      <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
+    </div>
+  </div>
+  <div class="scroll" id="home-content" style="padding-top:8px">
+    <div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>
+  </div>
+</div>
+
+<div class="screen" id="s-topic">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+  <div class="scroll" id="topic-content"></div>
+</div>
+
+<div class="screen" id="s-quiz">
+  <div class="topbar">
+    <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
+    <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
+    <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
+  </div>
+  <div class="quiz-wrap">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
+      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
+    </div>
+    <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
+    <div class="q-card">
+      <div class="q-tag" id="q-tag">Задание</div>
+      <div class="q-text" id="q-text">...</div>
+    </div>
+    <div class="answers" id="answers"></div>
+    <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Совет от Профессора Гео</button>
+    <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
+    <div id="ai-explain" style="display:none;background:#58a6ff0a;border:1px solid #58a6ff20;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#c8d8e8;margin-top:8px"></div>
+    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="openAIChat()">💬 Обсудить с Профессором</button>
+    <div id="ai-quiz" class="ai-panel" style="display:none"></div>
+    <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
+  </div>
+</div>
+
+<div class="screen" id="s-result">
+  <div class="result-wrap">
+    <div class="result-emoji" id="res-emoji">🎉</div>
+    <div class="result-title" id="res-title">Отлично!</div>
+    <div class="result-sub" id="res-sub">Ты справился!</div>
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
+        <circle class="ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
+    </div>
+    <div class="res-stats">
+      <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
+      <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
+      <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+      <button class="btn-full sec" onclick="replayLesson()">🔄 Ещё раз</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="s-boss-result">
+  <div class="result-wrap">
+    <div class="result-emoji">👑</div>
+    <div class="result-title">Финальный босс пройден!</div>
+    <div class="result-sub" id="boss-sub">Ты прошёл все темы ОГЭ</div>
+    <div class="ring-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle class="ring-bg" cx="65" cy="65" r="54"/>
+        <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/>
+      </svg>
+      <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div>
+    </div>
+    <div class="res-btns">
+      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+      <button class="btn-full sec" onclick="shareBossResult()">📤 Похвастаться результатом</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="s-profile">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
+  <div class="scroll" id="profile-content"></div>
+</div>
+
+<script>
+const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
+const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
+
+const THEORY_FILES = [
+  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo.json', tasks:'Задания 1-4' },
+  { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_student.json', tasks:'Задания 5-6' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'timezone', title:'🕐 Часовые пояса', file:'theory_timezone.json', tasks:'Задание 17' },
+  { key:'zones', title:'🌲 Природные зоны', file:'theory_zones.json', tasks:'Задание 28' },
+  { key:'population', title:'👥 Население России', file:'theory_population.json', tasks:'Задания 23-25'},
+  { key:'economy', title:'🏭 Хозяйство России', file:'theory_economy.json', tasks:'Задание 27' },
+  { key:'regions', title:'📍 Регионы России', file:'theory_regions.json', tasks:'Задания 20-21'},
+  { key:'world', title:'🌍 Страны и материки', file:'theory_world.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
+  { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
+  { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' },
+];
+
+const QUESTIONS_FILES = [
+  { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'ecology', title:'🌱 Экология', file:'questions_ecology.json', tasks:'Задание 15' },
+  { key:'timezone', title:'🕐 Часовые пояса', file:'questions_timezone.json', tasks:'Задание 17' },
+  { key:'world', title:'🌍 Страны и материки', file:'questions_world.json', tasks:'Задания 20-21'},
+  { key:'regions', title:'📍 Регионы России', file:'questions_regions.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'questions_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'questions_hydro.json', tasks:'Задание 22' },
+  { key:'population', title:'👥 Население России', file:'questions_population.json', tasks:'Задания 23-25'},
+  { key:'geopos', title:'📍 Геогр. положение России', file:'questions_geopos.json', tasks:'Задание 26' },
+  { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json', tasks:'Задание 27' },
+  { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
+];
+
+var theoryCache = {};
+var questionsCache = {};
+var lessonsLoaded = [];
+
+async function fetchJSON(filename) {
+  var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
+  var r = await fetch(url);
+  if (!r.ok) throw new Error('Ошибка загрузки: ' + filename);
+  return await r.json();
+}
+
+async function loadAllLessons() {
+  lessonsLoaded = [];
+  for (var i = 0; i < QUESTIONS_FILES.length; i++) {
+    var f = QUESTIONS_FILES[i];
+    try {
+      var data = await fetchJSON(f.file);
+      var questions = [];
+      if (Array.isArray(data)) {
+        data.forEach(function(item) {
+          if (item.tag && item.text && item.answers) {
+            questions.push(item);
+          }
+        });
+      }
+      if (questions.length > 0) {
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions });
+      }
+    } catch(e) {
+      console.warn('Не удалось загрузить', f.file, e);
+    }
+  }
+  return lessonsLoaded;
+}
+
+const lessons = [];
+
+function getAllLessons() {
+  return lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
+}
+
+let curQ=0, score=0, answered=false, shuffled=[];
+let curLesson=0, lives=3, hintUsed=false;
+let lastExplainText = '';
+
+// Telegram detection
+const tgApp = window.Telegram?.WebApp;
+const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
+if (isTelegram) {
+  tgApp.ready();
+  tgApp.expand();
+}
+
+// ── Ранговая система ──
+function getRank(xp) {
+  if (xp >= 10000) return 'Легенда';
+  if (xp >= 5000) return 'Мастер';
+  if (xp >= 3000) return 'Эксперт';
+  if (xp >= 500) return 'Ученик';
+  return 'Новичок';
+}
+
+function getNextRank(xp) {
+  const ranks = [
+    { name: 'Ученик', min: 500 },
+    { name: 'Эксперт', min: 3000 },
+    { name: 'Мастер', min: 5000 },
+    { name: 'Легенда', min: 10000 }
+  ];
+  for (var i = 0; i < ranks.length; i++) {
+    if (xp < ranks[i].min) return ranks[i];
+  }
+  return null;
+}
+
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+  if (id === 's-home') renderHomePath();
+  if (id === 's-profile') renderProfile();
+}
+
+function getDaysUntilOGE() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const currentYear = today.getFullYear();
+  const ogeThisYear = new Date(currentYear, 5, 19);
+  if (today <= ogeThisYear) {
+    return Math.ceil((ogeThisYear - today) / 86400000);
+  } else {
+    const ogeNextYear = new Date(currentYear + 1, 5, 19);
+    return Math.ceil((ogeNextYear - today) / 86400000);
+  }
+}
+
+function getPredictedGrade() {
+  if (userProgress.totalAnswered === 0) return '—';
+  var acc = userProgress.totalCorrect / userProgress.totalAnswered;
+  if (acc >= 0.85) return '5';
+  if (acc >= 0.70) return '4';
+  if (acc >= 0.55) return '3';
+  return '2';
+}
+
+function getCorrectAnswersNeededForGrade(targetGrade) {
+  var total = userProgress.totalAnswered;
+  var correct = userProgress.totalCorrect;
+  var target = 0;
+  if (targetGrade === 3) target = 0.55;
+  else if (targetGrade === 4) target = 0.70;
+  else if (targetGrade === 5) target = 0.85;
+  var needed = Math.ceil(target * total) - correct;
+  return Math.max(0, needed);
+}
+
+// ── Ежедневные задания ──
+function updateDailyTasks() {
+  var today = new Date().toISOString().slice(0,10);
+  if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
+    userProgress.dailyTasksDate = today;
+    userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
+    userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
+    userProgress.allDailyTasksDone = false;
+    saveProgress();
+  }
+  var tasks = userProgress.dailyTasks || {};
+  var collected = userProgress.dailyTasksCollected || {};
+
+  var dailyXP = (userProgress.dailyXP || 0);
+  var dailyQuestions = (userProgress.dailyQuestions || 0);
+
+  if (dailyQuestions >= 10 && !tasks.solve10) {
+    tasks.solve10 = true;
+    if (!collected.solve10) {
+      collected.solve10 = true;
+      addXP(20);
+    }
+  }
+  if (dailyXP >= 50 && !tasks.earn50XP) {
+    tasks.earn50XP = true;
+    if (!collected.earn50XP) {
+      collected.earn50XP = true;
+      addXP(20);
+    }
+  }
+  if (!tasks.loginToday) {
+    tasks.loginToday = true;
+    if (!collected.loginToday) {
+      collected.loginToday = true;
+      addXP(20);
+    }
+  }
+
+  if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
+    userProgress.allDailyTasksDone = true;
+    addXP(100);
+    if (!userProgress.chests) userProgress.chests = [];
+    userProgress.chests.push({ type: 'common' });
+    showToast('🎁 Сундук за все задания дня!');
+  }
+  saveProgress();
+}
+
+function incrementDailyCounters(questionsCount, xpAmount) {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.dailyTasksDate !== today) {
+    userProgress.dailyTasksDate = today;
+    userProgress.dailyQuestions = 0;
+    userProgress.dailyXP = 0;
+  }
+  userProgress.dailyQuestions = (userProgress.dailyQuestions || 0) + questionsCount;
+  userProgress.dailyXP = (userProgress.dailyXP || 0) + xpAmount;
+  saveProgress();
+  updateDailyTasks();
+}
+
+// Переопределяем addXP и saveLesson, чтобы вызывать инкремент
+var originalAddXP = addXP;
+addXP = function(amount) {
+  originalAddXP(amount);
+  if (amount > 0) {
+    incrementDailyCounters(0, amount);
+  }
+};
+
+var originalSaveLesson = saveLesson;
+saveLesson = function(lessonIdx, sc, total) {
+  originalSaveLesson(lessonIdx, sc, total);
+  incrementDailyCounters(total, sc * 20 + (sc === total ? 50 : 0));
+};
+
+// ── Достижения (обновлённая система) ──
+var ACHIEVEMENTS_LIST = [
+  { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
+  { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
+  { id: 'first_theme', icon: '🏆', title: 'Первая завершённая тема', cond: function() { return Object.keys(userProgress.completedLessons).length > 0; } },
+  { id: 'streak3', icon: '🔥', title: '3 дня подряд', cond: function() { return (userProgress.streak||0) >= 3; } },
+  { id: 'streak7', icon: '🔥', title: '7 дней подряд', cond: function() { return (userProgress.streak||0) >= 7; } },
+  { id: 'streak14', icon: '🔥', title: '14 дней подряд', cond: function() { return (userProgress.streak||0) >= 14; } },
+  { id: 'streak30', icon: '🔥', title: '30 дней подряд', cond: function() { return (userProgress.streak||0) >= 30; } },
+  { id: 'solve50', icon: '📚', title: 'Решить 50 вопросов', cond: function() { return userProgress.totalAnswered >= 50; }, max: 50, progress: function() { return Math.min(userProgress.totalAnswered, 50); } },
+  { id: 'solve100', icon: '📚', title: 'Решить 100 вопросов', cond: function() { return userProgress.totalAnswered >= 100; }, max: 100, progress: function() { return Math.min(userProgress.totalAnswered, 100); } },
+  { id: 'solve500', icon: '📚', title: 'Решить 500 вопросов', cond: function() { return userProgress.totalAnswered >= 500; }, max: 500, progress: function() { return Math.min(userProgress.totalAnswered, 500); } },
+  { id: 'solve1000', icon: '📚', title: 'Решить 1000 вопросов', cond: function() { return userProgress.totalAnswered >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.totalAnswered, 1000); } },
+  { id: 'xp500', icon: '⭐', title: 'Получить 500 XP', cond: function() { return userProgress.xp >= 500; }, max: 500, progress: function() { return Math.min(userProgress.xp, 500); } },
+  { id: 'xp1000', icon: '⭐', title: 'Получить 1000 XP', cond: function() { return userProgress.xp >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.xp, 1000); } },
+  { id: 'xp3000', icon: '⭐', title: 'Получить 3000 XP', cond: function() { return userProgress.xp >= 3000; }, max: 3000, progress: function() { return Math.min(userProgress.xp, 3000); } },
+  { id: 'xp5000', icon: '⭐', title: 'Получить 5000 XP', cond: function() { return userProgress.xp >= 5000; }, max: 5000, progress: function() { return Math.min(userProgress.xp, 5000); } },
+  { id: 'all_themes', icon: '🌍', title: 'Завершить все темы', cond: function() { var all = getAllLessons(); return all.length > 0 && Object.keys(userProgress.completedLessons).length >= all.length; } },
+  { id: 'pred4', icon: '🎯', title: 'Получить прогноз 4', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 4; } },
+  { id: 'pred5', icon: '🎯', title: 'Получить прогноз 5', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 5; } }
+];
+
+function checkAchievements() {
+  if (!userProgress.achievements) userProgress.achievements = {};
+  var now = new Date().toISOString();
+  ACHIEVEMENTS_LIST.forEach(function(a) {
+    if (userProgress.achievements[a.id] && userProgress.achievements[a.id].unlocked) return;
+    var unlocked = a.cond();
+    var progress = a.progress ? a.progress() : (unlocked ? (a.max || 1) : 0);
+    var wasUnlocked = userProgress.achievements[a.id]?.unlocked;
+    if (!userProgress.achievements[a.id]) {
+      userProgress.achievements[a.id] = { progress: progress, unlocked: unlocked, date: unlocked ? now : null };
+    } else {
+      userProgress.achievements[a.id].progress = progress;
+      if (unlocked && !wasUnlocked) {
+        userProgress.achievements[a.id].unlocked = true;
+        userProgress.achievements[a.id].date = now;
+        showToast('🏆 Получено достижение: ' + a.title);
+      }
+    }
+  });
+  saveProgress();
+}
+
+// ── Главный экран ──
+async function renderHomePath() {
+  var container = document.getElementById('home-content');
+
+  if (lessonsLoaded.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
+    await loadAllLessons();
+  }
+
+  var allLessons = getAllLessons();
+  if (allLessons.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания. Проверь интернет.</div>';
+    return;
+  }
+
+  var nextIdx = 0;
+  for (var i = 0; i < allLessons.length; i++) {
+    var key = allLessons[i].title;
+    if (!userProgress.completedLessons[key]) { nextIdx = i; break; }
+    if (i === allLessons.length - 1) nextIdx = allLessons.length;
+  }
+
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var totalCount = allLessons.length;
+  var pct = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
+  var allDone = completedCount >= totalCount;
+
+  var daysLeft = getDaysUntilOGE();
+  var predictedGrade = getPredictedGrade();
+
+  var html = '';
+
+  // Компактный блок прогресса ОГЭ (дни, оценка, прогресс до следующей)
+  html += '<div class="path-progress-card">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
+  html += '<div><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--text)">'+daysLeft+'</span> <span style="font-size:12px;color:var(--muted)">'+getDayWord(daysLeft)+' до ОГЭ</span></div>';
+  html += '<div style="text-align:right"><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--gold)">'+predictedGrade+'</span> <span style="font-size:12px;color:var(--muted)">твоя оценка</span></div>';
+  html += '</div>';
+  if (predictedGrade !== '—') {
+    var currentGrade = parseInt(predictedGrade);
+    if (currentGrade < 5) {
+      var nextGrade = currentGrade + 1;
+      var needed = getCorrectAnswersNeededForGrade(nextGrade);
+      html += '<div style="font-size:12px;color:var(--muted);margin-top:6px">📈 До оценки '+nextGrade+' осталось <b style="color:var(--text)">'+needed+'</b> прав. ответов</div>';
+    } else {
+      html += '<div style="font-size:13px;color:var(--primary2);margin-top:6px">🎉 Отлично! Ты на высшем уровне!</div>';
+    }
+  }
+  html += '</div>';
+
+  // Прогресс тем
+  html += '<div class="path-progress-card">';
+  html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">'+pct+'%</span></div>';
+  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
+  html += '</div>';
+
+  // Ежедневные задания с прогрессом
+  updateDailyTasks();
+  var tasks = userProgress.dailyTasks || {};
+  var dailyQ = userProgress.dailyQuestions || 0;
+  var dailyXP = userProgress.dailyXP || 0;
+  html += '<div class="path-progress-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.solve10?'var(--primary2)':'var(--muted)')+'">'+(tasks.solve10?'✅':'⬜')+'</span> Решить 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyQ,10)+'/10</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.earn50XP?'var(--primary2)':'var(--muted)')+'">'+(tasks.earn50XP?'✅':'⬜')+'</span> Получить 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyXP,50)+'/50</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.loginToday?'var(--primary2)':'var(--muted)')+'">'+(tasks.loginToday?'✅':'⬜')+'</span> Зайти сегодня</div>';
+  html += '</div>';
+  if (userProgress.allDailyTasksDone) {
+    html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">🎉 Все задания выполнены! +100 XP и сундук</div>';
+  } else {
+    html += '<div style="margin-top:8px;font-size:12px;color:var(--muted)">За каждое задание +20 XP</div>';
+  }
+  html += '</div>';
+
+  if (!allDone) {
+    var nextLesson = allLessons[nextIdx];
+    html += '<div class="continue-card" onclick="goQuizFromLoaded('+nextIdx+')">';
+    html += '<div class="continue-icon">'+(nextLesson.title.match(/^\S+/)?nextLesson.title.match(/^\S+/)[0]:'▶')+'</div>';
+    html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">'+nextLesson.title.replace(/^\S+\s*/,'')+'</div></div>';
+    html += '<div class="continue-arrow">→</div></div>';
+  } else {
+    html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+    html += '<div class="continue-icon">👑</div>';
+    html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс — все темы</div></div>';
+    html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+  }
+
+  // Остальной путь
+  html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
+  allLessons.forEach(function(l, i) {
+    var done = userProgress.completedLessons[l.title];
+    var prevKey = i > 0 ? allLessons[i-1].title : null;
+    var prevDone = i === 0 || userProgress.completedLessons[prevKey];
+    var isLocked = !prevDone && i > 0;
+    var isCurrent = !isLocked && !done;
+    var perfect = done && done.score === done.total;
+
+    var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
+    var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded('+i+')"';
+
+    if (i > 0) {
+      var connDone = userProgress.completedLessons[allLessons[i-1].title];
+      html += '<div class="path-connector" style="background:'+(connDone?'var(--primary2)':'var(--border)')+'"></div>';
+    }
+
+    var isRight = i % 2 === 1;
+    html += '<div class="path-node-row" style="flex-direction:'+(isRight?'row-reverse':'row')+';opacity:'+(isLocked?'0.45':'1')+'">';
+    html += '<div class="node-circle '+stateClass+'"'+onclk+' style="cursor:'+(isLocked?'default':'pointer')+'">'+nodeIcon+'</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">'+l.title+'</div>';
+    if (done) {
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">'+done.score+'/'+done.total+' верно</div>';
+    } else {
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(l.questions?l.questions.length:0)+' вопр.'+(l.tasks?' · '+l.tasks:'')+'</div>';
+    }
+    html += '</div></div>';
+  });
+
+  html += '<div class="path-connector" style="background:'+(allDone?'var(--primary2)':'var(--border)')+'"></div>';
+  html += '<div class="path-node-row">';
+  html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="goBossLevel()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
+  html += '<div style="flex:1"><div style="font-weight:800;font-size:15px;color:'+(allDone?'#d29922':'var(--muted)')+'">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(allDone?'Тест по всем темам — открыт!':'Пройди все темы чтобы открыть')+'</div></div>';
+  html += '</div>';
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
+  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+}
+
+function goQuizFromLoaded(idx) {
+  var allLessons = getAllLessons();
+  curLesson = idx;
+  shuffled = allLessons[idx].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
+}
+
+function replayLesson() {
+  if (isBossMode || curLesson < 0) { goBossLevel(); return; }
+  var allLessons = getAllLessons();
+  shuffled = allLessons[curLesson].questions;
+  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
+  goScreen('s-quiz');
+  renderQ();
+}
+
+var isBossMode = false;
+function goBossLevel() {
+  var allLessons = getAllLessons();
+  var allQuestions = [];
+  allLessons.forEach(function(l) { if (l.questions) allQuestions = allQuestions.concat(l.questions); });
+  allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
+  isBossMode = true;
+  shuffled = allQuestions; curLesson = -1; curQ=0; score=0; answered=false; lives=999; hintUsed=false;
+  goScreen('s-quiz'); renderQ();
+}
+
+// ── Профиль ──
+function renderProfile() {
+  var allLessons = getAllLessons();
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect/userProgress.totalAnswered)*100) : 0;
+  var predictedGrade = getPredictedGrade();
+  var rank = getRank(userProgress.xp);
+  var chestCount = (userProgress.chests || []).length;
+
+  var html = '';
+  html += '<div class="profile-header-card">';
+  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
+  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">'+rank+'</span></div>';
+  html += '<div class="profile-level-big">⚡ Уровень '+userProgress.level+' · '+userProgress.xp+' XP</div>';
+
+  var nextRank = getNextRank(userProgress.xp);
+  if (nextRank) {
+    var xpNeeded = nextRank.min;
+    var currentXP = userProgress.xp;
+    var progressPct = Math.min(100, Math.round((currentXP / xpNeeded)*100));
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "'+nextRank.name+'" осталось '+(xpNeeded - currentXP)+' XP</div>';
+    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:'+progressPct+'%"></div></div>';
+  }
+  html += '</div></div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div style="font-size:32px">🎯</div>';
+  html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">'+predictedGrade+'</span></div></div>';
+  html += '</div>';
+
+  html += '<div class="profile-stats-grid">';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+completedCount+'/'+allLessons.length+'</div><div class="profile-stat-label">Тем пройдено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+acc+'%</div><div class="profile-stat-label">Точность</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
+  html += '</div>';
+
+  // Сундуки
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
+  if (chestCount > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Нет доступных сундуков</div>';
+  }
+  html += '</div>';
+  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer"'+(chestCount===0?' disabled':'')+'>Открыть</button>';
+  html += '</div>';
+
+  // Напоминания
+  var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
+  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
+  html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
+  html += '<div style="font-size:13px;color:'+(isTelegram?'var(--primary2)':'var(--danger)')+';margin-top:6px">'+notifText+'</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+notifDesc+'</div>';
+  html += '</div>';
+
+  // Мой класс (заглушка)
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
+  html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
+  html += '</div>';
+
+  // Достижения
+  checkAchievements();
+  var achievements = userProgress.achievements || {};
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  ACHIEVEMENTS_LIST.forEach(function(a) {
+    var ach = achievements[a.id] || { progress: 0, unlocked: false };
+    var isUnlocked = ach.unlocked;
+    var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
+    var pct = a.max ? Math.round((progress / a.max)*100) : (isUnlocked ? 100 : 0);
+    var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
+    html += '<div class="badge-item-p'+(isUnlocked?'':' locked')+'" style="position:relative">';
+    html += '<div class="badge-icon-p">'+a.icon+'</div>';
+    html += '<div class="badge-name-p">'+a.title+'</div>';
+    if (a.max) {
+      html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">'+progress+'/'+a.max+'</div>';
+    }
+    if (isUnlocked && dateStr) {
+      html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">'+dateStr+'</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+
+  document.getElementById('profile-content').innerHTML = html;
+}
+
+// ── Остальные функции ──
+function getCurrentTopicTitle() {
+  if (isBossMode) return 'Финальный босс';
+  var all = getAllLessons();
+  return (all[curLesson] && all[curLesson].title) || 'Тренировка';
+}
+
+function renderQ() {
+  const q = shuffled[curQ];
+  const topicTitle = getCurrentTopicTitle();
+  answered=false; hintUsed=false; lastExplainText = '';
+  document.getElementById('quiz-topic-lbl').textContent = topicTitle;
+  document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(curQ+1)+' из '+shuffled.length;
+  document.getElementById('quiz-counter').textContent = (curQ+1)+'/'+shuffled.length;
+  document.getElementById('qpf').style.width = ((curQ/shuffled.length)*100)+'%';
+  document.getElementById('q-tag').textContent = q.tag;
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('ai-quiz').style.display = 'none';
+  document.getElementById('ai-explain').style.display = 'none';
+  document.getElementById('btn-ask-ai').style.display = 'none';
+  document.getElementById('hint-box').style.display = 'none';
+  document.getElementById('btn-hint').style.display = 'flex';
+  document.getElementById('btn-hint').disabled = false;
+  document.getElementById('btn-hint').textContent = '🎓 Совет от Профессора Гео';
+  var livesEl = document.getElementById('lives-row');
+  livesEl.innerHTML = '';
+  for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>'; }
+  const btn = document.getElementById('btn-next');
+  btn.classList.remove('show');
+  btn.textContent = curQ < shuffled.length-1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
+  const ans = document.getElementById('answers');
+  ans.innerHTML = '';
+  ['А','Б','В','Г'].forEach(function(l, i){
+    const b = document.createElement('button');
+    b.className = 'ans-btn';
+    b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
+    b.onclick = function(){ selectAns(i, q.correct, q.text, topicTitle, q.hint); };
+    ans.appendChild(b);
+  });
+}
+
+async function getHint() {
+  if (hintUsed) return;
+  hintUsed = true;
+  const q = shuffled[curQ];
+  const btn = document.getElementById('btn-hint');
+  btn.textContent = '⏳ Профессор Гео думает...'; btn.disabled = true;
+  const hintBox = document.getElementById('hint-box');
+  hintBox.style.display = 'block';
+  hintBox.textContent = '⏳ Профессор Гео анализирует вопрос...';
+
+  try {
+    const prompt = `Ты — Профессор Гео, добрый наставник по географии. Ученик решает задание ОГЭ: «${q.text}». Дай короткую подсказку (1-2 предложения), которая поможет понять ход решения, но НЕ называй правильный ответ и НЕ говори чисел. Направляй, задавай наводящие вопросы. Будь мотивирующим.`;
+    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({question: prompt, context: getCurrentTopicTitle()})});
+    const d = await r.json();
+    if (d.answer) hintBox.textContent = '🎓 ' + d.answer;
+    else hintBox.textContent = '🎓 Подумай, какое правило здесь можно применить.';
+  } catch(e) {
+    hintBox.textContent = '🎓 Вспомни основные закономерности по этой теме.';
+  }
+  btn.textContent = '🎓 Совет получен';
+}
+
+function selectAns(idx, correct, qText, topic, hint) {
+  if (answered) return;
+  answered = true;
+  if (idx === correct && isTelegram && tgApp.HapticFeedback) { try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){} }
+  const btns = document.querySelectorAll('.ans-btn');
+  btns[idx].classList.add(idx===correct?'correct':'wrong');
+  if (idx !== correct) { btns[correct].classList.add('correct'); lives--; }
+  if (idx === correct) score++;
+  document.getElementById('btn-hint').style.display = 'none';
+  var livesEl = document.getElementById('lives-row');
+  livesEl.innerHTML = '';
+  for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>'; }
+  requestAIExplanation(idx===correct, qText, topic);
+  document.getElementById('btn-next').classList.add('show');
+  if (lives <= 0) { document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз'; }
+  updateDailyTasks();
+}
+
+async function requestAIExplanation(isCorrect, qText, topic) {
+  const explainBox = document.getElementById('ai-explain');
+  const askBtn = document.getElementById('btn-ask-ai');
+  explainBox.style.display = 'block'; askBtn.style.display = 'block';
+  explainBox.textContent = '⏳ Профессор Гео объясняет...';
+  const prompt = isCorrect
+    ? `Ты Профессор Гео. Ученик правильно ответил на вопрос ОГЭ: «${qText}». Объясни кратко (2-3 предложения), почему ответ верный, выделив ключевую закономерность. Будь поддерживающим.`
+    : `Ты Профессор Гео. Ученик ошибся в вопросе ОГЭ: «${qText}». Дай КОРОТКОЕ объяснение правильного ответа, указав типичную ошибку и как её избежать. 2-3 предложения, мотивируй.`;
+  try {
+    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({question: prompt, context: topic})});
+    const d = await r.json();
+    const ans = d.answer || 'Подумай, какое правило здесь работает.';
+    explainBox.textContent = '📘 ' + ans; lastExplainText = ans;
+  } catch(e) { explainBox.textContent = '📘 ' + (isCorrect ? 'Отлично! Ты знаешь материал.' : 'Обрати внимание на это правило.'); lastExplainText = explainBox.textContent; }
+}
+
+function openAIChat() {
+  const aiPanel = document.getElementById('ai-quiz');
+  const topic = getCurrentTopicTitle();
+  const ctx = 'Вопрос ОГЭ: ' + (shuffled[curQ]?.text || '');
+  if (!aiPanel.dataset.initialized) { initAI('ai-quiz', ctx, [], false); aiPanel.dataset.initialized = '1'; }
+  aiPanel.style.display = 'block';
+  const body = aiPanel.querySelector('.ai-body');
+  if (body) {
+    body.classList.add('open');
+    const msgs = document.getElementById('msgs-ai-quiz');
+    if (msgs && lastExplainText.trim()) { msgs.innerHTML = ''; msgs.innerHTML += `<div class="msg ai">${lastExplainText.replace(/\n/g,'<br>')}</div>`; }
+  }
+  const toggle = aiPanel.querySelector('.ai-toggle');
+  if (toggle) toggle.classList.add('open');
+}
+
+function nextQ() { curQ++; if (curQ >= shuffled.length) showResult(); else renderQ(); }
+
+function showResult() {
+  const total = shuffled.length; const pct = Math.round(score/total*100);
+  if (isBossMode) {
+    userProgress.bossCompleted = true; saveProgress();
+    document.getElementById('boss-sub').textContent = score+'/'+total+' правильных ответов ('+pct+'%)';
+    document.getElementById('boss-num').textContent = score;
+    document.getElementById('boss-denom').textContent = 'из ' + total;
+    goScreen('s-boss-result');
+    setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
+    isBossMode = false; updateDailyTasks(); return;
+  }
+  let e='😔', t='Нужно повторить';
+  if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хороший результат!'; } else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
+  document.getElementById('res-emoji').textContent = e;
+  document.getElementById('res-title').textContent = t;
+  document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
+  document.getElementById('ring-num').textContent = score;
+  document.getElementById('ring-denom').textContent = `из ${total}`;
+  document.getElementById('res-c').textContent = score;
+  document.getElementById('res-w').textContent = total-score;
+  var xpGain = score*20 + (score===total ? 50 : 0);
+  document.getElementById('res-xp').textContent = '+'+xpGain;
+  saveLesson(curLesson, score, total);
+  goScreen('s-result');
+  setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
+  updateDailyTasks();
+}
+
+function initAI(cid, ctx, prompts=[], autoOpen=false) {
+  const el = document.getElementById(cid); if (!el) return;
+  const escCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+  el.innerHTML = `
+    <div class="ai-header" onclick="toggleAI(this)">
+      <div class="ai-header-left">
+        <div class="ai-avatar">🎓</div>
+        <div><div class="ai-name">Профессор Гео</div><div class="ai-tagline">Спроси — объясню как наставник</div></div>
+      </div>
+      <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
+    </div>
+    <div class="ai-body ${autoOpen?'open':''}">
+      <div class="ai-context">📌 ${ctx}</div>
+      <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="sendP('${cid}','${escCtx}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
+      <div class="ai-messages" id="msgs-${cid}"></div>
+      <div class="ai-input-row">
+        <textarea class="ai-input" id="inp-${cid}" placeholder="Спроси Профессора..." rows="1"
+          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('${cid}','${escCtx}');}"></textarea>
+        <button class="ai-send" id="snd-${cid}" onclick="sendM('${cid}','${escCtx}')">➤</button>
+      </div>
+    </div>
+  `;
+}
+
+function toggleAI(h) { const b = h.nextElementSibling; const t = h.querySelector('.ai-toggle'); b.classList.toggle('open'); t.classList.toggle('open'); }
+function sendP(cid, ctx, text) { document.getElementById(`inp-${cid}`).value = text; sendM(cid, ctx); }
+
+async function sendM(cid, ctx) {
+  const inp = document.getElementById(`inp-${cid}`); const snd = document.getElementById(`snd-${cid}`);
+  const msgs = document.getElementById(`msgs-${cid}`); const text = inp.value.trim(); if (!text) return;
+  inp.value = ''; snd.disabled = true;
+  msgs.innerHTML += `<div class="msg user">${text}</div>`;
+  const lid = 'l'+Date.now(); msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+  try {
+    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+    const d = await r.json(); const ans = d.answer || 'Не удалось получить ответ';
+    document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+  } catch(e) { document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`; }
+  snd.disabled = false; msgs.scrollTop = msgs.scrollHeight;
+}
+
+function inviteFriend() {
+  const inviteUrl = 'https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.';
+  if (isTelegram) { tgApp.openTelegramLink(inviteUrl); } else { window.open(inviteUrl, '_blank'); }
+  if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; addXP(50); saveProgress(); }
+}
+
+// Сундуки
+function openChest() {
+  if (!userProgress.chests || userProgress.chests.length === 0) return;
+  userProgress.chests.shift(); saveProgress();
+  var rand = Math.random();
+  var reward;
+  if (rand < 0.5) { reward = 50; }
+  else if (rand < 0.85) { reward = 100; }
+  else { reward = 200; }
+  // небольшая анимация
+  var modalHtml = `
+    <div class="modal-overlay" id="chest-modal">
+      <div class="modal-card">
+        <div class="chest-anim">🎁</div>
+        <div class="modal-title">Сундук открыт!</div>
+        <div class="modal-sub">Ты получил:</div>
+        <div class="modal-reward">+${reward} XP</div>
+        <button class="modal-btn" onclick="closeChestModal(${reward})">Круто!</button>
+      </div>
+    </div>`;
+  document.getElementById('modal-container').innerHTML = modalHtml;
+}
+
+function closeChestModal(reward) {
+  addXP(reward);
+  document.getElementById('modal-container').innerHTML = '';
+  renderProfile();
+}
+
+function shareBossResult() {
+  const total = shuffled.length;
+  const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+score+'/'+total+'! Попробуй и ты!';
+  if (isTelegram) { tgApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text)); }
+  else { prompt('Скопируй текст для друзей:', text); }
+}
+
+// Progress
+var userProgress = {
+  xp: 0, level: 1, streak: 0, lastDate: '',
+  completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
+  bossCompleted: false, freezes: 1, lastFreezeMonday: '',
+  dailyRewardDay: 1, lastDailyRewardDate: '',
+  chests: [], invitedFriend: false,
+  dailyTasksDate: '', dailyTasks: { solve10: false, earn50XP: false, loginToday: false },
+  dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
+  allDailyTasksDone: false, dailyQuestions: 0, dailyXP: 0,
+  achievements: {},
+  doubleXPUntil: null,
+  friends: []
+};
+
+function saveProgress() {
+  var data = JSON.stringify(userProgress);
+  if (isTelegram && tgApp.CloudStorage) { tgApp.CloudStorage.setItem('progress', data, function(){}); }
+  else { try { localStorage.setItem('geo_progress', data); } catch(e){} }
+}
+
+function loadProgress(callback) {
+  if (isTelegram && tgApp.CloudStorage) {
+    tgApp.CloudStorage.getItem('progress', function(err, val) {
+      if (!err && val) { try { userProgress = JSON.parse(val); } catch(e){} }
+      refreshFreeze(); callback();
+    });
+  } else {
+    try { var saved = localStorage.getItem('geo_progress'); if (saved) userProgress = JSON.parse(saved); } catch(e){}
+    refreshFreeze(); callback();
+  }
+}
+
+function getMonday(date) {
+  var d = new Date(date); d.setHours(0,0,0,0);
+  var day = d.getDay(); var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff)).toISOString().slice(0,10);
+}
+
+function refreshFreeze() {
+  var todayMonday = getMonday(new Date());
+  if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < todayMonday) {
+    userProgress.freezes = 1; userProgress.lastFreezeMonday = todayMonday; saveProgress();
+  }
+}
+
+function addXP(amount) {
+  if (amount > 0) {
+    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
+      amount *= 2;
+    } else {
+      userProgress.doubleXPUntil = null;
+    }
+    userProgress.xp += amount;
+    userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+    saveProgress();
+    showXPToast(amount);
+    checkAchievements();
+  }
+}
+
+function checkStreak() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDate === today) return;
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (userProgress.lastDate === yesterday) { userProgress.streak++; }
+  else if (userProgress.lastDate !== today) {
+    if (userProgress.freezes > 0) { userProgress.freezes = 0; userProgress.lastFreezeMonday = getMonday(new Date()); userProgress.streak++; }
+    else { userProgress.streak = 1; }
+  }
+  userProgress.lastDate = today; saveProgress(); checkAchievements();
+}
+
+function showXPToast(amount) {
+  var toast = document.createElement('div');
+  toast.textContent = amount ? '+' + amount + ' XP ⚡' : '✅ Выполнено';
+  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
+  document.body.appendChild(toast); setTimeout(function(){ toast.remove(); }, 2000);
+}
+
+function showToast(msg) {
+  var toast = document.createElement('div');
+  toast.textContent = msg;
+  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:var(--gold);color:#000;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
+  document.body.appendChild(toast); setTimeout(function(){ toast.remove(); }, 2000);
+}
+
+function getDayWord(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return 'день';
+  if ([2,3,4].includes(n%10) && ![12,13,14].includes(n%100)) return 'дня';
+  return 'дней';
+}
+
+function saveLesson(lessonIdx, sc, total) {
+  var today = new Date().toISOString().slice(0,10);
+  var allLessons = getAllLessons();
+  var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+  userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
+  userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
+  var xpGain = sc * 20 + (sc === total ? 50 : 0);
+  addXP(xpGain);
+  checkStreak();
+  saveProgress();
+  if (!userProgress.chests) userProgress.chests = [];
+  if (!userProgress.completedLessons[lessonKey].chestGiven) {
+    userProgress.chests.push({ type: 'common' });
+    userProgress.completedLessons[lessonKey].chestGiven = true;
+    saveProgress();
+    showToast('🎁 Сундук за завершение темы!');
+  }
+}
+
+// Daily Reward
+function checkDailyReward() {
+  const today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDailyRewardDate === today) return;
+  let day = userProgress.dailyRewardDay || 1;
+  const lastDate = userProgress.lastDailyRewardDate;
+  if (lastDate) {
+    const last = new Date(lastDate);
+    const diffDays = Math.floor((new Date(today).getTime() - last.getTime()) / 86400000);
+    if (diffDays > 2) { day = 1; }
+    else if (diffDays === 1) { day = Math.min(day + 1, 7); }
+  }
+  showDailyRewardModal(day);
+}
+
+function showDailyRewardModal(day) {
+  const rewards = [0, 20, 30, 50, 70, 100, 150, 'chest'];
+  const reward = rewards[day];
+  const title = day === 7 ? '🎁 Сундук!' : `🔥 День ${day}`;
+  const sub = day === 7 ? 'Ты получаешь сундук с сюрпризом!' : `Ты получаешь +${reward} XP`;
+  const modalHtml = `
+    <div class="modal-overlay" id="daily-modal">
+      <div class="modal-card">
+        <div class="modal-title">${title}</div>
+        <div class="modal-sub">${sub}</div>
+        <div class="modal-reward">${day===7?'🎁':'+'+reward+' XP'}</div>
+        <button class="modal-btn" onclick="claimDailyReward(${day})">Забрать</button>
+      </div>
+    </div>`;
+  document.getElementById('modal-container').innerHTML = modalHtml;
+}
+
+function claimDailyReward(day) {
+  const rewards = [0, 20, 30, 50, 70, 100, 150, 'chest'];
+  const reward = rewards[day];
+  const today = new Date().toISOString().slice(0,10);
+  userProgress.lastDailyRewardDate = today;
+  userProgress.dailyRewardDay = day;
+  if (reward === 'chest') {
+    if (!userProgress.chests) userProgress.chests = [];
+    userProgress.chests.push({ type: 'common' });
+    showToast('🎁 Сундук добавлен в профиль!');
+  } else { addXP(reward); }
+  saveProgress();
+  document.getElementById('modal-container').innerHTML = '';
+  renderHomePath();
+}
+
+// INIT
+loadProgress(function() {
+  checkStreak();
+  renderHomePath();
+  checkDailyReward();
+  updateDailyTasks();
+  checkAchievements();
+});
+</script>
+</body>
+</html>
