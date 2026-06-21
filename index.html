@@ -389,8 +389,6 @@ const QUESTIONS_FILES = [
   { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
 ];
 
-var theoryCache = {};
-var questionsCache = {};
 var lessonsLoaded = [];
 
 async function fetchJSON(filename) {
@@ -424,10 +422,8 @@ async function loadAllLessons() {
   return lessonsLoaded;
 }
 
-const lessons = [];
-
 function getAllLessons() {
-  return lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
+  return lessonsLoaded.length > 0 ? lessonsLoaded : [];
 }
 
 let curQ=0, score=0, answered=false, shuffled=[];
@@ -553,8 +549,7 @@ function updateDailyTasks() {
   if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
     userProgress.allDailyTasksDone = true;
     addXP(100);
-    if (!userProgress.chests) userProgress.chests = [];
-    userProgress.chests.push({ type: 'achievement', rewardType: 'xp' }); // сундук за все задания дня
+    giveChest('achievement');
     showToast('🎁 Сундук за все задания дня!');
   }
   saveProgress();
@@ -572,20 +567,6 @@ function incrementDailyCounters(questionsCount, xpAmount) {
   saveProgress();
   updateDailyTasks();
 }
-
-var originalAddXP = addXP;
-addXP = function(amount) {
-  originalAddXP(amount);
-  if (amount > 0) {
-    incrementDailyCounters(0, amount);
-  }
-};
-
-var originalSaveLesson = saveLesson;
-saveLesson = function(lessonIdx, sc, total) {
-  originalSaveLesson(lessonIdx, sc, total);
-  incrementDailyCounters(total, sc * 20 + (sc === total ? 50 : 0));
-};
 
 // ── Достижения ──
 var ACHIEVEMENTS_LIST = [
@@ -625,12 +606,9 @@ function checkAchievements() {
         userProgress.achievements[a.id].unlocked = true;
         userProgress.achievements[a.id].date = now;
         showToast('🏆 Получено достижение: ' + a.title);
-        // Выдаем сундук за достижение, если еще не выдан
         if (!userProgress.achievements[a.id].chestGiven) {
-          if (!userProgress.chests) userProgress.chests = [];
-          userProgress.chests.push({ type: 'achievement', rewardType: 'xp' });
+          giveChest('achievement');
           userProgress.achievements[a.id].chestGiven = true;
-          saveProgress();
           showToast('🎁 Сундук за достижение!');
         }
       }
@@ -639,7 +617,40 @@ function checkAchievements() {
   saveProgress();
 }
 
-// ── Главный экран (переработанный) ──
+// ── Сундуки (общая функция выдачи) ──
+function giveChest(type) {
+  if (!userProgress.chests) userProgress.chests = [];
+  userProgress.chests.push({ type: type || 'daily', rewardType: 'xp' });
+  saveProgress();
+}
+
+// Ежедневный сундук
+function giveDailyChest() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDailyChestDate === today) return;
+  userProgress.lastDailyChestDate = today;
+  giveChest('daily');
+  saveProgress();
+}
+
+// Сундуки за серию дней
+function giveStreakChests() {
+  var streak = userProgress.streak || 0;
+  var given = userProgress.streakChestsGiven || {};
+  var thresholds = [3, 7, 14, 30];
+  for (var i = 0; i < thresholds.length; i++) {
+    var t = thresholds[i];
+    if (streak >= t && !given[t]) {
+      giveChest('streak');
+      given[t] = true;
+      showToast('🎁 Сундук за серию ' + t + ' дней!');
+    }
+  }
+  userProgress.streakChestsGiven = given;
+  saveProgress();
+}
+
+// ── Главный экран ──
 async function renderHomePath() {
   var container = document.getElementById('home-content');
 
@@ -986,6 +997,7 @@ function selectAns(idx, correct, qText, topic, hint) {
   requestAIExplanation(idx===correct, qText, topic);
   document.getElementById('btn-next').classList.add('show');
   if (lives <= 0) { document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз'; }
+  incrementDailyCounters(1, 0);
   updateDailyTasks();
 }
 
@@ -1099,22 +1111,20 @@ function inviteFriend() {
   if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; addXP(50); saveProgress(); }
 }
 
-// ── Сундуки (обновлённая механика) ──
+// ── Открытие сундука ──
 function openChest() {
   if (!userProgress.chests || userProgress.chests.length === 0) return;
   var chest = userProgress.chests.shift();
   saveProgress();
-  // Генерация награды в зависимости от типа
   var reward = 0;
   if (chest.type === 'daily') {
-    reward = Math.floor(Math.random() * 31) + 20; // 20-50
+    reward = Math.floor(Math.random() * 31) + 20;
   } else if (chest.type === 'streak') {
-    reward = Math.floor(Math.random() * 101) + 50; // 50-150
+    reward = Math.floor(Math.random() * 101) + 50;
   } else if (chest.type === 'achievement') {
-    reward = Math.floor(Math.random() * 151) + 50; // 50-200
+    reward = Math.floor(Math.random() * 151) + 50;
   } else {
-    // на случай старых сундуков без типа
-    reward = Math.floor(Math.random() * 81) + 20; // 20-100
+    reward = Math.floor(Math.random() * 81) + 20;
   }
   var modalHtml = `
     <div class="modal-overlay" id="chest-modal">
@@ -1142,42 +1152,7 @@ function shareBossResult() {
   else { prompt('Скопируй текст для друзей:', text); }
 }
 
-// ── Система ежедневных сундуков и сундуков за серии ──
-function giveDailyChest() {
-  var today = new Date().toISOString().slice(0,10);
-  if (userProgress.lastDailyChestDate === today) return;
-  userProgress.lastDailyChestDate = today;
-  if (!userProgress.chests) userProgress.chests = [];
-  userProgress.chests.push({ type: 'daily', rewardType: 'xp' });
-  saveProgress();
-}
-
-function giveStreakChests() {
-  var streak = userProgress.streak || 0;
-  var given = userProgress.streakChestsGiven || {};
-  var thresholds = [3, 7, 14, 30];
-  for (var i = 0; i < thresholds.length; i++) {
-    var t = thresholds[i];
-    if (streak >= t && !given[t]) {
-      if (!userProgress.chests) userProgress.chests = [];
-      userProgress.chests.push({ type: 'streak', rewardType: 'xp' });
-      given[t] = true;
-      showToast('🎁 Сундук за серию ' + t + ' дней!');
-    }
-  }
-  userProgress.streakChestsGiven = given;
-  saveProgress();
-}
-
-// Обёртка checkStreak — добавляем выдачу сундуков
-var originalCheckStreak = checkStreak;
-checkStreak = function() {
-  originalCheckStreak();
-  giveDailyChest();
-  giveStreakChests();
-};
-
-// Progress
+// ── Progress ──
 var userProgress = {
   xp: 0, level: 1, streak: 0, lastDate: '',
   completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
@@ -1230,7 +1205,24 @@ function addXP(amount) {
     saveProgress();
     showXPToast(amount);
     checkAchievements();
+    incrementDailyCounters(0, amount);
   }
+}
+
+function checkStreak() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDate === today) return;
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (userProgress.lastDate === yesterday) { userProgress.streak++; }
+  else if (userProgress.lastDate !== today) {
+    if (userProgress.freezes > 0) { userProgress.freezes = 0; userProgress.lastFreezeMonday = getMonday(new Date()); userProgress.streak++; }
+    else { userProgress.streak = 1; }
+  }
+  userProgress.lastDate = today;
+  saveProgress();
+  checkAchievements();
+  giveDailyChest();
+  giveStreakChests();
 }
 
 function showXPToast(amount) {
@@ -1265,16 +1257,16 @@ function saveLesson(lessonIdx, sc, total) {
   saveProgress();
   if (!userProgress.chests) userProgress.chests = [];
   if (!userProgress.completedLessons[lessonKey].chestGiven) {
-    userProgress.chests.push({ type: 'achievement', rewardType: 'xp' }); // сундук за завершение темы
+    giveChest('achievement');
     userProgress.completedLessons[lessonKey].chestGiven = true;
     saveProgress();
     showToast('🎁 Сундук за завершение темы!');
   }
 }
 
-// INIT
+// ── INIT ──
 loadProgress(function() {
-  checkStreak(); // включает выдачу ежедневного сундука и сундуков за серию
+  checkStreak();
   renderHomePath();
   updateDailyTasks();
   checkAchievements();
