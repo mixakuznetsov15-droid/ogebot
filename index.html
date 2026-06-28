@@ -219,36 +219,53 @@ body::before {
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
 
-/* ── МОДАЛЬНОЕ ОКНО ── */
-.modal-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
-  display:flex; align-items:center; justify-content:center;
-  animation: fadeIn .2s ease;
+/* ── СУНДУКИ (анимации) ── */
+@keyframes chestGlow {
+  0% { box-shadow: 0 0 5px #d29922; }
+  50% { box-shadow: 0 0 20px #d29922; }
+  100% { box-shadow: 0 0 5px #d29922; }
 }
-.modal-card {
-  background:var(--card2); border:1px solid var(--border); border-radius:24px;
-  padding:24px; width:90%; max-width:340px; text-align:center; display:flex; flex-direction:column; gap:16px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.5);
-  animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+@keyframes chestPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
-.modal-title { font-family:var(--font-h); font-size:18px; font-weight:800; }
-.modal-sub { font-size:13px; color:var(--muted); }
-.modal-reward { font-family:var(--font-h); font-size:28px; font-weight:800; color:var(--gold); }
-.modal-btn { width:100%; padding:14px; border:none; border-radius:var(--radius); font-family:var(--font-h); font-size:14px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; }
-.modal-btn:active { transform:scale(.97); }
-button:disabled { opacity:0.5; background:gray !important; color:#fff; }
+.chest-card-available {
+  animation: chestGlow 2s infinite, chestPulse 1.5s infinite;
+  border-color: #d29922 !important;
+}
+.chest-btn-available {
+  background: linear-gradient(135deg, #f5a623, #d29922) !important;
+  animation: chestPulse 1.2s infinite;
+}
 
-.chest-anim {
-  width:80px; height:80px; margin:0 auto;
-  background: linear-gradient(135deg, #d29922, #b8860b);
-  border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:40px;
-  animation: chestBounce 0.6s ease-in-out;
+/* ── МОДАЛЬНОЕ ОКНО СУНДУКА ── */
+.chest-open-anim {
+  width: 90px; height: 90px; margin: 0 auto; position: relative;
 }
-@keyframes chestBounce {
-  0% { transform: scale(0.3) rotate(-10deg); opacity:0; }
-  50% { transform: scale(1.1) rotate(3deg); opacity:1; }
-  70% { transform: scale(0.9) rotate(-2deg); }
-  100% { transform: scale(1) rotate(0deg); }
+.chest-body {
+  width: 80px; height: 60px; background: linear-gradient(135deg, #b8860b, #d29922);
+  border-radius: 10px; position: absolute; bottom: 0; left: 5px;
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  box-shadow: 0 0 15px rgba(210,153,34,0.5);
+}
+.chest-lid {
+  width: 86px; height: 20px; background: linear-gradient(135deg, #d29922, #f5a623);
+  border-radius: 8px 8px 0 0; position: absolute; top: 0; left: 2px;
+  transform-origin: left bottom; transition: transform 0.4s ease;
+  box-shadow: 0 0 10px rgba(210,153,34,0.5);
+}
+.chest-lid.open {
+  transform: rotate(-35deg) translateY(-5px);
+}
+.particle {
+  position: absolute; width: 6px; height: 6px; background: #f5a623; border-radius: 50%;
+  animation: particleFly 0.8s ease-out forwards;
+  opacity: 0;
+}
+@keyframes particleFly {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; }
 }
 </style>
 </head>
@@ -430,7 +447,6 @@ let curQ=0, score=0, answered=false, shuffled=[];
 let curLesson=0, lives=3, hintUsed=false;
 let lastExplainText = '';
 
-// Telegram detection
 const tgApp = window.Telegram?.WebApp;
 const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
 if (isTelegram) {
@@ -438,7 +454,6 @@ if (isTelegram) {
   tgApp.expand();
 }
 
-// ── Ранговая система ──
 function getRank(xp) {
   if (xp >= 10000) return 'Легенда';
   if (xp >= 5000) return 'Мастер';
@@ -508,7 +523,6 @@ function getCorrectAnswersNeededForGrade(targetGrade) {
   return Math.max(0, needed);
 }
 
-// ── Ежедневные задания ──
 function updateDailyTasks() {
   var today = new Date().toISOString().slice(0,10);
   if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
@@ -568,7 +582,6 @@ function incrementDailyCounters(questionsCount, xpAmount) {
   updateDailyTasks();
 }
 
-// ── Достижения ──
 var ACHIEVEMENTS_LIST = [
   { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
   { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
@@ -617,14 +630,13 @@ function checkAchievements() {
   saveProgress();
 }
 
-// ── Сундуки (общая функция выдачи) ──
+// Сундуки — общая выдача
 function giveChest(type) {
   if (!userProgress.chests) userProgress.chests = [];
   userProgress.chests.push({ type: type || 'daily', rewardType: 'xp' });
   saveProgress();
 }
 
-// Ежедневный сундук
 function giveDailyChest() {
   var today = new Date().toISOString().slice(0,10);
   if (userProgress.lastDailyChestDate === today) return;
@@ -633,7 +645,6 @@ function giveDailyChest() {
   saveProgress();
 }
 
-// Сундуки за серию дней
 function giveStreakChests() {
   var streak = userProgress.streak || 0;
   var given = userProgress.streakChestsGiven || {};
@@ -650,7 +661,6 @@ function giveStreakChests() {
   saveProgress();
 }
 
-// ── Главный экран ──
 async function renderHomePath() {
   var container = document.getElementById('home-content');
 
@@ -684,7 +694,6 @@ async function renderHomePath() {
 
   var html = '';
 
-  // Единая карточка "Твой прогноз ОГЭ"
   html += '<div class="path-progress-card">';
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:6px">Твой прогноз ОГЭ</div>';
 
@@ -710,13 +719,11 @@ async function renderHomePath() {
   html += '<div style="font-size:11px;color:var(--muted);margin-top:10px">Подготовка: ' + streak + ' ' + getDayWord(streak) + ' подряд · До ОГЭ ' + daysLeft + ' ' + getDayWord(daysLeft) + '</div>';
   html += '</div>';
 
-  // Прогресс по темам
   html += '<div class="path-progress-card">';
   html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">'+pct+'%</span></div>';
   html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
   html += '</div>';
 
-  // Ежедневные задания
   updateDailyTasks();
   var tasks = userProgress.dailyTasks || {};
   var dailyQ = userProgress.dailyQuestions || 0;
@@ -748,7 +755,6 @@ async function renderHomePath() {
     html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
   }
 
-  // Путь по темам
   html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
   allLessons.forEach(function(l, i) {
     var done = userProgress.completedLessons[l.title];
@@ -822,7 +828,6 @@ function goBossLevel() {
   goScreen('s-quiz'); renderQ();
 }
 
-// ── Профиль ──
 function renderProfile() {
   var allLessons = getAllLessons();
   var completedCount = Object.keys(userProgress.completedLessons).length;
@@ -859,19 +864,18 @@ function renderProfile() {
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  // Сундуки
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center">';
+  // Сундуки с улучшенным UI
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
   if (chestCount > 0) {
     html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
   } else {
-    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все сундуки открыты. Возвращайся завтра за новыми наградами!</div>';
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
   }
   html += '</div>';
-  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer"'+(chestCount===0?' disabled':'')+'>'+(chestCount>0?'Открыть сундук':'Нет сундуков')+'</button>';
+  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount===0?' disabled':'')+'>'+(chestCount>0?'Открыть сундук':'Нет сундуков')+'</button>';
   html += '</div>';
 
-  // Напоминания
   var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
   var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
@@ -880,7 +884,6 @@ function renderProfile() {
   html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+notifDesc+'</div>';
   html += '</div>';
 
-  // Мой класс
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
@@ -888,7 +891,6 @@ function renderProfile() {
   html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
 
-  // Достижения
   checkAchievements();
   var achievements = userProgress.achievements || {};
   html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
@@ -897,7 +899,6 @@ function renderProfile() {
     var ach = achievements[a.id] || { progress: 0, unlocked: false };
     var isUnlocked = ach.unlocked;
     var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
-    var pct = a.max ? Math.round((progress / a.max)*100) : (isUnlocked ? 100 : 0);
     var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
     html += '<div class="badge-item-p'+(isUnlocked?'':' locked')+'" style="position:relative">';
     html += '<div class="badge-icon-p">'+a.icon+'</div>';
@@ -918,7 +919,6 @@ function renderProfile() {
   document.getElementById('profile-content').innerHTML = html;
 }
 
-// ── Остальные функции ──
 function getCurrentTopicTitle() {
   if (isBossMode) return 'Финальный босс';
   var all = getAllLessons();
@@ -1111,36 +1111,114 @@ function inviteFriend() {
   if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; addXP(50); saveProgress(); }
 }
 
-// ── Открытие сундука ──
+// ═══════════════ СУНДУКИ (новая механика) ═══════════════
+var rewardPool = [
+  { type: 'xp', value: 20, label: '+20 XP' },
+  { type: 'xp', value: 50, label: '+50 XP' },
+  { type: 'xp', value: 100, label: '+100 XP' },
+  { type: 'streak_day', value: 1, label: '+1 день серии' },
+  { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
+  { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
+  { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
+];
+
+function getRandomReward() {
+  var idx = Math.floor(Math.random() * rewardPool.length);
+  return rewardPool[idx];
+}
+
 function openChest() {
   if (!userProgress.chests || userProgress.chests.length === 0) return;
   var chest = userProgress.chests.shift();
   saveProgress();
-  var reward = 0;
-  if (chest.type === 'daily') {
-    reward = Math.floor(Math.random() * 31) + 20;
-  } else if (chest.type === 'streak') {
-    reward = Math.floor(Math.random() * 101) + 50;
-  } else if (chest.type === 'achievement') {
-    reward = Math.floor(Math.random() * 151) + 50;
-  } else {
-    reward = Math.floor(Math.random() * 81) + 20;
-  }
-  var modalHtml = `
-    <div class="modal-overlay" id="chest-modal">
-      <div class="modal-card">
-        <div class="chest-anim">🎁</div>
-        <div class="modal-title">Сундук открыт!</div>
-        <div class="modal-sub">Ты получил:</div>
-        <div class="modal-reward">+${reward} XP</div>
-        <button class="modal-btn" onclick="closeChestModal(${reward})">Забрать</button>
-      </div>
-    </div>`;
-  document.getElementById('modal-container').innerHTML = modalHtml;
+
+  // Показываем анимацию открытия
+  showChestOpeningAnimation(function() {
+    var reward = getRandomReward();
+    applyReward(reward);
+    showRewardModal(reward);
+  });
 }
 
-function closeChestModal(reward) {
-  addXP(reward);
+function showChestOpeningAnimation(callback) {
+  var container = document.getElementById('modal-container');
+  var particlesHtml = '';
+  for (var i=0; i<12; i++) {
+    var angle = (i/12)*Math.PI*2;
+    var x = Math.cos(angle) * 40 + 'px';
+    var y = Math.sin(angle) * 40 + 'px';
+    particlesHtml += '<div class="particle" style="--x:'+x+'; --y:'+y+'; animation-delay:'+(i*0.03)+'s"></div>';
+  }
+  var html = `
+    <div class="modal-overlay" id="chest-opening">
+      <div class="modal-card" style="background:transparent; box-shadow:none; border:none;">
+        <div class="chest-open-anim">
+          <div class="chest-body">🎁</div>
+          <div class="chest-lid" id="chestLid"></div>
+          ${particlesHtml}
+        </div>
+        <div style="color:var(--text); margin-top:16px; font-weight:700;">Открываем сундук...</div>
+      </div>
+    </div>`;
+  container.innerHTML = html;
+
+  // Запускаем анимацию открытия крышки через 300мс
+  setTimeout(function() {
+    var lid = document.getElementById('chestLid');
+    if (lid) lid.classList.add('open');
+  }, 400);
+
+  // Через 1.2 сек вызываем callback
+  setTimeout(function() {
+    container.innerHTML = '';
+    callback();
+  }, 1200);
+}
+
+function applyReward(reward) {
+  switch(reward.type) {
+    case 'xp':
+      addXP(reward.value);
+      break;
+    case 'streak_day':
+      // пока заглушка: просто показываем, но не меняем streak
+      showToast('🎁 +1 день серии (будет доступно позже)');
+      break;
+    case 'boost_x2':
+      userProgress.doubleXPUntil = new Date(Date.now() + reward.duration * 60000).toISOString();
+      saveProgress();
+      showToast('⚡ Бустер x2 XP активирован на 15 минут!');
+      break;
+    case 'free_hint':
+      userProgress.freeHints = (userProgress.freeHints || 0) + 1;
+      saveProgress();
+      showToast('💡 Бесплатная подсказка доступна!');
+      break;
+    case 'badge':
+      if (!userProgress.rareBadges) userProgress.rareBadges = [];
+      userProgress.rareBadges.push(reward.id);
+      saveProgress();
+      showToast('🏅 Получен редкий бейдж!');
+      break;
+    default: break;
+  }
+}
+
+function showRewardModal(reward) {
+  var container = document.getElementById('modal-container');
+  var html = `
+    <div class="modal-overlay" id="reward-modal">
+      <div class="modal-card">
+        <div class="modal-title">🎉 Поздравляем!</div>
+        <div class="modal-sub">Ты получил:</div>
+        <div class="modal-reward">${reward.label}</div>
+        <button class="modal-btn" onclick="closeRewardModal()">Продолжить обучение</button>
+      </div>
+    </div>`;
+  container.innerHTML = html;
+}
+
+function closeRewardModal() {
   document.getElementById('modal-container').innerHTML = '';
   renderProfile();
 }
@@ -1152,7 +1230,6 @@ function shareBossResult() {
   else { prompt('Скопируй текст для друзей:', text); }
 }
 
-// ── Progress ──
 var userProgress = {
   xp: 0, level: 1, streak: 0, lastDate: '',
   completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
@@ -1164,7 +1241,10 @@ var userProgress = {
   achievements: {},
   lastDailyChestDate: '',
   streakChestsGiven: {},
-  friends: []
+  friends: [],
+  freeHints: 0,
+  rareBadges: [],
+  doubleXPUntil: null
 };
 
 function saveProgress() {
@@ -1200,6 +1280,10 @@ function refreshFreeze() {
 
 function addXP(amount) {
   if (amount > 0) {
+    // двойной XP если активен
+    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
+      amount *= 2;
+    }
     userProgress.xp += amount;
     userProgress.level = Math.floor(userProgress.xp / 200) + 1;
     saveProgress();
