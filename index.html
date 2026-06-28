@@ -134,6 +134,20 @@ body::before {
 .btn-next.show { display:block; animation: fadeUp .3s ease; }
 .btn-next:active { transform:scale(.97); }
 
+/* ── Анимация правильного/неправильного ответа ── */
+.float-text {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-h); font-weight: 800; font-size: 22px; z-index: 300;
+  animation: floatUp 1.2s ease forwards; pointer-events: none;
+}
+@keyframes floatUp {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  30% { opacity: 1; transform: translate(-50%, -60%) scale(1.1); }
+  100% { opacity: 0; transform: translate(-50%, -80%) scale(0.8); }
+}
+
+.result-fade { animation: fadeUp .5s ease; }
+
 /* ── RESULT ── */
 .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
 .result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
@@ -314,17 +328,17 @@ body::before {
     <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Совет от Профессора Гео</button>
     <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
     <div id="ai-explain" style="display:none;background:#58a6ff0a;border:1px solid #58a6ff20;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#c8d8e8;margin-top:8px"></div>
-    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="openAIChat()">💬 Обсудить с Профессором</button>
+    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="openAIChat()">🎓 Спросить Профессора Гео</button>
     <div id="ai-quiz" class="ai-panel" style="display:none"></div>
     <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
   </div>
 </div>
 
 <div class="screen" id="s-result">
-  <div class="result-wrap">
+  <div class="result-wrap result-fade">
     <div class="result-emoji" id="res-emoji">🎉</div>
-    <div class="result-title" id="res-title">Отлично!</div>
-    <div class="result-sub" id="res-sub">Ты справился!</div>
+    <div class="result-title" id="res-title">Тема завершена!</div>
+    <div class="result-sub" id="res-sub"></div>
     <div class="ring-wrap">
       <svg width="130" height="130" viewBox="0 0 130 130">
         <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
@@ -338,7 +352,9 @@ body::before {
       <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
       <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
     </div>
+    <div id="extra-stats" style="display:flex;flex-direction:column;gap:6px;width:100%;margin-top:4px"></div>
     <div class="res-btns">
+      <button class="btn-full primary" id="btn-next-theme" onclick="goNextTheme()" style="display:none">📚 Следующая тема</button>
       <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
       <button class="btn-full sec" onclick="replayLesson()">🔄 Ещё раз</button>
     </div>
@@ -543,6 +559,7 @@ function updateDailyTasks() {
     if (!collected.solve10) {
       collected.solve10 = true;
       addXP(20);
+      showFloatingText('🎯 Выполнено ежедневное задание! +20 XP', 'var(--primary2)');
     }
   }
   if (dailyXP >= 50 && !tasks.earn50XP) {
@@ -550,6 +567,7 @@ function updateDailyTasks() {
     if (!collected.earn50XP) {
       collected.earn50XP = true;
       addXP(20);
+      showFloatingText('🎯 Выполнено ежедневное задание! +20 XP', 'var(--primary2)');
     }
   }
   if (!tasks.loginToday) {
@@ -557,6 +575,7 @@ function updateDailyTasks() {
     if (!collected.loginToday) {
       collected.loginToday = true;
       addXP(20);
+      showFloatingText('🎯 Выполнено ежедневное задание! +20 XP', 'var(--primary2)');
     }
   }
 
@@ -864,7 +883,6 @@ function renderProfile() {
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  // Сундуки с улучшенным UI
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
   if (chestCount > 0) {
@@ -925,6 +943,7 @@ function getCurrentTopicTitle() {
   return (all[curLesson] && all[curLesson].title) || 'Тренировка';
 }
 
+// ── Улучшенные функции прохождения вопросов ──
 function renderQ() {
   const q = shuffled[curQ];
   const topicTitle = getCurrentTopicTitle();
@@ -985,20 +1004,56 @@ async function getHint() {
 function selectAns(idx, correct, qText, topic, hint) {
   if (answered) return;
   answered = true;
-  if (idx === correct && isTelegram && tgApp.HapticFeedback) { try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){} }
-  const btns = document.querySelectorAll('.ans-btn');
-  btns[idx].classList.add(idx===correct?'correct':'wrong');
-  if (idx !== correct) { btns[correct].classList.add('correct'); lives--; }
-  if (idx === correct) score++;
+
+  // Визуальная обратная связь
+  if (idx === correct) {
+    if (isTelegram && tgApp.HapticFeedback) { try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){} }
+    // Анимация правильного ответа
+    const correctBtn = document.querySelectorAll('.ans-btn')[idx];
+    correctBtn.classList.add('correct');
+    showFloatingText('✅ +10 XP', 'var(--primary2)');
+    // Начисляем XP за правильный ответ
+    addXP(10);
+  } else {
+    // Неправильный ответ — мягкая подсветка
+    const wrongBtn = document.querySelectorAll('.ans-btn')[idx];
+    wrongBtn.classList.add('wrong');
+    document.querySelectorAll('.ans-btn')[correct].classList.add('correct');
+    // Показываем сообщение без штрафа
+    showFloatingText('❌ Пока неверно', 'var(--danger)');
+  }
+
+  // Блокируем кнопки
   document.getElementById('btn-hint').style.display = 'none';
   var livesEl = document.getElementById('lives-row');
   livesEl.innerHTML = '';
   for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>'; }
+
+  // Если неправильно — убавляем жизни
+  if (idx !== correct) {
+    lives--;
+  } else {
+    score++;
+  }
+
+  // Показываем объяснение AI и кнопку "Следующий вопрос"
   requestAIExplanation(idx===correct, qText, topic);
   document.getElementById('btn-next').classList.add('show');
-  if (lives <= 0) { document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз'; }
+  if (lives <= 0) {
+    document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
+  }
+
+  // Обновляем ежедневные счётчики и задания
   incrementDailyCounters(1, 0);
   updateDailyTasks();
+
+  // Вызов будущей системы энергии
+  onQuestionAnswered(idx === correct);
+}
+
+function onQuestionAnswered(isCorrect) {
+  // Заглушка для будущей энергии и других механик
+  // Пока ничего не делает
 }
 
 async function requestAIExplanation(isCorrect, qText, topic) {
@@ -1033,10 +1088,17 @@ function openAIChat() {
   if (toggle) toggle.classList.add('open');
 }
 
-function nextQ() { curQ++; if (curQ >= shuffled.length) showResult(); else renderQ(); }
+function nextQ() {
+  curQ++;
+  if (curQ >= shuffled.length) showResult();
+  else renderQ();
+}
 
 function showResult() {
-  const total = shuffled.length; const pct = Math.round(score/total*100);
+  const total = shuffled.length;
+  const pct = Math.round(score/total*100);
+  var xpGain = score*20 + (score===total ? 50 : 0);
+
   if (isBossMode) {
     userProgress.bossCompleted = true; saveProgress();
     document.getElementById('boss-sub').textContent = score+'/'+total+' правильных ответов ('+pct+'%)';
@@ -1046,8 +1108,12 @@ function showResult() {
     setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
     isBossMode = false; updateDailyTasks(); return;
   }
+
+  // Экран победы
   let e='😔', t='Нужно повторить';
-  if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хороший результат!'; } else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
+  if (pct>=80) { e='🏆'; t='Тема завершена!'; }
+  else if (pct>=60) { e='👍'; t='Хороший результат!'; }
+  else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
   document.getElementById('res-emoji').textContent = e;
   document.getElementById('res-title').textContent = t;
   document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
@@ -1055,12 +1121,59 @@ function showResult() {
   document.getElementById('ring-denom').textContent = `из ${total}`;
   document.getElementById('res-c').textContent = score;
   document.getElementById('res-w').textContent = total-score;
-  var xpGain = score*20 + (score===total ? 50 : 0);
   document.getElementById('res-xp').textContent = '+'+xpGain;
+
+  // Дополнительная статистика
+  var extraHtml = '';
+  extraHtml += '<div style="font-size:12px;color:var(--muted);display:flex;justify-content:center;gap:16px">';
+  extraHtml += '<span>🔥 Серия: '+(userProgress.streak||0)+' дн.</span>';
+  extraHtml += '<span>⭐ Точность: '+pct+'%</span>';
+  extraHtml += '</div>';
+  document.getElementById('extra-stats').innerHTML = extraHtml;
+
+  // Кнопка "Следующая тема", если есть
+  var allLessons = getAllLessons();
+  var nextLessonBtn = document.getElementById('btn-next-theme');
+  if (allLessons.length > 0 && !isBossMode) {
+    var currentTitle = getCurrentTopicTitle();
+    var nextIdx = -1;
+    for (var i = 0; i < allLessons.length; i++) {
+      if (allLessons[i].title === currentTitle) {
+        nextIdx = i + 1;
+        break;
+      }
+    }
+    if (nextIdx < allLessons.length) {
+      nextLessonBtn.style.display = 'block';
+      nextLessonBtn.setAttribute('onclick', 'goQuizFromLoaded('+nextIdx+')');
+    } else {
+      nextLessonBtn.style.display = 'none';
+    }
+  } else {
+    nextLessonBtn.style.display = 'none';
+  }
+
   saveLesson(curLesson, score, total);
   goScreen('s-result');
   setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
   updateDailyTasks();
+}
+
+function goNextTheme() {
+  var allLessons = getAllLessons();
+  var currentTitle = getCurrentTopicTitle();
+  var nextIdx = -1;
+  for (var i = 0; i < allLessons.length; i++) {
+    if (allLessons[i].title === currentTitle) {
+      nextIdx = i + 1;
+      break;
+    }
+  }
+  if (nextIdx < allLessons.length) {
+    goQuizFromLoaded(nextIdx);
+  } else {
+    goScreen('s-home');
+  }
 }
 
 function initAI(cid, ctx, prompts=[], autoOpen=false) {
@@ -1132,7 +1245,6 @@ function openChest() {
   var chest = userProgress.chests.shift();
   saveProgress();
 
-  // Показываем анимацию открытия
   showChestOpeningAnimation(function() {
     var reward = getRandomReward();
     applyReward(reward);
@@ -1162,13 +1274,11 @@ function showChestOpeningAnimation(callback) {
     </div>`;
   container.innerHTML = html;
 
-  // Запускаем анимацию открытия крышки через 300мс
   setTimeout(function() {
     var lid = document.getElementById('chestLid');
     if (lid) lid.classList.add('open');
   }, 400);
 
-  // Через 1.2 сек вызываем callback
   setTimeout(function() {
     container.innerHTML = '';
     callback();
@@ -1181,7 +1291,6 @@ function applyReward(reward) {
       addXP(reward.value);
       break;
     case 'streak_day':
-      // пока заглушка: просто показываем, но не меняем streak
       showToast('🎁 +1 день серии (будет доступно позже)');
       break;
     case 'boost_x2':
@@ -1228,6 +1337,16 @@ function shareBossResult() {
   const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+score+'/'+total+'! Попробуй и ты!';
   if (isTelegram) { tgApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text)); }
   else { prompt('Скопируй текст для друзей:', text); }
+}
+
+// Вспомогательная функция для плавающего текста
+function showFloatingText(text, color) {
+  var el = document.createElement('div');
+  el.className = 'float-text';
+  el.textContent = text;
+  el.style.color = color || 'var(--primary2)';
+  document.body.appendChild(el);
+  setTimeout(function() { el.remove(); }, 1300);
 }
 
 var userProgress = {
@@ -1280,7 +1399,6 @@ function refreshFreeze() {
 
 function addXP(amount) {
   if (amount > 0) {
-    // двойной XP если активен
     if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
       amount *= 2;
     }
