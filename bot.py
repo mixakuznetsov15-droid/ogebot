@@ -219,36 +219,62 @@ body::before {
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
 
-/* ── МОДАЛЬНОЕ ОКНО ── */
-.modal-overlay {
-  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
-  display:flex; align-items:center; justify-content:center;
-  animation: fadeIn .2s ease;
+/* ── СУНДУКИ (анимации) ── */
+@keyframes chestGlow {
+  0% { box-shadow: 0 0 5px #d29922; }
+  50% { box-shadow: 0 0 20px #d29922; }
+  100% { box-shadow: 0 0 5px #d29922; }
 }
-.modal-card {
-  background:var(--card2); border:1px solid var(--border); border-radius:24px;
-  padding:24px; width:90%; max-width:340px; text-align:center; display:flex; flex-direction:column; gap:16px;
-  box-shadow:0 20px 40px rgba(0,0,0,0.5);
-  animation: popIn .3s cubic-bezier(.34,1.56,.64,1);
+@keyframes chestPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
 }
-.modal-title { font-family:var(--font-h); font-size:18px; font-weight:800; }
-.modal-sub { font-size:13px; color:var(--muted); }
-.modal-reward { font-family:var(--font-h); font-size:28px; font-weight:800; color:var(--gold); }
-.modal-btn { width:100%; padding:14px; border:none; border-radius:var(--radius); font-family:var(--font-h); font-size:14px; font-weight:700; cursor:pointer; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; }
-.modal-btn:active { transform:scale(.97); }
-button:disabled { opacity:0.5; background:gray !important; color:#fff; }
+.chest-btn-available {
+  background: linear-gradient(135deg, #f5a623, #d29922) !important;
+  animation: chestPulse 1.2s infinite;
+}
 
-.chest-anim {
-  width:80px; height:80px; margin:0 auto;
-  background: linear-gradient(135deg, #d29922, #b8860b);
-  border-radius:16px; display:flex; align-items:center; justify-content:center; font-size:40px;
-  animation: chestBounce 0.6s ease-in-out;
+/* Модальное окно сундука */
+.chest-open-anim {
+  width: 90px; height: 90px; margin: 0 auto; position: relative;
 }
-@keyframes chestBounce {
-  0% { transform: scale(0.3) rotate(-10deg); opacity:0; }
-  50% { transform: scale(1.1) rotate(3deg); opacity:1; }
-  70% { transform: scale(0.9) rotate(-2deg); }
-  100% { transform: scale(1) rotate(0deg); }
+.chest-body {
+  width: 80px; height: 60px; background: linear-gradient(135deg, #b8860b, #d29922);
+  border-radius: 10px; position: absolute; bottom: 0; left: 5px;
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  box-shadow: 0 0 15px rgba(210,153,34,0.5);
+}
+.chest-lid {
+  width: 86px; height: 20px; background: linear-gradient(135deg, #d29922, #f5a623);
+  border-radius: 8px 8px 0 0; position: absolute; top: 0; left: 2px;
+  transform-origin: left bottom; transition: transform 0.4s ease;
+  box-shadow: 0 0 10px rgba(210,153,34,0.5);
+}
+.chest-lid.open {
+  transform: rotate(-35deg) translateY(-5px);
+}
+.particle {
+  position: absolute; width: 6px; height: 6px; background: #f5a623; border-radius: 50%;
+  animation: particleFly 0.8s ease-out forwards;
+  opacity: 0;
+}
+@keyframes particleFly {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; }
+}
+
+/* Анимация всплывающего +XP */
+.xp-pop {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-family: var(--font-h); font-size: 28px; font-weight: 800; color: var(--primary2);
+  z-index: 300; pointer-events: none;
+  animation: xpPopAnim 1s ease-out forwards;
+}
+@keyframes xpPopAnim {
+  0% { opacity:1; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity:1; transform: translate(-50%, -80%) scale(1.2); }
+  100% { opacity:0; transform: translate(-50%, -150%) scale(1); }
 }
 </style>
 </head>
@@ -294,12 +320,12 @@ button:disabled { opacity:0.5; background:gray !important; color:#fff; }
       <div class="q-text" id="q-text">...</div>
     </div>
     <div class="answers" id="answers"></div>
-    <button id="btn-hint" onclick="getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Совет от Профессора Гео</button>
+    <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
     <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
     <div id="ai-explain" style="display:none;background:#58a6ff0a;border:1px solid #58a6ff20;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#c8d8e8;margin-top:8px"></div>
-    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="openAIChat()">💬 Обсудить с Профессором</button>
+    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="AISystem.openChat()">💬 Обсудить с Профессором</button>
     <div id="ai-quiz" class="ai-panel" style="display:none"></div>
-    <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
+    <button class="btn-next" id="btn-next" onclick="QuestionSystem.next()">Следующий вопрос →</button>
   </div>
 </div>
 
@@ -323,7 +349,7 @@ button:disabled { opacity:0.5; background:gray !important; color:#fff; }
     </div>
     <div class="res-btns">
       <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="replayLesson()">🔄 Ещё раз</button>
+      <button class="btn-full sec" onclick="QuestionSystem.replay()">🔄 Ещё раз</button>
     </div>
   </div>
 </div>
@@ -389,8 +415,6 @@ const QUESTIONS_FILES = [
   { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
 ];
 
-var theoryCache = {};
-var questionsCache = {};
 var lessonsLoaded = [];
 
 async function fetchJSON(filename) {
@@ -424,17 +448,10 @@ async function loadAllLessons() {
   return lessonsLoaded;
 }
 
-const lessons = [];
-
 function getAllLessons() {
-  return lessonsLoaded.length > 0 ? lessonsLoaded : lessons;
+  return lessonsLoaded.length > 0 ? lessonsLoaded : [];
 }
 
-let curQ=0, score=0, answered=false, shuffled=[];
-let curLesson=0, lives=3, hintUsed=false;
-let lastExplainText = '';
-
-// Telegram detection
 const tgApp = window.Telegram?.WebApp;
 const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
 if (isTelegram) {
@@ -442,7 +459,604 @@ if (isTelegram) {
   tgApp.expand();
 }
 
-// ── Ранговая система ──
+// ── XPSystem ──
+var XPSystem = {
+  addXP: function(amount) {
+    if (amount > 0) {
+      if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
+        amount *= 2;
+      }
+      userProgress.xp += amount;
+      userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+      saveProgress();
+      this.showToast(amount);
+      AchievementSystem.check();
+      DailyQuestSystem.incrementCounters(0, amount);
+    }
+  },
+  showToast: function(amount) {
+    var toast = document.createElement('div');
+    toast.textContent = '+' + amount + ' XP ⚡';
+    toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
+    document.body.appendChild(toast);
+    setTimeout(function(){ toast.remove(); }, 2000);
+  }
+};
+
+// ── DailyQuestSystem ──
+var DailyQuestSystem = {
+  update: function() {
+    var today = new Date().toISOString().slice(0,10);
+    if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
+      userProgress.dailyTasksDate = today;
+      userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
+      userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
+      userProgress.allDailyTasksDone = false;
+      saveProgress();
+    }
+    var tasks = userProgress.dailyTasks || {};
+    var collected = userProgress.dailyTasksCollected || {};
+    var dailyXP = (userProgress.dailyXP || 0);
+    var dailyQuestions = (userProgress.dailyQuestions || 0);
+
+    if (dailyQuestions >= 10 && !tasks.solve10) {
+      tasks.solve10 = true;
+      if (!collected.solve10) {
+        collected.solve10 = true;
+        XPSystem.addXP(20);
+      }
+    }
+    if (dailyXP >= 50 && !tasks.earn50XP) {
+      tasks.earn50XP = true;
+      if (!collected.earn50XP) {
+        collected.earn50XP = true;
+        XPSystem.addXP(20);
+      }
+    }
+    if (!tasks.loginToday) {
+      tasks.loginToday = true;
+      if (!collected.loginToday) {
+        collected.loginToday = true;
+        XPSystem.addXP(20);
+      }
+    }
+
+    if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
+      userProgress.allDailyTasksDone = true;
+      XPSystem.addXP(100);
+      ChestSystem.give('achievement');
+      showToast('🎁 Сундук за все задания дня!');
+    }
+    saveProgress();
+  },
+  incrementCounters: function(questionsCount, xpAmount) {
+    var today = new Date().toISOString().slice(0,10);
+    if (userProgress.dailyTasksDate !== today) {
+      userProgress.dailyTasksDate = today;
+      userProgress.dailyQuestions = 0;
+      userProgress.dailyXP = 0;
+    }
+    userProgress.dailyQuestions = (userProgress.dailyQuestions || 0) + questionsCount;
+    userProgress.dailyXP = (userProgress.dailyXP || 0) + xpAmount;
+    saveProgress();
+    this.update();
+  }
+};
+
+// ── AchievementSystem ──
+var ACHIEVEMENTS_LIST = [
+  { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
+  { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
+  { id: 'first_theme', icon: '🏆', title: 'Первая завершённая тема', cond: function() { return Object.keys(userProgress.completedLessons).length > 0; } },
+  { id: 'streak3', icon: '🔥', title: '3 дня подряд', cond: function() { return (userProgress.streak||0) >= 3; } },
+  { id: 'streak7', icon: '🔥', title: '7 дней подряд', cond: function() { return (userProgress.streak||0) >= 7; } },
+  { id: 'streak14', icon: '🔥', title: '14 дней подряд', cond: function() { return (userProgress.streak||0) >= 14; } },
+  { id: 'streak30', icon: '🔥', title: '30 дней подряд', cond: function() { return (userProgress.streak||0) >= 30; } },
+  { id: 'solve50', icon: '📚', title: 'Решить 50 вопросов', cond: function() { return userProgress.totalAnswered >= 50; }, max: 50, progress: function() { return Math.min(userProgress.totalAnswered, 50); } },
+  { id: 'solve100', icon: '📚', title: 'Решить 100 вопросов', cond: function() { return userProgress.totalAnswered >= 100; }, max: 100, progress: function() { return Math.min(userProgress.totalAnswered, 100); } },
+  { id: 'solve500', icon: '📚', title: 'Решить 500 вопросов', cond: function() { return userProgress.totalAnswered >= 500; }, max: 500, progress: function() { return Math.min(userProgress.totalAnswered, 500); } },
+  { id: 'solve1000', icon: '📚', title: 'Решить 1000 вопросов', cond: function() { return userProgress.totalAnswered >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.totalAnswered, 1000); } },
+  { id: 'xp500', icon: '⭐', title: 'Получить 500 XP', cond: function() { return userProgress.xp >= 500; }, max: 500, progress: function() { return Math.min(userProgress.xp, 500); } },
+  { id: 'xp1000', icon: '⭐', title: 'Получить 1000 XP', cond: function() { return userProgress.xp >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.xp, 1000); } },
+  { id: 'xp3000', icon: '⭐', title: 'Получить 3000 XP', cond: function() { return userProgress.xp >= 3000; }, max: 3000, progress: function() { return Math.min(userProgress.xp, 3000); } },
+  { id: 'xp5000', icon: '⭐', title: 'Получить 5000 XP', cond: function() { return userProgress.xp >= 5000; }, max: 5000, progress: function() { return Math.min(userProgress.xp, 5000); } },
+  { id: 'all_themes', icon: '🌍', title: 'Завершить все темы', cond: function() { var all = getAllLessons(); return all.length > 0 && Object.keys(userProgress.completedLessons).length >= all.length; } },
+  { id: 'pred4', icon: '🎯', title: 'Получить прогноз 4', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 4; } },
+  { id: 'pred5', icon: '🎯', title: 'Получить прогноз 5', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 5; } }
+];
+
+var AchievementSystem = {
+  check: function() {
+    if (!userProgress.achievements) userProgress.achievements = {};
+    var now = new Date().toISOString();
+    ACHIEVEMENTS_LIST.forEach(function(a) {
+      if (userProgress.achievements[a.id] && userProgress.achievements[a.id].unlocked) return;
+      var unlocked = a.cond();
+      var progress = a.progress ? a.progress() : (unlocked ? (a.max || 1) : 0);
+      var wasUnlocked = userProgress.achievements[a.id]?.unlocked;
+      if (!userProgress.achievements[a.id]) {
+        userProgress.achievements[a.id] = { progress: progress, unlocked: unlocked, date: unlocked ? now : null, chestGiven: false };
+      } else {
+        userProgress.achievements[a.id].progress = progress;
+        if (unlocked && !wasUnlocked) {
+          userProgress.achievements[a.id].unlocked = true;
+          userProgress.achievements[a.id].date = now;
+          showToast('🏆 Получено достижение: ' + a.title);
+          if (!userProgress.achievements[a.id].chestGiven) {
+            ChestSystem.give('achievement');
+            userProgress.achievements[a.id].chestGiven = true;
+            showToast('🎁 Сундук за достижение!');
+          }
+        }
+      }
+    });
+    saveProgress();
+  }
+};
+
+// ── ChestSystem ──
+var ChestSystem = {
+  isOpening: false,
+  rewardPool: [
+    { type: 'xp', value: 20, label: '+20 XP' },
+    { type: 'xp', value: 50, label: '+50 XP' },
+    { type: 'xp', value: 100, label: '+100 XP' },
+    { type: 'streak_day', value: 1, label: '+1 день серии' },
+    { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
+    { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
+    { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
+  ],
+  give: function(type) {
+    if (!userProgress.chests) userProgress.chests = [];
+    userProgress.chests.push({ type: type || 'daily', rewardType: 'xp' });
+    saveProgress();
+  },
+  giveDaily: function() {
+    var today = new Date().toISOString().slice(0,10);
+    if (userProgress.lastDailyChestDate === today) return;
+    userProgress.lastDailyChestDate = today;
+    this.give('daily');
+    saveProgress();
+  },
+  giveStreak: function() {
+    var streak = userProgress.streak || 0;
+    var given = userProgress.streakChestsGiven || {};
+    var thresholds = [3, 7, 14, 30];
+    for (var i = 0; i < thresholds.length; i++) {
+      var t = thresholds[i];
+      if (streak >= t && !given[t]) {
+        this.give('streak');
+        given[t] = true;
+        showToast('🎁 Сундук за серию ' + t + ' дней!');
+      }
+    }
+    userProgress.streakChestsGiven = given;
+    saveProgress();
+  },
+  open: function() {
+    if (this.isOpening) return;
+    if (!userProgress.chests || userProgress.chests.length === 0) return;
+    this.isOpening = true;
+    var chest = userProgress.chests.shift();
+    saveProgress();
+
+    var self = this;
+    showChestOpeningAnimation(function() {
+      var reward = self.getRandomReward();
+      self.applyReward(reward);
+      self.showRewardModal(reward);
+      self.isOpening = false;
+    });
+  },
+  getRandomReward: function() {
+    var idx = Math.floor(Math.random() * this.rewardPool.length);
+    return this.rewardPool[idx];
+  },
+  applyReward: function(reward) {
+    switch(reward.type) {
+      case 'xp':
+        XPSystem.addXP(reward.value);
+        break;
+      case 'streak_day':
+        showToast('🎁 +1 день серии (будет доступно позже)');
+        break;
+      case 'boost_x2':
+        userProgress.doubleXPUntil = new Date(Date.now() + reward.duration * 60000).toISOString();
+        saveProgress();
+        showToast('⚡ Бустер x2 XP активирован на 15 минут!');
+        break;
+      case 'free_hint':
+        userProgress.freeHints = (userProgress.freeHints || 0) + 1;
+        saveProgress();
+        showToast('💡 Бесплатная подсказка доступна!');
+        break;
+      case 'badge':
+        if (!userProgress.rareBadges) userProgress.rareBadges = [];
+        userProgress.rareBadges.push(reward.id);
+        saveProgress();
+        showToast('🏅 Получен редкий бейдж!');
+        break;
+      default: break;
+    }
+  },
+  showRewardModal: function(reward) {
+    var container = document.getElementById('modal-container');
+    var html = `
+      <div class="modal-overlay" id="reward-modal">
+        <div class="modal-card">
+          <div class="modal-title">🎉 Поздравляем!</div>
+          <div class="modal-sub">Ты получил:</div>
+          <div class="modal-reward">${reward.label}</div>
+          <button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить обучение</button>
+        </div>
+      </div>`;
+    container.innerHTML = html;
+  },
+  closeRewardModal: function() {
+    document.getElementById('modal-container').innerHTML = '';
+    renderProfile();
+  }
+};
+
+function showChestOpeningAnimation(callback) {
+  var container = document.getElementById('modal-container');
+  var particlesHtml = '';
+  for (var i=0; i<12; i++) {
+    var angle = (i/12)*Math.PI*2;
+    var x = Math.cos(angle) * 40 + 'px';
+    var y = Math.sin(angle) * 40 + 'px';
+    particlesHtml += '<div class="particle" style="--x:'+x+'; --y:'+y+'; animation-delay:'+(i*0.03)+'s"></div>';
+  }
+  var html = `
+    <div class="modal-overlay" id="chest-opening">
+      <div class="modal-card" style="background:transparent; box-shadow:none; border:none;">
+        <div class="chest-open-anim">
+          <div class="chest-body">🎁</div>
+          <div class="chest-lid" id="chestLid"></div>
+          ${particlesHtml}
+        </div>
+        <div style="color:var(--text); margin-top:16px; font-weight:700;">Открываем сундук...</div>
+      </div>
+    </div>`;
+  container.innerHTML = html;
+
+  setTimeout(function() {
+    var lid = document.getElementById('chestLid');
+    if (lid) lid.classList.add('open');
+  }, 400);
+
+  setTimeout(function() {
+    container.innerHTML = '';
+    if (callback) callback();
+  }, 1200);
+}
+
+// ── QuestionSystem ──
+var QuestionSystem = {
+  curQ: 0,
+  score: 0,
+  answered: false,
+  shuffled: [],
+  curLesson: 0,
+  lives: 3,
+  hintUsed: false,
+  lastExplainText: '',
+  isBossMode: false,
+
+  start: function(idx) {
+    var allLessons = getAllLessons();
+    this.curLesson = idx;
+    this.shuffled = allLessons[idx].questions;
+    this.curQ = 0;
+    this.score = 0;
+    this.answered = false;
+    this.lives = 3;
+    this.hintUsed = false;
+    this.isBossMode = false;
+    goScreen('s-quiz');
+    this.renderQ();
+  },
+  startBoss: function() {
+    var allLessons = getAllLessons();
+    var allQuestions = [];
+    allLessons.forEach(function(l) { if (l.questions) allQuestions = allQuestions.concat(l.questions); });
+    allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
+    this.isBossMode = true;
+    this.shuffled = allQuestions;
+    this.curLesson = -1;
+    this.curQ = 0;
+    this.score = 0;
+    this.answered = false;
+    this.lives = 999;
+    this.hintUsed = false;
+    goScreen('s-quiz');
+    this.renderQ();
+  },
+  replay: function() {
+    if (this.isBossMode || this.curLesson < 0) { this.startBoss(); return; }
+    var allLessons = getAllLessons();
+    this.shuffled = allLessons[this.curLesson].questions;
+    this.curQ = 0;
+    this.score = 0;
+    this.answered = false;
+    this.lives = 3;
+    this.hintUsed = false;
+    goScreen('s-quiz');
+    this.renderQ();
+  },
+  renderQ: function() {
+    const q = this.shuffled[this.curQ];
+    const topicTitle = this.getTopicTitle();
+    this.answered = false;
+    this.hintUsed = false;
+    this.lastExplainText = '';
+
+    document.getElementById('quiz-topic-lbl').textContent = topicTitle;
+    document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(this.curQ+1)+' из '+this.shuffled.length;
+    document.getElementById('quiz-counter').textContent = (this.curQ+1)+'/'+this.shuffled.length;
+    document.getElementById('qpf').style.width = ((this.curQ/this.shuffled.length)*100)+'%';
+    document.getElementById('q-tag').textContent = q.tag;
+    document.getElementById('q-text').textContent = q.text;
+    document.getElementById('ai-quiz').style.display = 'none';
+    document.getElementById('ai-explain').style.display = 'none';
+    document.getElementById('btn-ask-ai').style.display = 'none';
+    document.getElementById('hint-box').style.display = 'none';
+    var btnHint = document.getElementById('btn-hint');
+    btnHint.style.display = 'flex';
+    btnHint.disabled = false;
+    btnHint.textContent = '🎓 Спросить профессора Гео';
+
+    var livesEl = document.getElementById('lives-row');
+    livesEl.innerHTML = '';
+    for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
+
+    const btn = document.getElementById('btn-next');
+    btn.classList.remove('show');
+    btn.textContent = this.curQ < this.shuffled.length-1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
+
+    const ans = document.getElementById('answers');
+    ans.innerHTML = '';
+    ['А','Б','В','Г'].forEach(function(l, i){
+      const b = document.createElement('button');
+      b.className = 'ans-btn';
+      b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
+      b.onclick = function(){ QuestionSystem.selectAns(i, q.correct, q.text, topicTitle, q.hint); };
+      ans.appendChild(b);
+    });
+  },
+  getTopicTitle: function() {
+    if (this.isBossMode) return 'Финальный босс';
+    var all = getAllLessons();
+    return (all[this.curLesson] && all[this.curLesson].title) || 'Тренировка';
+  },
+  selectAns: function(idx, correct, qText, topic, hint) {
+    if (this.answered) return;
+    this.answered = true;
+
+    if (idx === correct && isTelegram && tgApp.HapticFeedback) {
+      try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){}
+    }
+
+    const btns = document.querySelectorAll('.ans-btn');
+    btns[idx].classList.add(idx===correct?'correct':'wrong');
+    if (idx !== correct) {
+      btns[correct].classList.add('correct');
+      this.lives--;
+    }
+    if (idx === correct) {
+      this.score++;
+      // всплывающее +XP
+      this.showXPPopup(10);
+      XPSystem.addXP(10);
+    }
+
+    document.getElementById('btn-hint').style.display = 'none';
+    var livesEl = document.getElementById('lives-row');
+    livesEl.innerHTML = '';
+    for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
+
+    this.requestAIExplanation(idx===correct, qText, topic);
+    document.getElementById('btn-next').classList.add('show');
+    if (this.lives <= 0) {
+      document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
+    }
+
+    DailyQuestSystem.incrementCounters(1, 0);
+    DailyQuestSystem.update();
+  },
+  showXPPopup: function(amount) {
+    var popup = document.createElement('div');
+    popup.className = 'xp-pop';
+    popup.textContent = '+' + amount + ' XP';
+    document.body.appendChild(popup);
+    setTimeout(function(){ popup.remove(); }, 1000);
+  },
+  requestAIExplanation: async function(isCorrect, qText, topic) {
+    const explainBox = document.getElementById('ai-explain');
+    const askBtn = document.getElementById('btn-ask-ai');
+    explainBox.style.display = 'block';
+    askBtn.style.display = 'block';
+    explainBox.textContent = '⏳ Профессор Гео объясняет...';
+    const prompt = isCorrect
+      ? `Ты Профессор Гео. Ученик правильно ответил на вопрос ОГЭ: «${qText}». Объясни кратко (2-3 предложения), почему ответ верный, выделив ключевую закономерность. Будь поддерживающим.`
+      : `Ты Профессор Гео. Ученик ошибся в вопросе ОГЭ: «${qText}». Дай КОРОТКОЕ объяснение правильного ответа, указав типичную ошибку и как её избежать. 2-3 предложения, мотивируй.`;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({question: prompt, context: topic})});
+      const d = await r.json();
+      const ans = d.answer || 'Подумай, какое правило здесь работает.';
+      explainBox.textContent = '📘 ' + ans;
+      this.lastExplainText = ans;
+    } catch(e) {
+      explainBox.textContent = '📘 ' + (isCorrect ? 'Отлично! Ты знаешь материал.' : 'Обрати внимание на это правило.');
+      this.lastExplainText = explainBox.textContent;
+    }
+  },
+  next: function() {
+    this.curQ++;
+    if (this.curQ >= this.shuffled.length) this.showResult();
+    else this.renderQ();
+  },
+  showResult: function() {
+    const total = this.shuffled.length;
+    const pct = Math.round(this.score/total*100);
+
+    if (this.isBossMode) {
+      userProgress.bossCompleted = true;
+      saveProgress();
+      document.getElementById('boss-sub').textContent = this.score+'/'+total+' правильных ответов ('+pct+'%)';
+      document.getElementById('boss-num').textContent = this.score;
+      document.getElementById('boss-denom').textContent = 'из ' + total;
+      goScreen('s-boss-result');
+      setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
+      this.isBossMode = false;
+      DailyQuestSystem.update();
+      return;
+    }
+
+    let e='😔', t='Нужно повторить';
+    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хороший результат!'; } else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
+    document.getElementById('res-emoji').textContent = e;
+    document.getElementById('res-title').textContent = t;
+    document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
+    document.getElementById('ring-num').textContent = this.score;
+    document.getElementById('ring-denom').textContent = `из ${total}`;
+    document.getElementById('res-c').textContent = this.score;
+    document.getElementById('res-w').textContent = total-this.score;
+    var xpGain = this.score*20 + (this.score===total ? 50 : 0);
+    document.getElementById('res-xp').textContent = '+'+xpGain;
+    this.saveLesson(this.curLesson, this.score, total);
+    goScreen('s-result');
+    setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
+    DailyQuestSystem.update();
+  },
+  saveLesson: function(lessonIdx, sc, total) {
+    var today = new Date().toISOString().slice(0,10);
+    var allLessons = getAllLessons();
+    var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+    userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
+    userProgress.totalAnswered += total;
+    userProgress.totalCorrect += sc;
+    var xpGain = sc * 20 + (sc === total ? 50 : 0);
+    XPSystem.addXP(xpGain);
+    checkStreak();
+    saveProgress();
+    if (!userProgress.chests) userProgress.chests = [];
+    if (!userProgress.completedLessons[lessonKey].chestGiven) {
+      ChestSystem.give('achievement');
+      userProgress.completedLessons[lessonKey].chestGiven = true;
+      saveProgress();
+      showToast('🎁 Сундук за завершение темы!');
+    }
+  },
+  getHint: async function() {
+    if (this.hintUsed) return;
+    this.hintUsed = true;
+    const q = this.shuffled[this.curQ];
+    const btn = document.getElementById('btn-hint');
+    btn.textContent = '⏳ Профессор Гео думает...'; btn.disabled = true;
+    const hintBox = document.getElementById('hint-box');
+    hintBox.style.display = 'block';
+    hintBox.textContent = '⏳ Профессор Гео анализирует вопрос...';
+
+    try {
+      const prompt = `Ты — Профессор Гео, добрый наставник по географии. Ученик решает задание ОГЭ: «${q.text}». Дай короткую подсказку (1-2 предложения), которая поможет понять ход решения, но НЕ называй правильный ответ и НЕ говори чисел. Направляй, задавай наводящие вопросы. Будь мотивирующим.`;
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({question: prompt, context: this.getTopicTitle()})});
+      const d = await r.json();
+      if (d.answer) hintBox.textContent = '🎓 ' + d.answer;
+      else hintBox.textContent = '🎓 Подумай, какое правило здесь можно применить.';
+    } catch(e) {
+      hintBox.textContent = '🎓 Вспомни основные закономерности по этой теме.';
+    }
+    btn.textContent = '🎓 Совет получен';
+  }
+};
+
+// ── AISystem ──
+var AISystem = {
+  openChat: function() {
+    const aiPanel = document.getElementById('ai-quiz');
+    const topic = QuestionSystem.getTopicTitle();
+    const ctx = 'Вопрос ОГЭ: ' + (QuestionSystem.shuffled[QuestionSystem.curQ]?.text || '');
+    if (!aiPanel.dataset.initialized) {
+      this.initAI('ai-quiz', ctx, [], false);
+      aiPanel.dataset.initialized = '1';
+    }
+    aiPanel.style.display = 'block';
+    const body = aiPanel.querySelector('.ai-body');
+    if (body) {
+      body.classList.add('open');
+      const msgs = document.getElementById('msgs-ai-quiz');
+      if (msgs && QuestionSystem.lastExplainText.trim()) {
+        msgs.innerHTML = '';
+        msgs.innerHTML += `<div class="msg ai">${QuestionSystem.lastExplainText.replace(/\n/g,'<br>')}</div>`;
+      }
+    }
+    const toggle = aiPanel.querySelector('.ai-toggle');
+    if (toggle) toggle.classList.add('open');
+  },
+  initAI: function(cid, ctx, prompts, autoOpen) {
+    const el = document.getElementById(cid);
+    if (!el) return;
+    const escCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    el.innerHTML = `
+      <div class="ai-header" onclick="AISystem.toggle(this)">
+        <div class="ai-header-left">
+          <div class="ai-avatar">🎓</div>
+          <div><div class="ai-name">Профессор Гео</div><div class="ai-tagline">Спроси — объясню как наставник</div></div>
+        </div>
+        <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
+      </div>
+      <div class="ai-body ${autoOpen?'open':''}">
+        <div class="ai-context">📌 ${ctx}</div>
+        <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="AISystem.sendP('${cid}','${escCtx}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
+        <div class="ai-messages" id="msgs-${cid}"></div>
+        <div class="ai-input-row">
+          <textarea class="ai-input" id="inp-${cid}" placeholder="Спроси Профессора..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();AISystem.sendM('${cid}','${escCtx}');}"></textarea>
+          <button class="ai-send" id="snd-${cid}" onclick="AISystem.sendM('${cid}','${escCtx}')">➤</button>
+        </div>
+      </div>
+    `;
+  },
+  toggle: function(h) {
+    const b = h.nextElementSibling;
+    const t = h.querySelector('.ai-toggle');
+    b.classList.toggle('open');
+    t.classList.toggle('open');
+  },
+  sendP: function(cid, ctx, text) {
+    document.getElementById(`inp-${cid}`).value = text;
+    this.sendM(cid, ctx);
+  },
+  sendM: async function(cid, ctx) {
+    const inp = document.getElementById(`inp-${cid}`);
+    const snd = document.getElementById(`snd-${cid}`);
+    const msgs = document.getElementById(`msgs-${cid}`);
+    const text = inp.value.trim();
+    if (!text) return;
+    inp.value = '';
+    snd.disabled = true;
+    msgs.innerHTML += `<div class="msg user">${text}</div>`;
+    const lid = 'l'+Date.now();
+    msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+      const d = await r.json();
+      const ans = d.answer || 'Не удалось получить ответ';
+      document.getElementById(lid)?.remove();
+      msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+    } catch(e) {
+      document.getElementById(lid)?.remove();
+      msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`;
+    }
+    snd.disabled = false;
+    msgs.scrollTop = msgs.scrollHeight;
+  }
+};
+
+// ── Profile & Home rendering (unchanged except using new systems) ──
 function getRank(xp) {
   if (xp >= 10000) return 'Легенда';
   if (xp >= 5000) return 'Мастер';
@@ -476,12 +1090,9 @@ function getDaysUntilOGE() {
   const today = new Date(); today.setHours(0,0,0,0);
   const currentYear = today.getFullYear();
   const ogeThisYear = new Date(currentYear, 5, 19);
-  if (today <= ogeThisYear) {
-    return Math.ceil((ogeThisYear - today) / 86400000);
-  } else {
-    const ogeNextYear = new Date(currentYear + 1, 5, 19);
-    return Math.ceil((ogeNextYear - today) / 86400000);
-  }
+  if (today <= ogeThisYear) return Math.ceil((ogeThisYear - today) / 86400000);
+  const ogeNextYear = new Date(currentYear + 1, 5, 19);
+  return Math.ceil((ogeNextYear - today) / 86400000);
 }
 
 function getPredictedGrade() {
@@ -491,6 +1102,14 @@ function getPredictedGrade() {
   if (acc >= 0.70) return '4';
   if (acc >= 0.55) return '3';
   return '2';
+}
+
+function getPredictedScore(grade) {
+  if (grade === '5') return '28–31';
+  if (grade === '4') return '19–25';
+  if (grade === '3') return '12–18';
+  if (grade === '2') return '0–11';
+  return '—';
 }
 
 function getCorrectAnswersNeededForGrade(targetGrade) {
@@ -504,135 +1123,12 @@ function getCorrectAnswersNeededForGrade(targetGrade) {
   return Math.max(0, needed);
 }
 
-// ── Ежедневные задания ──
-function updateDailyTasks() {
-  var today = new Date().toISOString().slice(0,10);
-  if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
-    userProgress.dailyTasksDate = today;
-    userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
-    userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
-    userProgress.allDailyTasksDone = false;
-    saveProgress();
-  }
-  var tasks = userProgress.dailyTasks || {};
-  var collected = userProgress.dailyTasksCollected || {};
-
-  var dailyXP = (userProgress.dailyXP || 0);
-  var dailyQuestions = (userProgress.dailyQuestions || 0);
-
-  if (dailyQuestions >= 10 && !tasks.solve10) {
-    tasks.solve10 = true;
-    if (!collected.solve10) {
-      collected.solve10 = true;
-      addXP(20);
-    }
-  }
-  if (dailyXP >= 50 && !tasks.earn50XP) {
-    tasks.earn50XP = true;
-    if (!collected.earn50XP) {
-      collected.earn50XP = true;
-      addXP(20);
-    }
-  }
-  if (!tasks.loginToday) {
-    tasks.loginToday = true;
-    if (!collected.loginToday) {
-      collected.loginToday = true;
-      addXP(20);
-    }
-  }
-
-  if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
-    userProgress.allDailyTasksDone = true;
-    addXP(100);
-    if (!userProgress.chests) userProgress.chests = [];
-    userProgress.chests.push({ type: 'common' });
-    showToast('🎁 Сундук за все задания дня!');
-  }
-  saveProgress();
-}
-
-function incrementDailyCounters(questionsCount, xpAmount) {
-  var today = new Date().toISOString().slice(0,10);
-  if (userProgress.dailyTasksDate !== today) {
-    userProgress.dailyTasksDate = today;
-    userProgress.dailyQuestions = 0;
-    userProgress.dailyXP = 0;
-  }
-  userProgress.dailyQuestions = (userProgress.dailyQuestions || 0) + questionsCount;
-  userProgress.dailyXP = (userProgress.dailyXP || 0) + xpAmount;
-  saveProgress();
-  updateDailyTasks();
-}
-
-// Переопределяем addXP и saveLesson, чтобы вызывать инкремент
-var originalAddXP = addXP;
-addXP = function(amount) {
-  originalAddXP(amount);
-  if (amount > 0) {
-    incrementDailyCounters(0, amount);
-  }
-};
-
-var originalSaveLesson = saveLesson;
-saveLesson = function(lessonIdx, sc, total) {
-  originalSaveLesson(lessonIdx, sc, total);
-  incrementDailyCounters(total, sc * 20 + (sc === total ? 50 : 0));
-};
-
-// ── Достижения (обновлённая система) ──
-var ACHIEVEMENTS_LIST = [
-  { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
-  { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
-  { id: 'first_theme', icon: '🏆', title: 'Первая завершённая тема', cond: function() { return Object.keys(userProgress.completedLessons).length > 0; } },
-  { id: 'streak3', icon: '🔥', title: '3 дня подряд', cond: function() { return (userProgress.streak||0) >= 3; } },
-  { id: 'streak7', icon: '🔥', title: '7 дней подряд', cond: function() { return (userProgress.streak||0) >= 7; } },
-  { id: 'streak14', icon: '🔥', title: '14 дней подряд', cond: function() { return (userProgress.streak||0) >= 14; } },
-  { id: 'streak30', icon: '🔥', title: '30 дней подряд', cond: function() { return (userProgress.streak||0) >= 30; } },
-  { id: 'solve50', icon: '📚', title: 'Решить 50 вопросов', cond: function() { return userProgress.totalAnswered >= 50; }, max: 50, progress: function() { return Math.min(userProgress.totalAnswered, 50); } },
-  { id: 'solve100', icon: '📚', title: 'Решить 100 вопросов', cond: function() { return userProgress.totalAnswered >= 100; }, max: 100, progress: function() { return Math.min(userProgress.totalAnswered, 100); } },
-  { id: 'solve500', icon: '📚', title: 'Решить 500 вопросов', cond: function() { return userProgress.totalAnswered >= 500; }, max: 500, progress: function() { return Math.min(userProgress.totalAnswered, 500); } },
-  { id: 'solve1000', icon: '📚', title: 'Решить 1000 вопросов', cond: function() { return userProgress.totalAnswered >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.totalAnswered, 1000); } },
-  { id: 'xp500', icon: '⭐', title: 'Получить 500 XP', cond: function() { return userProgress.xp >= 500; }, max: 500, progress: function() { return Math.min(userProgress.xp, 500); } },
-  { id: 'xp1000', icon: '⭐', title: 'Получить 1000 XP', cond: function() { return userProgress.xp >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.xp, 1000); } },
-  { id: 'xp3000', icon: '⭐', title: 'Получить 3000 XP', cond: function() { return userProgress.xp >= 3000; }, max: 3000, progress: function() { return Math.min(userProgress.xp, 3000); } },
-  { id: 'xp5000', icon: '⭐', title: 'Получить 5000 XP', cond: function() { return userProgress.xp >= 5000; }, max: 5000, progress: function() { return Math.min(userProgress.xp, 5000); } },
-  { id: 'all_themes', icon: '🌍', title: 'Завершить все темы', cond: function() { var all = getAllLessons(); return all.length > 0 && Object.keys(userProgress.completedLessons).length >= all.length; } },
-  { id: 'pred4', icon: '🎯', title: 'Получить прогноз 4', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 4; } },
-  { id: 'pred5', icon: '🎯', title: 'Получить прогноз 5', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 5; } }
-];
-
-function checkAchievements() {
-  if (!userProgress.achievements) userProgress.achievements = {};
-  var now = new Date().toISOString();
-  ACHIEVEMENTS_LIST.forEach(function(a) {
-    if (userProgress.achievements[a.id] && userProgress.achievements[a.id].unlocked) return;
-    var unlocked = a.cond();
-    var progress = a.progress ? a.progress() : (unlocked ? (a.max || 1) : 0);
-    var wasUnlocked = userProgress.achievements[a.id]?.unlocked;
-    if (!userProgress.achievements[a.id]) {
-      userProgress.achievements[a.id] = { progress: progress, unlocked: unlocked, date: unlocked ? now : null };
-    } else {
-      userProgress.achievements[a.id].progress = progress;
-      if (unlocked && !wasUnlocked) {
-        userProgress.achievements[a.id].unlocked = true;
-        userProgress.achievements[a.id].date = now;
-        showToast('🏆 Получено достижение: ' + a.title);
-      }
-    }
-  });
-  saveProgress();
-}
-
-// ── Главный экран ──
 async function renderHomePath() {
   var container = document.getElementById('home-content');
-
   if (lessonsLoaded.length === 0) {
     container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
     await loadAllLessons();
   }
-
   var allLessons = getAllLessons();
   if (allLessons.length === 0) {
     container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания. Проверь интернет.</div>';
@@ -650,38 +1146,40 @@ async function renderHomePath() {
   var totalCount = allLessons.length;
   var pct = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
   var allDone = completedCount >= totalCount;
-
   var daysLeft = getDaysUntilOGE();
   var predictedGrade = getPredictedGrade();
+  var streak = userProgress.streak || 0;
+  var predictedScore = getPredictedScore(predictedGrade);
 
   var html = '';
-
-  // Компактный блок прогресса ОГЭ (дни, оценка, прогресс до следующей)
   html += '<div class="path-progress-card">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">';
-  html += '<div><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--text)">'+daysLeft+'</span> <span style="font-size:12px;color:var(--muted)">'+getDayWord(daysLeft)+' до ОГЭ</span></div>';
-  html += '<div style="text-align:right"><span style="font-family:var(--font-h);font-size:16px;font-weight:800;color:var(--gold)">'+predictedGrade+'</span> <span style="font-size:12px;color:var(--muted)">твоя оценка</span></div>';
-  html += '</div>';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:6px">Твой прогноз ОГЭ</div>';
   if (predictedGrade !== '—') {
     var currentGrade = parseInt(predictedGrade);
+    html += '<div style="font-size:42px;font-weight:800;color:var(--gold);line-height:1">' + predictedGrade + '</div>';
+    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Прогноз: ' + predictedScore + ' баллов</div>';
     if (currentGrade < 5) {
       var nextGrade = currentGrade + 1;
       var needed = getCorrectAnswersNeededForGrade(nextGrade);
-      html += '<div style="font-size:12px;color:var(--muted);margin-top:6px">📈 До оценки '+nextGrade+' осталось <b style="color:var(--text)">'+needed+'</b> прав. ответов</div>';
+      html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">До ' + nextGrade + ' осталось ' + needed + ' баллов</div>';
+      var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
+      progressPercent = Math.min(100, Math.round(progressPercent));
+      html += '<div class="path-progress-bar" style="height:8px"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
     } else {
-      html += '<div style="font-size:13px;color:var(--primary2);margin-top:6px">🎉 Отлично! Ты на высшем уровне!</div>';
+      html += '<div style="font-size:13px;color:var(--primary2);margin-bottom:8px">Ты на высшем уровне!</div>';
     }
+  } else {
+    html += '<div style="font-size:16px;color:var(--muted)">Недостаточно данных</div>';
   }
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px">Подготовка: ' + streak + ' ' + getDayWord(streak) + ' подряд · До ОГЭ ' + daysLeft + ' ' + getDayWord(daysLeft) + '</div>';
   html += '</div>';
 
-  // Прогресс тем
   html += '<div class="path-progress-card">';
   html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">'+pct+'%</span></div>';
   html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
   html += '</div>';
 
-  // Ежедневные задания с прогрессом
-  updateDailyTasks();
+  DailyQuestSystem.update();
   var tasks = userProgress.dailyTasks || {};
   var dailyQ = userProgress.dailyQuestions || 0;
   var dailyXP = userProgress.dailyXP || 0;
@@ -701,18 +1199,17 @@ async function renderHomePath() {
 
   if (!allDone) {
     var nextLesson = allLessons[nextIdx];
-    html += '<div class="continue-card" onclick="goQuizFromLoaded('+nextIdx+')">';
+    html += '<div class="continue-card" onclick="QuestionSystem.start('+nextIdx+')">';
     html += '<div class="continue-icon">'+(nextLesson.title.match(/^\S+/)?nextLesson.title.match(/^\S+/)[0]:'▶')+'</div>';
     html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">'+nextLesson.title.replace(/^\S+\s*/,'')+'</div></div>';
     html += '<div class="continue-arrow">→</div></div>';
   } else {
-    html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+    html += '<div class="continue-card" onclick="QuestionSystem.startBoss()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
     html += '<div class="continue-icon">👑</div>';
     html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс — все темы</div></div>';
     html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
   }
 
-  // Остальной путь
   html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
   allLessons.forEach(function(l, i) {
     var done = userProgress.completedLessons[l.title];
@@ -724,7 +1221,7 @@ async function renderHomePath() {
 
     var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
     var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
-    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded('+i+')"';
+    var onclk = isLocked ? '' : ' onclick="QuestionSystem.start('+i+')"';
 
     if (i > 0) {
       var connDone = userProgress.completedLessons[allLessons[i-1].title];
@@ -745,7 +1242,7 @@ async function renderHomePath() {
 
   html += '<div class="path-connector" style="background:'+(allDone?'var(--primary2)':'var(--border)')+'"></div>';
   html += '<div class="path-node-row">';
-  html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="goBossLevel()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
+  html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="QuestionSystem.startBoss()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
   html += '<div style="flex:1"><div style="font-weight:800;font-size:15px;color:'+(allDone?'#d29922':'var(--muted)')+'">Финальный босс</div>';
   html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(allDone?'Тест по всем темам — открыт!':'Пройди все темы чтобы открыть')+'</div></div>';
   html += '</div>';
@@ -757,36 +1254,6 @@ async function renderHomePath() {
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 }
 
-function goQuizFromLoaded(idx) {
-  var allLessons = getAllLessons();
-  curLesson = idx;
-  shuffled = allLessons[idx].questions;
-  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
-  goScreen('s-quiz');
-  renderQ();
-}
-
-function replayLesson() {
-  if (isBossMode || curLesson < 0) { goBossLevel(); return; }
-  var allLessons = getAllLessons();
-  shuffled = allLessons[curLesson].questions;
-  curQ=0; score=0; answered=false; lives=3; hintUsed=false;
-  goScreen('s-quiz');
-  renderQ();
-}
-
-var isBossMode = false;
-function goBossLevel() {
-  var allLessons = getAllLessons();
-  var allQuestions = [];
-  allLessons.forEach(function(l) { if (l.questions) allQuestions = allQuestions.concat(l.questions); });
-  allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
-  isBossMode = true;
-  shuffled = allQuestions; curLesson = -1; curQ=0; score=0; answered=false; lives=999; hintUsed=false;
-  goScreen('s-quiz'); renderQ();
-}
-
-// ── Профиль ──
 function renderProfile() {
   var allLessons = getAllLessons();
   var completedCount = Object.keys(userProgress.completedLessons).length;
@@ -824,18 +1291,17 @@ function renderProfile() {
   html += '</div>';
 
   // Сундуки
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center">';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
   if (chestCount > 0) {
     html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
   } else {
-    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Нет доступных сундуков</div>';
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
   }
   html += '</div>';
-  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer"'+(chestCount===0?' disabled':'')+'>Открыть</button>';
+  html += '<button onclick="ChestSystem.open()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount===0?' disabled':'')+'>'+(chestCount>0?'Открыть сундук':'Нет сундуков')+'</button>';
   html += '</div>';
 
-  // Напоминания
   var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
   var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
@@ -844,7 +1310,6 @@ function renderProfile() {
   html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+notifDesc+'</div>';
   html += '</div>';
 
-  // Мой класс (заглушка)
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
@@ -852,8 +1317,7 @@ function renderProfile() {
   html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
 
-  // Достижения
-  checkAchievements();
+  AchievementSystem.check();
   var achievements = userProgress.achievements || {};
   html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
@@ -861,7 +1325,6 @@ function renderProfile() {
     var ach = achievements[a.id] || { progress: 0, unlocked: false };
     var isUnlocked = ach.unlocked;
     var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
-    var pct = a.max ? Math.round((progress / a.max)*100) : (isUnlocked ? 100 : 0);
     var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
     html += '<div class="badge-item-p'+(isUnlocked?'':' locked')+'" style="position:relative">';
     html += '<div class="badge-icon-p">'+a.icon+'</div>';
@@ -882,247 +1345,35 @@ function renderProfile() {
   document.getElementById('profile-content').innerHTML = html;
 }
 
-// ── Остальные функции ──
-function getCurrentTopicTitle() {
-  if (isBossMode) return 'Финальный босс';
-  var all = getAllLessons();
-  return (all[curLesson] && all[curLesson].title) || 'Тренировка';
-}
-
-function renderQ() {
-  const q = shuffled[curQ];
-  const topicTitle = getCurrentTopicTitle();
-  answered=false; hintUsed=false; lastExplainText = '';
-  document.getElementById('quiz-topic-lbl').textContent = topicTitle;
-  document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(curQ+1)+' из '+shuffled.length;
-  document.getElementById('quiz-counter').textContent = (curQ+1)+'/'+shuffled.length;
-  document.getElementById('qpf').style.width = ((curQ/shuffled.length)*100)+'%';
-  document.getElementById('q-tag').textContent = q.tag;
-  document.getElementById('q-text').textContent = q.text;
-  document.getElementById('ai-quiz').style.display = 'none';
-  document.getElementById('ai-explain').style.display = 'none';
-  document.getElementById('btn-ask-ai').style.display = 'none';
-  document.getElementById('hint-box').style.display = 'none';
-  document.getElementById('btn-hint').style.display = 'flex';
-  document.getElementById('btn-hint').disabled = false;
-  document.getElementById('btn-hint').textContent = '🎓 Совет от Профессора Гео';
-  var livesEl = document.getElementById('lives-row');
-  livesEl.innerHTML = '';
-  for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>'; }
-  const btn = document.getElementById('btn-next');
-  btn.classList.remove('show');
-  btn.textContent = curQ < shuffled.length-1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
-  const ans = document.getElementById('answers');
-  ans.innerHTML = '';
-  ['А','Б','В','Г'].forEach(function(l, i){
-    const b = document.createElement('button');
-    b.className = 'ans-btn';
-    b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
-    b.onclick = function(){ selectAns(i, q.correct, q.text, topicTitle, q.hint); };
-    ans.appendChild(b);
-  });
-}
-
-async function getHint() {
-  if (hintUsed) return;
-  hintUsed = true;
-  const q = shuffled[curQ];
-  const btn = document.getElementById('btn-hint');
-  btn.textContent = '⏳ Профессор Гео думает...'; btn.disabled = true;
-  const hintBox = document.getElementById('hint-box');
-  hintBox.style.display = 'block';
-  hintBox.textContent = '⏳ Профессор Гео анализирует вопрос...';
-
-  try {
-    const prompt = `Ты — Профессор Гео, добрый наставник по географии. Ученик решает задание ОГЭ: «${q.text}». Дай короткую подсказку (1-2 предложения), которая поможет понять ход решения, но НЕ называй правильный ответ и НЕ говори чисел. Направляй, задавай наводящие вопросы. Будь мотивирующим.`;
-    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({question: prompt, context: getCurrentTopicTitle()})});
-    const d = await r.json();
-    if (d.answer) hintBox.textContent = '🎓 ' + d.answer;
-    else hintBox.textContent = '🎓 Подумай, какое правило здесь можно применить.';
-  } catch(e) {
-    hintBox.textContent = '🎓 Вспомни основные закономерности по этой теме.';
-  }
-  btn.textContent = '🎓 Совет получен';
-}
-
-function selectAns(idx, correct, qText, topic, hint) {
-  if (answered) return;
-  answered = true;
-  if (idx === correct && isTelegram && tgApp.HapticFeedback) { try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){} }
-  const btns = document.querySelectorAll('.ans-btn');
-  btns[idx].classList.add(idx===correct?'correct':'wrong');
-  if (idx !== correct) { btns[correct].classList.add('correct'); lives--; }
-  if (idx === correct) score++;
-  document.getElementById('btn-hint').style.display = 'none';
-  var livesEl = document.getElementById('lives-row');
-  livesEl.innerHTML = '';
-  for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<lives?'❤️':'🖤')+'</span>'; }
-  requestAIExplanation(idx===correct, qText, topic);
-  document.getElementById('btn-next').classList.add('show');
-  if (lives <= 0) { document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз'; }
-  updateDailyTasks();
-}
-
-async function requestAIExplanation(isCorrect, qText, topic) {
-  const explainBox = document.getElementById('ai-explain');
-  const askBtn = document.getElementById('btn-ask-ai');
-  explainBox.style.display = 'block'; askBtn.style.display = 'block';
-  explainBox.textContent = '⏳ Профессор Гео объясняет...';
-  const prompt = isCorrect
-    ? `Ты Профессор Гео. Ученик правильно ответил на вопрос ОГЭ: «${qText}». Объясни кратко (2-3 предложения), почему ответ верный, выделив ключевую закономерность. Будь поддерживающим.`
-    : `Ты Профессор Гео. Ученик ошибся в вопросе ОГЭ: «${qText}». Дай КОРОТКОЕ объяснение правильного ответа, указав типичную ошибку и как её избежать. 2-3 предложения, мотивируй.`;
-  try {
-    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({question: prompt, context: topic})});
-    const d = await r.json();
-    const ans = d.answer || 'Подумай, какое правило здесь работает.';
-    explainBox.textContent = '📘 ' + ans; lastExplainText = ans;
-  } catch(e) { explainBox.textContent = '📘 ' + (isCorrect ? 'Отлично! Ты знаешь материал.' : 'Обрати внимание на это правило.'); lastExplainText = explainBox.textContent; }
-}
-
-function openAIChat() {
-  const aiPanel = document.getElementById('ai-quiz');
-  const topic = getCurrentTopicTitle();
-  const ctx = 'Вопрос ОГЭ: ' + (shuffled[curQ]?.text || '');
-  if (!aiPanel.dataset.initialized) { initAI('ai-quiz', ctx, [], false); aiPanel.dataset.initialized = '1'; }
-  aiPanel.style.display = 'block';
-  const body = aiPanel.querySelector('.ai-body');
-  if (body) {
-    body.classList.add('open');
-    const msgs = document.getElementById('msgs-ai-quiz');
-    if (msgs && lastExplainText.trim()) { msgs.innerHTML = ''; msgs.innerHTML += `<div class="msg ai">${lastExplainText.replace(/\n/g,'<br>')}</div>`; }
-  }
-  const toggle = aiPanel.querySelector('.ai-toggle');
-  if (toggle) toggle.classList.add('open');
-}
-
-function nextQ() { curQ++; if (curQ >= shuffled.length) showResult(); else renderQ(); }
-
-function showResult() {
-  const total = shuffled.length; const pct = Math.round(score/total*100);
-  if (isBossMode) {
-    userProgress.bossCompleted = true; saveProgress();
-    document.getElementById('boss-sub').textContent = score+'/'+total+' правильных ответов ('+pct+'%)';
-    document.getElementById('boss-num').textContent = score;
-    document.getElementById('boss-denom').textContent = 'из ' + total;
-    goScreen('s-boss-result');
-    setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
-    isBossMode = false; updateDailyTasks(); return;
-  }
-  let e='😔', t='Нужно повторить';
-  if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хороший результат!'; } else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
-  document.getElementById('res-emoji').textContent = e;
-  document.getElementById('res-title').textContent = t;
-  document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
-  document.getElementById('ring-num').textContent = score;
-  document.getElementById('ring-denom').textContent = `из ${total}`;
-  document.getElementById('res-c').textContent = score;
-  document.getElementById('res-w').textContent = total-score;
-  var xpGain = score*20 + (score===total ? 50 : 0);
-  document.getElementById('res-xp').textContent = '+'+xpGain;
-  saveLesson(curLesson, score, total);
-  goScreen('s-result');
-  setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-score/total); }, 100);
-  updateDailyTasks();
-}
-
-function initAI(cid, ctx, prompts=[], autoOpen=false) {
-  const el = document.getElementById(cid); if (!el) return;
-  const escCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
-  el.innerHTML = `
-    <div class="ai-header" onclick="toggleAI(this)">
-      <div class="ai-header-left">
-        <div class="ai-avatar">🎓</div>
-        <div><div class="ai-name">Профессор Гео</div><div class="ai-tagline">Спроси — объясню как наставник</div></div>
-      </div>
-      <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
-    </div>
-    <div class="ai-body ${autoOpen?'open':''}">
-      <div class="ai-context">📌 ${ctx}</div>
-      <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="sendP('${cid}','${escCtx}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
-      <div class="ai-messages" id="msgs-${cid}"></div>
-      <div class="ai-input-row">
-        <textarea class="ai-input" id="inp-${cid}" placeholder="Спроси Профессора..." rows="1"
-          onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendM('${cid}','${escCtx}');}"></textarea>
-        <button class="ai-send" id="snd-${cid}" onclick="sendM('${cid}','${escCtx}')">➤</button>
-      </div>
-    </div>
-  `;
-}
-
-function toggleAI(h) { const b = h.nextElementSibling; const t = h.querySelector('.ai-toggle'); b.classList.toggle('open'); t.classList.toggle('open'); }
-function sendP(cid, ctx, text) { document.getElementById(`inp-${cid}`).value = text; sendM(cid, ctx); }
-
-async function sendM(cid, ctx) {
-  const inp = document.getElementById(`inp-${cid}`); const snd = document.getElementById(`snd-${cid}`);
-  const msgs = document.getElementById(`msgs-${cid}`); const text = inp.value.trim(); if (!text) return;
-  inp.value = ''; snd.disabled = true;
-  msgs.innerHTML += `<div class="msg user">${text}</div>`;
-  const lid = 'l'+Date.now(); msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
-  msgs.scrollTop = msgs.scrollHeight;
-  try {
-    const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
-    const d = await r.json(); const ans = d.answer || 'Не удалось получить ответ';
-    document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
-  } catch(e) { document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`; }
-  snd.disabled = false; msgs.scrollTop = msgs.scrollHeight;
-}
-
 function inviteFriend() {
   const inviteUrl = 'https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.';
   if (isTelegram) { tgApp.openTelegramLink(inviteUrl); } else { window.open(inviteUrl, '_blank'); }
-  if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; addXP(50); saveProgress(); }
-}
-
-// Сундуки
-function openChest() {
-  if (!userProgress.chests || userProgress.chests.length === 0) return;
-  userProgress.chests.shift(); saveProgress();
-  var rand = Math.random();
-  var reward;
-  if (rand < 0.5) { reward = 50; }
-  else if (rand < 0.85) { reward = 100; }
-  else { reward = 200; }
-  // небольшая анимация
-  var modalHtml = `
-    <div class="modal-overlay" id="chest-modal">
-      <div class="modal-card">
-        <div class="chest-anim">🎁</div>
-        <div class="modal-title">Сундук открыт!</div>
-        <div class="modal-sub">Ты получил:</div>
-        <div class="modal-reward">+${reward} XP</div>
-        <button class="modal-btn" onclick="closeChestModal(${reward})">Круто!</button>
-      </div>
-    </div>`;
-  document.getElementById('modal-container').innerHTML = modalHtml;
-}
-
-function closeChestModal(reward) {
-  addXP(reward);
-  document.getElementById('modal-container').innerHTML = '';
-  renderProfile();
+  if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; XPSystem.addXP(50); saveProgress(); }
 }
 
 function shareBossResult() {
-  const total = shuffled.length;
-  const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+score+'/'+total+'! Попробуй и ты!';
+  const total = QuestionSystem.shuffled.length;
+  const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+QuestionSystem.score+'/'+total+'! Попробуй и ты!';
   if (isTelegram) { tgApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text)); }
   else { prompt('Скопируй текст для друзей:', text); }
 }
 
-// Progress
+// ── Progress ──
 var userProgress = {
   xp: 0, level: 1, streak: 0, lastDate: '',
   completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
   bossCompleted: false, freezes: 1, lastFreezeMonday: '',
-  dailyRewardDay: 1, lastDailyRewardDate: '',
   chests: [], invitedFriend: false,
   dailyTasksDate: '', dailyTasks: { solve10: false, earn50XP: false, loginToday: false },
   dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
   allDailyTasksDone: false, dailyQuestions: 0, dailyXP: 0,
   achievements: {},
-  doubleXPUntil: null,
-  friends: []
+  lastDailyChestDate: '',
+  streakChestsGiven: {},
+  friends: [],
+  freeHints: 0,
+  rareBadges: [],
+  doubleXPUntil: null
 };
 
 function saveProgress() {
@@ -1156,21 +1407,6 @@ function refreshFreeze() {
   }
 }
 
-function addXP(amount) {
-  if (amount > 0) {
-    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
-      amount *= 2;
-    } else {
-      userProgress.doubleXPUntil = null;
-    }
-    userProgress.xp += amount;
-    userProgress.level = Math.floor(userProgress.xp / 200) + 1;
-    saveProgress();
-    showXPToast(amount);
-    checkAchievements();
-  }
-}
-
 function checkStreak() {
   var today = new Date().toISOString().slice(0,10);
   if (userProgress.lastDate === today) return;
@@ -1180,14 +1416,11 @@ function checkStreak() {
     if (userProgress.freezes > 0) { userProgress.freezes = 0; userProgress.lastFreezeMonday = getMonday(new Date()); userProgress.streak++; }
     else { userProgress.streak = 1; }
   }
-  userProgress.lastDate = today; saveProgress(); checkAchievements();
-}
-
-function showXPToast(amount) {
-  var toast = document.createElement('div');
-  toast.textContent = amount ? '+' + amount + ' XP ⚡' : '✅ Выполнено';
-  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
-  document.body.appendChild(toast); setTimeout(function(){ toast.remove(); }, 2000);
+  userProgress.lastDate = today;
+  saveProgress();
+  AchievementSystem.check();
+  ChestSystem.giveDaily();
+  ChestSystem.giveStreak();
 }
 
 function showToast(msg) {
@@ -1203,80 +1436,12 @@ function getDayWord(n) {
   return 'дней';
 }
 
-function saveLesson(lessonIdx, sc, total) {
-  var today = new Date().toISOString().slice(0,10);
-  var allLessons = getAllLessons();
-  var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
-  userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
-  userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
-  var xpGain = sc * 20 + (sc === total ? 50 : 0);
-  addXP(xpGain);
-  checkStreak();
-  saveProgress();
-  if (!userProgress.chests) userProgress.chests = [];
-  if (!userProgress.completedLessons[lessonKey].chestGiven) {
-    userProgress.chests.push({ type: 'common' });
-    userProgress.completedLessons[lessonKey].chestGiven = true;
-    saveProgress();
-    showToast('🎁 Сундук за завершение темы!');
-  }
-}
-
-// Daily Reward
-function checkDailyReward() {
-  const today = new Date().toISOString().slice(0,10);
-  if (userProgress.lastDailyRewardDate === today) return;
-  let day = userProgress.dailyRewardDay || 1;
-  const lastDate = userProgress.lastDailyRewardDate;
-  if (lastDate) {
-    const last = new Date(lastDate);
-    const diffDays = Math.floor((new Date(today).getTime() - last.getTime()) / 86400000);
-    if (diffDays > 2) { day = 1; }
-    else if (diffDays === 1) { day = Math.min(day + 1, 7); }
-  }
-  showDailyRewardModal(day);
-}
-
-function showDailyRewardModal(day) {
-  const rewards = [0, 20, 30, 50, 70, 100, 150, 'chest'];
-  const reward = rewards[day];
-  const title = day === 7 ? '🎁 Сундук!' : `🔥 День ${day}`;
-  const sub = day === 7 ? 'Ты получаешь сундук с сюрпризом!' : `Ты получаешь +${reward} XP`;
-  const modalHtml = `
-    <div class="modal-overlay" id="daily-modal">
-      <div class="modal-card">
-        <div class="modal-title">${title}</div>
-        <div class="modal-sub">${sub}</div>
-        <div class="modal-reward">${day===7?'🎁':'+'+reward+' XP'}</div>
-        <button class="modal-btn" onclick="claimDailyReward(${day})">Забрать</button>
-      </div>
-    </div>`;
-  document.getElementById('modal-container').innerHTML = modalHtml;
-}
-
-function claimDailyReward(day) {
-  const rewards = [0, 20, 30, 50, 70, 100, 150, 'chest'];
-  const reward = rewards[day];
-  const today = new Date().toISOString().slice(0,10);
-  userProgress.lastDailyRewardDate = today;
-  userProgress.dailyRewardDay = day;
-  if (reward === 'chest') {
-    if (!userProgress.chests) userProgress.chests = [];
-    userProgress.chests.push({ type: 'common' });
-    showToast('🎁 Сундук добавлен в профиль!');
-  } else { addXP(reward); }
-  saveProgress();
-  document.getElementById('modal-container').innerHTML = '';
-  renderHomePath();
-}
-
-// INIT
+// ── INIT ──
 loadProgress(function() {
   checkStreak();
   renderHomePath();
-  checkDailyReward();
-  updateDailyTasks();
-  checkAchievements();
+  DailyQuestSystem.update();
+  AchievementSystem.check();
 });
 </script>
 </body>
