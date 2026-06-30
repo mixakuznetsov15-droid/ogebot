@@ -48,35 +48,84 @@ body::before {
 .scroll::-webkit-scrollbar { width:3px; }
 .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-.xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
-.xp-icon { font-size:26px; }
-.xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
-.xp-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
-.xp-stats { font-size:11px; color:var(--muted); }
-.xp-title { font-weight:600; font-size:14px; }
+/* ── Анимации появления карточек ── */
+.card-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes cardAppear {
+  to { opacity:1; transform:translateY(0); }
+}
 
-.actions { display:flex; gap:10px; }
-.btn { flex:1; padding:14px 6px; border-radius:var(--radius); background:var(--card2); border:1px solid var(--border); display:flex; flex-direction:column; align-items:center; gap:5px; color:var(--text); font-weight:600; font-size:12px; cursor:pointer; transition:transform .15s; }
-.btn:active { transform:scale(.97); }
-.btn.primary { background:linear-gradient(135deg,var(--primary),#3b8fd9); border:none; box-shadow:0 6px 18px #58a6ff25; }
-.btn.accent { background:linear-gradient(135deg,var(--primary2),#2d8a3e); border:none; box-shadow:0 6px 18px #3fb95025; }
-.btn-icon { font-size:24px; }
+/* ── Кнопки ── */
+.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
+  transform: scale(0.97) !important;
+}
 
-.grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.grid-item { background:var(--card2); border-radius:var(--radius); padding:14px; border:1px solid var(--border); cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:6px; color:#c0c8d0; font-size:12px; font-weight:500; text-align:center; transition:.15s; }
-.grid-item:active { background:#253544; }
+/* ── Прогресс-бары ── */
+.path-progress-fill, .q-progress-fill {
+  transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
 
-.sec-title { font-family:var(--font-h); font-size:14px; font-weight:700; }
-.back-link { color:var(--primary); font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+/* ── Ежедневные задания: анимация выполнения ── */
+.task-check {
+  display: inline-block;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.task-check.done {
+  color: var(--primary2) !important;
+  animation: taskPop 0.35s ease;
+}
+@keyframes taskPop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
 
-.topic-list { display:flex; flex-direction:column; gap:8px; }
-.topic-item { background:var(--card2); border-radius:var(--radius); padding:12px 14px; border:1px solid var(--border); cursor:pointer; font-size:13px; color:#c0c8d0; transition:.15s; }
-.topic-item:active { background:#253544; }
-
-.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:rgba(13,17,23,.96); backdrop-filter:blur(20px); border-top:1px solid var(--border); display:flex; padding:10px 0 22px; z-index:100; }
-.nav-item { flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; color:var(--muted); font-size:10px; font-weight:500; cursor:pointer; }
-.nav-item.active { color:var(--primary); }
-.nav-icon { font-size:20px; }
+/* ── Toast ── */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(28, 35, 51, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 18px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
+  pointer-events: auto;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.xp { border-left: 3px solid var(--primary2); }
+.toast.chest { border-left: 3px solid var(--gold); }
+.toast.achievement { border-left: 3px solid #c084fc; }
+.toast.streak { border-left: 3px solid #f97316; }
+@keyframes toastIn {
+  from { opacity:0; transform:translateY(-16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity:1; transform:translateY(0); }
+  to { opacity:0; transform:translateY(-12px); }
+}
 
 /* ── AI PANEL (Профессор Гео) ── */
 .ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
@@ -230,6 +279,10 @@ body::before {
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
+.chest-card-available {
+  animation: chestGlow 2s infinite, chestPulse 1.5s infinite;
+  border-color: #d29922 !important;
+}
 .chest-btn-available {
   background: linear-gradient(135deg, #f5a623, #d29922) !important;
   animation: chestPulse 1.2s infinite;
@@ -264,7 +317,7 @@ body::before {
   100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; }
 }
 
-/* Анимация всплывающего +XP */
+/* всплывающий +XP */
 .xp-pop {
   position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
   font-family: var(--font-h); font-size: 28px; font-weight: 800; color: var(--primary2);
@@ -281,6 +334,7 @@ body::before {
 <body>
 
 <div id="modal-container"></div>
+<div id="toast-container" class="toast-container"></div>
 
 <div class="screen active" id="s-home">
   <div class="topbar">
@@ -459,6 +513,28 @@ if (isTelegram) {
   tgApp.expand();
 }
 
+// ── Единый Toast ──
+function showToastMsg(text, type) {
+  type = type || 'info';
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(function() {
+    if (toast.parentNode) toast.remove();
+  }, 2600);
+}
+
+// ── Анимация появления карточек ──
+function animateCards(container) {
+  var cards = container.querySelectorAll('.path-progress-card, .continue-card, .profile-header-card, .profile-stats-grid > div, .badge-item-p, .sub-status-card, .profile-stat, .badges-grid-profile > div, .chest-card-available, .chest-btn-available');
+  cards.forEach(function(card, index) {
+    card.classList.add('card-animate');
+    card.style.animationDelay = (index * 0.05) + 's';
+  });
+}
+
 // ── XPSystem ──
 var XPSystem = {
   addXP: function(amount) {
@@ -469,17 +545,10 @@ var XPSystem = {
       userProgress.xp += amount;
       userProgress.level = Math.floor(userProgress.xp / 200) + 1;
       saveProgress();
-      this.showToast(amount);
+      showToastMsg('⚡ +' + amount + ' XP', 'xp');
       AchievementSystem.check();
       DailyQuestSystem.incrementCounters(0, amount);
     }
-  },
-  showToast: function(amount) {
-    var toast = document.createElement('div');
-    toast.textContent = '+' + amount + ' XP ⚡';
-    toast.style.cssText = 'position:fixed;top:80px;right:16px;background:linear-gradient(135deg,#58a6ff,#3fb950);color:#fff;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
-    document.body.appendChild(toast);
-    setTimeout(function(){ toast.remove(); }, 2000);
   }
 };
 
@@ -504,6 +573,7 @@ var DailyQuestSystem = {
       if (!collected.solve10) {
         collected.solve10 = true;
         XPSystem.addXP(20);
+        showToastMsg('🎯 Задание дня: решено 10 вопросов', 'info');
       }
     }
     if (dailyXP >= 50 && !tasks.earn50XP) {
@@ -511,6 +581,7 @@ var DailyQuestSystem = {
       if (!collected.earn50XP) {
         collected.earn50XP = true;
         XPSystem.addXP(20);
+        showToastMsg('🎯 Задание дня: получено 50 XP', 'info');
       }
     }
     if (!tasks.loginToday) {
@@ -525,7 +596,7 @@ var DailyQuestSystem = {
       userProgress.allDailyTasksDone = true;
       XPSystem.addXP(100);
       ChestSystem.give('achievement');
-      showToast('🎁 Сундук за все задания дня!');
+      showToastMsg('🎁 Сундук за все задания дня!', 'chest');
     }
     saveProgress();
   },
@@ -581,11 +652,11 @@ var AchievementSystem = {
         if (unlocked && !wasUnlocked) {
           userProgress.achievements[a.id].unlocked = true;
           userProgress.achievements[a.id].date = now;
-          showToast('🏆 Получено достижение: ' + a.title);
+          showToastMsg('🏆 ' + a.title, 'achievement');
           if (!userProgress.achievements[a.id].chestGiven) {
             ChestSystem.give('achievement');
             userProgress.achievements[a.id].chestGiven = true;
-            showToast('🎁 Сундук за достижение!');
+            showToastMsg('🎁 Сундук за достижение!', 'chest');
           }
         }
       }
@@ -610,13 +681,13 @@ var ChestSystem = {
     if (!userProgress.chests) userProgress.chests = [];
     userProgress.chests.push({ type: type || 'daily', rewardType: 'xp' });
     saveProgress();
+    showToastMsg('🎁 Получен сундук!', 'chest');
   },
   giveDaily: function() {
     var today = new Date().toISOString().slice(0,10);
     if (userProgress.lastDailyChestDate === today) return;
     userProgress.lastDailyChestDate = today;
     this.give('daily');
-    saveProgress();
   },
   giveStreak: function() {
     var streak = userProgress.streak || 0;
@@ -627,7 +698,7 @@ var ChestSystem = {
       if (streak >= t && !given[t]) {
         this.give('streak');
         given[t] = true;
-        showToast('🎁 Сундук за серию ' + t + ' дней!');
+        showToastMsg('🔥 Серия ' + t + ' дней — сундук!', 'streak');
       }
     }
     userProgress.streakChestsGiven = given;
@@ -658,25 +729,24 @@ var ChestSystem = {
         XPSystem.addXP(reward.value);
         break;
       case 'streak_day':
-        showToast('🎁 +1 день серии (будет доступно позже)');
+        showToastMsg('🎁 +1 день серии (скоро)', 'info');
         break;
       case 'boost_x2':
         userProgress.doubleXPUntil = new Date(Date.now() + reward.duration * 60000).toISOString();
         saveProgress();
-        showToast('⚡ Бустер x2 XP активирован на 15 минут!');
+        showToastMsg('⚡ Бустер x2 XP на 15 минут!', 'xp');
         break;
       case 'free_hint':
         userProgress.freeHints = (userProgress.freeHints || 0) + 1;
         saveProgress();
-        showToast('💡 Бесплатная подсказка доступна!');
+        showToastMsg('💡 Бесплатная подсказка доступна!', 'info');
         break;
       case 'badge':
         if (!userProgress.rareBadges) userProgress.rareBadges = [];
         userProgress.rareBadges.push(reward.id);
         saveProgress();
-        showToast('🏅 Получен редкий бейдж!');
+        showToastMsg('🏅 Редкий бейдж!', 'achievement');
         break;
-      default: break;
     }
   },
   showRewardModal: function(reward) {
@@ -845,7 +915,6 @@ var QuestionSystem = {
     }
     if (idx === correct) {
       this.score++;
-      // всплывающее +XP
       this.showXPPopup(10);
       XPSystem.addXP(10);
     }
@@ -945,7 +1014,6 @@ var QuestionSystem = {
       ChestSystem.give('achievement');
       userProgress.completedLessons[lessonKey].chestGiven = true;
       saveProgress();
-      showToast('🎁 Сундук за завершение темы!');
     }
   },
   getHint: async function() {
@@ -1056,7 +1124,7 @@ var AISystem = {
   }
 };
 
-// ── Profile & Home rendering (unchanged except using new systems) ──
+// ── Profile & Home rendering ──
 function getRank(xp) {
   if (xp >= 10000) return 'Легенда';
   if (xp >= 5000) return 'Мастер';
@@ -1164,7 +1232,7 @@ async function renderHomePath() {
       html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">До ' + nextGrade + ' осталось ' + needed + ' баллов</div>';
       var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
       progressPercent = Math.min(100, Math.round(progressPercent));
-      html += '<div class="path-progress-bar" style="height:8px"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
+      html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="' + progressPercent + '%"></div></div>';
     } else {
       html += '<div style="font-size:13px;color:var(--primary2);margin-bottom:8px">Ты на высшем уровне!</div>';
     }
@@ -1176,7 +1244,7 @@ async function renderHomePath() {
 
   html += '<div class="path-progress-card">';
   html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">'+pct+'%</span></div>';
-  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:'+pct+'%"></div></div>';
+  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="'+pct+'%"></div></div>';
   html += '</div>';
 
   DailyQuestSystem.update();
@@ -1186,9 +1254,9 @@ async function renderHomePath() {
   html += '<div class="path-progress-card">';
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
   html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.solve10?'var(--primary2)':'var(--muted)')+'">'+(tasks.solve10?'✅':'⬜')+'</span> Решить 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyQ,10)+'/10</span></div>';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.earn50XP?'var(--primary2)':'var(--muted)')+'">'+(tasks.earn50XP?'✅':'⬜')+'</span> Получить 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyXP,50)+'/50</span></div>';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:'+(tasks.loginToday?'var(--primary2)':'var(--muted)')+'">'+(tasks.loginToday?'✅':'⬜')+'</span> Зайти сегодня</div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.solve10?' done':'')+'" style="color:'+(tasks.solve10?'var(--primary2)':'var(--muted)')+'">'+(tasks.solve10?'✅':'⬜')+'</span> Решить 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyQ,10)+'/10</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.earn50XP?' done':'')+'" style="color:'+(tasks.earn50XP?'var(--primary2)':'var(--muted)')+'">'+(tasks.earn50XP?'✅':'⬜')+'</span> Получить 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyXP,50)+'/50</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.loginToday?' done':'')+'" style="color:'+(tasks.loginToday?'var(--primary2)':'var(--muted)')+'">'+(tasks.loginToday?'✅':'⬜')+'</span> Зайти сегодня</div>';
   html += '</div>';
   if (userProgress.allDailyTasksDone) {
     html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">🎉 Все задания выполнены! +100 XP и сундук</div>';
@@ -1252,6 +1320,15 @@ async function renderHomePath() {
 
   document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+
+  // Анимация прогресс-баров
+  setTimeout(function() {
+    var fills = container.querySelectorAll('.path-progress-fill[data-target]');
+    fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
+  }, 50);
+
+  // Анимация появления карточек
+  animateCards(container);
 }
 
 function renderProfile() {
@@ -1274,7 +1351,7 @@ function renderProfile() {
     var currentXP = userProgress.xp;
     var progressPct = Math.min(100, Math.round((currentXP / xpNeeded)*100));
     html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "'+nextRank.name+'" осталось '+(xpNeeded - currentXP)+' XP</div>';
-    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:'+progressPct+'%"></div></div>';
+    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:0%" data-target="'+progressPct+'%"></div></div>';
   }
   html += '</div></div>';
 
@@ -1343,6 +1420,15 @@ function renderProfile() {
   html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
 
   document.getElementById('profile-content').innerHTML = html;
+
+  // Анимация прогресс-баров
+  setTimeout(function() {
+    var fills = document.querySelectorAll('#profile-content .path-progress-fill[data-target]');
+    fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
+  }, 50);
+
+  // Анимация появления карточек
+  animateCards(document.getElementById('profile-content'));
 }
 
 function inviteFriend() {
@@ -1421,13 +1507,6 @@ function checkStreak() {
   AchievementSystem.check();
   ChestSystem.giveDaily();
   ChestSystem.giveStreak();
-}
-
-function showToast(msg) {
-  var toast = document.createElement('div');
-  toast.textContent = msg;
-  toast.style.cssText = 'position:fixed;top:80px;right:16px;background:var(--gold);color:#000;padding:8px 16px;border-radius:20px;font-weight:700;font-size:13px;z-index:999;animation: fadeUp .3s ease;';
-  document.body.appendChild(toast); setTimeout(function(){ toast.remove(); }, 2000);
 }
 
 function getDayWord(n) {
