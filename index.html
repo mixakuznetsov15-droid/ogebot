@@ -352,142 +352,88 @@ body::before {
   pointer-events: none;
 }
 
-/* ── Плавающая кнопка Профессора (Маскот) ── */
-.professor-fab {
+/* ========== НОВЫЙ ВИДЖЕТ ПРОФЕССОРА GEO ========== */
+.prof-geo-widget {
   position: fixed;
-  bottom: 10px;
-  right: 5px;
-  width: 100px;
-  height: 130px;
-  background: none;
-  box-shadow: none;
+  bottom: 24px;
+  right: 24px;
+  z-index: 950; /* выше экранов, но ниже тостов и модалок */
   display: flex;
+  flex-direction: column;
   align-items: flex-end;
-  justify-content: center;
-  cursor: pointer;
-  z-index: 900;
-  transition: transform 0.2s ease, opacity 0.3s ease;
-  border: none;
-  outline: none;
-  animation: professorFabAppear 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-}
-@keyframes professorFabAppear {
-  from { opacity: 0; transform: translateY(40px) scale(0.8); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-.professor-fab img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: bottom center;
-  filter: drop-shadow(0 4px 15px rgba(0,0,0,0.4));
-  transition: opacity 0.3s ease;
-}
-.professor-fab:active {
-  transform: scale(0.95) !important;
-}
-.professor-fab.hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(20px);
+  gap: 8px;
 }
 
-/* Облачко с речью */
-.professor-speech {
-  position: fixed;
-  bottom: 145px;
-  right: 24px;
-  max-width: 240px;
+/* Кнопка с портретом */
+.prof-geo-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #1e2a3a;
+  background-image: url('https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  animation: subtlePulse 3s infinite ease-in-out;
+}
+.prof-geo-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 18px rgba(210, 153, 34, 0.7), 0 2px 8px rgba(0,0,0,0.3);
+}
+@keyframes subtlePulse {
+  0% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); }
+  100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
+}
+
+/* Облачко приветствия */
+.prof-geo-speech {
+  position: relative;
   background: var(--card2);
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 14px 16px;
+  max-width: 240px;
   font-size: 13px;
-  color: var(--text);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.5);
-  z-index: 901;
-  opacity: 1;
-  pointer-events: auto;
   line-height: 1.5;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.professor-speech::after {
-  content: '';
-  position: absolute;
-  bottom: -10px;
-  right: 30px;
-  width: 0;
-  height: 0;
-  border-left: 10px solid transparent;
-  border-right: 10px solid transparent;
-  border-top: 10px solid var(--card2);
-}
-.professor-speech::before {
-  content: '';
-  position: absolute;
-  bottom: -11px;
-  right: 29px;
-  width: 0;
-  height: 0;
-  border-left: 11px solid transparent;
-  border-right: 11px solid transparent;
-  border-top: 11px solid var(--border);
-}
-.professor-speech.hidden {
+  color: var(--text);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
   opacity: 0;
-  transform: translateY(12px);
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
   pointer-events: none;
 }
-
-/* Модалка-заглушка профессора */
-.professor-placeholder-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.65);
-  z-index: 1100;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  animation: fadeInOverlay 0.25s ease;
+.prof-geo-speech.visible {
+  opacity: 1;
+  transform: translateY(0);
 }
-.professor-placeholder-card {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 24px 24px 0 0;
-  padding: 30px 24px 36px;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
+/* Стрелка к кнопке */
+.prof-geo-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 24px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--card2);
 }
-.placeholder-avatar {
-  width: 80px; height: 80px;
-  background: transparent;
-  border-radius: 28px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 40px;
-  margin-bottom: 8px;
-  overflow: hidden;
-}
-.placeholder-avatar img {
-  width: 100%; height: 100%; object-fit: cover; border-radius: 28px;
-}
-.placeholder-title {
-  font-family: var(--font-h);
-  font-size: 20px;
-  font-weight: 800;
-  color: var(--text);
-}
-.placeholder-desc {
-  font-size: 14px;
-  color: var(--muted);
-  line-height: 1.5;
-  max-width: 280px;
+/* Тонкая рамка стрелки */
+.prof-geo-speech::before {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  right: 23px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid var(--border);
 }
 </style>
 </head>
@@ -591,84 +537,64 @@ body::before {
   <div class="scroll" id="profile-content"></div>
 </div>
 
-<!-- Элементы маскота Профессор Гео с картинками -->
-<div class="professor-fab" id="professor-fab" onclick="openProfessorPlaceholder()" title="Профессор Гео">
-  <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png" alt="Профессор Гео" id="professor-img">
-</div>
-<div class="professor-speech hidden" id="professor-speech"></div>
-
-<!-- Модальное окно-заглушка профессора -->
-<div id="professor-placeholder-modal" class="professor-placeholder-overlay" style="display:none;">
-  <div class="professor-placeholder-card">
-    <div class="placeholder-avatar">
-      <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png" alt="Профессор Гео">
-    </div>
-    <div class="placeholder-title">Профессор Гео</div>
-    <div class="placeholder-desc">Совсем скоро здесь появится твой личный AI-наставник по географии.</div>
-    <button class="professor-btn professor-btn-primary" onclick="closeProfessorPlaceholder()" style="margin-top: 8px;">Скоро</button>
-  </div>
+<!-- ========== НОВЫЙ ВИДЖЕТ ПРОФЕССОРА GEO ========== -->
+<div id="professor-geo-widget" class="prof-geo-widget">
+  <div id="prof-geo-speech" class="prof-geo-speech"></div>
+  <div id="prof-geo-btn" class="prof-geo-btn" title="Профессор Гео"></div>
 </div>
 
 <script>
-// ========== Картинки профессора ==========
-const PROF_IMAGES = {
-  default: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png',
-  happy: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  sad: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_sad.png',
-  hint: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hint.png',
-  chat: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png'
-};
-
-// ========== Настроение профессора ==========
-const ProfessorMood = {
-  current: 'default',
+// ========== ProfessorGeoWidget (единый компонент) ==========
+const ProfessorGeoWidget = {
+  greetShownToday: false,
   timer: null,
-  setMood: function(mood) {
-    this.current = mood;
-    const img = document.getElementById('professor-img');
-    if (img && PROF_IMAGES[mood]) {
-      img.style.opacity = '0';
-      setTimeout(() => { img.src = PROF_IMAGES[mood]; img.style.opacity = '1'; }, 150);
+
+  init() {
+    const today = new Date().toISOString().slice(0,10);
+    this.greetShownToday = (userProgress.professorGreetingDate === today);
+    if (!this.greetShownToday) {
+      setTimeout(() => this.showGreeting(), 1200);
+      userProgress.professorGreetingDate = today;
+      saveProgress();
     }
   },
-  showSpeech: function(text, duration) {
-    duration = duration || 4000;
-    const el = document.getElementById('professor-speech');
-    if (!el) return;
+
+  showGreeting() {
+    const speechEl = document.getElementById('prof-geo-speech');
+    if (!speechEl) return;
+    const phrases = [
+      "Здравствуйте!<br><br>Сегодня отличный день, чтобы узнать что-то новое о нашей планете 🌍<br><br>У тебя всё получится!",
+      "Привет! Рад снова видеть тебя.<br>Давай сегодня покорим ещё одну тему по географии! 🚀",
+      "Добрый день! Помни: каждая решённая задача — это шаг к пятёрке на ОГЭ.",
+      "Приветствую, исследователь! 🌏<br>Готов продолжить путешествие по миру географии?"
+    ];
+    speechEl.innerHTML = phrases[Math.floor(Math.random() * phrases.length)];
+    speechEl.classList.add('visible');
     if (this.timer) clearTimeout(this.timer);
-    el.textContent = text;
-    el.classList.remove('hidden');
     this.timer = setTimeout(() => {
-      el.classList.add('hidden');
-      this.setMood('default');
+      speechEl.classList.remove('visible');
+    }, 6000);
+  },
+
+  showMessage(text, duration = 4000) {
+    const speechEl = document.getElementById('prof-geo-speech');
+    if (!speechEl) return;
+    if (this.timer) clearTimeout(this.timer);
+    speechEl.innerHTML = text;
+    speechEl.classList.add('visible');
+    this.timer = setTimeout(() => {
+      speechEl.classList.remove('visible');
     }, duration);
   },
-  hideSpeech: function() {
-    const el = document.getElementById('professor-speech');
-    if (el) el.classList.add('hidden');
+
+  hideSpeech() {
+    const speechEl = document.getElementById('prof-geo-speech');
+    if (speechEl) speechEl.classList.remove('visible');
     if (this.timer) clearTimeout(this.timer);
-    this.setMood('default');
   }
 };
 
-// Показываем речь профессора с настроением
-function showProfessorReaction(isCorrect) {
-  if (isCorrect) {
-    ProfessorMood.setMood('happy');
-    const phrases = ["Отлично! 🎉","Верно! 🎉","Так держать! 🎉","Молодец! 🎉","Правильно! 🎉"];
-    ProfessorMood.showSpeech(phrases[Math.floor(Math.random()*phrases.length)], 3000);
-  } else {
-    ProfessorMood.setMood('sad');
-    const phrases = ["Не страшно 🤔","Запомни эту тему 🤔","Подумай ещё 🤔","Ошибки учат 🤔","Разберёмся! 🤔"];
-    ProfessorMood.showSpeech(phrases[Math.floor(Math.random()*phrases.length)], 3000);
-  }
-}
-
-function showProfessorHintReaction() {
-  ProfessorMood.setMood('hint');
-  ProfessorMood.showSpeech('💡 Подумай, какие ключевые слова в вопросе помогают найти ответ.', 4000);
-}
-
+// ========== ДАННЫЕ И ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ) ==========
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 
@@ -1102,7 +1028,7 @@ function showChestOpeningAnimation(callback) {
   }, 1200);
 }
 
-// ── Professor Modal (с картинками) ──
+// ── Professor Modal ──
 var ProfessorModal = {
   currentHintLevel: 0,
   topicKey: '',
@@ -1110,7 +1036,6 @@ var ProfessorModal = {
     this.topicKey = topicKey;
     this.currentHintLevel = 0;
     var hint = getProfessorHint(topicKey, 0);
-    showProfessorHintReaction(); // показать реакцию маскота
     this._show(hint, [
       { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } },
       { text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } }
@@ -1139,8 +1064,6 @@ var ProfessorModal = {
     } else if (!isCorrect) {
       fullMessage = "Ничего страшного. Ошибки помогают понять тему лучше. " + message;
     }
-    // Показываем реакцию маскота
-    showProfessorReaction(isCorrect);
     this._show(fullMessage, [
       { text: 'Понятно', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.close(); } }
     ]);
@@ -1150,12 +1073,11 @@ var ProfessorModal = {
     var btnsHtml = buttons.map(function(b) {
       return '<button class="professor-btn ' + b.cls + '"' + (b.disabled ? ' disabled' : '') + '>' + b.text + '</button>';
     }).join('');
-    // Используем аватар с картинкой
     container.innerHTML = `
       <div class="professor-modal-overlay" id="professor-overlay">
         <div class="professor-modal-card">
           <div class="professor-avatar">
-            <img src="${PROF_IMAGES.chat}" alt="Профессор Гео">
+            <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png" alt="Профессор Гео">
           </div>
           <div class="professor-message">${message}</div>
           <div class="professor-actions">${btnsHtml}</div>
@@ -1174,7 +1096,6 @@ var ProfessorModal = {
   },
   close: function() {
     document.getElementById('professor-modal-container').innerHTML = '';
-    ProfessorMood.hideSpeech();
   }
 };
 
@@ -1357,7 +1278,7 @@ var QuestionSystem = {
   }
 };
 
-// ── AISystem (оставлен для чата) ──
+// ── AISystem ──
 var AISystem = {
   openChat: function() {
     const aiPanel = document.getElementById('ai-quiz');
@@ -1480,35 +1401,10 @@ function getCorrectAnswersNeededForGrade(targetGrade) {
   return Math.max(0, needed);
 }
 
-// ── Ежедневное приветствие профессора ──
-const GREETING_PHRASES = [
-  "Привет! Сегодня отличный день стать ещё ближе к пятёрке! 🚀",
-  "Продолжим подготовку? Осталось совсем немного!",
-  "Рад тебя видеть! Давай разберёмся с географией вместе.",
-  "Не забудь пройти ежедневные задания — они помогут закрепить знания.",
-  "Сегодня отличный день, чтобы прокачать свои знания по географии!"
-];
+// ── Ежедневное приветствие профессора (теперь через виджет) ──
+// Старая функция showDailyProfessorGreeting() удалена, используется ProfessorGeoWidget.showGreeting()
 
-function showDailyProfessorGreeting() {
-  var today = new Date().toISOString().slice(0,10);
-  if (userProgress.professorGreetingDate === today) return;
-  userProgress.professorGreetingDate = today;
-  saveProgress();
-
-  var phrase = GREETING_PHRASES[Math.floor(Math.random() * GREETING_PHRASES.length)];
-  ProfessorMood.showSpeech(phrase, 6000);
-}
-
-// ── Управление модальным окном-заглушкой профессора ──
-function openProfessorPlaceholder() {
-  ProfessorMood.hideSpeech();
-  document.getElementById('professor-placeholder-modal').style.display = 'flex';
-}
-function closeProfessorPlaceholder() {
-  document.getElementById('professor-placeholder-modal').style.display = 'none';
-}
-
-// Обновлённый renderHomePath с вызовом приветствия
+// Обновлённый renderHomePath
 async function renderHomePath() {
   var container = document.getElementById('home-content');
   if (lessonsLoaded.length === 0) {
@@ -1521,8 +1417,8 @@ async function renderHomePath() {
     return;
   }
 
-  // Ежедневное приветствие профессора (только на главном экране)
-  showDailyProfessorGreeting();
+  // Инициализация виджета профессора (проверка приветствия)
+  ProfessorGeoWidget.init();
 
   var nextIdx = 0;
   for (var i = 0; i < allLessons.length; i++) {
@@ -1763,7 +1659,7 @@ var userProgress = {
   achievements: {},
   lastDailyChestDate: '', streakChestsGiven: {},
   friends: [], freeHints: 0, rareBadges: [], doubleXPUntil: null,
-  professorGreetingDate: '' // поле для ежедневного приветствия профессора
+  professorGreetingDate: ''
 };
 
 function saveProgress() {
@@ -1824,10 +1720,6 @@ loadProgress(function() {
   renderHomePath();
   DailyQuestSystem.update();
   AchievementSystem.check();
-  // Закрытие модалки профессора по клику на оверлей
-  document.getElementById('professor-placeholder-modal').addEventListener('click', function(e) {
-    if (e.target === this) closeProfessorPlaceholder();
-  });
 });
 </script>
 </body>
