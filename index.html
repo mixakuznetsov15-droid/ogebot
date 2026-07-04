@@ -1,341 +1,178 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ГеоПро — Подготовка к ОГЭ</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0d1117;
-  --card: #161b22;
-  --card2: #1c2333;
-  --primary: #58a6ff;
-  --primary2: #3fb950;
-  --text: #f0f6fc;
-  --muted: #8b949e;
-  --danger: #f85149;
-  --gold: #d29922;
-  --border: #ffffff0c;
-  --radius: 18px;
-  --font-h: 'Unbounded', sans-serif;
-  --font-b: 'Onest', sans-serif;
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ГеоПро — Подготовка к ОГЭ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d1117;
+      --card: #161b22;
+      --card2: #1c2333;
+      --primary: #58a6ff;
+      --primary2: #3fb950;
+      --text: #f0f6fc;
+      --muted: #8b949e;
+      --danger: #f85149;
+      --gold: #d29922;
+      --border: #ffffff0c;
+      --radius: 18px;
+      --font-h: 'Unbounded', sans-serif;
+      --font-b: 'Onest', sans-serif;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+    body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+    body::before {
+      content:''; position:fixed; inset:0;
+      background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+                  radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+      pointer-events:none; z-index:0;
+    }
+    .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+    .screen.active { display:flex; animation: fadeUp .3s ease; }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    .topbar {
+      padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+      background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+    }
+    .avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+    .username { font-family:var(--font-h); font-size:13px; font-weight:700; }
+    .sublabel { font-size:10px; color:var(--muted); }
+    .streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
+    .scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
+    .scroll::-webkit-scrollbar { width:3px; }
+    .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
+    .card-animate {
+      opacity: 0; transform: translateY(20px);
+      animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
+    @keyframes cardAppear { to { opacity:1; transform:translateY(0); } }
+    .btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
+      transform: scale(0.97) !important;
+    }
+    .path-progress-fill, .q-progress-fill { transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1); }
+    .task-check { display: inline-block; transition: transform 0.25s ease, color 0.25s ease; }
+    .task-check.done { color: var(--primary2) !important; animation: taskPop 0.35s ease; }
+    @keyframes taskPop { 0% { transform: scale(0.8); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    .toast-container {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
+      display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none;
+    }
+    .toast {
+      background: rgba(28, 35, 51, 0.92); backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 12px 20px;
+      border-radius: 18px; font-weight: 600; font-size: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
+      pointer-events: auto; max-width: 90vw; text-align: center;
+    }
+    .toast.xp { border-left: 3px solid var(--primary2); }
+    .toast.chest { border-left: 3px solid var(--gold); }
+    .toast.achievement { border-left: 3px solid #c084fc; }
+    .toast.streak { border-left: 3px solid #f97316; }
+    @keyframes toastIn { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-12px); } }
 
-body::before {
-  content:''; position:fixed; inset:0;
-  background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
-              radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
-  pointer-events:none; z-index:0;
-}
+    /* quiz */
+    .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+    .q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
+    .q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); }
+    .q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+    .q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+    .q-text { font-size:15px; line-height:1.55; font-weight:500; }
+    .answers { display:flex; flex-direction:column; gap:8px; }
+    .ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); }
+    .ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
+    .ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+    .ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+    .ans-btn.correct .ans-letter { background:var(--primary2); }
+    .ans-btn.wrong .ans-letter { background:var(--danger); }
+    .btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; margin-top:4px; }
+    .btn-next.show { display:block; animation: fadeUp .3s ease; }
 
-.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
-.screen.active { display:flex; animation: fadeUp .3s ease; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    /* result */
+    .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+    .ring-wrap { position:relative; width:130px; height:130px; }
+    .ring-wrap svg { transform:rotate(-90deg); }
+    .ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+    .ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+    .res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
+    .res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+    .res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
+    .res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
+    .btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; }
+    .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
+    .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
 
-.topbar {
-  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
-  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
-}
-.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
-.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
-.sublabel { font-size:10px; color:var(--muted); }
-.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
+    /* path */
+    .path-progress-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:6px; }
+    .path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
+    .path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
+    .continue-card { background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; }
+    .node-circle { width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
+    .node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
+    .node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
+    .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
+    .node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
+    @keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
+    .boss-node { width:72px; height:72px; border-radius:20px; flex-shrink:0; background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922; display:flex; align-items:center; justify-content:center; font-size:30px; }
+    .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
 
-.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
-.scroll::-webkit-scrollbar { width:3px; }
-.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
+    /* professor */
+    .professor-fab {
+      position: fixed; bottom: 24px; right: 24px; width: 68px; height: 68px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--primary2));
+      box-shadow: 0 4px 15px rgba(0,0,0,0.35), 0 0 0 4px rgba(88,166,255,0.15);
+      display: flex; align-items: center; justify-content: center; font-size: 32px;
+      cursor: pointer; z-index: 900; transition: transform 0.2s; border: none;
+    }
+    .professor-speech {
+      position: fixed; bottom: 104px; right: 24px; max-width: 260px; background: var(--card2);
+      border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; font-size: 13px;
+      color: var(--text); box-shadow: 0 12px 25px rgba(0,0,0,0.5); z-index: 901;
+      transition: opacity 0.25s, transform 0.25s; pointer-events: auto;
+    }
+    .professor-speech.hidden { opacity: 0; transform: translateY(12px); pointer-events: none; }
 
-.card-animate {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-}
-@keyframes cardAppear {
-  to { opacity:1; transform:translateY(0); }
-}
-
-.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
-  transform: scale(0.97) !important;
-}
-
-.path-progress-fill, .q-progress-fill {
-  transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-
-.task-check {
-  display: inline-block;
-  transition: transform 0.25s ease, color 0.25s ease;
-}
-.task-check.done {
-  color: var(--primary2) !important;
-  animation: taskPop 0.35s ease;
-}
-@keyframes taskPop {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-.toast-container {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  background: rgba(28, 35, 51, 0.92);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 18px;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
-  pointer-events: auto;
-  max-width: 90vw;
-  text-align: center;
-}
-.toast.xp { border-left: 3px solid var(--primary2); }
-.toast.chest { border-left: 3px solid var(--gold); }
-.toast.achievement { border-left: 3px solid #c084fc; }
-.toast.streak { border-left: 3px solid #f97316; }
-@keyframes toastIn {
-  from { opacity:0; transform:translateY(-16px); }
-  to { opacity:1; transform:translateY(0); }
-}
-@keyframes toastOut {
-  from { opacity:1; transform:translateY(0); }
-  to { opacity:0; transform:translateY(-12px); }
-}
-
-/* ── QUIZ ── */
-.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
-.quiz-wrap::-webkit-scrollbar { width:3px; }
-.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
-.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
-.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
-.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
-.q-text { font-size:15px; line-height:1.55; font-weight:500; }
-.answers { display:flex; flex-direction:column; gap:8px; }
-.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
-.ans-btn:active { transform:scale(.98); }
-.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
-.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
-.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
-.ans-btn.correct .ans-letter { background:var(--primary2); }
-.ans-btn.wrong .ans-letter { background:var(--danger); }
-.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
-.btn-next.show { display:block; animation: fadeUp .3s ease; }
-.btn-next:active { transform:scale(.97); }
-
-/* ── RESULT ── */
-.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
-.result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
-@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
-.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
-.result-sub { font-size:14px; color:var(--muted); }
-.ring-wrap { position:relative; width:130px; height:130px; }
-.ring-wrap svg { transform:rotate(-90deg); }
-.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
-.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
-.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
-.ring-denom { font-size:12px; color:var(--muted); }
-.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
-.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
-.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
-.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
-.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
-.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
-.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
-.btn-full:active { transform:scale(.97); }
-.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
-.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
-
-/* ── PATH ── */
-.path-progress-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:6px; }
-.path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-.path-progress-label { font-size:13px; font-weight:600; }
-.path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
-.path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
-.path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
-
-.continue-card { background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s; }
-.continue-card:active { transform:scale(.98); }
-.continue-icon { font-size:32px; flex-shrink:0; }
-.continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
-.continue-title { font-size:15px; font-weight:700; margin-top:2px; }
-.continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
-
-.path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
-.path-connector { width:3px; height:24px; margin:0 auto; }
-.node-circle { width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
-.node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
-.node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
-.node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
-.node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
-@keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-.boss-node { width:72px; height:72px; border-radius:20px; flex-shrink:0; background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922; display:flex; align-items:center; justify-content:center; font-size:30px; }
-.boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
-
-/* ── PROFILE ── */
-.profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
-.profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
-.profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
-.profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
-.profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
-.profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
-.profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
-
-/* ── Профессор FAB и чат ── */
-.professor-fab {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 68px;
-  height: 68px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--primary2));
-  box-shadow: 0 4px 15px rgba(0,0,0,0.35), 0 0 0 4px rgba(88,166,255,0.15);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  cursor: pointer;
-  z-index: 900;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border: none;
-  outline: none;
-}
-.professor-fab:active { transform: scale(0.95); }
-
-.professor-speech {
-  position: fixed;
-  bottom: 104px;
-  right: 24px;
-  max-width: 260px;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 14px 16px;
-  font-size: 13px;
-  color: var(--text);
-  box-shadow: 0 12px 25px rgba(0,0,0,0.5);
-  z-index: 901;
-  opacity: 1;
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  pointer-events: auto;
-}
-.professor-speech.hidden { opacity: 0; transform: translateY(12px); pointer-events: none; }
-
-/* Чат с профессором (bottom sheet) */
-.chat-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.65);
-  z-index: 1100; display: flex; align-items: flex-end; justify-content: center;
-  animation: fadeInOverlay 0.25s ease;
-}
-.chat-sheet {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 24px 24px 0 0;
-  width: 100%; max-width: 500px; height: 85vh;
-  display: flex; flex-direction: column;
-  box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-.chat-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 16px 20px; border-bottom: 1px solid var(--border);
-}
-.chat-header-left { display: flex; align-items: center; gap: 12px; }
-.chat-avatar {
-  width: 44px; height: 44px; border-radius: 16px;
-  background: linear-gradient(135deg, #4a6fa5, #3b5998);
-  display: flex; align-items: center; justify-content: center; font-size: 24px;
-}
-.chat-name { font-family: var(--font-h); font-size: 16px; font-weight: 700; }
-.chat-topic { font-size: 11px; color: var(--primary); margin-top: 2px; }
-.chat-close {
-  width: 36px; height: 36px; border-radius: 50%;
-  background: var(--card); border: 1px solid var(--border);
-  color: var(--muted); font-size: 18px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-}
-.chat-messages {
-  flex: 1; overflow-y: auto; padding: 16px;
-  display: flex; flex-direction: column; gap: 12px;
-}
-.chat-messages::-webkit-scrollbar { width: 3px; }
-.chat-messages::-webkit-scrollbar-thumb { background: #ffffff15; border-radius: 8px; }
-
-.chat-msg {
-  max-width: 85%; padding: 12px 14px; border-radius: 16px;
-  font-size: 13px; line-height: 1.5; word-break: break-word;
-}
-.chat-msg.user {
-  align-self: flex-end;
-  background: var(--primary); color: #fff;
-  border-bottom-right-radius: 4px;
-}
-.chat-msg.professor {
-  align-self: flex-start;
-  background: var(--card); border: 1px solid var(--border);
-  color: var(--text); border-bottom-left-radius: 4px;
-}
-.chat-msg.loading {
-  align-self: flex-start; background: transparent; color: var(--muted);
-  font-style: italic; padding: 8px 14px;
-}
-
-.chat-quick-actions {
-  display: flex; gap: 8px; padding: 8px 16px; overflow-x: auto;
-  border-top: 1px solid var(--border);
-}
-.chat-quick-btn {
-  flex-shrink: 0; background: var(--card); border: 1px solid var(--border);
-  border-radius: 20px; padding: 8px 14px; font-size: 12px;
-  color: var(--text); cursor: pointer; font-family: var(--font-b);
-  white-space: nowrap;
-}
-.chat-input-row {
-  display: flex; gap: 8px; padding: 12px 16px 20px;
-  border-top: 1px solid var(--border);
-}
-.chat-input {
-  flex: 1; background: var(--card); border: 1px solid var(--border);
-  border-radius: 14px; padding: 12px 14px; color: var(--text);
-  font-family: var(--font-b); font-size: 13px; resize: none; outline: none;
-}
-.chat-input::placeholder { color: var(--muted); }
-.chat-send-btn {
-  width: 44px; height: 44px; border-radius: 14px; background: var(--primary);
-  border: none; color: #fff; font-size: 18px; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0;
-}
-@keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
-@keyframes slideUp { from { transform: translateY(100%); opacity:0; } to { transform: translateY(0); opacity:1; } }
-</style>
+    /* chat */
+    .chat-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1100;
+      display: flex; align-items: flex-end; justify-content: center;
+      animation: fadeInOverlay 0.25s ease;
+    }
+    .chat-sheet {
+      background: var(--card2); border: 1px solid var(--border); border-radius: 24px 24px 0 0;
+      width: 100%; max-width: 500px; height: 85vh; display: flex; flex-direction: column;
+      box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
+      animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+    }
+    .chat-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
+    .chat-avatar { width:44px; height:44px; border-radius:16px; background:linear-gradient(135deg,#4a6fa5,#3b5998); display:flex; align-items:center; justify-content:center; font-size:24px; }
+    .chat-name { font-family:var(--font-h); font-size:16px; font-weight:700; }
+    .chat-topic { font-size:11px; color:var(--primary); margin-top:2px; }
+    .chat-close { width:36px; height:36px; border-radius:50%; background:var(--card); border:1px solid var(--border); color:var(--muted); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .chat-msg { max-width:85%; padding:12px 14px; border-radius:16px; font-size:13px; line-height:1.5; }
+    .chat-msg.user { align-self:flex-end; background:var(--primary); color:#fff; border-bottom-right-radius:4px; }
+    .chat-msg.professor { align-self:flex-start; background:var(--card); border:1px solid var(--border); color:var(--text); border-bottom-left-radius:4px; }
+    .chat-msg.loading { align-self:flex-start; background:transparent; color:var(--muted); font-style:italic; }
+    .chat-quick-actions { display:flex; gap:8px; padding:8px 16px; overflow-x:auto; border-top:1px solid var(--border); }
+    .chat-quick-btn { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:8px 14px; font-size:12px; color:var(--text); cursor:pointer; font-family:var(--font-b); }
+    .chat-input-row { display:flex; gap:8px; padding:12px 16px 20px; border-top:1px solid var(--border); }
+    .chat-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 14px; color:var(--text); font-family:var(--font-b); font-size:13px; outline:none; }
+    .chat-send-btn { width:44px; height:44px; border-radius:14px; background:var(--primary); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
+    @keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
+    @keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+  </style>
 </head>
 <body>
 <div id="toast-container" class="toast-container"></div>
 
-<!-- Экраны -->
+<!-- Screens -->
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -347,7 +184,7 @@ body::before {
       <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
     </div>
   </div>
-  <div class="scroll" id="home-content" style="padding-top:8px"><div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div></div>
+  <div class="scroll" id="home-content"><div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div></div>
 </div>
 
 <div class="screen" id="s-quiz">
@@ -359,13 +196,10 @@ body::before {
   <div class="quiz-wrap">
     <div style="display:flex;align-items:center;gap:10px">
       <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
-      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
+      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;"></div>
     </div>
     <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
-    <div class="q-card">
-      <div class="q-tag" id="q-tag">Задание</div>
-      <div class="q-text" id="q-text">...</div>
-    </div>
+    <div class="q-card"><div class="q-tag" id="q-tag"></div><div class="q-text" id="q-text"></div></div>
     <div class="answers" id="answers"></div>
     <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
     <button class="btn-next" id="btn-next" onclick="QuestionSystem.next()">Следующий вопрос →</button>
@@ -397,54 +231,30 @@ body::before {
   </div>
 </div>
 
-<div class="screen" id="s-boss-result">
-  <div class="result-wrap">
-    <div class="result-emoji">👑</div>
-    <div class="result-title">Финальный босс пройден!</div>
-    <div class="result-sub" id="boss-sub">Ты прошёл все темы ОГЭ</div>
-    <div class="ring-wrap">
-      <svg width="130" height="130" viewBox="0 0 130 130">
-        <circle class="ring-bg" cx="65" cy="65" r="54"/>
-        <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/>
-      </svg>
-      <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div>
-    </div>
-    <div class="res-btns">
-      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="shareBossResult()">📤 Похвастаться результатом</button>
-    </div>
-  </div>
-</div>
-
 <div class="screen" id="s-profile">
   <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
   <div class="scroll" id="profile-content"></div>
 </div>
 
-<!-- Профессор Гео: FAB и облачко -->
-<div class="professor-fab" id="professor-fab" title="Профессор Гео">👨‍🏫</div>
+<!-- Professor FAB & speech -->
+<div class="professor-fab" id="professor-fab">👨‍🏫</div>
 <div class="professor-speech hidden" id="professor-speech"></div>
 
-<!-- Чат с профессором (bottom sheet) -->
+<!-- Chat overlay -->
 <div id="chat-overlay" class="chat-overlay" style="display:none;">
   <div class="chat-sheet">
     <div class="chat-header">
-      <div class="chat-header-left">
+      <div style="display:flex;align-items:center;gap:12px">
         <div class="chat-avatar">👨‍🏫</div>
-        <div>
-          <div class="chat-name">Профессор Гео</div>
-          <div class="chat-topic" id="chat-current-topic">Тема не выбрана</div>
-        </div>
+        <div><div class="chat-name">Профессор Гео</div><div class="chat-topic" id="chat-current-topic">Общая подготовка</div></div>
       </div>
       <button class="chat-close" onclick="ProfessorChat.close()">✕</button>
     </div>
-    <div class="chat-messages" id="chat-messages">
-      <div class="chat-msg professor">Привет! Я твой AI-наставник. Задай вопрос по географии или выбери тему ниже.</div>
-    </div>
-    <div class="chat-quick-actions" id="chat-quick-buttons">
+    <div class="chat-messages" id="chat-messages"></div>
+    <div class="chat-quick-actions">
       <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Объясни текущую тему')">📘 Объясни тему</button>
-      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Дай подсказку по текущему вопросу')">💡 Подсказка</button>
-      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Что спросят на ОГЭ?')">❓ Что спросят на ОГЭ</button>
+      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Дай подсказку')">💡 Подсказка</button>
+      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Что спросят на ОГЭ?')">❓ ОГЭ</button>
     </div>
     <div class="chat-input-row">
       <input class="chat-input" id="chat-input" placeholder="Введи вопрос..." onkeydown="if(event.key==='Enter') ProfessorChat.sendMessage(this.value)">
@@ -454,8 +264,7 @@ body::before {
 </div>
 
 <script>
-// ── Глобальные переменные и утилиты ──
-const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
+// ---------- DATA ----------
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 const QUESTIONS_FILES = [
   { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json' },
@@ -472,8 +281,27 @@ const QUESTIONS_FILES = [
   { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json' },
   { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json' }
 ];
+
+let lessonsLoaded = [];
+async function fetchJSON(filename) {
+  const r = await fetch(GITHUB_RAW + filename + '?nocache=' + Date.now());
+  return r.ok ? r.json() : [];
+}
+async function loadAllLessons() {
+  lessonsLoaded = [];
+  for (let f of QUESTIONS_FILES) {
+    try {
+      const data = await fetchJSON(f.file);
+      const questions = (Array.isArray(data) ? data : []).filter(q => q.tag && q.text && q.answers);
+      if (questions.length) lessonsLoaded.push({ ...f, questions });
+    } catch(e) { console.warn(e); }
+  }
+}
+function getAllLessons() { return lessonsLoaded; }
+
+// ---------- GLOBAL STATE ----------
 const tgApp = window.Telegram?.WebApp;
-const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
+const isTelegram = !!tgApp?.initData;
 if (isTelegram) { tgApp.ready(); tgApp.expand(); }
 
 let userProgress = {
@@ -487,11 +315,11 @@ let userProgress = {
 
 function saveProgress() {
   const data = JSON.stringify(userProgress);
-  if (isTelegram && tgApp.CloudStorage) tgApp.CloudStorage.setItem('progress', data, ()=>{});
+  if (isTelegram) tgApp.CloudStorage.setItem('progress', data, ()=>{});
   else try { localStorage.setItem('geo_progress', data); } catch(e) {}
 }
 function loadProgress(cb) {
-  if (isTelegram && tgApp.CloudStorage) {
+  if (isTelegram) {
     tgApp.CloudStorage.getItem('progress', (err, val) => {
       if (!err && val) try { userProgress = JSON.parse(val); } catch(e) {}
       refreshFreeze(); cb();
@@ -502,141 +330,332 @@ function loadProgress(cb) {
   }
 }
 
-function showToastMsg(text, type='info') {
-  const container = document.getElementById('toast-container');
-  const toast = document.createElement('div');
-  toast.className = 'toast ' + type;
-  toast.textContent = text;
-  container.appendChild(toast);
-  setTimeout(() => toast.remove(), 2600);
+function refreshFreeze() {
+  const d = new Date(); d.setHours(0,0,0,0);
+  const day = d.getDay();
+  const monday = new Date(d.setDate(d.getDate() - ((day + 6) % 7))).toISOString().slice(0,10);
+  if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < monday) {
+    userProgress.freezes = 1; userProgress.lastFreezeMonday = monday; saveProgress();
+  }
+}
+function checkStreak() {
+  const today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDate === today) return;
+  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+  if (userProgress.lastDate === yesterday) userProgress.streak++;
+  else if (userProgress.lastDate !== today) {
+    if (userProgress.freezes > 0) { userProgress.freezes--; userProgress.streak++; }
+    else userProgress.streak = 1;
+  }
+  userProgress.lastDate = today; saveProgress();
+  AchievementSystem.check(); ChestSystem.giveDaily(); ChestSystem.giveStreak();
 }
 
-// ── ProfessorGeo (облачко) ──
-const ProfessorGeo = {
-  HAPPY: ["Отлично! 🎉","Верно, молодец! 🎉","Так держать! 🎉","Превосходно! 🎉","Ты справился! 🎉"],
-  SAD: ["Не страшно, разберёмся! 🤔","Запомни эту тему! 🤔","Ничего, в следующий раз получится! 🤔","Ошибки помогают учиться 🤔","Подумай ещё разок 🤔"],
-  timer: null,
-  show(text, mood='neutral', duration=3000) {
-    const speech = document.getElementById('professor-speech');
-    if (!speech) return;
-    if (this.timer) clearTimeout(this.timer);
-    speech.textContent = text;
-    speech.classList.remove('hidden');
-    this.timer = setTimeout(() => this.hide(), duration);
-  },
-  hide() {
-    const speech = document.getElementById('professor-speech');
-    if (!speech) return;
-    speech.classList.add('hidden');
-    if (this.timer) { clearTimeout(this.timer); this.timer = null; }
-  },
-  showHappy() { this.show(this.HAPPY[Math.floor(Math.random()*this.HAPPY.length)], 'happy'); },
-  showSad() { this.show(this.SAD[Math.floor(Math.random()*this.SAD.length)], 'sad'); },
-  showHint(text) { this.show('💡 ' + text, 'hint', 4000); }
+function showToast(text, type='info') {
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.className = 'toast ' + type; t.textContent = text;
+  c.appendChild(t); setTimeout(() => t.remove(), 2600);
+}
+
+// ---------- SYSTEMS ----------
+const XPSystem = {
+  addXP(amount) {
+    if (amount <= 0) return;
+    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) amount *= 2;
+    userProgress.xp += amount;
+    userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+    saveProgress(); showToast('⚡ +' + amount + ' XP', 'xp');
+    AchievementSystem.check();
+    DailyQuestSystem.incrementCounters(0, amount);
+  }
 };
 
-// ── ProfessorChat (окно чата) ──
-const ProfessorChat = {
-  currentTopic: 'Общая подготовка',
-  history: [], // [{role:'user'|'professor', text}]
-  isOpen: false,
+const DailyQuestSystem = {
+  update() {
+    const today = new Date().toISOString().slice(0,10);
+    if (userProgress.dailyTasksDate !== today) {
+      userProgress.dailyTasksDate = today;
+      userProgress.dailyTasks = { solve10:false, earn50XP:false, loginToday:true };
+      userProgress.dailyTasksCollected = { solve10:false, earn50XP:false, loginToday:false };
+      userProgress.allDailyTasksDone = false; saveProgress();
+    }
+    const tasks = userProgress.dailyTasks, collected = userProgress.dailyTasksCollected;
+    if (userProgress.dailyQuestions >= 10 && !tasks.solve10) {
+      tasks.solve10 = true; if (!collected.solve10) { collected.solve10 = true; XPSystem.addXP(20); }
+    }
+    if (userProgress.dailyXP >= 50 && !tasks.earn50XP) {
+      tasks.earn50XP = true; if (!collected.earn50XP) { collected.earn50XP = true; XPSystem.addXP(20); }
+    }
+    if (!tasks.loginToday) { tasks.loginToday = true; if (!collected.loginToday) { collected.loginToday = true; XPSystem.addXP(20); } }
+    if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
+      userProgress.allDailyTasksDone = true; XPSystem.addXP(100); ChestSystem.give('achievement');
+    }
+    saveProgress();
+  },
+  incrementCounters(q, xp) {
+    const today = new Date().toISOString().slice(0,10);
+    if (userProgress.dailyTasksDate !== today) { userProgress.dailyQuestions=0; userProgress.dailyXP=0; }
+    userProgress.dailyQuestions += q; userProgress.dailyXP += xp; saveProgress(); this.update();
+  }
+};
 
+const ACHIEVEMENTS_LIST = [
+  { id:'first_login', icon:'🏆', title:'Первый вход', cond:()=>true },
+  { id:'first_lesson', icon:'🏆', title:'Первый урок', cond:()=>userProgress.totalAnswered>0 },
+  { id:'streak3', icon:'🔥', title:'3 дня подряд', cond:()=>(userProgress.streak||0)>=3 },
+  { id:'solve50', icon:'📚', title:'50 вопросов', cond:()=>userProgress.totalAnswered>=50, max:50, progress:()=>Math.min(userProgress.totalAnswered,50) },
+  { id:'xp500', icon:'⭐', title:'500 XP', cond:()=>userProgress.xp>=500, max:500, progress:()=>Math.min(userProgress.xp,500) },
+];
+
+const AchievementSystem = {
+  check() {
+    if (!userProgress.achievements) userProgress.achievements = {};
+    const now = new Date().toISOString();
+    ACHIEVEMENTS_LIST.forEach(a => {
+      if (userProgress.achievements[a.id]?.unlocked) return;
+      const unlocked = a.cond();
+      const progress = a.progress ? a.progress() : (unlocked ? 1 : 0);
+      if (!userProgress.achievements[a.id]) userProgress.achievements[a.id] = { progress, unlocked, date: unlocked?now:null, chestGiven:false };
+      else {
+        userProgress.achievements[a.id].progress = progress;
+        if (unlocked && !userProgress.achievements[a.id].unlocked) {
+          userProgress.achievements[a.id].unlocked = true; userProgress.achievements[a.id].date = now;
+          showToast('🏆 ' + a.title, 'achievement');
+          if (!userProgress.achievements[a.id].chestGiven) {
+            ChestSystem.give('achievement'); userProgress.achievements[a.id].chestGiven = true;
+          }
+        }
+      }
+    });
+    saveProgress();
+  }
+};
+
+const ChestSystem = {
+  give(type) { if (!userProgress.chests) userProgress.chests = []; userProgress.chests.push({type}); saveProgress(); },
+  giveDaily() { const today = new Date().toISOString().slice(0,10); if (userProgress.lastDailyChestDate!==today) { userProgress.lastDailyChestDate=today; this.give('daily'); } },
+  giveStreak() { const s = userProgress.streak||0; const given = userProgress.streakChestsGiven||{}; [3,7,14,30].forEach(t => { if (s>=t && !given[t]) { this.give('streak'); given[t]=true; } }); userProgress.streakChestsGiven=given; saveProgress(); }
+};
+
+// ---------- PROFESSOR GEO ----------
+const ProfessorGeo = {
+  HAPPY: ["Отлично! 🎉","Верно! 🎉","Так держать! 🎉","Молодец! 🎉","Правильно! 🎉"],
+  SAD: ["Не страшно 🤔","Запомни эту тему 🤔","Подумай ещё 🤔","Ошибки учат 🤔","Разберёмся! 🤔"],
+  timer: null,
+  show(text, duration=3000) {
+    const el = document.getElementById('professor-speech');
+    if (!el) return; if (this.timer) clearTimeout(this.timer);
+    el.textContent = text; el.classList.remove('hidden');
+    this.timer = setTimeout(() => this.hide(), duration);
+  },
+  hide() { const el = document.getElementById('professor-speech'); if(el) el.classList.add('hidden'); if(this.timer) clearTimeout(this.timer); },
+  showHappy() { this.show(this.HAPPY[Math.floor(Math.random()*this.HAPPY.length)]); },
+  showSad() { this.show(this.SAD[Math.floor(Math.random()*this.SAD.length)]); },
+  showHint(text) { this.show('💡 ' + text, 4000); }
+};
+
+// ---------- PROFESSOR CHAT ----------
+const ProfessorChat = {
+  history: [],
+  currentTopic: 'Общая подготовка',
+  isOpen: false,
   open() {
     if (this.isOpen) return;
     this.isOpen = true;
-    // Определяем текущую тему из QuestionSystem или из главного экрана
-    try {
-      if (document.getElementById('s-quiz').classList.contains('active')) {
-        this.currentTopic = QuestionSystem.getTopicTitle();
-      } else {
-        // можно взять из активной темы на главном экране, но для упрощения оставим общую
-        this.currentTopic = 'Общая подготовка';
-      }
-    } catch(e) { this.currentTopic = 'Общая подготовка'; }
+    try { this.currentTopic = document.getElementById('s-quiz').classList.contains('active') ? QuestionSystem.getTopicTitle() : 'Общая подготовка'; } catch(e) {}
     document.getElementById('chat-current-topic').textContent = '📚 ' + this.currentTopic;
     document.getElementById('chat-overlay').style.display = 'flex';
-    document.getElementById('chat-input').focus();
-    // Если история пуста, добавляем приветственное сообщение
-    if (this.history.length === 0) {
-      this.addMessage('professor', 'Привет! Я твой AI-наставник. Задай вопрос по географии или выбери тему ниже.');
-    }
-    this.renderHistory();
+    if (!this.history.length) this.addMessage('professor', 'Привет! Я твой AI-наставник. Задай вопрос по географии или выбери тему.');
+    this.render();
   },
-
-  close() {
-    this.isOpen = false;
-    document.getElementById('chat-overlay').style.display = 'none';
-    // Не очищаем историю, чтобы при повторном открытии сохранялась (пока окно не перезагружено)
-  },
-
-  addMessage(role, text) {
-    this.history.push({ role, text });
-    this.renderHistory();
-  },
-
-  renderHistory() {
-    const container = document.getElementById('chat-messages');
-    if (!container) return;
-    container.innerHTML = this.history.map(msg => {
-      if (msg.role === 'loading') return '<div class="chat-msg loading">⏳ Профессор Гео думает...</div>';
-      return `<div class="chat-msg ${msg.role}">${msg.text.replace(/\n/g,'<br>')}</div>`;
+  close() { this.isOpen = false; document.getElementById('chat-overlay').style.display = 'none'; },
+  addMessage(role, text) { this.history.push({role, text}); this.render(); },
+  render() {
+    const c = document.getElementById('chat-messages');
+    if (!c) return;
+    c.innerHTML = this.history.map(m => {
+      if (m.role === 'loading') return '<div class="chat-msg loading">⏳ Профессор думает...</div>';
+      return `<div class="chat-msg ${m.role}">${m.text.replace(/\n/g,'<br>')}</div>`;
     }).join('');
-    container.scrollTop = container.scrollHeight;
+    c.scrollTop = c.scrollHeight;
   },
-
   async sendMessage(text) {
-    if (!text || !text.trim()) return;
-    const input = document.getElementById('chat-input');
-    if (input) input.value = '';
-    const userText = text.trim();
-    this.addMessage('user', userText);
-    // Показать индикатор загрузки
-    this.history.push({ role: 'loading', text: '' });
-    this.renderHistory();
+    if (!text?.trim()) return;
+    const input = document.getElementById('chat-input'); if (input) input.value = '';
+    this.addMessage('user', text.trim());
+    this.history.push({role:'loading', text:''}); this.render();
     try {
-      const reply = await sendToProfessor(userText, this.currentTopic);
-      // Удалить индикатор загрузки
+      const reply = await sendToProfessor(text, this.currentTopic);
       this.history = this.history.filter(m => m.role !== 'loading');
       this.addMessage('professor', reply);
     } catch(e) {
       this.history = this.history.filter(m => m.role !== 'loading');
-      this.addMessage('professor', '⚠️ Не удалось связаться с профессором. Попробуй позже.');
+      this.addMessage('professor', '⚠️ Ошибка связи.');
     }
   }
 };
 
-// Заглушка AI-ответа (в будущем заменить на реальный API)
-async function sendToProfessor(message, topic) {
-  // Имитация задержки сети
-  await new Promise(r => setTimeout(r, 800 + Math.random() * 1200));
-  const lowerMsg = message.toLowerCase();
-  if (lowerMsg.includes('объясни') || lowerMsg.includes('тему')) {
-    return `📘 Тема «${topic}» — важный раздел географии. Рекомендую повторить основные определения и потренироваться на вопросах из ОГЭ.`;
-  } else if (lowerMsg.includes('подсказк')) {
-    return `💡 Подумай, какие ключевые слова есть в вопросе. Они часто указывают на правильный ответ.`;
-  } else if (lowerMsg.includes('огэ') || lowerMsg.includes('спросят')) {
-    return `❓ На ОГЭ по географии проверяют знание карт, климата, природных зон, населения и хозяйства России. Обязательно разбери задания с топографическими и синоптическими картами.`;
-  } else {
-    return `🤔 Интересный вопрос! В рамках темы «${topic}» могу сказать, что регулярная практика — ключ к успеху.`;
-  }
+async function sendToProfessor(msg, topic) {
+  await new Promise(r => setTimeout(r, 800 + Math.random()*1200));
+  const m = msg.toLowerCase();
+  if (m.includes('объясни')) return `📘 Тема «${topic}» важна для ОГЭ. Повтори основные понятия и выполни тесты.`;
+  if (m.includes('подсказк')) return `💡 Обрати внимание на ключевые слова вопроса – они часто ведут к ответу.`;
+  if (m.includes('огэ')) return `❓ На ОГЭ спрашивают карты, климат, население, регионы России. Тренируйся на реальных заданиях.`;
+  return `🤔 Интересно! По теме «${topic}» могу сказать: практика и повторение — твои лучшие помощники.`;
 }
 
-// Обработчик FAB профессора: теперь открывает чат
-document.getElementById('professor-fab').addEventListener('click', () => {
-  // Если показано облачко, скрываем его
-  ProfessorGeo.hide();
-  ProfessorChat.open();
-});
+document.getElementById('professor-fab').addEventListener('click', () => { ProfessorGeo.hide(); ProfessorChat.open(); });
+document.getElementById('chat-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) ProfessorChat.close(); });
 
-// Закрытие чата по клику на оверлей
-document.getElementById('chat-overlay').addEventListener('click', function(e) {
-  if (e.target === this) ProfessorChat.close();
-});
+// ---------- QUIZ SYSTEM ----------
+const QuestionSystem = {
+  curQ:0, score:0, answered:false, shuffled:[], curLesson:0, lives:3, hintUsed:false, isBoss:false,
+  start(idx) {
+    const all = getAllLessons(); this.curLesson = idx; this.shuffled = all[idx].questions;
+    this.curQ=0; this.score=0; this.lives=3; this.hintUsed=false; this.isBoss=false;
+    goScreen('s-quiz'); this.renderQ();
+  },
+  startBoss() {
+    const all = getAllLessons(); let qs = []; all.forEach(l => qs = qs.concat(l.questions));
+    qs = qs.sort(()=>Math.random()-0.5).slice(0,30);
+    this.isBoss = true; this.shuffled = qs; this.curQ=0; this.score=0; this.lives=999; this.hintUsed=false;
+    goScreen('s-quiz'); this.renderQ();
+  },
+  replay() { if (this.isBoss) this.startBoss(); else this.start(this.curLesson); },
+  renderQ() {
+    const q = this.shuffled[this.curQ]; this.answered = false; this.hintUsed = false;
+    document.getElementById('quiz-topic-lbl').textContent = this.getTopicTitle();
+    document.getElementById('lesson-badge').textContent = `${this.getTopicTitle()} · Вопрос ${this.curQ+1}/${this.shuffled.length}`;
+    document.getElementById('quiz-counter').textContent = `${this.curQ+1}/${this.shuffled.length}`;
+    document.getElementById('qpf').style.width = (this.curQ/this.shuffled.length*100)+'%';
+    document.getElementById('q-tag').textContent = q.tag; document.getElementById('q-text').textContent = q.text;
+    document.getElementById('btn-hint').style.display='flex'; document.getElementById('btn-hint').disabled=false;
+    document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
+    const next = document.getElementById('btn-next'); next.classList.remove('show');
+    next.textContent = this.curQ < this.shuffled.length-1 ? 'Следующий вопрос →' : 'Результат →';
+    const ans = document.getElementById('answers'); ans.innerHTML = '';
+    ['А','Б','В','Г'].forEach((l,i) => {
+      const b = document.createElement('button'); b.className='ans-btn';
+      b.innerHTML = `<div class="ans-letter">${l}</div><span>${q.answers[i]}</span>`;
+      b.onclick = () => this.selectAns(i, q.correct);
+      ans.appendChild(b);
+    });
+  },
+  getTopicTitle() { return this.isBoss ? 'Финальный босс' : (getAllLessons()[this.curLesson]?.title || 'Тренировка'); },
+  getTopicKey() { return this.isBoss ? 'topo' : (getAllLessons()[this.curLesson]?.key || 'topo'); },
+  selectAns(idx, correct) {
+    if (this.answered) return; this.answered = true;
+    if (idx === correct && isTelegram && tgApp.HapticFeedback) tgApp.HapticFeedback.notificationOccurred('success');
+    const btns = document.querySelectorAll('.ans-btn');
+    btns[idx].classList.add(idx===correct?'correct':'wrong');
+    if (idx !== correct) { btns[correct].classList.add('correct'); this.lives--; ProfessorGeo.showSad(); }
+    else { this.score++; XPSystem.addXP(10); ProfessorGeo.showHappy(); }
+    document.getElementById('btn-hint').style.display='none';
+    document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
+    document.getElementById('btn-next').classList.add('show');
+    if (this.lives<=0) document.getElementById('btn-next').textContent = '😔 Жизни кончились';
+    DailyQuestSystem.incrementCounters(1,0); DailyQuestSystem.update();
+  },
+  next() { this.curQ++; if (this.curQ >= this.shuffled.length) this.showResult(); else this.renderQ(); },
+  getHint() { if (this.hintUsed) return; this.hintUsed = true; ProfessorGeo.showHint('Подумай, какие ключевые слова в вопросе.'); document.getElementById('btn-hint').disabled = true; },
+  showResult() {
+    const total = this.shuffled.length, pct = Math.round(this.score/total*100);
+    if (this.isBoss) {
+      userProgress.bossCompleted = true; saveProgress();
+      document.getElementById('boss-sub').textContent = `${this.score}/${total} (${pct}%)`;
+      document.getElementById('boss-num').textContent = this.score; goScreen('s-boss-result');
+      setTimeout(()=>document.getElementById('boss-ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
+      this.isBoss=false; DailyQuestSystem.update(); return;
+    }
+    let e='😔', t='Нужно повторить';
+    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хорошо!'; }
+    document.getElementById('res-emoji').textContent = e; document.getElementById('res-title').textContent = t;
+    document.getElementById('res-sub').textContent = `${pct}% правильных`;
+    document.getElementById('ring-num').textContent = this.score;
+    document.getElementById('ring-denom').textContent = `из ${total}`;
+    document.getElementById('res-c').textContent = this.score;
+    document.getElementById('res-w').textContent = total-this.score;
+    const xp = this.score*20 + (this.score===total?50:0);
+    document.getElementById('res-xp').textContent = '+'+xp;
+    this.saveLesson(this.curLesson, this.score, total);
+    goScreen('s-result');
+    setTimeout(()=>document.getElementById('ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
+    DailyQuestSystem.update();
+  },
+  saveLesson(idx, sc, total) {
+    const today = new Date().toISOString().slice(0,10);
+    const key = getAllLessons()[idx]?.title || String(idx);
+    userProgress.completedLessons[key] = { score:sc, total, date:today };
+    userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
+    XPSystem.addXP(sc*20 + (sc===total?50:0));
+    checkStreak(); saveProgress();
+    if (!userProgress.completedLessons[key].chestGiven) {
+      ChestSystem.give('achievement'); userProgress.completedLessons[key].chestGiven = true; saveProgress();
+    }
+  }
+};
 
-// ── Остальной код (квиз, рендеринг) без изменений ──
-// ... (полная реализация QuestionSystem, рендеринга главного экрана и профиля)
-// Ввиду ограничения длины ответа, здесь приведён только ключевой фрагмент.
-// Полная версия доступна в предыдущих ответах.
+// ---------- RENDERING ----------
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id === 's-home') renderHomePath();
+  if (id === 's-profile') renderProfile();
+}
+
+function getPredictedGrade() {
+  if (!userProgress.totalAnswered) return '—';
+  const acc = userProgress.totalCorrect / userProgress.totalAnswered;
+  if (acc >= 0.85) return '5'; if (acc >= 0.7) return '4'; if (acc >= 0.55) return '3'; return '2';
+}
+
+async function renderHomePath() {
+  const container = document.getElementById('home-content');
+  if (!lessonsLoaded.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю...</div>'; await loadAllLessons(); }
+  const all = getAllLessons();
+  if (!all.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Ошибка загрузки</div>'; return; }
+
+  const today = new Date().toISOString().slice(0,10);
+  if (userProgress.professorGreetingDate !== today) {
+    userProgress.professorGreetingDate = today; saveProgress();
+    ProfessorGeo.show("Привет! Готов продолжить подготовку? 🚀", 5000);
+  }
+
+  const completedCount = Object.keys(userProgress.completedLessons).length;
+  const totalCount = all.length;
+  const pct = totalCount ? Math.round(completedCount/totalCount*100) : 0;
+  const grade = getPredictedGrade();
+  let html = `<div class="path-progress-card"><b>Прогноз ОГЭ</b><div style="font-size:42px;color:var(--gold)">${grade}</div>`;
+  html += `<div style="font-size:11px;color:var(--muted)">🔥 ${userProgress.streak||0} дней подряд · ${getDaysUntilOGE()} дн. до ОГЭ</div></div>`;
+  html += `<div class="path-progress-card"><div style="display:flex;justify-content:space-between"><span>Прогресс</span><span>${pct}%</span></div><div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="${pct}%"></div></div></div>`;
+
+  const nextIdx = all.findIndex((l,i) => !userProgress.completedLessons[l.title]);
+  const nextLesson = nextIdx >= 0 ? all[nextIdx] : null;
+  if (nextLesson) {
+    html += `<div class="continue-card" onclick="QuestionSystem.start(${nextIdx})"><span>▶️</span><div><div class="continue-label">Продолжить</div><div>${nextLesson.title}</div></div></div>`;
+  } else {
+    html += `<div class="continue-card" onclick="QuestionSystem.startBoss()"><span>👑</span><div>Финальный босс</div></div>`;
+  }
+  container.innerHTML = html;
+  setTimeout(() => container.querySelectorAll('.path-progress-fill[data-target]').forEach(f => f.style.width = f.dataset.target), 50);
+  document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
+  document.getElementById('home-sublabel').textContent = `${completedCount}/${totalCount} тем`;
+}
+
+function renderProfile() {
+  const container = document.getElementById('profile-content');
+  const rank = userProgress.xp >= 5000 ? 'Мастер' : userProgress.xp >= 1000 ? 'Ученик' : 'Новичок';
+  container.innerHTML = `<div class="profile-header-card"><div class="profile-avatar-big">🧑‍🎓</div><div><div class="profile-name-big">Ученик <span style="background:var(--primary);padding:2px 8px;border-radius:10px;font-size:12px">${rank}</span></div><div>⚡ Ур.${userProgress.level} · ${userProgress.xp} XP</div></div></div>`;
+}
+
+function getDaysUntilOGE() {
+  const now = new Date(); const oge = new Date(now.getFullYear(), 5, 19);
+  if (now > oge) oge.setFullYear(oge.getFullYear()+1);
+  return Math.ceil((oge - now)/86400000);
+}
+
+loadProgress(() => { checkStreak(); renderHomePath(); DailyQuestSystem.update(); AchievementSystem.check(); });
 </script>
 </body>
 </html>
