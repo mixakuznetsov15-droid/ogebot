@@ -1,353 +1,460 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>ГеоПро — Подготовка к ОГЭ</title>
-  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --bg: #0d1117;
-      --card: #161b22;
-      --card2: #1c2333;
-      --primary: #58a6ff;
-      --primary2: #3fb950;
-      --text: #f0f6fc;
-      --muted: #8b949e;
-      --danger: #f85149;
-      --gold: #d29922;
-      --border: #ffffff0c;
-      --radius: 18px;
-      --font-h: 'Unbounded', sans-serif;
-      --font-b: 'Onest', sans-serif;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-    body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
-    body::before {
-      content:''; position:fixed; inset:0;
-      background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
-                  radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
-      pointer-events:none; z-index:0;
-    }
-    .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
-    .screen.active { display:flex; animation: fadeUp .3s ease; }
-    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-    .topbar {
-      padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
-      background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
-    }
-    .avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
-    .username { font-family:var(--font-h); font-size:13px; font-weight:700; }
-    .sublabel { font-size:10px; color:var(--muted); }
-    .streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
-    .scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
-    .scroll::-webkit-scrollbar { width:3px; }
-    .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
-    .card-animate {
-      opacity: 0; transform: translateY(20px);
-      animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-    }
-    @keyframes cardAppear { to { opacity:1; transform:translateY(0); } }
-    .btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
-      transition: transform 0.12s ease, opacity 0.12s ease;
-    }
-    .btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
-      transform: scale(0.97) !important;
-    }
-    .path-progress-fill, .q-progress-fill { transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1); }
-    .task-check { display: inline-block; transition: transform 0.25s ease, color 0.25s ease; }
-    .task-check.done { color: var(--primary2) !important; animation: taskPop 0.35s ease; }
-    @keyframes taskPop { 0% { transform: scale(0.8); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-    .toast-container {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none;
-    }
-    .toast {
-      background: rgba(28, 35, 51, 0.92); backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 12px 20px;
-      border-radius: 18px; font-weight: 600; font-size: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
-      pointer-events: auto; max-width: 90vw; text-align: center;
-    }
-    .toast.xp { border-left: 3px solid var(--primary2); }
-    .toast.chest { border-left: 3px solid var(--gold); }
-    .toast.achievement { border-left: 3px solid #c084fc; }
-    .toast.streak { border-left: 3px solid #f97316; }
-    @keyframes toastIn { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-12px); } }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ГеоПро — Подготовка к ОГЭ</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --card2: #1c2333;
+  --primary: #58a6ff;
+  --primary2: #3fb950;
+  --text: #f0f6fc;
+  --muted: #8b949e;
+  --danger: #f85149;
+  --gold: #d29922;
+  --border: #ffffff0c;
+  --radius: 18px;
+  --font-h: 'Unbounded', sans-serif;
+  --font-b: 'Onest', sans-serif;
+}
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
-    /* quiz */
-    .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
-    .q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
-    .q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); }
-    .q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
-    .q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
-    .q-text { font-size:15px; line-height:1.55; font-weight:500; }
-    .answers { display:flex; flex-direction:column; gap:8px; }
-    .ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); }
-    .ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
-    .ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
-    .ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
-    .ans-btn.correct .ans-letter { background:var(--primary2); }
-    .ans-btn.wrong .ans-letter { background:var(--danger); }
-    .btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; margin-top:4px; }
-    .btn-next.show { display:block; animation: fadeUp .3s ease; }
+body::before {
+  content:''; position:fixed; inset:0;
+  background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
+              radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
 
-    /* result */
-    .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
-    .ring-wrap { position:relative; width:130px; height:130px; }
-    .ring-wrap svg { transform:rotate(-90deg); }
-    .ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
-    .ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
-    .res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
-    .res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
-    .res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
-    .res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
-    .btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; }
-    .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
-    .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
+.screen.active { display:flex; animation: fadeUp .3s ease; }
+@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
 
-    /* path */
-    .path-progress-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:6px; }
-    .path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
-    .path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; }
-    .continue-card { background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; }
-    .node-circle { width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
-    .node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
-    .node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
-    .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
-    .node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
-    @keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-    .boss-node { width:72px; height:72px; border-radius:20px; flex-shrink:0; background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922; display:flex; align-items:center; justify-content:center; font-size:30px; }
-    .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
+.topbar {
+  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+}
+.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
+.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
+.sublabel { font-size:10px; color:var(--muted); }
+.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
 
-    /* ===== PROFESSOR GEO - UPDATED WITH IMAGES ===== */
-    .professor-fab {
-      position: fixed;
-      bottom: -10px;
-      right: -5px;
-      width: 130px;
-      height: 170px;
-      background: none;
-      box-shadow: none;
-      border: none;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
-      cursor: pointer;
-      z-index: 900;
-      transition: transform 0.2s ease, opacity 0.3s ease;
-      animation: professorAppear 0.6s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-    }
-    @keyframes professorAppear {
-      from { opacity: 0; transform: translateY(40px) scale(0.8); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    .professor-fab img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: bottom center;
-      filter: drop-shadow(0 4px 15px rgba(0,0,0,0.4));
-      transition: opacity 0.3s ease;
-    }
-    .professor-fab:active {
-      transform: scale(0.95) !important;
-    }
-    .professor-fab.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(20px);
-    }
+.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
+.scroll::-webkit-scrollbar { width:3px; }
+.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-    .professor-speech {
-      position: fixed;
-      bottom: 165px;
-      right: 24px;
-      max-width: 260px;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 18px;
-      padding: 14px 16px;
-      font-size: 13px;
-      color: var(--text);
-      box-shadow: 0 12px 25px rgba(0,0,0,0.5);
-      z-index: 901;
-      transition: opacity 0.25s, transform 0.25s;
-      pointer-events: auto;
-      line-height: 1.5;
-    }
-    .professor-speech.hidden {
-      opacity: 0;
-      transform: translateY(12px);
-      pointer-events: none;
-    }
-    .professor-speech::after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      right: 30px;
-      width: 0;
-      height: 0;
-      border-left: 10px solid transparent;
-      border-right: 10px solid transparent;
-      border-top: 10px solid var(--card2);
-    }
-    .professor-speech::before {
-      content: '';
-      position: absolute;
-      bottom: -11px;
-      right: 29px;
-      width: 0;
-      height: 0;
-      border-left: 11px solid transparent;
-      border-right: 11px solid transparent;
-      border-top: 11px solid var(--border);
-    }
+/* ── Анимации появления карточек ── */
+.card-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes cardAppear {
+  to { opacity:1; transform:translateY(0); }
+}
 
-    /* Quiz professor - appears next to answers during quiz */
-    .quiz-professor {
-      position: fixed;
-      bottom: 80px;
-      right: 10px;
-      width: 100px;
-      height: 130px;
-      z-index: 100;
-      pointer-events: none;
-      animation: professorAppear 0.5s ease forwards;
-    }
-    .quiz-professor img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      object-position: bottom center;
-      filter: drop-shadow(0 3px 10px rgba(0,0,0,0.3));
-    }
-    .quiz-professor.hidden {
-      opacity: 0;
-      transform: translateY(20px);
-    }
+/* ── Кнопки ── */
+.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
+  transform: scale(0.97) !important;
+}
 
-    .quiz-professor-speech {
-      position: fixed;
-      bottom: 210px;
-      right: 20px;
-      max-width: 220px;
-      background: var(--card2);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 12px 14px;
-      font-size: 12px;
-      color: var(--text);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-      z-index: 101;
-      transition: opacity 0.25s, transform 0.25s;
-      line-height: 1.5;
-    }
-    .quiz-professor-speech.hidden {
-      opacity: 0;
-      transform: translateY(10px);
-      pointer-events: none;
-    }
-    .quiz-professor-speech::after {
-      content: '';
-      position: absolute;
-      bottom: -8px;
-      right: 25px;
-      width: 0;
-      height: 0;
-      border-left: 8px solid transparent;
-      border-right: 8px solid transparent;
-      border-top: 8px solid var(--card2);
-    }
+/* ── Прогресс-бары ── */
+.path-progress-fill, .q-progress-fill {
+  transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
 
-    /* chat */
-    .chat-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1100;
-      display: flex; align-items: flex-end; justify-content: center;
-      animation: fadeInOverlay 0.25s ease;
-    }
-    .chat-sheet {
-      background: var(--card2); border: 1px solid var(--border); border-radius: 24px 24px 0 0;
-      width: 100%; max-width: 500px; height: 85vh; display: flex; flex-direction: column;
-      box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-      animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-    }
-    .chat-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
-    .chat-avatar { width:44px; height:44px; border-radius:16px; overflow:hidden; background:linear-gradient(135deg,#4a6fa5,#3b5998); display:flex; align-items:center; justify-content:center; }
-    .chat-avatar img { width:100%; height:100%; object-fit:cover; }
-    .chat-name { font-family:var(--font-h); font-size:16px; font-weight:700; }
-    .chat-topic { font-size:11px; color:var(--primary); margin-top:2px; }
-    .chat-close { width:36px; height:36px; border-radius:50%; background:var(--card); border:1px solid var(--border); color:var(--muted); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
-    .chat-msg { max-width:85%; padding:12px 14px; border-radius:16px; font-size:13px; line-height:1.5; }
-    .chat-msg.user { align-self:flex-end; background:var(--primary); color:#fff; border-bottom-right-radius:4px; }
-    .chat-msg.professor { align-self:flex-start; background:var(--card); border:1px solid var(--border); color:var(--text); border-bottom-left-radius:4px; }
-    .chat-msg.loading { align-self:flex-start; background:transparent; color:var(--muted); font-style:italic; }
-    .chat-quick-actions { display:flex; gap:8px; padding:8px 16px; overflow-x:auto; border-top:1px solid var(--border); }
-    .chat-quick-btn { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:8px 14px; font-size:12px; color:var(--text); cursor:pointer; font-family:var(--font-b); }
-    .chat-input-row { display:flex; gap:8px; padding:12px 16px 20px; border-top:1px solid var(--border); }
-    .chat-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 14px; color:var(--text); font-family:var(--font-b); font-size:13px; outline:none; }
-    .chat-send-btn { width:44px; height:44px; border-radius:14px; background:var(--primary); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    @keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
-    @keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+/* ── Ежедневные задания: анимация выполнения ── */
+.task-check {
+  display: inline-block;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.task-check.done {
+  color: var(--primary2) !important;
+  animation: taskPop 0.35s ease;
+}
+@keyframes taskPop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
 
-    /* Home screen hero */
-    .hero-professor {
-      position: absolute;
-      top: 60px;
-      right: 10px;
-      width: 140px;
-      height: 180px;
-      z-index: 2;
-      pointer-events: none;
-      animation: heroAppear 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-    }
-    @keyframes heroAppear {
-      from { opacity: 0; transform: translateX(30px) scale(0.9); }
-      to { opacity: 1; transform: translateX(0) scale(1); }
-    }
-    .hero-professor img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      filter: drop-shadow(0 6px 20px rgba(0,0,0,0.4));
-    }
+/* ── Toast ── */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(28, 35, 51, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 18px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
+  pointer-events: auto;
+  max-width: 90vw;
+  text-align: center;
+}
+.toast.xp { border-left: 3px solid var(--primary2); }
+.toast.chest { border-left: 3px solid var(--gold); }
+.toast.achievement { border-left: 3px solid #c084fc; }
+.toast.streak { border-left: 3px solid #f97316; }
+@keyframes toastIn {
+  from { opacity:0; transform:translateY(-16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity:1; transform:translateY(0); }
+  to { opacity:0; transform:translateY(-12px); }
+}
 
-    /* Back link */
-    .back-link { font-size:13px; color:var(--muted); cursor:pointer; }
-    .sec-title { font-family:var(--font-h); font-size:15px; font-weight:700; }
+/* ── AI PANEL (Профессор Гео) ── */
+.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
+.ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
+.ai-header-left { display:flex; align-items:center; gap:10px; }
+.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
+.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
+.ai-tagline { font-size:10px; color:var(--muted); }
+.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
+.ai-toggle.open { transform:rotate(180deg); }
 
-    /* Profile */
-    .profile-header-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:20px; display:flex; align-items:center; gap:16px; margin-bottom:14px; }
-    .profile-avatar-big { width:64px; height:64px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:32px; }
-    .profile-name-big { font-family:var(--font-h); font-size:16px; font-weight:700; margin-bottom:4px; }
+.ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
+.ai-body.open { display:flex; animation: fadeUp .25s ease; }
 
-    /* Result */
-    .result-emoji { font-size:48px; }
-    .result-title { font-family:var(--font-h); font-size:22px; font-weight:800; }
-    .result-sub { color:var(--muted); font-size:14px; }
-    .ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-    .ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
-    .ring-denom { font-size:12px; color:var(--muted); }
-    .res-label { font-size:11px; color:var(--muted); margin-top:4px; }
-    .res-btns { width:100%; display:flex; flex-direction:column; gap:10px; margin-top:8px; }
+.ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
+.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
+.ai-prompt-btn:active { background:#58a6ff30; }
 
-    /* Continue label */
-    .continue-label { font-size:11px; color:var(--primary); font-weight:600; margin-bottom:2px; }
+.ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
+.ai-messages::-webkit-scrollbar { width:2px; }
+.ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
 
-    /* Boss result screen */
-    .boss-result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
-    .boss-emoji { font-size:48px; }
-    .boss-title { font-family:var(--font-h); font-size:22px; font-weight:800; }
-    .boss-sub { color:var(--muted); font-size:14px; }
-  </style>
+.msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
+.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
+.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
+.msg.loading { color:var(--muted); font-style:italic; }
+
+.ai-input-row { display:flex; gap:8px; align-items:flex-end; }
+.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
+.ai-input:focus { border-color:#58a6ff60; }
+.ai-input::placeholder { color:var(--muted); }
+.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
+.ai-send:active { transform:scale(.93); }
+.ai-send:disabled { opacity:.5; cursor:default; }
+.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
+
+/* ── QUIZ ── */
+.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+.quiz-wrap::-webkit-scrollbar { width:3px; }
+.q-header { display:flex; justify-content:space-between; align-items:center; }
+.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
+.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
+.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
+.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
+.q-text { font-size:15px; line-height:1.55; font-weight:500; }
+.answers { display:flex; flex-direction:column; gap:8px; }
+.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
+.ans-btn:active { transform:scale(.98); }
+.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
+.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
+.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
+.ans-btn.correct .ans-letter { background:var(--primary2); }
+.ans-btn.wrong .ans-letter { background:var(--danger); }
+.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
+.btn-next.show { display:block; animation: fadeUp .3s ease; }
+.btn-next:active { transform:scale(.97); }
+
+/* ── RESULT ── */
+.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+.result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
+@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
+.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
+.result-sub { font-size:14px; color:var(--muted); }
+.ring-wrap { position:relative; width:130px; height:130px; }
+.ring-wrap svg { transform:rotate(-90deg); }
+.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
+.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
+.ring-denom { font-size:12px; color:var(--muted); }
+.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
+.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
+.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
+.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
+.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
+.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
+.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
+.btn-full:active { transform:scale(.97); }
+.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
+.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
+
+/* ── PATH (главный экран) ── */
+.path-progress-card {
+  background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px; margin-bottom:6px;
+}
+.path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.path-progress-label { font-size:13px; font-weight:600; }
+.path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
+.path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
+.path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
+
+.continue-card {
+  background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
+  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
+}
+.continue-card:active { transform:scale(.98); }
+.continue-icon { font-size:32px; flex-shrink:0; }
+.continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
+.continue-title { font-size:15px; font-weight:700; margin-top:2px; }
+.continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
+
+.path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
+.path-connector { width:3px; height:24px; margin:0 auto; }
+
+.node-circle {
+  width:56px; height:56px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
+.node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
+.node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
+.node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
+.node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
+@keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
+
+.boss-node {
+  width:72px; height:72px; border-radius:20px; flex-shrink:0;
+  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+}
+.boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
+
+/* ── PROFILE ── */
+.profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
+.profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
+.profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
+.profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
+
+.profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+.profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
+.profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
+.profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
+
+.badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+.badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
+.badge-item-p.locked { opacity:.3; }
+.badge-icon-p { font-size:22px; margin-bottom:4px; }
+.badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
+
+.sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
+.sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
+
+/* ── СУНДУКИ (анимации) ── */
+@keyframes chestGlow {
+  0% { box-shadow: 0 0 5px #d29922; }
+  50% { box-shadow: 0 0 20px #d29922; }
+  100% { box-shadow: 0 0 5px #d29922; }
+}
+@keyframes chestPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* Модальное окно профессора (для подсказок) */
+.professor-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeInOverlay 0.25s ease;
+}
+.professor-modal-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+}
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.professor-avatar {
+  width: 64px; height: 64px; margin: 0 auto;
+  background: linear-gradient(135deg, #4a6fa5, #3b5998);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+}
+.professor-message {
+  font-size: 15px; line-height: 1.6; color: var(--text);
+  padding: 0 8px;
+}
+.professor-actions {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
+}
+.professor-btn {
+  width: 100%; padding: 14px; border-radius: var(--radius);
+  font-family: var(--font-h); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: transform 0.12s ease, background 0.2s ease;
+  border: none;
+}
+.professor-btn:active { transform: scale(0.97); }
+.professor-btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  color: #fff;
+}
+.professor-btn-secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.professor-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* ── Плавающая кнопка Профессора (Маскот) ── */
+.professor-fab {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 68px;
+  height: 68px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  box-shadow: 0 4px 15px rgba(0,0,0,0.35), 0 0 0 4px rgba(88,166,255,0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  cursor: pointer;
+  z-index: 900;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: none;
+  outline: none;
+}
+.professor-fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.35), 0 0 0 4px rgba(88,166,255,0.2);
+}
+
+/* Облачко с приветствием */
+.professor-speech {
+  position: fixed;
+  bottom: 104px;
+  right: 24px;
+  max-width: 260px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.5);
+  z-index: 901;
+  opacity: 1;
+  animation: speechIn 0.4s ease, speechOut 0.4s ease 5.5s forwards;
+  pointer-events: none;
+}
+@keyframes speechIn {
+  from { opacity:0; transform: translateY(12px); }
+  to { opacity:1; transform: translateY(0); }
+}
+@keyframes speechOut {
+  from { opacity:1; transform: translateY(0); }
+  to { opacity:0; transform: translateY(12px); }
+}
+
+/* Модалка-заглушка профессора */
+.professor-placeholder-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 1100;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeInOverlay 0.25s ease;
+}
+.professor-placeholder-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+  padding: 30px 24px 36px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.placeholder-avatar {
+  width: 80px; height: 80px;
+  background: linear-gradient(135deg, #4a6fa5, #3b5998);
+  border-radius: 28px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 40px;
+  margin-bottom: 8px;
+}
+.placeholder-title {
+  font-family: var(--font-h);
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--text);
+}
+.placeholder-desc {
+  font-size: 14px;
+  color: var(--muted);
+  line-height: 1.5;
+  max-width: 280px;
+}
+</style>
 </head>
 <body>
-<div id="toast-container" class="toast-container"></div>
 
-<!-- Screens -->
+<div id="modal-container"></div>
+<div id="toast-container" class="toast-container"></div>
+<div id="professor-modal-container"></div>
+
+<!-- Экраны приложения -->
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -359,12 +466,14 @@
       <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
     </div>
   </div>
-  <div class="scroll" id="home-content"><div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div></div>
-
-  <!-- Hero professor on home screen -->
-  <div class="hero-professor" id="hero-professor">
-    <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hero.png" alt="Профессор Гео">
+  <div class="scroll" id="home-content" style="padding-top:8px">
+    <div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>
   </div>
+</div>
+
+<div class="screen" id="s-topic">
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+  <div class="scroll" id="topic-content"></div>
 </div>
 
 <div class="screen" id="s-quiz">
@@ -376,20 +485,18 @@
   <div class="quiz-wrap">
     <div style="display:flex;align-items:center;gap:10px">
       <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
-      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;"></div>
+      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
     </div>
     <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
-    <div class="q-card"><div class="q-tag" id="q-tag"></div><div class="q-text" id="q-text"></div></div>
+    <div class="q-card">
+      <div class="q-tag" id="q-tag">Задание</div>
+      <div class="q-text" id="q-text">...</div>
+    </div>
     <div class="answers" id="answers"></div>
     <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
+    <div id="ai-quiz" class="ai-panel" style="display:none"></div>
     <button class="btn-next" id="btn-next" onclick="QuestionSystem.next()">Следующий вопрос →</button>
   </div>
-
-  <!-- Quiz professor -->
-  <div class="quiz-professor hidden" id="quiz-professor">
-    <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png" alt="Профессор Гео" id="quiz-professor-img">
-  </div>
-  <div class="quiz-professor-speech hidden" id="quiz-professor-speech"></div>
 </div>
 
 <div class="screen" id="s-result">
@@ -418,20 +525,20 @@
 </div>
 
 <div class="screen" id="s-boss-result">
-  <div class="boss-result-wrap">
-    <div class="boss-emoji">👑</div>
-    <div class="boss-title">Финальный босс пройден!</div>
-    <div class="boss-sub" id="boss-sub">0/30</div>
+  <div class="result-wrap">
+    <div class="result-emoji">👑</div>
+    <div class="result-title">Финальный босс пройден!</div>
+    <div class="result-sub" id="boss-sub">Ты прошёл все темы ОГЭ</div>
     <div class="ring-wrap">
       <svg width="130" height="130" viewBox="0 0 130 130">
-        <defs><linearGradient id="rg2" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#d29922"/><stop offset="100%" stop-color="#f5a623"/></linearGradient></defs>
         <circle class="ring-bg" cx="65" cy="65" r="54"/>
-        <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339" stroke="url(#rg2)"/>
+        <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/>
       </svg>
-      <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom">из 30</div></div>
+      <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div>
     </div>
     <div class="res-btns">
       <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+      <button class="btn-full sec" onclick="shareBossResult()">📤 Похвастаться результатом</button>
     </div>
   </div>
 </div>
@@ -441,221 +548,319 @@
   <div class="scroll" id="profile-content"></div>
 </div>
 
-<!-- Professor FAB & speech -->
-<div class="professor-fab" id="professor-fab">
-  <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png" alt="Профессор Гео" id="professor-img">
-</div>
-<div class="professor-speech hidden" id="professor-speech"></div>
+<!-- Элементы маскота Профессор Гео -->
+<div class="professor-fab" id="professor-fab" onclick="openProfessorPlaceholder()" title="Профессор Гео">👨‍🏫</div>
+<div class="professor-speech" id="professor-speech" style="display:none;"></div>
 
-<!-- Chat overlay -->
-<div id="chat-overlay" class="chat-overlay" style="display:none;">
-  <div class="chat-sheet">
-    <div class="chat-header">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="chat-avatar">
-          <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png" alt="Профессор Гео">
-        </div>
-        <div><div class="chat-name">Профессор Гео</div><div class="chat-topic" id="chat-current-topic">Общая подготовка</div></div>
-      </div>
-      <button class="chat-close" onclick="ProfessorChat.close()">✕</button>
-    </div>
-    <div class="chat-messages" id="chat-messages"></div>
-    <div class="chat-quick-actions">
-      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Объясни текущую тему')">📘 Объясни тему</button>
-      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Дай подсказку')">💡 Подсказка</button>
-      <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Что спросят на ОГЭ?')">❓ ОГЭ</button>
-    </div>
-    <div class="chat-input-row">
-      <input class="chat-input" id="chat-input" placeholder="Введи вопрос..." onkeydown="if(event.key==='Enter') ProfessorChat.sendMessage(this.value)">
-      <button class="chat-send-btn" onclick="ProfessorChat.sendMessage(document.getElementById('chat-input').value)">➤</button>
-    </div>
+<!-- Модальное окно-заглушка профессора -->
+<div id="professor-placeholder-modal" class="professor-placeholder-overlay" style="display:none;">
+  <div class="professor-placeholder-card">
+    <div class="placeholder-avatar">👨‍🏫</div>
+    <div class="placeholder-title">Профессор Гео</div>
+    <div class="placeholder-desc">Совсем скоро здесь появится твой личный AI-наставник по географии.</div>
+    <button class="professor-btn professor-btn-primary" onclick="closeProfessorPlaceholder()" style="margin-top: 8px;">Скоро</button>
   </div>
 </div>
 
 <script>
-// ========== IMAGE URLs ==========
-const PROF_IMAGES = {
-  default: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png',
-  happy: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  sad: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_sad.png',
-  hint: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hint.png',
-  chat: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png',
-  hero: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hero.png'
-};
-
-// ---------- DATA ----------
+const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
-const QUESTIONS_FILES = [
-  { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json' },
-  { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json' },
-  { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json' },
-  { key:'ecology', title:'🌱 Экология', file:'questions_ecology.json' },
-  { key:'timezone', title:'🕐 Часовые пояса', file:'questions_timezone.json' },
-  { key:'world', title:'🌍 Страны и материки', file:'questions_world.json' },
-  { key:'regions', title:'📍 Регионы России', file:'questions_regions.json' },
-  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'questions_litosphere.json' },
-  { key:'hydro', title:'💧 Гидросфера', file:'questions_hydro.json' },
-  { key:'population', title:'👥 Население России', file:'questions_population.json' },
-  { key:'geopos', title:'📍 Геогр. положение России', file:'questions_geopos.json' },
-  { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json' },
-  { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json' }
+
+const THEORY_FILES = [
+  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo.json', tasks:'Задания 1-4' },
+  { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_student.json', tasks:'Задания 5-6' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'timezone', title:'🕐 Часовые пояса', file:'theory_timezone.json', tasks:'Задание 17' },
+  { key:'zones', title:'🌲 Природные зоны', file:'theory_zones.json', tasks:'Задание 28' },
+  { key:'population', title:'👥 Население России', file:'theory_population.json', tasks:'Задания 23-25'},
+  { key:'economy', title:'🏭 Хозяйство России', file:'theory_economy.json', tasks:'Задание 27' },
+  { key:'regions', title:'📍 Регионы России', file:'theory_regions.json', tasks:'Задания 20-21'},
+  { key:'world', title:'🌍 Страны и материки', file:'theory_world.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
+  { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
+  { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' },
 ];
 
-let lessonsLoaded = [];
+const QUESTIONS_FILES = [
+  { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'ecology', title:'🌱 Экология', file:'questions_ecology.json', tasks:'Задание 15' },
+  { key:'timezone', title:'🕐 Часовые пояса', file:'questions_timezone.json', tasks:'Задание 17' },
+  { key:'world', title:'🌍 Страны и материки', file:'questions_world.json', tasks:'Задания 20-21'},
+  { key:'regions', title:'📍 Регионы России', file:'questions_regions.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'questions_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'questions_hydro.json', tasks:'Задание 22' },
+  { key:'population', title:'👥 Население России', file:'questions_population.json', tasks:'Задания 23-25'},
+  { key:'geopos', title:'📍 Геогр. положение России', file:'questions_geopos.json', tasks:'Задание 26' },
+  { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json', tasks:'Задание 27' },
+  { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
+];
+
+// База подсказок профессора (три уровня для каждой темы)
+const HINTS_DB = {
+  topo: [
+    "Давай подумаем: что означают условные знаки на топографической карте?",
+    "Обрати внимание на направление и масштаб — это поможет определить расположение объектов.",
+    "Попробуй мысленно проложить маршрут от одного объекта к другому, учитывая рельеф."
+  ],
+  climat: [
+    "Посмотри на график температуры и осадков. Что можно сказать о климате?",
+    "Определи самый тёплый и самый холодный месяц — это ключ к типу климата.",
+    "Сравни полученные данные с характеристиками известных типов климата."
+  ],
+  nature_russia: [
+    "Вспомни основные природные зоны России и их особенности.",
+    "Подумай, какие факторы влияют на размещение природных зон.",
+    "Сопоставь описание с конкретной природной зоной."
+  ],
+  ecology: [
+    "Подумай, как деятельность человека влияет на окружающую среду.",
+    "Какие меры помогают снизить негативное воздействие?",
+    "Вспомни примеры рационального природопользования."
+  ],
+  timezone: [
+    "Вспомни, как определяется разница во времени между городами.",
+    "Используй карту часовых поясов России — это твой главный помощник.",
+    "Прибавь или вычти нужное количество часов в зависимости от направления."
+  ],
+  world: [
+    "Вспомни особенности географического положения стран и материков.",
+    "Подумай, какие природные условия характерны для указанного региона.",
+    "Сравни с соседними территориями — это может дать подсказку."
+  ],
+  regions: [
+    "Вспомни экономическую специализацию регионов России.",
+    "Обрати внимание на природные ресурсы и климатические условия региона.",
+    "Подумай, какие отрасли промышленности здесь наиболее развиты."
+  ],
+  litosphere: [
+    "Вспомни, какие формы рельефа бывают и как они образуются.",
+    "Подумай о внутренних и внешних силах, формирующих рельеф.",
+    "Сопоставь описание с конкретной формой рельефа."
+  ],
+  hydro: [
+    "Вспомни, какие водные объекты относятся к гидросфере.",
+    "Подумай о режиме питания рек и особенностях озёр.",
+    "Какие факторы влияют на полноводность реки?"
+  ],
+  population: [
+    "Вспомни, какие показатели характеризуют население.",
+    "Подумай, как рассчитывается плотность населения и естественный прирост.",
+    "Какие факторы влияют на размещение населения по территории?"
+  ],
+  geopos: [
+    "Вспомни, с какими странами граничит Россия.",
+    "Подумай о преимуществах и недостатках географического положения.",
+    "Какие моря омывают территорию России?"
+  ],
+  economy: [
+    "Вспомни основные отрасли хозяйства России.",
+    "Подумай, какие факторы влияют на размещение предприятий.",
+    "Какие ресурсы необходимы для развития данной отрасли?"
+  ],
+  zones: [
+    "Вспомни, какие природные зоны есть на территории России.",
+    "Подумай, как изменяются природные зоны с севера на юг.",
+    "Какие почвы и растительность характерны для каждой зоны?"
+  ]
+};
+
+function getProfessorHint(topicKey, level) {
+  const hints = HINTS_DB[topicKey] || HINTS_DB['topo'];
+  return hints[Math.min(level, hints.length - 1)];
+}
+
+var lessonsLoaded = [];
+
 async function fetchJSON(filename) {
-  try {
-    const r = await fetch(GITHUB_RAW + filename + '?nocache=' + Date.now());
-    return r.ok ? r.json() : [];
-  } catch(e) {
-    console.warn('Ошибка загрузки', filename, e);
-    return [];
-  }
+  var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
+  var r = await fetch(url);
+  if (!r.ok) throw new Error('Ошибка загрузки: ' + filename);
+  return await r.json();
 }
+
 async function loadAllLessons() {
-  if (lessonsLoaded.length) return; // уже загружены
   lessonsLoaded = [];
-  for (let f of QUESTIONS_FILES) {
-    const data = await fetchJSON(f.file);
-    const questions = (Array.isArray(data) ? data : []).filter(q => q.tag && q.text && q.answers);
-    if (questions.length) lessonsLoaded.push({ ...f, questions });
-  }
-}
-function getAllLessons() { return lessonsLoaded; }
-
-// ---------- GLOBAL STATE ----------
-const tgApp = window.Telegram?.WebApp;
-const isTelegram = !!tgApp?.initData;
-if (isTelegram) { tgApp.ready(); tgApp.expand(); }
-
-let userProgress = {
-  xp:0, level:1, streak:0, lastDate:'', completedLessons:{}, totalAnswered:0, totalCorrect:0,
-  bossCompleted:false, freezes:1, lastFreezeMonday:'', chests:[], invitedFriend:false,
-  dailyTasksDate:'', dailyTasks:{solve10:false,earn50XP:false,loginToday:false},
-  dailyTasksCollected:{solve10:false,earn50XP:false,loginToday:false},
-  allDailyTasksDone:false, dailyQuestions:0, dailyXP:0, achievements:{},
-  lastDailyChestDate:'', streakChestsGiven:{}, professorGreetingDate:''
-};
-
-function saveProgress() {
-  const data = JSON.stringify(userProgress);
-  if (isTelegram) {
-    tgApp.CloudStorage.setItem('progress', data, (err) => {
-      if (err) console.warn('CloudStorage save error', err);
-    });
-  } else {
-    try { localStorage.setItem('geo_progress', data); } catch(e) {}
-  }
-}
-function loadProgress(cb) {
-  if (isTelegram) {
-    tgApp.CloudStorage.getItem('progress', (err, val) => {
-      if (!err && val) {
-        try { userProgress = JSON.parse(val); } catch(e) { userProgress = {...userProgress}; }
+  for (var i = 0; i < QUESTIONS_FILES.length; i++) {
+    var f = QUESTIONS_FILES[i];
+    try {
+      var data = await fetchJSON(f.file);
+      var questions = [];
+      if (Array.isArray(data)) {
+        data.forEach(function(item) {
+          if (item.tag && item.text && item.answers) {
+            questions.push(item);
+          }
+        });
       }
-      refreshFreeze();
-      cb();
-    });
-  } else {
-    try { const s = localStorage.getItem('geo_progress'); if(s) userProgress = JSON.parse(s); } catch(e) {}
-    refreshFreeze();
-    cb();
+      if (questions.length > 0) {
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions, key: f.key });
+      }
+    } catch(e) {
+      console.warn('Не удалось загрузить', f.file, e);
+    }
   }
+  return lessonsLoaded;
 }
 
-function refreshFreeze() {
-  const d = new Date(); d.setHours(0,0,0,0);
-  const day = d.getDay();
-  const monday = new Date(d.setDate(d.getDate() - ((day + 6) % 7))).toISOString().slice(0,10);
-  if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < monday) {
-    userProgress.freezes = 1; userProgress.lastFreezeMonday = monday; saveProgress();
-  }
-}
-function checkStreak() {
-  const today = new Date().toISOString().slice(0,10);
-  if (userProgress.lastDate === today) return;
-  const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
-  if (userProgress.lastDate === yesterday) userProgress.streak++;
-  else if (userProgress.lastDate !== today) {
-    if (userProgress.freezes > 0) { userProgress.freezes--; userProgress.streak++; }
-    else userProgress.streak = 1;
-  }
-  userProgress.lastDate = today; saveProgress();
-  AchievementSystem.check(); ChestSystem.giveDaily(); ChestSystem.giveStreak();
+function getAllLessons() {
+  return lessonsLoaded.length > 0 ? lessonsLoaded : [];
 }
 
-function showToast(text, type='info') {
-  const c = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  t.className = 'toast ' + type; t.textContent = text;
-  c.appendChild(t); setTimeout(() => t.remove(), 2600);
+const tgApp = window.Telegram?.WebApp;
+const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
+if (isTelegram) {
+  tgApp.ready();
+  tgApp.expand();
 }
 
-// ---------- SYSTEMS ----------
-const XPSystem = {
-  addXP(amount) {
-    if (amount <= 0) return;
-    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) amount *= 2;
-    userProgress.xp += amount;
-    userProgress.level = Math.floor(userProgress.xp / 200) + 1;
-    saveProgress(); showToast('⚡ +' + amount + ' XP', 'xp');
-    AchievementSystem.check();
-    DailyQuestSystem.incrementCounters(0, amount);
+// ── Единый Toast ──
+function showToastMsg(text, type) {
+  type = type || 'info';
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(function() {
+    if (toast.parentNode) toast.remove();
+  }, 2600);
+}
+
+// ── Анимация появления карточек ──
+function animateCards(container) {
+  var cards = container.querySelectorAll('.path-progress-card, .continue-card, .profile-header-card, .profile-stats-grid > div, .badge-item-p, .sub-status-card, .profile-stat, .badges-grid-profile > div');
+  cards.forEach(function(card, index) {
+    card.classList.add('card-animate');
+    card.style.animationDelay = (index * 0.05) + 's';
+  });
+}
+
+// ── XPSystem ──
+var XPSystem = {
+  addXP: function(amount) {
+    if (amount > 0) {
+      if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
+        amount *= 2;
+      }
+      userProgress.xp += amount;
+      userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+      saveProgress();
+      showToastMsg('⚡ +' + amount + ' XP', 'xp');
+      AchievementSystem.check();
+      DailyQuestSystem.incrementCounters(0, amount);
+    }
   }
 };
 
-const DailyQuestSystem = {
-  update() {
-    const today = new Date().toISOString().slice(0,10);
-    if (userProgress.dailyTasksDate !== today) {
+// ── DailyQuestSystem ──
+var DailyQuestSystem = {
+  update: function() {
+    var today = new Date().toISOString().slice(0,10);
+    if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
       userProgress.dailyTasksDate = today;
-      userProgress.dailyTasks = { solve10:false, earn50XP:false, loginToday:true };
-      userProgress.dailyTasksCollected = { solve10:false, earn50XP:false, loginToday:false };
-      userProgress.allDailyTasksDone = false; saveProgress();
+      userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
+      userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
+      userProgress.allDailyTasksDone = false;
+      saveProgress();
     }
-    const tasks = userProgress.dailyTasks, collected = userProgress.dailyTasksCollected;
-    if (userProgress.dailyQuestions >= 10 && !tasks.solve10) {
-      tasks.solve10 = true; if (!collected.solve10) { collected.solve10 = true; XPSystem.addXP(20); }
+    var tasks = userProgress.dailyTasks || {};
+    var collected = userProgress.dailyTasksCollected || {};
+    var dailyXP = (userProgress.dailyXP || 0);
+    var dailyQuestions = (userProgress.dailyQuestions || 0);
+
+    if (dailyQuestions >= 10 && !tasks.solve10) {
+      tasks.solve10 = true;
+      if (!collected.solve10) {
+        collected.solve10 = true;
+        XPSystem.addXP(20);
+        showToastMsg('🎯 Задание дня: решено 10 вопросов', 'info');
+      }
     }
-    if (userProgress.dailyXP >= 50 && !tasks.earn50XP) {
-      tasks.earn50XP = true; if (!collected.earn50XP) { collected.earn50XP = true; XPSystem.addXP(20); }
+    if (dailyXP >= 50 && !tasks.earn50XP) {
+      tasks.earn50XP = true;
+      if (!collected.earn50XP) {
+        collected.earn50XP = true;
+        XPSystem.addXP(20);
+        showToastMsg('🎯 Задание дня: получено 50 XP', 'info');
+      }
     }
-    if (!tasks.loginToday) { tasks.loginToday = true; if (!collected.loginToday) { collected.loginToday = true; XPSystem.addXP(20); } }
+    if (!tasks.loginToday) {
+      tasks.loginToday = true;
+      if (!collected.loginToday) {
+        collected.loginToday = true;
+        XPSystem.addXP(20);
+      }
+    }
+
     if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
-      userProgress.allDailyTasksDone = true; XPSystem.addXP(100); ChestSystem.give('achievement');
+      userProgress.allDailyTasksDone = true;
+      XPSystem.addXP(100);
+      ChestSystem.give('achievement');
+      showToastMsg('🎁 Сундук за все задания дня!', 'chest');
     }
     saveProgress();
   },
-  incrementCounters(q, xp) {
-    const today = new Date().toISOString().slice(0,10);
-    if (userProgress.dailyTasksDate !== today) { userProgress.dailyQuestions=0; userProgress.dailyXP=0; }
-    userProgress.dailyQuestions += q; userProgress.dailyXP += xp; saveProgress(); this.update();
+  incrementCounters: function(questionsCount, xpAmount) {
+    var today = new Date().toISOString().slice(0,10);
+    if (userProgress.dailyTasksDate !== today) {
+      userProgress.dailyTasksDate = today;
+      userProgress.dailyQuestions = 0;
+      userProgress.dailyXP = 0;
+    }
+    userProgress.dailyQuestions = (userProgress.dailyQuestions || 0) + questionsCount;
+    userProgress.dailyXP = (userProgress.dailyXP || 0) + xpAmount;
+    saveProgress();
+    this.update();
   }
 };
 
-const ACHIEVEMENTS_LIST = [
-  { id:'first_login', icon:'🏆', title:'Первый вход', cond:()=>true },
-  { id:'first_lesson', icon:'🏆', title:'Первый урок', cond:()=>userProgress.totalAnswered>0 },
-  { id:'streak3', icon:'🔥', title:'3 дня подряд', cond:()=>(userProgress.streak||0)>=3 },
-  { id:'solve50', icon:'📚', title:'50 вопросов', cond:()=>userProgress.totalAnswered>=50, max:50, progress:()=>Math.min(userProgress.totalAnswered,50) },
-  { id:'xp500', icon:'⭐', title:'500 XP', cond:()=>userProgress.xp>=500, max:500, progress:()=>Math.min(userProgress.xp,500) },
+// ── AchievementSystem ──
+var ACHIEVEMENTS_LIST = [
+  { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
+  { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
+  { id: 'first_theme', icon: '🏆', title: 'Первая завершённая тема', cond: function() { return Object.keys(userProgress.completedLessons).length > 0; } },
+  { id: 'streak3', icon: '🔥', title: '3 дня подряд', cond: function() { return (userProgress.streak||0) >= 3; } },
+  { id: 'streak7', icon: '🔥', title: '7 дней подряд', cond: function() { return (userProgress.streak||0) >= 7; } },
+  { id: 'streak14', icon: '🔥', title: '14 дней подряд', cond: function() { return (userProgress.streak||0) >= 14; } },
+  { id: 'streak30', icon: '🔥', title: '30 дней подряд', cond: function() { return (userProgress.streak||0) >= 30; } },
+  { id: 'solve50', icon: '📚', title: 'Решить 50 вопросов', cond: function() { return userProgress.totalAnswered >= 50; }, max: 50, progress: function() { return Math.min(userProgress.totalAnswered, 50); } },
+  { id: 'solve100', icon: '📚', title: 'Решить 100 вопросов', cond: function() { return userProgress.totalAnswered >= 100; }, max: 100, progress: function() { return Math.min(userProgress.totalAnswered, 100); } },
+  { id: 'solve500', icon: '📚', title: 'Решить 500 вопросов', cond: function() { return userProgress.totalAnswered >= 500; }, max: 500, progress: function() { return Math.min(userProgress.totalAnswered, 500); } },
+  { id: 'solve1000', icon: '📚', title: 'Решить 1000 вопросов', cond: function() { return userProgress.totalAnswered >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.totalAnswered, 1000); } },
+  { id: 'xp500', icon: '⭐', title: 'Получить 500 XP', cond: function() { return userProgress.xp >= 500; }, max: 500, progress: function() { return Math.min(userProgress.xp, 500); } },
+  { id: 'xp1000', icon: '⭐', title: 'Получить 1000 XP', cond: function() { return userProgress.xp >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.xp, 1000); } },
+  { id: 'xp3000', icon: '⭐', title: 'Получить 3000 XP', cond: function() { return userProgress.xp >= 3000; }, max: 3000, progress: function() { return Math.min(userProgress.xp, 3000); } },
+  { id: 'xp5000', icon: '⭐', title: 'Получить 5000 XP', cond: function() { return userProgress.xp >= 5000; }, max: 5000, progress: function() { return Math.min(userProgress.xp, 5000); } },
+  { id: 'all_themes', icon: '🌍', title: 'Завершить все темы', cond: function() { var all = getAllLessons(); return all.length > 0 && Object.keys(userProgress.completedLessons).length >= all.length; } },
+  { id: 'pred4', icon: '🎯', title: 'Получить прогноз 4', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 4; } },
+  { id: 'pred5', icon: '🎯', title: 'Получить прогноз 5', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 5; } }
 ];
 
-const AchievementSystem = {
-  check() {
+var AchievementSystem = {
+  check: function() {
     if (!userProgress.achievements) userProgress.achievements = {};
-    const now = new Date().toISOString();
-    ACHIEVEMENTS_LIST.forEach(a => {
-      if (userProgress.achievements[a.id]?.unlocked) return;
-      const unlocked = a.cond();
-      const progress = a.progress ? a.progress() : (unlocked ? 1 : 0);
-      if (!userProgress.achievements[a.id]) userProgress.achievements[a.id] = { progress, unlocked, date: unlocked?now:null, chestGiven:false };
-      else {
+    var now = new Date().toISOString();
+    ACHIEVEMENTS_LIST.forEach(function(a) {
+      if (userProgress.achievements[a.id] && userProgress.achievements[a.id].unlocked) return;
+      var unlocked = a.cond();
+      var progress = a.progress ? a.progress() : (unlocked ? (a.max || 1) : 0);
+      var wasUnlocked = userProgress.achievements[a.id]?.unlocked;
+      if (!userProgress.achievements[a.id]) {
+        userProgress.achievements[a.id] = { progress: progress, unlocked: unlocked, date: unlocked ? now : null, chestGiven: false };
+      } else {
         userProgress.achievements[a.id].progress = progress;
-        if (unlocked && !userProgress.achievements[a.id].unlocked) {
-          userProgress.achievements[a.id].unlocked = true; userProgress.achievements[a.id].date = now;
-          showToast('🏆 ' + a.title, 'achievement');
+        if (unlocked && !wasUnlocked) {
+          userProgress.achievements[a.id].unlocked = true;
+          userProgress.achievements[a.id].date = now;
+          showToastMsg('🏆 ' + a.title, 'achievement');
           if (!userProgress.achievements[a.id].chestGiven) {
-            ChestSystem.give('achievement'); userProgress.achievements[a.id].chestGiven = true;
+            ChestSystem.give('achievement');
+            userProgress.achievements[a.id].chestGiven = true;
+            showToastMsg('🎁 Сундук за достижение!', 'chest');
           }
         }
       }
@@ -664,344 +869,865 @@ const AchievementSystem = {
   }
 };
 
-const ChestSystem = {
-  give(type) { if (!userProgress.chests) userProgress.chests = []; userProgress.chests.push({type}); saveProgress(); showToast('🎁 Сундук получен!', 'chest'); },
-  giveDaily() { const today = new Date().toISOString().slice(0,10); if (userProgress.lastDailyChestDate!==today) { userProgress.lastDailyChestDate=today; this.give('daily'); } },
-  giveStreak() { const s = userProgress.streak||0; const given = userProgress.streakChestsGiven||{}; [3,7,14,30].forEach(t => { if (s>=t && !given[t]) { this.give('streak'); given[t]=true; } }); userProgress.streakChestsGiven=given; saveProgress(); }
-};
-
-// ---------- PROFESSOR GEO - UPDATED WITH MOODS ----------
-const ProfessorGeo = {
-  HAPPY: ["Отлично! 🎉","Верно! 🎉","Так держать! 🎉","Молодец! 🎉","Правильно! 🎉"],
-  SAD: ["Не страшно 🤔","Запомни эту тему 🤔","Подумай ещё 🤔","Ошибки учат 🤔","Разберёмся! 🤔"],
-  timer: null,
-  currentMood: 'default',
-
-  setMood(mood) {
-    this.currentMood = mood;
-    const img = document.getElementById('professor-img');
-    const quizImg = document.getElementById('quiz-professor-img');
-    if (img && PROF_IMAGES[mood]) {
-      img.style.opacity = '0';
-      setTimeout(() => { img.src = PROF_IMAGES[mood]; img.style.opacity = '1'; }, 150);
+// ── ChestSystem ──
+var ChestSystem = {
+  isOpening: false,
+  rewardPool: [
+    { type: 'xp', value: 20, label: '+20 XP' },
+    { type: 'xp', value: 50, label: '+50 XP' },
+    { type: 'xp', value: 100, label: '+100 XP' },
+    { type: 'streak_day', value: 1, label: '+1 день серии' },
+    { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
+    { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
+    { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
+  ],
+  give: function(type) {
+    if (!userProgress.chests) userProgress.chests = [];
+    userProgress.chests.push({ type: type || 'daily', rewardType: 'xp' });
+    saveProgress();
+    showToastMsg('🎁 Получен сундук!', 'chest');
+  },
+  giveDaily: function() {
+    var today = new Date().toISOString().slice(0,10);
+    if (userProgress.lastDailyChestDate === today) return;
+    userProgress.lastDailyChestDate = today;
+    this.give('daily');
+  },
+  giveStreak: function() {
+    var streak = userProgress.streak || 0;
+    var given = userProgress.streakChestsGiven || {};
+    var thresholds = [3, 7, 14, 30];
+    for (var i = 0; i < thresholds.length; i++) {
+      var t = thresholds[i];
+      if (streak >= t && !given[t]) {
+        this.give('streak');
+        given[t] = true;
+        showToastMsg('🔥 Серия ' + t + ' дней — сундук!', 'streak');
+      }
     }
-    if (quizImg && PROF_IMAGES[mood]) {
-      quizImg.style.opacity = '0';
-      setTimeout(() => { quizImg.src = PROF_IMAGES[mood]; quizImg.style.opacity = '1'; }, 150);
+    userProgress.streakChestsGiven = given;
+    saveProgress();
+  },
+  open: function() {
+    if (this.isOpening) return;
+    if (!userProgress.chests || userProgress.chests.length === 0) return;
+    this.isOpening = true;
+    var chest = userProgress.chests.shift();
+    saveProgress();
+    var self = this;
+    showChestOpeningAnimation(function() {
+      var reward = self.getRandomReward();
+      self.applyReward(reward);
+      self.showRewardModal(reward);
+      self.isOpening = false;
+    });
+  },
+  getRandomReward: function() {
+    var idx = Math.floor(Math.random() * this.rewardPool.length);
+    return this.rewardPool[idx];
+  },
+  applyReward: function(reward) {
+    switch(reward.type) {
+      case 'xp': XPSystem.addXP(reward.value); break;
+      case 'streak_day': showToastMsg('🎁 +1 день серии (скоро)', 'info'); break;
+      case 'boost_x2':
+        userProgress.doubleXPUntil = new Date(Date.now() + reward.duration * 60000).toISOString();
+        saveProgress();
+        showToastMsg('⚡ Бустер x2 XP на 15 минут!', 'xp');
+        break;
+      case 'free_hint':
+        userProgress.freeHints = (userProgress.freeHints || 0) + 1;
+        saveProgress();
+        showToastMsg('💡 Бесплатная подсказка доступна!', 'info');
+        break;
+      case 'badge':
+        if (!userProgress.rareBadges) userProgress.rareBadges = [];
+        userProgress.rareBadges.push(reward.id);
+        saveProgress();
+        showToastMsg('🏅 Редкий бейдж!', 'achievement');
+        break;
     }
   },
-
-  show(text, duration=3000) {
-    const el = document.getElementById('professor-speech');
-    const quizEl = document.getElementById('quiz-professor-speech');
-    if (!el && !quizEl) return;
-    if (this.timer) clearTimeout(this.timer);
-
-    const isQuiz = document.getElementById('s-quiz').classList.contains('active');
-    // Скрываем все speech перед показом
-    this.hideSpeechElements();
-
-    if (isQuiz && quizEl) {
-      quizEl.textContent = text;
-      quizEl.classList.remove('hidden');
-    } else if (el) {
-      el.textContent = text;
-      el.classList.remove('hidden');
-    }
-
-    this.timer = setTimeout(() => this.hide(), duration);
+  showRewardModal: function(reward) {
+    var container = document.getElementById('modal-container');
+    container.innerHTML = `
+      <div class="modal-overlay" id="reward-modal">
+        <div class="modal-card">
+          <div class="modal-title">🎉 Поздравляем!</div>
+          <div class="modal-sub">Ты получил:</div>
+          <div class="modal-reward">${reward.label}</div>
+          <button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить обучение</button>
+        </div>
+      </div>`;
   },
-
-  hide() {
-    this.hideSpeechElements();
-    if (this.timer) clearTimeout(this.timer);
-    setTimeout(() => this.setMood('default'), 300);
-  },
-
-  hideSpeechElements() {
-    const el = document.getElementById('professor-speech');
-    const quizEl = document.getElementById('quiz-professor-speech');
-    if (el) el.classList.add('hidden');
-    if (quizEl) quizEl.classList.add('hidden');
-  },
-
-  showHappy() {
-    this.setMood('happy');
-    this.show(this.HAPPY[Math.floor(Math.random()*this.HAPPY.length)]);
-  },
-
-  showSad() {
-    this.setMood('sad');
-    this.show(this.SAD[Math.floor(Math.random()*this.SAD.length)]);
-  },
-
-  showHint(text) {
-    this.setMood('hint');
-    this.show('💡 ' + text, 4000);
+  closeRewardModal: function() {
+    document.getElementById('modal-container').innerHTML = '';
+    renderProfile();
   }
 };
 
-// ---------- PROFESSOR CHAT ----------
-const ProfessorChat = {
-  history: [],
-  currentTopic: 'Общая подготовка',
-  isOpen: false,
-  open() {
-    if (this.isOpen) return;
-    this.isOpen = true;
-    const fab = document.getElementById('professor-fab');
-    if (fab) fab.classList.add('hidden');
-    ProfessorGeo.hide();
-
-    try { this.currentTopic = document.getElementById('s-quiz').classList.contains('active') ? QuestionSystem.getTopicTitle() : 'Общая подготовка'; } catch(e) {}
-    document.getElementById('chat-current-topic').textContent = '📚 ' + this.currentTopic;
-    document.getElementById('chat-overlay').style.display = 'flex';
-    if (!this.history.length) this.addMessage('professor', 'Привет! Я Профессор Гео, твой AI-наставник по географии. Задай вопрос или выбери тему для обсуждения! 🌍');
-    this.render();
-  },
-  close() {
-    this.isOpen = false;
-    document.getElementById('chat-overlay').style.display = 'none';
-    const fab = document.getElementById('professor-fab');
-    if (fab) fab.classList.remove('hidden');
-  },
-  addMessage(role, text) { this.history.push({role, text}); this.render(); },
-  render() {
-    const c = document.getElementById('chat-messages');
-    if (!c) return;
-    c.innerHTML = this.history.map(m => {
-      if (m.role === 'loading') return '<div class="chat-msg loading">⏳ Профессор думает...</div>';
-      return `<div class="chat-msg ${m.role}">${m.text.replace(/\\n/g,'<br>')}</div>`;
-    }).join('');
-    c.scrollTop = c.scrollHeight;
-  },
-  async sendMessage(text) {
-    if (!text?.trim()) return;
-    const input = document.getElementById('chat-input'); if (input) input.value = '';
-    this.addMessage('user', text.trim());
-    this.history.push({role:'loading', text:''}); this.render();
-    try {
-      const reply = await sendToProfessor(text, this.currentTopic);
-      this.history = this.history.filter(m => m.role !== 'loading');
-      this.addMessage('professor', reply);
-    } catch(e) {
-      this.history = this.history.filter(m => m.role !== 'loading');
-      this.addMessage('professor', '⚠️ Ошибка связи. Попробуй позже.');
-    }
+function showChestOpeningAnimation(callback) {
+  var container = document.getElementById('modal-container');
+  var particlesHtml = '';
+  for (var i=0; i<12; i++) {
+    var angle = (i/12)*Math.PI*2;
+    var x = Math.cos(angle) * 40 + 'px';
+    var y = Math.sin(angle) * 40 + 'px';
+    particlesHtml += '<div class="particle" style="--x:'+x+'; --y:'+y+'; animation-delay:'+(i*0.03)+'s"></div>';
   }
-};
-
-async function sendToProfessor(msg, topic) {
-  await new Promise(r => setTimeout(r, 800 + Math.random()*1200));
-  const m = msg.toLowerCase();
-  if (m.includes('объясни')) return `📘 Тема «${topic}» — одна из ключевых на ОГЭ. Сосредоточься на основных понятиях, определениях и типовых заданиях. Практика закрепит знания!`;
-  if (m.includes('подсказк')) return `💡 Внимательно прочитай вопрос. Ключевые слова часто содержат подсказку к ответу. Если не уверен — исключай заведомо неверные варианты.`;
-  if (m.includes('огэ')) return `❓ На ОГЭ по географии спрашивают: топографические карты, климатограммы, природу России, регионы, население, хозяйство. Регулярная тренировка — залог успеха!`;
-  if (m.includes('привет') || m.includes('здрав')) return `👋 Привет! Рад тебя видеть! Готов помочь с подготовкой к ОГЭ. Какая тема интересует?`;
-  if (m.includes('спасибо')) return `😊 Всегда рад помочь! Продолжай в том же духе — у тебя всё получится!`;
-  return `🤔 Интересный вопрос! По теме «${topic}» рекомендую: повтори теорию, порешай тесты и не бойся ошибок — они лучшие учителя.`;
+  container.innerHTML = `
+    <div class="modal-overlay" id="chest-opening">
+      <div class="modal-card" style="background:transparent; box-shadow:none; border:none;">
+        <div class="chest-open-anim">
+          <div class="chest-body">🎁</div>
+          <div class="chest-lid" id="chestLid"></div>
+          ${particlesHtml}
+        </div>
+        <div style="color:var(--text); margin-top:16px; font-weight:700;">Открываем сундук...</div>
+      </div>
+    </div>`;
+  setTimeout(function() {
+    var lid = document.getElementById('chestLid');
+    if (lid) lid.classList.add('open');
+  }, 400);
+  setTimeout(function() {
+    container.innerHTML = '';
+    if (callback) callback();
+  }, 1200);
 }
 
-document.getElementById('professor-fab').addEventListener('click', () => { ProfessorGeo.hide(); ProfessorChat.open(); });
-document.getElementById('chat-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) ProfessorChat.close(); });
+// ── Professor Modal (существующая логика подсказок) ──
+var ProfessorModal = {
+  currentHintLevel: 0,
+  topicKey: '',
+  openHint: function(topicKey) {
+    this.topicKey = topicKey;
+    this.currentHintLevel = 0;
+    var hint = getProfessorHint(topicKey, 0);
+    this._show(hint, [
+      { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } },
+      { text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } }
+    ]);
+  },
+  nextHint: function() {
+    this.currentHintLevel++;
+    if (this.currentHintLevel >= 3) {
+      this.currentHintLevel = 2;
+    }
+    var hint = getProfessorHint(this.topicKey, this.currentHintLevel);
+    var buttons = [
+      { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } }
+    ];
+    if (this.currentHintLevel < 2) {
+      buttons.push({ text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } });
+    } else {
+      buttons.push({ text: 'Подсказок больше нет', cls: 'professor-btn-primary', disabled: true });
+    }
+    this._show(hint, buttons);
+  },
+  showExplanation: function(message, isCorrect, usedHint) {
+    var fullMessage = message;
+    if (isCorrect && usedHint && Math.random() < 0.5) {
+      fullMessage = "Отлично! Ты справился сам — именно так знания запоминаются лучше. " + message;
+    } else if (!isCorrect) {
+      fullMessage = "Ничего страшного. Ошибки помогают понять тему лучше. " + message;
+    }
+    this._show(fullMessage, [
+      { text: 'Понятно', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.close(); } }
+    ]);
+  },
+  _show: function(message, buttons) {
+    var container = document.getElementById('professor-modal-container');
+    var btnsHtml = buttons.map(function(b) {
+      return '<button class="professor-btn ' + b.cls + '"' + (b.disabled ? ' disabled' : '') + '>' + b.text + '</button>';
+    }).join('');
+    container.innerHTML = `
+      <div class="professor-modal-overlay" id="professor-overlay">
+        <div class="professor-modal-card">
+          <div class="professor-avatar">👨‍🏫</div>
+          <div class="professor-message">${message}</div>
+          <div class="professor-actions">${btnsHtml}</div>
+        </div>
+      </div>`;
+    var overlay = document.getElementById('professor-overlay');
+    var btns = overlay.querySelectorAll('.professor-btn');
+    buttons.forEach(function(b, idx) {
+      if (b.onClick) {
+        btns[idx].addEventListener('click', b.onClick);
+      }
+    });
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) ProfessorModal.close();
+    });
+  },
+  close: function() {
+    document.getElementById('professor-modal-container').innerHTML = '';
+  }
+};
 
-// ---------- QUIZ SYSTEM ----------
-const QuestionSystem = {
-  curQ:0, score:0, answered:false, shuffled:[], curLesson:0, lives:3, hintUsed:false, isBoss:false,
-  async start(idx) {
-    const all = getAllLessons();
-    if (!all.length) {
-      showToast('Загружаю уроки...');
-      await loadAllLessons();
-      if (!getAllLessons().length) { showToast('Не удалось загрузить уроки', 'danger'); return; }
-    }
-    this.curLesson = idx; this.shuffled = all[idx].questions;
-    this.curQ=0; this.score=0; this.lives=3; this.hintUsed=false; this.isBoss=false;
+// ── QuestionSystem ──
+var QuestionSystem = {
+  curQ: 0, score: 0, answered: false, shuffled: [],
+  curLesson: 0, lives: 3, hintUsed: false,
+  lastExplainText: '', isBossMode: false,
+
+  start: function(idx) {
+    var allLessons = getAllLessons();
+    this.curLesson = idx;
+    this.shuffled = allLessons[idx].questions;
+    this.curQ = 0; this.score = 0; this.answered = false;
+    this.lives = 3; this.hintUsed = false; this.isBossMode = false;
     goScreen('s-quiz'); this.renderQ();
-    const qp = document.getElementById('quiz-professor');
-    if (qp) qp.classList.remove('hidden');
   },
-  async startBoss() {
-    let all = getAllLessons();
-    if (!all.length) {
-      showToast('Загружаю уроки...');
-      await loadAllLessons();
-      all = getAllLessons();
-      if (!all.length) { showToast('Не удалось загрузить уроки', 'danger'); return; }
-    }
-    let qs = []; all.forEach(l => qs = qs.concat(l.questions));
-    qs = qs.sort(()=>Math.random()-0.5).slice(0,30);
-    this.isBoss = true; this.shuffled = qs; this.curQ=0; this.score=0; this.lives=999; this.hintUsed=false;
+  startBoss: function() {
+    var allLessons = getAllLessons();
+    var allQuestions = [];
+    allLessons.forEach(function(l) { if (l.questions) allQuestions = allQuestions.concat(l.questions); });
+    allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
+    this.isBossMode = true; this.shuffled = allQuestions; this.curLesson = -1;
+    this.curQ = 0; this.score = 0; this.answered = false; this.lives = 999; this.hintUsed = false;
     goScreen('s-quiz'); this.renderQ();
-    const qp = document.getElementById('quiz-professor');
-    if (qp) qp.classList.remove('hidden');
   },
-  replay() { if (this.isBoss) this.startBoss(); else this.start(this.curLesson); },
-  renderQ() {
-    const q = this.shuffled[this.curQ]; this.answered = false; this.hintUsed = false;
-    document.getElementById('quiz-topic-lbl').textContent = this.getTopicTitle();
-    document.getElementById('lesson-badge').textContent = `${this.getTopicTitle()} · Вопрос ${this.curQ+1}/${this.shuffled.length}`;
-    document.getElementById('quiz-counter').textContent = `${this.curQ+1}/${this.shuffled.length}`;
-    document.getElementById('qpf').style.width = (this.curQ/this.shuffled.length*100)+'%';
-    document.getElementById('q-tag').textContent = q.tag; document.getElementById('q-text').textContent = q.text;
-    document.getElementById('btn-hint').style.display='flex'; document.getElementById('btn-hint').disabled=false;
-    document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
-    const next = document.getElementById('btn-next'); next.classList.remove('show');
-    next.textContent = this.curQ < this.shuffled.length-1 ? 'Следующий вопрос →' : 'Результат →';
-    const ans = document.getElementById('answers'); ans.innerHTML = '';
-    ['А','Б','В','Г'].forEach((l,i) => {
-      const b = document.createElement('button'); b.className='ans-btn';
-      b.innerHTML = `<div class="ans-letter">${l}</div><span>${q.answers[i]}</span>`;
-      b.onclick = () => this.selectAns(i, q.correct);
+  replay: function() {
+    if (this.isBossMode || this.curLesson < 0) { this.startBoss(); return; }
+    var allLessons = getAllLessons();
+    this.shuffled = allLessons[this.curLesson].questions;
+    this.curQ = 0; this.score = 0; this.answered = false; this.lives = 3; this.hintUsed = false;
+    goScreen('s-quiz'); this.renderQ();
+  },
+  renderQ: function() {
+    const q = this.shuffled[this.curQ];
+    const topicTitle = this.getTopicTitle();
+    this.answered = false; this.hintUsed = false; this.lastExplainText = '';
+
+    document.getElementById('quiz-topic-lbl').textContent = topicTitle;
+    document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(this.curQ+1)+' из '+this.shuffled.length;
+    document.getElementById('quiz-counter').textContent = (this.curQ+1)+'/'+this.shuffled.length;
+    document.getElementById('qpf').style.width = ((this.curQ/this.shuffled.length)*100)+'%';
+    document.getElementById('q-tag').textContent = q.tag;
+    document.getElementById('q-text').textContent = q.text;
+    var btnHint = document.getElementById('btn-hint');
+    btnHint.style.display = 'flex'; btnHint.disabled = false;
+    btnHint.textContent = '🎓 Спросить профессора Гео';
+
+    var livesEl = document.getElementById('lives-row');
+    livesEl.innerHTML = '';
+    for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
+
+    const btn = document.getElementById('btn-next');
+    btn.classList.remove('show');
+    btn.textContent = this.curQ < this.shuffled.length-1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
+
+    const ans = document.getElementById('answers');
+    ans.innerHTML = '';
+    ['А','Б','В','Г'].forEach(function(l, i){
+      const b = document.createElement('button');
+      b.className = 'ans-btn';
+      b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
+      b.onclick = function(){ QuestionSystem.selectAns(i, q.correct, q.text, topicTitle, q); };
       ans.appendChild(b);
     });
-    ProfessorGeo.setMood('default');
   },
-  getTopicTitle() { return this.isBoss ? 'Финальный босс' : (getAllLessons()[this.curLesson]?.title || 'Тренировка'); },
-  getTopicKey() { return this.isBoss ? 'topo' : (getAllLessons()[this.curLesson]?.key || 'topo'); },
-  selectAns(idx, correct) {
-    if (this.answered) return; this.answered = true;
-    if (idx === correct && isTelegram && tgApp.HapticFeedback) tgApp.HapticFeedback.notificationOccurred('success');
+  getTopicTitle: function() {
+    if (this.isBossMode) return 'Финальный босс';
+    var all = getAllLessons();
+    return (all[this.curLesson] && all[this.curLesson].title) || 'Тренировка';
+  },
+  getTopicKey: function() {
+    if (this.isBossMode) return 'topo';
+    var all = getAllLessons();
+    return (all[this.curLesson] && all[this.curLesson].key) || 'topo';
+  },
+  selectAns: function(idx, correct, qText, topic, question) {
+    if (this.answered) return;
+    this.answered = true;
+
+    if (idx === correct && isTelegram && tgApp.HapticFeedback) {
+      try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){}
+    }
+
     const btns = document.querySelectorAll('.ans-btn');
     btns[idx].classList.add(idx===correct?'correct':'wrong');
-    if (idx !== correct) { btns[correct].classList.add('correct'); this.lives--; ProfessorGeo.showSad(); }
-    else { this.score++; XPSystem.addXP(10); ProfessorGeo.showHappy(); }
-    document.getElementById('btn-hint').style.display='none';
-    document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
+    if (idx !== correct) {
+      btns[correct].classList.add('correct');
+      this.lives--;
+    }
+    if (idx === correct) {
+      this.score++;
+      this.showXPPopup(10);
+      XPSystem.addXP(10);
+    }
+
+    document.getElementById('btn-hint').style.display = 'none';
+    var livesEl = document.getElementById('lives-row');
+    livesEl.innerHTML = '';
+    for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
+
+    this.showProfessorExplanation(idx===correct, question);
     document.getElementById('btn-next').classList.add('show');
-    if (this.lives<=0) document.getElementById('btn-next').textContent = '😔 Жизни кончились';
-    DailyQuestSystem.incrementCounters(1,0); DailyQuestSystem.update();
+    if (this.lives <= 0) {
+      document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
+    }
+    DailyQuestSystem.incrementCounters(1, 0);
+    DailyQuestSystem.update();
   },
-  next() {
+  showXPPopup: function(amount) {
+    var popup = document.createElement('div');
+    popup.className = 'xp-pop';
+    popup.textContent = '+' + amount + ' XP';
+    document.body.appendChild(popup);
+    setTimeout(function(){ popup.remove(); }, 1000);
+  },
+  showProfessorExplanation: function(isCorrect, question) {
+    var correctAnswerText = question.answers[question.correct];
+    var message = isCorrect
+      ? 'Правильно! ' + correctAnswerText + ' — верный ответ.'
+      : 'Правильный ответ — ' + correctAnswerText + '.';
+    ProfessorModal.showExplanation(message, isCorrect, this.hintUsed);
+  },
+  next: function() {
     this.curQ++;
-    if (this.curQ >= this.shuffled.length) {
-      const qp = document.getElementById('quiz-professor');
-      if (qp) qp.classList.add('hidden');
-      ProfessorGeo.hide();
-      this.showResult();
-    } else {
-      this.renderQ();
-    }
+    if (this.curQ >= this.shuffled.length) this.showResult();
+    else this.renderQ();
   },
-  getHint() { if (this.hintUsed) return; this.hintUsed = true; ProfessorGeo.showHint('Подумай, какие ключевые слова в вопросе помогают найти ответ.'); document.getElementById('btn-hint').disabled = true; },
-  showResult() {
-    const total = this.shuffled.length, pct = Math.round(this.score/total*100);
-    if (this.isBoss) {
+  showResult: function() {
+    const total = this.shuffled.length;
+    const pct = Math.round(this.score/total*100);
+
+    if (this.isBossMode) {
       userProgress.bossCompleted = true; saveProgress();
-      document.getElementById('boss-sub').textContent = `${this.score}/${total} (${pct}%)`;
-      document.getElementById('boss-num').textContent = this.score; goScreen('s-boss-result');
-      setTimeout(()=>document.getElementById('boss-ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
-      this.isBoss=false; DailyQuestSystem.update(); return;
+      document.getElementById('boss-sub').textContent = this.score+'/'+total+' правильных ответов ('+pct+'%)';
+      document.getElementById('boss-num').textContent = this.score;
+      document.getElementById('boss-denom').textContent = 'из ' + total;
+      goScreen('s-boss-result');
+      setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
+      this.isBossMode = false; DailyQuestSystem.update(); return;
     }
+
     let e='😔', t='Нужно повторить';
-    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хорошо!'; }
-    document.getElementById('res-emoji').textContent = e; document.getElementById('res-title').textContent = t;
-    document.getElementById('res-sub').textContent = `${pct}% правильных`;
+    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хороший результат!'; } else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
+    document.getElementById('res-emoji').textContent = e;
+    document.getElementById('res-title').textContent = t;
+    document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
     document.getElementById('ring-num').textContent = this.score;
     document.getElementById('ring-denom').textContent = `из ${total}`;
     document.getElementById('res-c').textContent = this.score;
     document.getElementById('res-w').textContent = total-this.score;
-    const xp = this.score*20 + (this.score===total?50:0);
-    document.getElementById('res-xp').textContent = '+'+xp;
+    var xpGain = this.score*20 + (this.score===total ? 50 : 0);
+    document.getElementById('res-xp').textContent = '+'+xpGain;
     this.saveLesson(this.curLesson, this.score, total);
     goScreen('s-result');
-    setTimeout(()=>document.getElementById('ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
+    setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
     DailyQuestSystem.update();
   },
-  saveLesson(idx, sc, total) {
-    const today = new Date().toISOString().slice(0,10);
-    const key = getAllLessons()[idx]?.title || String(idx);
-    userProgress.completedLessons[key] = { score:sc, total, date:today };
+  saveLesson: function(lessonIdx, sc, total) {
+    var today = new Date().toISOString().slice(0,10);
+    var allLessons = getAllLessons();
+    var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+    userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
     userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
-    XPSystem.addXP(sc*20 + (sc===total?50:0));
+    var xpGain = sc * 20 + (sc === total ? 50 : 0);
+    XPSystem.addXP(xpGain);
     checkStreak(); saveProgress();
-    if (!userProgress.completedLessons[key].chestGiven) {
-      ChestSystem.give('achievement'); userProgress.completedLessons[key].chestGiven = true; saveProgress();
+    if (!userProgress.chests) userProgress.chests = [];
+    if (!userProgress.completedLessons[lessonKey].chestGiven) {
+      ChestSystem.give('achievement');
+      userProgress.completedLessons[lessonKey].chestGiven = true;
+      saveProgress();
     }
+  },
+  getHint: function() {
+    if (this.hintUsed) return;
+    this.hintUsed = true;
+    var topicKey = this.getTopicKey();
+    ProfessorModal.openHint(topicKey);
   }
 };
 
-// ---------- RENDERING ----------
-function goScreen(id) {
-  if (id !== 's-quiz') {
-    const qp = document.getElementById('quiz-professor');
-    if (qp) qp.classList.add('hidden');
-    ProfessorGeo.hide();
+// ── AISystem (оставлен для чата) ──
+var AISystem = {
+  openChat: function() {
+    const aiPanel = document.getElementById('ai-quiz');
+    const topic = QuestionSystem.getTopicTitle();
+    const ctx = 'Вопрос ОГЭ: ' + (QuestionSystem.shuffled[QuestionSystem.curQ]?.text || '');
+    if (!aiPanel.dataset.initialized) {
+      this.initAI('ai-quiz', ctx, [], false);
+      aiPanel.dataset.initialized = '1';
+    }
+    aiPanel.style.display = 'block';
+    const body = aiPanel.querySelector('.ai-body');
+    if (body) {
+      body.classList.add('open');
+      const msgs = document.getElementById('msgs-ai-quiz');
+      if (msgs && QuestionSystem.lastExplainText.trim()) {
+        msgs.innerHTML = '';
+        msgs.innerHTML += `<div class="msg ai">${QuestionSystem.lastExplainText.replace(/\n/g,'<br>')}</div>`;
+      }
+    }
+    const toggle = aiPanel.querySelector('.ai-toggle');
+    if (toggle) toggle.classList.add('open');
+  },
+  initAI: function(cid, ctx, prompts, autoOpen) {
+    const el = document.getElementById(cid);
+    if (!el) return;
+    const escCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    el.innerHTML = `
+      <div class="ai-header" onclick="AISystem.toggle(this)">
+        <div class="ai-header-left">
+          <div class="ai-avatar">🎓</div>
+          <div><div class="ai-name">Профессор Гео</div><div class="ai-tagline">Спроси — объясню как наставник</div></div>
+        </div>
+        <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
+      </div>
+      <div class="ai-body ${autoOpen?'open':''}">
+        <div class="ai-context">📌 ${ctx}</div>
+        <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="AISystem.sendP('${cid}','${escCtx}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
+        <div class="ai-messages" id="msgs-${cid}"></div>
+        <div class="ai-input-row">
+          <textarea class="ai-input" id="inp-${cid}" placeholder="Спроси Профессора..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();AISystem.sendM('${cid}','${escCtx}');}"></textarea>
+          <button class="ai-send" id="snd-${cid}" onclick="AISystem.sendM('${cid}','${escCtx}')">➤</button>
+        </div>
+      </div>
+    `;
+  },
+  toggle: function(h) { const b = h.nextElementSibling; const t = h.querySelector('.ai-toggle'); b.classList.toggle('open'); t.classList.toggle('open'); },
+  sendP: function(cid, ctx, text) { document.getElementById(`inp-${cid}`).value = text; this.sendM(cid, ctx); },
+  sendM: async function(cid, ctx) {
+    const inp = document.getElementById(`inp-${cid}`); const snd = document.getElementById(`snd-${cid}`);
+    const msgs = document.getElementById(`msgs-${cid}`); const text = inp.value.trim(); if (!text) return;
+    inp.value = ''; snd.disabled = true;
+    msgs.innerHTML += `<div class="msg user">${text}</div>`;
+    const lid = 'l'+Date.now(); msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+      const d = await r.json(); const ans = d.answer || 'Не удалось получить ответ';
+      document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+    } catch(e) { document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`; }
+    snd.disabled = false; msgs.scrollTop = msgs.scrollHeight;
   }
-  const hero = document.getElementById('hero-professor');
-  if (hero) {
-    if (id === 's-home') hero.classList.remove('hidden');
-    else hero.classList.add('hidden');
-  }
-  const fab = document.getElementById('professor-fab');
-  if (fab) {
-    if (id === 's-home' || id === 's-profile') fab.classList.remove('hidden');
-    else fab.classList.add('hidden');
-  }
+};
 
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+// ── Profile & Home rendering ──
+function getRank(xp) {
+  if (xp >= 10000) return 'Легенда';
+  if (xp >= 5000) return 'Мастер';
+  if (xp >= 3000) return 'Эксперт';
+  if (xp >= 500) return 'Ученик';
+  return 'Новичок';
+}
+
+function getNextRank(xp) {
+  const ranks = [
+    { name: 'Ученик', min: 500 }, { name: 'Эксперт', min: 3000 },
+    { name: 'Мастер', min: 5000 }, { name: 'Легенда', min: 10000 }
+  ];
+  for (var i = 0; i < ranks.length; i++) { if (xp < ranks[i].min) return ranks[i]; }
+  return null;
+}
+
+function goScreen(id) {
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
   if (id === 's-home') renderHomePath();
   if (id === 's-profile') renderProfile();
 }
 
-function getPredictedGrade() {
-  if (!userProgress.totalAnswered) return '—';
-  const acc = userProgress.totalCorrect / userProgress.totalAnswered;
-  if (acc >= 0.85) return '5'; if (acc >= 0.7) return '4'; if (acc >= 0.55) return '3'; return '2';
+function getDaysUntilOGE() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const currentYear = today.getFullYear();
+  const ogeThisYear = new Date(currentYear, 5, 19);
+  if (today <= ogeThisYear) return Math.ceil((ogeThisYear - today) / 86400000);
+  const ogeNextYear = new Date(currentYear + 1, 5, 19);
+  return Math.ceil((ogeNextYear - today) / 86400000);
 }
 
+function getPredictedGrade() {
+  if (userProgress.totalAnswered === 0) return '—';
+  var acc = userProgress.totalCorrect / userProgress.totalAnswered;
+  if (acc >= 0.85) return '5';
+  if (acc >= 0.70) return '4';
+  if (acc >= 0.55) return '3';
+  return '2';
+}
+
+function getPredictedScore(grade) {
+  if (grade === '5') return '28–31'; if (grade === '4') return '19–25';
+  if (grade === '3') return '12–18'; if (grade === '2') return '0–11';
+  return '—';
+}
+
+function getCorrectAnswersNeededForGrade(targetGrade) {
+  var total = userProgress.totalAnswered; var correct = userProgress.totalCorrect;
+  var target = 0;
+  if (targetGrade === 3) target = 0.55; else if (targetGrade === 4) target = 0.70; else if (targetGrade === 5) target = 0.85;
+  var needed = Math.ceil(target * total) - correct;
+  return Math.max(0, needed);
+}
+
+// ── Ежедневное приветствие профессора ──
+const GREETING_PHRASES = [
+  "Привет! Сегодня отличный день стать ещё ближе к пятёрке! 🚀",
+  "Продолжим подготовку? Осталось совсем немного!",
+  "Рад тебя видеть! Давай разберёмся с географией вместе.",
+  "Не забудь пройти ежедневные задания — они помогут закрепить знания.",
+  "Сегодня отличный день, чтобы прокачать свои знания по географии!"
+];
+
+function showDailyProfessorGreeting() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.professorGreetingDate === today) return;
+  userProgress.professorGreetingDate = today;
+  saveProgress();
+
+  var speech = document.getElementById('professor-speech');
+  if (!speech) return;
+  var phrase = GREETING_PHRASES[Math.floor(Math.random() * GREETING_PHRASES.length)];
+  speech.textContent = phrase;
+  speech.style.display = 'block';
+  // Удаляем предыдущие анимации, перезапускаем
+  speech.style.animation = 'none';
+  speech.offsetHeight; // рефлоу
+  speech.style.animation = 'speechIn 0.4s ease, speechOut 0.4s ease 5.5s forwards';
+  // Скрыть после окончания анимации
+  setTimeout(function() {
+    if (speech.style.animation.includes('speechOut')) {
+      speech.style.display = 'none';
+    }
+  }, 6000);
+}
+
+// ── Управление модальным окном-заглушкой профессора ──
+function openProfessorPlaceholder() {
+  document.getElementById('professor-placeholder-modal').style.display = 'flex';
+}
+function closeProfessorPlaceholder() {
+  document.getElementById('professor-placeholder-modal').style.display = 'none';
+}
+
+// Обновлённый renderHomePath с вызовом приветствия
 async function renderHomePath() {
-  const container = document.getElementById('home-content');
-  if (!lessonsLoaded.length) {
-    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю...</div>';
+  var container = document.getElementById('home-content');
+  if (lessonsLoaded.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
     await loadAllLessons();
   }
-  const all = getAllLessons();
-  if (!all.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Ошибка загрузки</div>'; return; }
-
-  const today = new Date().toISOString().slice(0,10);
-  if (userProgress.professorGreetingDate !== today) {
-    userProgress.professorGreetingDate = today; saveProgress();
-    setTimeout(() => {
-      ProfessorGeo.show("Привет! Готов продолжить подготовку? 🚀", 5000);
-    }, 800);
+  var allLessons = getAllLessons();
+  if (allLessons.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания. Проверь интернет.</div>';
+    return;
   }
 
-  const completedCount = Object.keys(userProgress.completedLessons).length;
-  const totalCount = all.length;
-  const pct = totalCount ? Math.round(completedCount/totalCount*100) : 0;
-  const grade = getPredictedGrade();
-  let html = `<div class="path-progress-card"><b>Прогноз ОГЭ</b><div style="font-size:42px;color:var(--gold)">${grade}</div>`;
-  html += `<div style="font-size:11px;color:var(--muted)">🔥 ${userProgress.streak||0} дней подряд · ${getDaysUntilOGE()} дн. до ОГЭ</div></div>`;
-  html += `<div class="path-progress-card"><div style="display:flex;justify-content:space-between"><span>Прогресс</span><span>${pct}%</span></div><div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="${pct}%"></div></div></div>`;
+  // Ежедневное приветствие профессора (только на главном экране)
+  showDailyProfessorGreeting();
 
-  const nextIdx = all.findIndex((l,i) => !userProgress.completedLessons[l.title]);
-  const nextLesson = nextIdx >= 0 ? all[nextIdx] : null;
-  if (nextLesson) {
-    html += `<div class="continue-card" onclick="QuestionSystem.start(${nextIdx})"><span>▶️</span><div><div class="continue-label">Продолжить</div><div>${nextLesson.title}</div></div></div>`;
+  var nextIdx = 0;
+  for (var i = 0; i < allLessons.length; i++) {
+    var key = allLessons[i].title;
+    if (!userProgress.completedLessons[key]) { nextIdx = i; break; }
+    if (i === allLessons.length - 1) nextIdx = allLessons.length;
+  }
+
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var totalCount = allLessons.length;
+  var pct = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
+  var allDone = completedCount >= totalCount;
+  var daysLeft = getDaysUntilOGE();
+  var predictedGrade = getPredictedGrade();
+  var streak = userProgress.streak || 0;
+  var predictedScore = getPredictedScore(predictedGrade);
+
+  var html = '';
+  html += '<div class="path-progress-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:6px">Твой прогноз ОГЭ</div>';
+  if (predictedGrade !== '—') {
+    var currentGrade = parseInt(predictedGrade);
+    html += '<div style="font-size:42px;font-weight:800;color:var(--gold);line-height:1">' + predictedGrade + '</div>';
+    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Прогноз: ' + predictedScore + ' баллов</div>';
+    if (currentGrade < 5) {
+      var nextGrade = currentGrade + 1;
+      var needed = getCorrectAnswersNeededForGrade(nextGrade);
+      html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">До ' + nextGrade + ' осталось ' + needed + ' баллов</div>';
+      var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
+      progressPercent = Math.min(100, Math.round(progressPercent));
+      html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="' + progressPercent + '%"></div></div>';
+    } else {
+      html += '<div style="font-size:13px;color:var(--primary2);margin-bottom:8px">Ты на высшем уровне!</div>';
+    }
   } else {
-    html += `<div class="continue-card" onclick="QuestionSystem.startBoss()"><span>👑</span><div><div class="continue-label">Финальное испытание</div><div>Финальный босс</div></div></div>`;
+    html += '<div style="font-size:16px;color:var(--muted)">Недостаточно данных</div>';
   }
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px">Подготовка: ' + streak + ' ' + getDayWord(streak) + ' подряд · До ОГЭ ' + daysLeft + ' ' + getDayWord(daysLeft) + '</div>';
+  html += '</div>';
+
+  html += '<div class="path-progress-card">';
+  html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">'+pct+'%</span></div>';
+  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="'+pct+'%"></div></div>';
+  html += '</div>';
+
+  DailyQuestSystem.update();
+  var tasks = userProgress.dailyTasks || {};
+  var dailyQ = userProgress.dailyQuestions || 0;
+  var dailyXP = userProgress.dailyXP || 0;
+  html += '<div class="path-progress-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.solve10?' done':'')+'" style="color:'+(tasks.solve10?'var(--primary2)':'var(--muted)')+'">'+(tasks.solve10?'✅':'⬜')+'</span> Решить 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyQ,10)+'/10</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.earn50XP?' done':'')+'" style="color:'+(tasks.earn50XP?'var(--primary2)':'var(--muted)')+'">'+(tasks.earn50XP?'✅':'⬜')+'</span> Получить 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyXP,50)+'/50</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.loginToday?' done':'')+'" style="color:'+(tasks.loginToday?'var(--primary2)':'var(--muted)')+'">'+(tasks.loginToday?'✅':'⬜')+'</span> Зайти сегодня</div>';
+  html += '</div>';
+  if (userProgress.allDailyTasksDone) {
+    html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">🎉 Все задания выполнены! +100 XP и сундук</div>';
+  } else {
+    html += '<div style="margin-top:8px;font-size:12px;color:var(--muted)">За каждое задание +20 XP</div>';
+  }
+  html += '</div>';
+
+  if (!allDone) {
+    var nextLesson = allLessons[nextIdx];
+    html += '<div class="continue-card" onclick="QuestionSystem.start('+nextIdx+')">';
+    html += '<div class="continue-icon">'+(nextLesson.title.match(/^\S+/)?nextLesson.title.match(/^\S+/)[0]:'▶')+'</div>';
+    html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">'+nextLesson.title.replace(/^\S+\s*/,'')+'</div></div>';
+    html += '<div class="continue-arrow">→</div></div>';
+  } else {
+    html += '<div class="continue-card" onclick="QuestionSystem.startBoss()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+    html += '<div class="continue-icon">👑</div>';
+    html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс — все темы</div></div>';
+    html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+  }
+
+  html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
+  allLessons.forEach(function(l, i) {
+    var done = userProgress.completedLessons[l.title];
+    var prevKey = i > 0 ? allLessons[i-1].title : null;
+    var prevDone = i === 0 || userProgress.completedLessons[prevKey];
+    var isLocked = !prevDone && i > 0;
+    var isCurrent = !isLocked && !done;
+    var perfect = done && done.score === done.total;
+
+    var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
+    var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var onclk = isLocked ? '' : ' onclick="QuestionSystem.start('+i+')"';
+
+    if (i > 0) {
+      var connDone = userProgress.completedLessons[allLessons[i-1].title];
+      html += '<div class="path-connector" style="background:'+(connDone?'var(--primary2)':'var(--border)')+'"></div>';
+    }
+    var isRight = i % 2 === 1;
+    html += '<div class="path-node-row" style="flex-direction:'+(isRight?'row-reverse':'row')+';opacity:'+(isLocked?'0.45':'1')+'">';
+    html += '<div class="node-circle '+stateClass+'"'+onclk+' style="cursor:'+(isLocked?'default':'pointer')+'">'+nodeIcon+'</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">'+l.title+'</div>';
+    if (done) {
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">'+done.score+'/'+done.total+' верно</div>';
+    } else {
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(l.questions?l.questions.length:0)+' вопр.'+(l.tasks?' · '+l.tasks:'')+'</div>';
+    }
+    html += '</div></div>';
+  });
+
+  html += '<div class="path-connector" style="background:'+(allDone?'var(--primary2)':'var(--border)')+'"></div>';
+  html += '<div class="path-node-row">';
+  html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="QuestionSystem.startBoss()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
+  html += '<div style="flex:1"><div style="font-weight:800;font-size:15px;color:'+(allDone?'#d29922':'var(--muted)')+'">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(allDone?'Тест по всем темам — открыт!':'Пройди все темы чтобы открыть')+'</div></div>';
+  html += '</div>';
+
+  html += '</div>';
   container.innerHTML = html;
-  setTimeout(() => container.querySelectorAll('.path-progress-fill[data-target]').forEach(f => f.style.width = f.dataset.target), 50);
+
   document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
-  document.getElementById('home-sublabel').textContent = `${completedCount}/${totalCount} тем`;
+  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+
+  setTimeout(function() {
+    var fills = container.querySelectorAll('.path-progress-fill[data-target]');
+    fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
+  }, 50);
+  animateCards(container);
 }
 
 function renderProfile() {
-  const container = document.getElementById('profile-content');
-  const rank = userProgress.xp >= 5000 ? 'Мастер' : userProgress.xp >= 1000 ? 'Ученик' : 'Новичок';
-  container.innerHTML = `<div class="profile-header-card"><div class="profile-avatar-big">🧑‍🎓</div><div><div class="profile-name-big">Ученик <span style="background:var(--primary);padding:2px 8px;border-radius:10px;font-size:12px">${rank}</span></div><div>⚡ Ур.${userProgress.level} · ${userProgress.xp} XP</div></div></div>`;
+  var allLessons = getAllLessons();
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect/userProgress.totalAnswered)*100) : 0;
+  var predictedGrade = getPredictedGrade();
+  var rank = getRank(userProgress.xp);
+  var chestCount = (userProgress.chests || []).length;
+
+  var html = '';
+  html += '<div class="profile-header-card">';
+  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
+  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">'+rank+'</span></div>';
+  html += '<div class="profile-level-big">⚡ Уровень '+userProgress.level+' · '+userProgress.xp+' XP</div>';
+
+  var nextRank = getNextRank(userProgress.xp);
+  if (nextRank) {
+    var xpNeeded = nextRank.min; var currentXP = userProgress.xp;
+    var progressPct = Math.min(100, Math.round((currentXP / xpNeeded)*100));
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "'+nextRank.name+'" осталось '+(xpNeeded - currentXP)+' XP</div>';
+    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:0%" data-target="'+progressPct+'%"></div></div>';
+  }
+  html += '</div></div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div style="font-size:32px">🎯</div>';
+  html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">'+predictedGrade+'</span></div></div>';
+  html += '</div>';
+
+  html += '<div class="profile-stats-grid">';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+completedCount+'/'+allLessons.length+'</div><div class="profile-stat-label">Тем пройдено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+acc+'%</div><div class="profile-stat-label">Точность</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
+  html += '</div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
+  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
+  if (chestCount > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
+  }
+  html += '</div>';
+  html += '<button onclick="ChestSystem.open()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount===0?' disabled':'')+'>'+(chestCount>0?'Открыть сундук':'Нет сундуков')+'</button>';
+  html += '</div>';
+
+  var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
+  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
+  html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
+  html += '<div style="font-size:13px;color:'+(isTelegram?'var(--primary2)':'var(--danger)')+';margin-top:6px">'+notifText+'</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+notifDesc+'</div>';
+  html += '</div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
+  html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
+  html += '</div>';
+
+  AchievementSystem.check();
+  var achievements = userProgress.achievements || {};
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  ACHIEVEMENTS_LIST.forEach(function(a) {
+    var ach = achievements[a.id] || { progress: 0, unlocked: false };
+    var isUnlocked = ach.unlocked;
+    var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
+    var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
+    html += '<div class="badge-item-p'+(isUnlocked?'':' locked')+'" style="position:relative">';
+    html += '<div class="badge-icon-p">'+a.icon+'</div>';
+    html += '<div class="badge-name-p">'+a.title+'</div>';
+    if (a.max) { html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">'+progress+'/'+a.max+'</div>'; }
+    if (isUnlocked && dateStr) { html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">'+dateStr+'</div>'; }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+
+  document.getElementById('profile-content').innerHTML = html;
+
+  setTimeout(function() {
+    var fills = document.querySelectorAll('#profile-content .path-progress-fill[data-target]');
+    fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
+  }, 50);
+  animateCards(document.getElementById('profile-content'));
 }
 
-function getDaysUntilOGE() {
-  const now = new Date(); const oge = new Date(now.getFullYear(), 5, 19);
-  if (now > oge) oge.setFullYear(oge.getFullYear()+1);
-  return Math.ceil((oge - now)/86400000);
+function inviteFriend() {
+  const inviteUrl = 'https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.';
+  if (isTelegram) { tgApp.openTelegramLink(inviteUrl); } else { window.open(inviteUrl, '_blank'); }
+  if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; XPSystem.addXP(50); saveProgress(); }
 }
 
-loadProgress(() => { checkStreak(); renderHomePath(); DailyQuestSystem.update(); AchievementSystem.check(); });
+function shareBossResult() {
+  const total = QuestionSystem.shuffled.length;
+  const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+QuestionSystem.score+'/'+total+'! Попробуй и ты!';
+  if (isTelegram) { tgApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text)); }
+  else { prompt('Скопируй текст для друзей:', text); }
+}
+
+var userProgress = {
+  xp: 0, level: 1, streak: 0, lastDate: '',
+  completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
+  bossCompleted: false, freezes: 1, lastFreezeMonday: '',
+  chests: [], invitedFriend: false,
+  dailyTasksDate: '', dailyTasks: { solve10: false, earn50XP: false, loginToday: false },
+  dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
+  allDailyTasksDone: false, dailyQuestions: 0, dailyXP: 0,
+  achievements: {},
+  lastDailyChestDate: '', streakChestsGiven: {},
+  friends: [], freeHints: 0, rareBadges: [], doubleXPUntil: null,
+  professorGreetingDate: '' // поле для ежедневного приветствия профессора
+};
+
+function saveProgress() {
+  var data = JSON.stringify(userProgress);
+  if (isTelegram && tgApp.CloudStorage) { tgApp.CloudStorage.setItem('progress', data, function(){}); }
+  else { try { localStorage.setItem('geo_progress', data); } catch(e){} }
+}
+
+function loadProgress(callback) {
+  if (isTelegram && tgApp.CloudStorage) {
+    tgApp.CloudStorage.getItem('progress', function(err, val) {
+      if (!err && val) { try { userProgress = JSON.parse(val); } catch(e){} }
+      refreshFreeze(); callback();
+    });
+  } else {
+    try { var saved = localStorage.getItem('geo_progress'); if (saved) userProgress = JSON.parse(saved); } catch(e){}
+    refreshFreeze(); callback();
+  }
+}
+
+function getMonday(date) {
+  var d = new Date(date); d.setHours(0,0,0,0);
+  var day = d.getDay(); var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff)).toISOString().slice(0,10);
+}
+
+function refreshFreeze() {
+  var todayMonday = getMonday(new Date());
+  if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < todayMonday) {
+    userProgress.freezes = 1; userProgress.lastFreezeMonday = todayMonday; saveProgress();
+  }
+}
+
+function checkStreak() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDate === today) return;
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (userProgress.lastDate === yesterday) { userProgress.streak++; }
+  else if (userProgress.lastDate !== today) {
+    if (userProgress.freezes > 0) { userProgress.freezes = 0; userProgress.lastFreezeMonday = getMonday(new Date()); userProgress.streak++; }
+    else { userProgress.streak = 1; }
+  }
+  userProgress.lastDate = today; saveProgress();
+  AchievementSystem.check();
+  ChestSystem.giveDaily();
+  ChestSystem.giveStreak();
+}
+
+function getDayWord(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return 'день';
+  if ([2,3,4].includes(n%10) && ![12,13,14].includes(n%100)) return 'дня';
+  return 'дней';
+}
+
+// ── INIT ──
+loadProgress(function() {
+  checkStreak();
+  renderHomePath();
+  DailyQuestSystem.update();
+  AchievementSystem.check();
+  // Закрытие модалки профессора по клику на оверлей
+  document.getElementById('professor-placeholder-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeProfessorPlaceholder();
+  });
+});
 </script>
 </body>
 </html>
