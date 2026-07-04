@@ -279,55 +279,73 @@ body::before {
   50% { transform: scale(1.03); }
   100% { transform: scale(1); }
 }
-.chest-card-available {
-  animation: chestGlow 2s infinite, chestPulse 1.5s infinite;
-  border-color: #d29922 !important;
-}
-.chest-btn-available {
-  background: linear-gradient(135deg, #f5a623, #d29922) !important;
-  animation: chestPulse 1.2s infinite;
-}
 
-/* Модальное окно сундука */
-.chest-open-anim {
-  width: 90px; height: 90px; margin: 0 auto; position: relative;
+/* Модальное окно профессора */
+.professor-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeInOverlay 0.25s ease;
 }
-.chest-body {
-  width: 80px; height: 60px; background: linear-gradient(135deg, #b8860b, #d29922);
-  border-radius: 10px; position: absolute; bottom: 0; left: 5px;
-  display: flex; align-items: center; justify-content: center; font-size: 36px;
-  box-shadow: 0 0 15px rgba(210,153,34,0.5);
+.professor-modal-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
 }
-.chest-lid {
-  width: 86px; height: 20px; background: linear-gradient(135deg, #d29922, #f5a623);
-  border-radius: 8px 8px 0 0; position: absolute; top: 0; left: 2px;
-  transform-origin: left bottom; transition: transform 0.4s ease;
-  box-shadow: 0 0 10px rgba(210,153,34,0.5);
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
-.chest-lid.open {
-  transform: rotate(-35deg) translateY(-5px);
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
-.particle {
-  position: absolute; width: 6px; height: 6px; background: #f5a623; border-radius: 50%;
-  animation: particleFly 0.8s ease-out forwards;
-  opacity: 0;
+.professor-avatar {
+  width: 64px; height: 64px; margin: 0 auto;
+  background: linear-gradient(135deg, #4a6fa5, #3b5998);
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
 }
-@keyframes particleFly {
-  0% { transform: translate(0,0) scale(1); opacity:1; }
-  100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; }
+.professor-message {
+  font-size: 15px; line-height: 1.6; color: var(--text);
+  padding: 0 8px;
 }
-
-/* всплывающий +XP */
-.xp-pop {
-  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  font-family: var(--font-h); font-size: 28px; font-weight: 800; color: var(--primary2);
-  z-index: 300; pointer-events: none;
-  animation: xpPopAnim 1s ease-out forwards;
+.professor-actions {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
 }
-@keyframes xpPopAnim {
-  0% { opacity:1; transform: translate(-50%, -50%) scale(0.5); }
-  50% { opacity:1; transform: translate(-50%, -80%) scale(1.2); }
-  100% { opacity:0; transform: translate(-50%, -150%) scale(1); }
+.professor-btn {
+  width: 100%; padding: 14px; border-radius: var(--radius);
+  font-family: var(--font-h); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: transform 0.12s ease, background 0.2s ease;
+  border: none;
+}
+.professor-btn:active { transform: scale(0.97); }
+.professor-btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  color: #fff;
+}
+.professor-btn-secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.professor-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
 }
 </style>
 </head>
@@ -335,6 +353,7 @@ body::before {
 
 <div id="modal-container"></div>
 <div id="toast-container" class="toast-container"></div>
+<div id="professor-modal-container"></div>
 
 <div class="screen active" id="s-home">
   <div class="topbar">
@@ -375,9 +394,6 @@ body::before {
     </div>
     <div class="answers" id="answers"></div>
     <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
-    <div id="hint-box" style="display:none;background:#f5a62310;border:1px solid #f5a62330;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#e8d0a0"></div>
-    <div id="ai-explain" style="display:none;background:#58a6ff0a;border:1px solid #58a6ff20;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#c8d8e8;margin-top:8px"></div>
-    <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="AISystem.openChat()">💬 Обсудить с Профессором</button>
     <div id="ai-quiz" class="ai-panel" style="display:none"></div>
     <button class="btn-next" id="btn-next" onclick="QuestionSystem.next()">Следующий вопрос →</button>
   </div>
@@ -469,6 +485,80 @@ const QUESTIONS_FILES = [
   { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
 ];
 
+// База подсказок профессора (три уровня для каждой темы)
+const HINTS_DB = {
+  topo: [
+    "Давай подумаем: что означают условные знаки на топографической карте?",
+    "Обрати внимание на направление и масштаб — это поможет определить расположение объектов.",
+    "Попробуй мысленно проложить маршрут от одного объекта к другому, учитывая рельеф."
+  ],
+  climat: [
+    "Посмотри на график температуры и осадков. Что можно сказать о климате?",
+    "Определи самый тёплый и самый холодный месяц — это ключ к типу климата.",
+    "Сравни полученные данные с характеристиками известных типов климата."
+  ],
+  nature_russia: [
+    "Вспомни основные природные зоны России и их особенности.",
+    "Подумай, какие факторы влияют на размещение природных зон.",
+    "Сопоставь описание с конкретной природной зоной."
+  ],
+  ecology: [
+    "Подумай, как деятельность человека влияет на окружающую среду.",
+    "Какие меры помогают снизить негативное воздействие?",
+    "Вспомни примеры рационального природопользования."
+  ],
+  timezone: [
+    "Вспомни, как определяется разница во времени между городами.",
+    "Используй карту часовых поясов России — это твой главный помощник.",
+    "Прибавь или вычти нужное количество часов в зависимости от направления."
+  ],
+  world: [
+    "Вспомни особенности географического положения стран и материков.",
+    "Подумай, какие природные условия характерны для указанного региона.",
+    "Сравни с соседними территориями — это может дать подсказку."
+  ],
+  regions: [
+    "Вспомни экономическую специализацию регионов России.",
+    "Обрати внимание на природные ресурсы и климатические условия региона.",
+    "Подумай, какие отрасли промышленности здесь наиболее развиты."
+  ],
+  litosphere: [
+    "Вспомни, какие формы рельефа бывают и как они образуются.",
+    "Подумай о внутренних и внешних силах, формирующих рельеф.",
+    "Сопоставь описание с конкретной формой рельефа."
+  ],
+  hydro: [
+    "Вспомни, какие водные объекты относятся к гидросфере.",
+    "Подумай о режиме питания рек и особенностях озёр.",
+    "Какие факторы влияют на полноводность реки?"
+  ],
+  population: [
+    "Вспомни, какие показатели характеризуют население.",
+    "Подумай, как рассчитывается плотность населения и естественный прирост.",
+    "Какие факторы влияют на размещение населения по территории?"
+  ],
+  geopos: [
+    "Вспомни, с какими странами граничит Россия.",
+    "Подумай о преимуществах и недостатках географического положения.",
+    "Какие моря омывают территорию России?"
+  ],
+  economy: [
+    "Вспомни основные отрасли хозяйства России.",
+    "Подумай, какие факторы влияют на размещение предприятий.",
+    "Какие ресурсы необходимы для развития данной отрасли?"
+  ],
+  zones: [
+    "Вспомни, какие природные зоны есть на территории России.",
+    "Подумай, как изменяются природные зоны с севера на юг.",
+    "Какие почвы и растительность характерны для каждой зоны?"
+  ]
+};
+
+function getProfessorHint(topicKey, level) {
+  const hints = HINTS_DB[topicKey] || HINTS_DB['topo'];
+  return hints[Math.min(level, hints.length - 1)];
+}
+
 var lessonsLoaded = [];
 
 async function fetchJSON(filename) {
@@ -493,7 +583,7 @@ async function loadAllLessons() {
         });
       }
       if (questions.length > 0) {
-        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions });
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions, key: f.key });
       }
     } catch(e) {
       console.warn('Не удалось загрузить', f.file, e);
@@ -528,7 +618,7 @@ function showToastMsg(text, type) {
 
 // ── Анимация появления карточек ──
 function animateCards(container) {
-  var cards = container.querySelectorAll('.path-progress-card, .continue-card, .profile-header-card, .profile-stats-grid > div, .badge-item-p, .sub-status-card, .profile-stat, .badges-grid-profile > div, .chest-card-available, .chest-btn-available');
+  var cards = container.querySelectorAll('.path-progress-card, .continue-card, .profile-header-card, .profile-stats-grid > div, .badge-item-p, .sub-status-card, .profile-stat, .badges-grid-profile > div');
   cards.forEach(function(card, index) {
     card.classList.add('card-animate');
     card.style.animationDelay = (index * 0.05) + 's';
@@ -710,7 +800,6 @@ var ChestSystem = {
     this.isOpening = true;
     var chest = userProgress.chests.shift();
     saveProgress();
-
     var self = this;
     showChestOpeningAnimation(function() {
       var reward = self.getRandomReward();
@@ -725,12 +814,8 @@ var ChestSystem = {
   },
   applyReward: function(reward) {
     switch(reward.type) {
-      case 'xp':
-        XPSystem.addXP(reward.value);
-        break;
-      case 'streak_day':
-        showToastMsg('🎁 +1 день серии (скоро)', 'info');
-        break;
+      case 'xp': XPSystem.addXP(reward.value); break;
+      case 'streak_day': showToastMsg('🎁 +1 день серии (скоро)', 'info'); break;
       case 'boost_x2':
         userProgress.doubleXPUntil = new Date(Date.now() + reward.duration * 60000).toISOString();
         saveProgress();
@@ -751,7 +836,7 @@ var ChestSystem = {
   },
   showRewardModal: function(reward) {
     var container = document.getElementById('modal-container');
-    var html = `
+    container.innerHTML = `
       <div class="modal-overlay" id="reward-modal">
         <div class="modal-card">
           <div class="modal-title">🎉 Поздравляем!</div>
@@ -760,7 +845,6 @@ var ChestSystem = {
           <button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить обучение</button>
         </div>
       </div>`;
-    container.innerHTML = html;
   },
   closeRewardModal: function() {
     document.getElementById('modal-container').innerHTML = '';
@@ -777,7 +861,7 @@ function showChestOpeningAnimation(callback) {
     var y = Math.sin(angle) * 40 + 'px';
     particlesHtml += '<div class="particle" style="--x:'+x+'; --y:'+y+'; animation-delay:'+(i*0.03)+'s"></div>';
   }
-  var html = `
+  container.innerHTML = `
     <div class="modal-overlay" id="chest-opening">
       <div class="modal-card" style="background:transparent; box-shadow:none; border:none;">
         <div class="chest-open-anim">
@@ -788,78 +872,121 @@ function showChestOpeningAnimation(callback) {
         <div style="color:var(--text); margin-top:16px; font-weight:700;">Открываем сундук...</div>
       </div>
     </div>`;
-  container.innerHTML = html;
-
   setTimeout(function() {
     var lid = document.getElementById('chestLid');
     if (lid) lid.classList.add('open');
   }, 400);
-
   setTimeout(function() {
     container.innerHTML = '';
     if (callback) callback();
   }, 1200);
 }
 
+// ── Professor Modal ──
+var ProfessorModal = {
+  currentHintLevel: 0,
+  topicKey: '',
+  openHint: function(topicKey) {
+    this.topicKey = topicKey;
+    this.currentHintLevel = 0;
+    var hint = getProfessorHint(topicKey, 0);
+    this._show(hint, [
+      { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } },
+      { text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } }
+    ]);
+  },
+  nextHint: function() {
+    this.currentHintLevel++;
+    if (this.currentHintLevel >= 3) {
+      this.currentHintLevel = 2;
+    }
+    var hint = getProfessorHint(this.topicKey, this.currentHintLevel);
+    var buttons = [
+      { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } }
+    ];
+    if (this.currentHintLevel < 2) {
+      buttons.push({ text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } });
+    } else {
+      buttons.push({ text: 'Подсказок больше нет', cls: 'professor-btn-primary', disabled: true });
+    }
+    this._show(hint, buttons);
+  },
+  showExplanation: function(message, isCorrect, usedHint) {
+    var fullMessage = message;
+    if (isCorrect && usedHint && Math.random() < 0.5) {
+      fullMessage = "Отлично! Ты справился сам — именно так знания запоминаются лучше. " + message;
+    } else if (!isCorrect) {
+      fullMessage = "Ничего страшного. Ошибки помогают понять тему лучше. " + message;
+    }
+    this._show(fullMessage, [
+      { text: 'Понятно', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.close(); } }
+    ]);
+  },
+  _show: function(message, buttons) {
+    var container = document.getElementById('professor-modal-container');
+    var btnsHtml = buttons.map(function(b) {
+      return '<button class="professor-btn ' + b.cls + '"' + (b.disabled ? ' disabled' : '') + '>' + b.text + '</button>';
+    }).join('');
+    container.innerHTML = `
+      <div class="professor-modal-overlay" id="professor-overlay">
+        <div class="professor-modal-card">
+          <div class="professor-avatar">👨‍🏫</div>
+          <div class="professor-message">${message}</div>
+          <div class="professor-actions">${btnsHtml}</div>
+        </div>
+      </div>`;
+    // привязываем события
+    var overlay = document.getElementById('professor-overlay');
+    var btns = overlay.querySelectorAll('.professor-btn');
+    buttons.forEach(function(b, idx) {
+      if (b.onClick) {
+        btns[idx].addEventListener('click', b.onClick);
+      }
+    });
+    // закрытие по клику на оверлей (опционально)
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) ProfessorModal.close();
+    });
+  },
+  close: function() {
+    document.getElementById('professor-modal-container').innerHTML = '';
+  }
+};
+
 // ── QuestionSystem ──
 var QuestionSystem = {
-  curQ: 0,
-  score: 0,
-  answered: false,
-  shuffled: [],
-  curLesson: 0,
-  lives: 3,
-  hintUsed: false,
-  lastExplainText: '',
-  isBossMode: false,
+  curQ: 0, score: 0, answered: false, shuffled: [],
+  curLesson: 0, lives: 3, hintUsed: false,
+  lastExplainText: '', isBossMode: false,
 
   start: function(idx) {
     var allLessons = getAllLessons();
     this.curLesson = idx;
     this.shuffled = allLessons[idx].questions;
-    this.curQ = 0;
-    this.score = 0;
-    this.answered = false;
-    this.lives = 3;
-    this.hintUsed = false;
-    this.isBossMode = false;
-    goScreen('s-quiz');
-    this.renderQ();
+    this.curQ = 0; this.score = 0; this.answered = false;
+    this.lives = 3; this.hintUsed = false; this.isBossMode = false;
+    goScreen('s-quiz'); this.renderQ();
   },
   startBoss: function() {
     var allLessons = getAllLessons();
     var allQuestions = [];
     allLessons.forEach(function(l) { if (l.questions) allQuestions = allQuestions.concat(l.questions); });
     allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
-    this.isBossMode = true;
-    this.shuffled = allQuestions;
-    this.curLesson = -1;
-    this.curQ = 0;
-    this.score = 0;
-    this.answered = false;
-    this.lives = 999;
-    this.hintUsed = false;
-    goScreen('s-quiz');
-    this.renderQ();
+    this.isBossMode = true; this.shuffled = allQuestions; this.curLesson = -1;
+    this.curQ = 0; this.score = 0; this.answered = false; this.lives = 999; this.hintUsed = false;
+    goScreen('s-quiz'); this.renderQ();
   },
   replay: function() {
     if (this.isBossMode || this.curLesson < 0) { this.startBoss(); return; }
     var allLessons = getAllLessons();
     this.shuffled = allLessons[this.curLesson].questions;
-    this.curQ = 0;
-    this.score = 0;
-    this.answered = false;
-    this.lives = 3;
-    this.hintUsed = false;
-    goScreen('s-quiz');
-    this.renderQ();
+    this.curQ = 0; this.score = 0; this.answered = false; this.lives = 3; this.hintUsed = false;
+    goScreen('s-quiz'); this.renderQ();
   },
   renderQ: function() {
     const q = this.shuffled[this.curQ];
     const topicTitle = this.getTopicTitle();
-    this.answered = false;
-    this.hintUsed = false;
-    this.lastExplainText = '';
+    this.answered = false; this.hintUsed = false; this.lastExplainText = '';
 
     document.getElementById('quiz-topic-lbl').textContent = topicTitle;
     document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(this.curQ+1)+' из '+this.shuffled.length;
@@ -867,13 +994,8 @@ var QuestionSystem = {
     document.getElementById('qpf').style.width = ((this.curQ/this.shuffled.length)*100)+'%';
     document.getElementById('q-tag').textContent = q.tag;
     document.getElementById('q-text').textContent = q.text;
-    document.getElementById('ai-quiz').style.display = 'none';
-    document.getElementById('ai-explain').style.display = 'none';
-    document.getElementById('btn-ask-ai').style.display = 'none';
-    document.getElementById('hint-box').style.display = 'none';
     var btnHint = document.getElementById('btn-hint');
-    btnHint.style.display = 'flex';
-    btnHint.disabled = false;
+    btnHint.style.display = 'flex'; btnHint.disabled = false;
     btnHint.textContent = '🎓 Спросить профессора Гео';
 
     var livesEl = document.getElementById('lives-row');
@@ -890,7 +1012,7 @@ var QuestionSystem = {
       const b = document.createElement('button');
       b.className = 'ans-btn';
       b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
-      b.onclick = function(){ QuestionSystem.selectAns(i, q.correct, q.text, topicTitle, q.hint); };
+      b.onclick = function(){ QuestionSystem.selectAns(i, q.correct, q.text, topicTitle, q); };
       ans.appendChild(b);
     });
   },
@@ -899,7 +1021,12 @@ var QuestionSystem = {
     var all = getAllLessons();
     return (all[this.curLesson] && all[this.curLesson].title) || 'Тренировка';
   },
-  selectAns: function(idx, correct, qText, topic, hint) {
+  getTopicKey: function() {
+    if (this.isBossMode) return 'topo';
+    var all = getAllLessons();
+    return (all[this.curLesson] && all[this.curLesson].key) || 'topo';
+  },
+  selectAns: function(idx, correct, qText, topic, question) {
     if (this.answered) return;
     this.answered = true;
 
@@ -924,12 +1051,11 @@ var QuestionSystem = {
     livesEl.innerHTML = '';
     for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
 
-    this.requestAIExplanation(idx===correct, qText, topic);
+    this.showProfessorExplanation(idx===correct, question);
     document.getElementById('btn-next').classList.add('show');
     if (this.lives <= 0) {
       document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
     }
-
     DailyQuestSystem.incrementCounters(1, 0);
     DailyQuestSystem.update();
   },
@@ -940,25 +1066,12 @@ var QuestionSystem = {
     document.body.appendChild(popup);
     setTimeout(function(){ popup.remove(); }, 1000);
   },
-  requestAIExplanation: async function(isCorrect, qText, topic) {
-    const explainBox = document.getElementById('ai-explain');
-    const askBtn = document.getElementById('btn-ask-ai');
-    explainBox.style.display = 'block';
-    askBtn.style.display = 'block';
-    explainBox.textContent = '⏳ Профессор Гео объясняет...';
-    const prompt = isCorrect
-      ? `Ты Профессор Гео. Ученик правильно ответил на вопрос ОГЭ: «${qText}». Объясни кратко (2-3 предложения), почему ответ верный, выделив ключевую закономерность. Будь поддерживающим.`
-      : `Ты Профессор Гео. Ученик ошибся в вопросе ОГЭ: «${qText}». Дай КОРОТКОЕ объяснение правильного ответа, указав типичную ошибку и как её избежать. 2-3 предложения, мотивируй.`;
-    try {
-      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({question: prompt, context: topic})});
-      const d = await r.json();
-      const ans = d.answer || 'Подумай, какое правило здесь работает.';
-      explainBox.textContent = '📘 ' + ans;
-      this.lastExplainText = ans;
-    } catch(e) {
-      explainBox.textContent = '📘 ' + (isCorrect ? 'Отлично! Ты знаешь материал.' : 'Обрати внимание на это правило.');
-      this.lastExplainText = explainBox.textContent;
-    }
+  showProfessorExplanation: function(isCorrect, question) {
+    var correctAnswerText = question.answers[question.correct];
+    var message = isCorrect
+      ? 'Правильно! ' + correctAnswerText + ' — верный ответ.'
+      : 'Правильный ответ — ' + correctAnswerText + '.';
+    ProfessorModal.showExplanation(message, isCorrect, this.hintUsed);
   },
   next: function() {
     this.curQ++;
@@ -970,16 +1083,13 @@ var QuestionSystem = {
     const pct = Math.round(this.score/total*100);
 
     if (this.isBossMode) {
-      userProgress.bossCompleted = true;
-      saveProgress();
+      userProgress.bossCompleted = true; saveProgress();
       document.getElementById('boss-sub').textContent = this.score+'/'+total+' правильных ответов ('+pct+'%)';
       document.getElementById('boss-num').textContent = this.score;
       document.getElementById('boss-denom').textContent = 'из ' + total;
       goScreen('s-boss-result');
       setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
-      this.isBossMode = false;
-      DailyQuestSystem.update();
-      return;
+      this.isBossMode = false; DailyQuestSystem.update(); return;
     }
 
     let e='😔', t='Нужно повторить';
@@ -1003,12 +1113,10 @@ var QuestionSystem = {
     var allLessons = getAllLessons();
     var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
     userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
-    userProgress.totalAnswered += total;
-    userProgress.totalCorrect += sc;
+    userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
     var xpGain = sc * 20 + (sc === total ? 50 : 0);
     XPSystem.addXP(xpGain);
-    checkStreak();
-    saveProgress();
+    checkStreak(); saveProgress();
     if (!userProgress.chests) userProgress.chests = [];
     if (!userProgress.completedLessons[lessonKey].chestGiven) {
       ChestSystem.give('achievement');
@@ -1016,31 +1124,15 @@ var QuestionSystem = {
       saveProgress();
     }
   },
-  getHint: async function() {
+  getHint: function() {
     if (this.hintUsed) return;
     this.hintUsed = true;
-    const q = this.shuffled[this.curQ];
-    const btn = document.getElementById('btn-hint');
-    btn.textContent = '⏳ Профессор Гео думает...'; btn.disabled = true;
-    const hintBox = document.getElementById('hint-box');
-    hintBox.style.display = 'block';
-    hintBox.textContent = '⏳ Профессор Гео анализирует вопрос...';
-
-    try {
-      const prompt = `Ты — Профессор Гео, добрый наставник по географии. Ученик решает задание ОГЭ: «${q.text}». Дай короткую подсказку (1-2 предложения), которая поможет понять ход решения, но НЕ называй правильный ответ и НЕ говори чисел. Направляй, задавай наводящие вопросы. Будь мотивирующим.`;
-      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({question: prompt, context: this.getTopicTitle()})});
-      const d = await r.json();
-      if (d.answer) hintBox.textContent = '🎓 ' + d.answer;
-      else hintBox.textContent = '🎓 Подумай, какое правило здесь можно применить.';
-    } catch(e) {
-      hintBox.textContent = '🎓 Вспомни основные закономерности по этой теме.';
-    }
-    btn.textContent = '🎓 Совет получен';
+    var topicKey = this.getTopicKey();
+    ProfessorModal.openHint(topicKey);
   }
 };
 
-// ── AISystem ──
+// ── AISystem (оставлен для чата) ──
 var AISystem = {
   openChat: function() {
     const aiPanel = document.getElementById('ai-quiz');
@@ -1087,40 +1179,21 @@ var AISystem = {
       </div>
     `;
   },
-  toggle: function(h) {
-    const b = h.nextElementSibling;
-    const t = h.querySelector('.ai-toggle');
-    b.classList.toggle('open');
-    t.classList.toggle('open');
-  },
-  sendP: function(cid, ctx, text) {
-    document.getElementById(`inp-${cid}`).value = text;
-    this.sendM(cid, ctx);
-  },
+  toggle: function(h) { const b = h.nextElementSibling; const t = h.querySelector('.ai-toggle'); b.classList.toggle('open'); t.classList.toggle('open'); },
+  sendP: function(cid, ctx, text) { document.getElementById(`inp-${cid}`).value = text; this.sendM(cid, ctx); },
   sendM: async function(cid, ctx) {
-    const inp = document.getElementById(`inp-${cid}`);
-    const snd = document.getElementById(`snd-${cid}`);
-    const msgs = document.getElementById(`msgs-${cid}`);
-    const text = inp.value.trim();
-    if (!text) return;
-    inp.value = '';
-    snd.disabled = true;
+    const inp = document.getElementById(`inp-${cid}`); const snd = document.getElementById(`snd-${cid}`);
+    const msgs = document.getElementById(`msgs-${cid}`); const text = inp.value.trim(); if (!text) return;
+    inp.value = ''; snd.disabled = true;
     msgs.innerHTML += `<div class="msg user">${text}</div>`;
-    const lid = 'l'+Date.now();
-    msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
+    const lid = 'l'+Date.now(); msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
     msgs.scrollTop = msgs.scrollHeight;
     try {
       const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
-      const d = await r.json();
-      const ans = d.answer || 'Не удалось получить ответ';
-      document.getElementById(lid)?.remove();
-      msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
-    } catch(e) {
-      document.getElementById(lid)?.remove();
-      msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`;
-    }
-    snd.disabled = false;
-    msgs.scrollTop = msgs.scrollHeight;
+      const d = await r.json(); const ans = d.answer || 'Не удалось получить ответ';
+      document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+    } catch(e) { document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`; }
+    snd.disabled = false; msgs.scrollTop = msgs.scrollHeight;
   }
 };
 
@@ -1135,14 +1208,10 @@ function getRank(xp) {
 
 function getNextRank(xp) {
   const ranks = [
-    { name: 'Ученик', min: 500 },
-    { name: 'Эксперт', min: 3000 },
-    { name: 'Мастер', min: 5000 },
-    { name: 'Легенда', min: 10000 }
+    { name: 'Ученик', min: 500 }, { name: 'Эксперт', min: 3000 },
+    { name: 'Мастер', min: 5000 }, { name: 'Легенда', min: 10000 }
   ];
-  for (var i = 0; i < ranks.length; i++) {
-    if (xp < ranks[i].min) return ranks[i];
-  }
+  for (var i = 0; i < ranks.length; i++) { if (xp < ranks[i].min) return ranks[i]; }
   return null;
 }
 
@@ -1173,20 +1242,15 @@ function getPredictedGrade() {
 }
 
 function getPredictedScore(grade) {
-  if (grade === '5') return '28–31';
-  if (grade === '4') return '19–25';
-  if (grade === '3') return '12–18';
-  if (grade === '2') return '0–11';
+  if (grade === '5') return '28–31'; if (grade === '4') return '19–25';
+  if (grade === '3') return '12–18'; if (grade === '2') return '0–11';
   return '—';
 }
 
 function getCorrectAnswersNeededForGrade(targetGrade) {
-  var total = userProgress.totalAnswered;
-  var correct = userProgress.totalCorrect;
+  var total = userProgress.totalAnswered; var correct = userProgress.totalCorrect;
   var target = 0;
-  if (targetGrade === 3) target = 0.55;
-  else if (targetGrade === 4) target = 0.70;
-  else if (targetGrade === 5) target = 0.85;
+  if (targetGrade === 3) target = 0.55; else if (targetGrade === 4) target = 0.70; else if (targetGrade === 5) target = 0.85;
   var needed = Math.ceil(target * total) - correct;
   return Math.max(0, needed);
 }
@@ -1295,7 +1359,6 @@ async function renderHomePath() {
       var connDone = userProgress.completedLessons[allLessons[i-1].title];
       html += '<div class="path-connector" style="background:'+(connDone?'var(--primary2)':'var(--border)')+'"></div>';
     }
-
     var isRight = i % 2 === 1;
     html += '<div class="path-node-row" style="flex-direction:'+(isRight?'row-reverse':'row')+';opacity:'+(isLocked?'0.45':'1')+'">';
     html += '<div class="node-circle '+stateClass+'"'+onclk+' style="cursor:'+(isLocked?'default':'pointer')+'">'+nodeIcon+'</div>';
@@ -1321,13 +1384,10 @@ async function renderHomePath() {
   document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 
-  // Анимация прогресс-баров
   setTimeout(function() {
     var fills = container.querySelectorAll('.path-progress-fill[data-target]');
     fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
   }, 50);
-
-  // Анимация появления карточек
   animateCards(container);
 }
 
@@ -1347,8 +1407,7 @@ function renderProfile() {
 
   var nextRank = getNextRank(userProgress.xp);
   if (nextRank) {
-    var xpNeeded = nextRank.min;
-    var currentXP = userProgress.xp;
+    var xpNeeded = nextRank.min; var currentXP = userProgress.xp;
     var progressPct = Math.min(100, Math.round((currentXP / xpNeeded)*100));
     html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "'+nextRank.name+'" осталось '+(xpNeeded - currentXP)+' XP</div>';
     html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:0%" data-target="'+progressPct+'%"></div></div>';
@@ -1367,7 +1426,6 @@ function renderProfile() {
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  // Сундуки
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
   if (chestCount > 0) {
@@ -1406,12 +1464,8 @@ function renderProfile() {
     html += '<div class="badge-item-p'+(isUnlocked?'':' locked')+'" style="position:relative">';
     html += '<div class="badge-icon-p">'+a.icon+'</div>';
     html += '<div class="badge-name-p">'+a.title+'</div>';
-    if (a.max) {
-      html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">'+progress+'/'+a.max+'</div>';
-    }
-    if (isUnlocked && dateStr) {
-      html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">'+dateStr+'</div>';
-    }
+    if (a.max) { html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">'+progress+'/'+a.max+'</div>'; }
+    if (isUnlocked && dateStr) { html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">'+dateStr+'</div>'; }
     html += '</div>';
   });
   html += '</div>';
@@ -1421,13 +1475,10 @@ function renderProfile() {
 
   document.getElementById('profile-content').innerHTML = html;
 
-  // Анимация прогресс-баров
   setTimeout(function() {
     var fills = document.querySelectorAll('#profile-content .path-progress-fill[data-target]');
     fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
   }, 50);
-
-  // Анимация появления карточек
   animateCards(document.getElementById('profile-content'));
 }
 
@@ -1444,7 +1495,6 @@ function shareBossResult() {
   else { prompt('Скопируй текст для друзей:', text); }
 }
 
-// ── Progress ──
 var userProgress = {
   xp: 0, level: 1, streak: 0, lastDate: '',
   completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
@@ -1454,12 +1504,8 @@ var userProgress = {
   dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
   allDailyTasksDone: false, dailyQuestions: 0, dailyXP: 0,
   achievements: {},
-  lastDailyChestDate: '',
-  streakChestsGiven: {},
-  friends: [],
-  freeHints: 0,
-  rareBadges: [],
-  doubleXPUntil: null
+  lastDailyChestDate: '', streakChestsGiven: {},
+  friends: [], freeHints: 0, rareBadges: [], doubleXPUntil: null
 };
 
 function saveProgress() {
@@ -1502,8 +1548,7 @@ function checkStreak() {
     if (userProgress.freezes > 0) { userProgress.freezes = 0; userProgress.lastFreezeMonday = getMonday(new Date()); userProgress.streak++; }
     else { userProgress.streak = 1; }
   }
-  userProgress.lastDate = today;
-  saveProgress();
+  userProgress.lastDate = today; saveProgress();
   AchievementSystem.check();
   ChestSystem.giveDaily();
   ChestSystem.giveStreak();
