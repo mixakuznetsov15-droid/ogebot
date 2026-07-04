@@ -44,66 +44,54 @@
     .scroll::-webkit-scrollbar { width:3px; }
     .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
     .card-animate {
-      opacity: 0; transform: translateY(20px);
-      animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+      opacity:0; transform:translateY(20px);
+      animation:cardAppear 0.45s cubic-bezier(0.2,0.9,0.3,1) forwards;
     }
-    @keyframes cardAppear { to { opacity:1; transform:translateY(0); } }
-    .btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
-      transition: transform 0.12s ease, opacity 0.12s ease;
-    }
-    .btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
-      transform: scale(0.97) !important;
-    }
-    .path-progress-fill, .q-progress-fill { transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1); }
-    .task-check { display: inline-block; transition: transform 0.25s ease, color 0.25s ease; }
-    .task-check.done { color: var(--primary2) !important; animation: taskPop 0.35s ease; }
-    @keyframes taskPop { 0% { transform: scale(0.8); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+    @keyframes cardAppear { to{opacity:1;transform:translateY(0)} }
+    .path-progress-fill, .q-progress-fill { transition:width 0.8s cubic-bezier(0.2,0.9,0.3,1); }
+    .task-check { display:inline-block; transition:transform 0.25s ease, color 0.25s ease; }
+    .task-check.done { color:var(--primary2)!important; animation:taskPop 0.35s ease; }
+    @keyframes taskPop { 0%{transform:scale(0.8)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
     .toast-container {
-      position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999;
-      display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none;
+      position:fixed; top:20px; left:50%; transform:translateX(-50%); z-index:9999;
+      display:flex; flex-direction:column; align-items:center; gap:8px; pointer-events:none;
     }
     .toast {
-      background: rgba(28, 35, 51, 0.92); backdrop-filter: blur(16px);
-      border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 12px 20px;
-      border-radius: 18px; font-weight: 600; font-size: 14px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-      animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
-      pointer-events: auto; max-width: 90vw; text-align: center;
+      background:rgba(28,35,51,0.92); backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,0.08); color:#fff; padding:12px 20px;
+      border-radius:18px; font-weight:600; font-size:14px;
+      box-shadow:0 8px 20px rgba(0,0,0,0.3);
+      animation:toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
+      pointer-events:auto; max-width:90vw; text-align:center;
     }
-    .toast.xp { border-left: 3px solid var(--primary2); }
-    .toast.chest { border-left: 3px solid var(--gold); }
-    .toast.achievement { border-left: 3px solid #c084fc; }
-    .toast.streak { border-left: 3px solid #f97316; }
-    @keyframes toastIn { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
-    @keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-12px); } }
+    .toast.xp { border-left:3px solid var(--primary2); }
+    .toast.chest { border-left:3px solid var(--gold); }
+    .toast.achievement { border-left:3px solid #c084fc; }
+    @keyframes toastIn { from{opacity:0;transform:translateY(-16px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes toastOut { from{opacity:1;transform:translateY(0)} to{opacity:0;transform:translateY(-12px)} }
 
     /* quiz */
-    .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
+    .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; overflow-y:auto; }
     .q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
     .q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); }
     .q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
     .q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
     .q-text { font-size:15px; line-height:1.55; font-weight:500; }
     .answers { display:flex; flex-direction:column; gap:8px; }
-    .ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); }
+    .ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-size:13px; color:var(--text); }
     .ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
     .ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
     .ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
-    .ans-btn.correct .ans-letter { background:var(--primary2); }
-    .ans-btn.wrong .ans-letter { background:var(--danger); }
     .btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; margin-top:4px; }
-    .btn-next.show { display:block; animation: fadeUp .3s ease; }
+    .btn-next.show { display:block; }
 
     /* result */
-    .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
+    .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; }
     .ring-wrap { position:relative; width:130px; height:130px; }
-    .ring-wrap svg { transform:rotate(-90deg); }
     .ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
     .ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
     .res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
     .res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
-    .res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
-    .res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
     .btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; }
     .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
     .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
@@ -116,57 +104,35 @@
     .node-circle { width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
     .node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
     .node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
-    .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
+    .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation:pulseNode 2s infinite; }
     .node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
     @keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
     .boss-node { width:72px; height:72px; border-radius:20px; flex-shrink:0; background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922; display:flex; align-items:center; justify-content:center; font-size:30px; }
     .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
 
     /* professor */
-    .professor-fab {
-      position: fixed; bottom: 24px; right: 24px; width: 68px; height: 68px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--primary), var(--primary2));
-      box-shadow: 0 4px 15px rgba(0,0,0,0.35), 0 0 0 4px rgba(88,166,255,0.15);
-      display: flex; align-items: center; justify-content: center; font-size: 32px;
-      cursor: pointer; z-index: 900; transition: transform 0.2s; border: none;
-    }
-    .professor-speech {
-      position: fixed; bottom: 104px; right: 24px; max-width: 260px; background: var(--card2);
-      border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; font-size: 13px;
-      color: var(--text); box-shadow: 0 12px 25px rgba(0,0,0,0.5); z-index: 901;
-      transition: opacity 0.25s, transform 0.25s; pointer-events: auto;
-    }
-    .professor-speech.hidden { opacity: 0; transform: translateY(12px); pointer-events: none; }
+    .professor-fab { position:fixed; bottom:24px; right:24px; width:68px; height:68px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); box-shadow:0 4px 15px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; font-size:32px; cursor:pointer; z-index:900; border:none; }
+    .professor-speech { position:fixed; bottom:104px; right:24px; max-width:260px; background:var(--card2); border:1px solid var(--border); border-radius:18px; padding:14px 16px; font-size:13px; color:var(--text); box-shadow:0 12px 25px rgba(0,0,0,0.5); z-index:901; transition:opacity 0.25s, transform 0.25s; pointer-events:auto; }
+    .professor-speech.hidden { opacity:0; transform:translateY(12px); pointer-events:none; }
 
     /* chat */
-    .chat-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 1100;
-      display: flex; align-items: flex-end; justify-content: center;
-      animation: fadeInOverlay 0.25s ease;
-    }
-    .chat-sheet {
-      background: var(--card2); border: 1px solid var(--border); border-radius: 24px 24px 0 0;
-      width: 100%; max-width: 500px; height: 85vh; display: flex; flex-direction: column;
-      box-shadow: 0 -15px 35px rgba(0,0,0,0.6);
-      animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-    }
+    .chat-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.65); z-index:1100; display:flex; align-items:flex-end; justify-content:center; animation:fadeInOverlay 0.25s ease; }
+    .chat-sheet { background:var(--card2); border:1px solid var(--border); border-radius:24px 24px 0 0; width:100%; max-width:500px; height:85vh; display:flex; flex-direction:column; box-shadow:0 -15px 35px rgba(0,0,0,0.6); animation:slideUp 0.3s cubic-bezier(0.2,0.9,0.3,1); }
     .chat-header { display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border); }
     .chat-avatar { width:44px; height:44px; border-radius:16px; background:linear-gradient(135deg,#4a6fa5,#3b5998); display:flex; align-items:center; justify-content:center; font-size:24px; }
     .chat-name { font-family:var(--font-h); font-size:16px; font-weight:700; }
-    .chat-topic { font-size:11px; color:var(--primary); margin-top:2px; }
     .chat-close { width:36px; height:36px; border-radius:50%; background:var(--card); border:1px solid var(--border); color:var(--muted); font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
     .chat-messages { flex:1; overflow-y:auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
     .chat-msg { max-width:85%; padding:12px 14px; border-radius:16px; font-size:13px; line-height:1.5; }
     .chat-msg.user { align-self:flex-end; background:var(--primary); color:#fff; border-bottom-right-radius:4px; }
     .chat-msg.professor { align-self:flex-start; background:var(--card); border:1px solid var(--border); color:var(--text); border-bottom-left-radius:4px; }
-    .chat-msg.loading { align-self:flex-start; background:transparent; color:var(--muted); font-style:italic; }
     .chat-quick-actions { display:flex; gap:8px; padding:8px 16px; overflow-x:auto; border-top:1px solid var(--border); }
-    .chat-quick-btn { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:8px 14px; font-size:12px; color:var(--text); cursor:pointer; font-family:var(--font-b); }
+    .chat-quick-btn { flex-shrink:0; background:var(--card); border:1px solid var(--border); border-radius:20px; padding:8px 14px; font-size:12px; color:var(--text); cursor:pointer; }
     .chat-input-row { display:flex; gap:8px; padding:12px 16px 20px; border-top:1px solid var(--border); }
-    .chat-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 14px; color:var(--text); font-family:var(--font-b); font-size:13px; outline:none; }
+    .chat-input { flex:1; background:var(--card); border:1px solid var(--border); border-radius:14px; padding:12px 14px; color:var(--text); font-size:13px; outline:none; }
     .chat-send-btn { width:44px; height:44px; border-radius:14px; background:var(--primary); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; }
-    @keyframes fadeInOverlay { from { opacity:0; } to { opacity:1; } }
-    @keyframes slideUp { from { transform:translateY(100%); opacity:0; } to { transform:translateY(0); opacity:1; } }
+    @keyframes fadeInOverlay { from{opacity:0} to{opacity:1} }
+    @keyframes slideUp { from{transform:translateY(100%);opacity:0} to{transform:translateY(0);opacity:1} }
   </style>
 </head>
 <body>
@@ -184,70 +150,53 @@
       <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
     </div>
   </div>
-  <div class="scroll" id="home-content"><div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div></div>
+  <div class="scroll" id="home-content"></div>
 </div>
 
 <div class="screen" id="s-quiz">
-  <div class="topbar">
-    <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
-    <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
-    <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
-  </div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Выйти</span><div id="quiz-topic-lbl">Тренировка</div><div id="quiz-counter">1/5</div></div>
   <div class="quiz-wrap">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
-      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;"></div>
-    </div>
-    <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
+    <div style="display:flex;align-items:center;gap:10px"><div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf"></div></div><div id="lives-row"></div></div>
+    <div id="lesson-badge"></div>
     <div class="q-card"><div class="q-tag" id="q-tag"></div><div class="q-text" id="q-text"></div></div>
     <div class="answers" id="answers"></div>
-    <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
+    <button id="btn-hint" onclick="QuestionSystem.getHint()">🎓 Спросить профессора Гео</button>
     <button class="btn-next" id="btn-next" onclick="QuestionSystem.next()">Следующий вопрос →</button>
   </div>
 </div>
 
 <div class="screen" id="s-result">
   <div class="result-wrap">
-    <div class="result-emoji" id="res-emoji">🎉</div>
-    <div class="result-title" id="res-title">Отлично!</div>
-    <div class="result-sub" id="res-sub">Ты справился!</div>
+    <div class="result-emoji" id="res-emoji">🎉</div><div class="result-title" id="res-title"></div><div class="result-sub" id="res-sub"></div>
     <div class="ring-wrap">
-      <svg width="130" height="130" viewBox="0 0 130 130">
-        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
-        <circle class="ring-bg" cx="65" cy="65" r="54"/>
-        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
-      </svg>
+      <svg width="130" height="130"><defs><linearGradient id="rg"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs><circle class="ring-bg" cx="65" cy="65" r="54"/><circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/></svg>
       <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
     </div>
-    <div class="res-stats">
-      <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
-      <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
-      <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
-    </div>
-    <div class="res-btns">
-      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="QuestionSystem.replay()">🔄 Ещё раз</button>
-    </div>
+    <div class="res-stats"><div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div><div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div><div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div></div>
+    <div class="res-btns"><button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button><button class="btn-full sec" onclick="QuestionSystem.replay()">🔄 Ещё раз</button></div>
+  </div>
+</div>
+
+<div class="screen" id="s-boss-result">
+  <div class="result-wrap">
+    <div class="result-emoji">👑</div><div class="result-title">Финальный босс пройден!</div><div class="result-sub" id="boss-sub"></div>
+    <div class="ring-wrap"><svg width="130" height="130"><circle class="ring-bg" cx="65" cy="65" r="54"/><circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/></svg><div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div></div>
+    <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
   </div>
 </div>
 
 <div class="screen" id="s-profile">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
+  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div>👤 Профиль</div><div></div></div>
   <div class="scroll" id="profile-content"></div>
 </div>
 
-<!-- Professor FAB & speech -->
+<!-- Professor -->
 <div class="professor-fab" id="professor-fab">👨‍🏫</div>
 <div class="professor-speech hidden" id="professor-speech"></div>
-
-<!-- Chat overlay -->
 <div id="chat-overlay" class="chat-overlay" style="display:none;">
   <div class="chat-sheet">
     <div class="chat-header">
-      <div style="display:flex;align-items:center;gap:12px">
-        <div class="chat-avatar">👨‍🏫</div>
-        <div><div class="chat-name">Профессор Гео</div><div class="chat-topic" id="chat-current-topic">Общая подготовка</div></div>
-      </div>
+      <div style="display:flex;align-items:center;gap:12px"><div class="chat-avatar">👨‍🏫</div><div><div class="chat-name">Профессор Гео</div><div class="chat-topic" id="chat-current-topic">Общая подготовка</div></div></div>
       <button class="chat-close" onclick="ProfessorChat.close()">✕</button>
     </div>
     <div class="chat-messages" id="chat-messages"></div>
@@ -256,10 +205,7 @@
       <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Дай подсказку')">💡 Подсказка</button>
       <button class="chat-quick-btn" onclick="ProfessorChat.sendMessage('Что спросят на ОГЭ?')">❓ ОГЭ</button>
     </div>
-    <div class="chat-input-row">
-      <input class="chat-input" id="chat-input" placeholder="Введи вопрос..." onkeydown="if(event.key==='Enter') ProfessorChat.sendMessage(this.value)">
-      <button class="chat-send-btn" onclick="ProfessorChat.sendMessage(document.getElementById('chat-input').value)">➤</button>
-    </div>
+    <div class="chat-input-row"><input class="chat-input" id="chat-input" placeholder="Введи вопрос..."><button class="chat-send-btn" onclick="ProfessorChat.sendMessage(document.getElementById('chat-input').value)">➤</button></div>
   </div>
 </div>
 
@@ -283,23 +229,15 @@ const QUESTIONS_FILES = [
 ];
 
 let lessonsLoaded = [];
-async function fetchJSON(filename) {
-  const r = await fetch(GITHUB_RAW + filename + '?nocache=' + Date.now());
-  return r.ok ? r.json() : [];
-}
+async function fetchJSON(f) { const r = await fetch(GITHUB_RAW+f+'?nocache='+Date.now()); return r.ok ? r.json() : []; }
 async function loadAllLessons() {
   lessonsLoaded = [];
   for (let f of QUESTIONS_FILES) {
-    try {
-      const data = await fetchJSON(f.file);
-      const questions = (Array.isArray(data) ? data : []).filter(q => q.tag && q.text && q.answers);
-      if (questions.length) lessonsLoaded.push({ ...f, questions });
-    } catch(e) { console.warn(e); }
+    try { const data = await fetchJSON(f.file); const q = (Array.isArray(data)?data:[]).filter(i=>i.tag&&i.text&&i.answers); if(q.length) lessonsLoaded.push({...f, questions:q}); } catch(e){}
   }
 }
 function getAllLessons() { return lessonsLoaded; }
 
-// ---------- GLOBAL STATE ----------
 const tgApp = window.Telegram?.WebApp;
 const isTelegram = !!tgApp?.initData;
 if (isTelegram) { tgApp.ready(); tgApp.expand(); }
@@ -308,32 +246,25 @@ let userProgress = {
   xp:0, level:1, streak:0, lastDate:'', completedLessons:{}, totalAnswered:0, totalCorrect:0,
   bossCompleted:false, freezes:1, lastFreezeMonday:'', chests:[], invitedFriend:false,
   dailyTasksDate:'', dailyTasks:{solve10:false,earn50XP:false,loginToday:false},
-  dailyTasksCollected:{solve10:false,earn50XP:false,loginToday:false},
-  allDailyTasksDone:false, dailyQuestions:0, dailyXP:0, achievements:{},
-  lastDailyChestDate:'', streakChestsGiven:{}, professorGreetingDate:''
+  dailyTasksCollected:{}, allDailyTasksDone:false, dailyQuestions:0, dailyXP:0,
+  achievements:{}, lastDailyChestDate:'', streakChestsGiven:{}, professorGreetingDate:''
 };
 
 function saveProgress() {
-  const data = JSON.stringify(userProgress);
-  if (isTelegram) tgApp.CloudStorage.setItem('progress', data, ()=>{});
-  else try { localStorage.setItem('geo_progress', data); } catch(e) {}
+  const d = JSON.stringify(userProgress);
+  if (isTelegram) tgApp.CloudStorage.setItem('progress', d, ()=>{});
+  else try { localStorage.setItem('geo_progress', d); } catch(e) {}
 }
 function loadProgress(cb) {
-  if (isTelegram) {
-    tgApp.CloudStorage.getItem('progress', (err, val) => {
-      if (!err && val) try { userProgress = JSON.parse(val); } catch(e) {}
-      refreshFreeze(); cb();
-    });
-  } else {
-    try { const s = localStorage.getItem('geo_progress'); if(s) userProgress = JSON.parse(s); } catch(e) {}
+  if (isTelegram) tgApp.CloudStorage.getItem('progress', (err, val) => {
+    if (!err && val) try { userProgress = JSON.parse(val); } catch(e) {}
     refreshFreeze(); cb();
-  }
+  });
+  else { try { const s = localStorage.getItem('geo_progress'); if(s) userProgress = JSON.parse(s); } catch(e) {} refreshFreeze(); cb(); }
 }
-
 function refreshFreeze() {
-  const d = new Date(); d.setHours(0,0,0,0);
-  const day = d.getDay();
-  const monday = new Date(d.setDate(d.getDate() - ((day + 6) % 7))).toISOString().slice(0,10);
+  const d = new Date(); d.setHours(0,0,0,0); const day = d.getDay();
+  const monday = new Date(d.setDate(d.getDate()-((day+6)%7))).toISOString().slice(0,10);
   if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < monday) {
     userProgress.freezes = 1; userProgress.lastFreezeMonday = monday; saveProgress();
   }
@@ -353,24 +284,20 @@ function checkStreak() {
 
 function showToast(text, type='info') {
   const c = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  t.className = 'toast ' + type; t.textContent = text;
-  c.appendChild(t); setTimeout(() => t.remove(), 2600);
+  const t = document.createElement('div'); t.className = 'toast '+type; t.textContent = text;
+  c.appendChild(t); setTimeout(()=>t.remove(), 2600);
 }
 
 // ---------- SYSTEMS ----------
 const XPSystem = {
   addXP(amount) {
-    if (amount <= 0) return;
-    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) amount *= 2;
-    userProgress.xp += amount;
-    userProgress.level = Math.floor(userProgress.xp / 200) + 1;
-    saveProgress(); showToast('⚡ +' + amount + ' XP', 'xp');
-    AchievementSystem.check();
-    DailyQuestSystem.incrementCounters(0, amount);
+    if (amount<=0) return;
+    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) amount*=2;
+    userProgress.xp += amount; userProgress.level = Math.floor(userProgress.xp/200)+1;
+    saveProgress(); showToast('⚡ +'+amount+' XP', 'xp');
+    AchievementSystem.check(); DailyQuestSystem.incrementCounters(0, amount);
   }
 };
-
 const DailyQuestSystem = {
   update() {
     const today = new Date().toISOString().slice(0,10);
@@ -380,26 +307,21 @@ const DailyQuestSystem = {
       userProgress.dailyTasksCollected = { solve10:false, earn50XP:false, loginToday:false };
       userProgress.allDailyTasksDone = false; saveProgress();
     }
-    const tasks = userProgress.dailyTasks, collected = userProgress.dailyTasksCollected;
-    if (userProgress.dailyQuestions >= 10 && !tasks.solve10) {
-      tasks.solve10 = true; if (!collected.solve10) { collected.solve10 = true; XPSystem.addXP(20); }
-    }
-    if (userProgress.dailyXP >= 50 && !tasks.earn50XP) {
-      tasks.earn50XP = true; if (!collected.earn50XP) { collected.earn50XP = true; XPSystem.addXP(20); }
-    }
-    if (!tasks.loginToday) { tasks.loginToday = true; if (!collected.loginToday) { collected.loginToday = true; XPSystem.addXP(20); } }
-    if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
+    const t = userProgress.dailyTasks, c = userProgress.dailyTasksCollected;
+    if (userProgress.dailyQuestions>=10 && !t.solve10) { t.solve10=true; if(!c.solve10){c.solve10=true; XPSystem.addXP(20);} }
+    if (userProgress.dailyXP>=50 && !t.earn50XP) { t.earn50XP=true; if(!c.earn50XP){c.earn50XP=true; XPSystem.addXP(20);} }
+    if (!t.loginToday) { t.loginToday=true; if(!c.loginToday){c.loginToday=true; XPSystem.addXP(20);} }
+    if (t.solve10 && t.earn50XP && t.loginToday && !userProgress.allDailyTasksDone) {
       userProgress.allDailyTasksDone = true; XPSystem.addXP(100); ChestSystem.give('achievement');
     }
     saveProgress();
   },
-  incrementCounters(q, xp) {
+  incrementCounters(q,xp) {
     const today = new Date().toISOString().slice(0,10);
-    if (userProgress.dailyTasksDate !== today) { userProgress.dailyQuestions=0; userProgress.dailyXP=0; }
-    userProgress.dailyQuestions += q; userProgress.dailyXP += xp; saveProgress(); this.update();
+    if (userProgress.dailyTasksDate!==today) { userProgress.dailyQuestions=0; userProgress.dailyXP=0; }
+    userProgress.dailyQuestions+=q; userProgress.dailyXP+=xp; saveProgress(); this.update();
   }
 };
-
 const ACHIEVEMENTS_LIST = [
   { id:'first_login', icon:'🏆', title:'Первый вход', cond:()=>true },
   { id:'first_lesson', icon:'🏆', title:'Первый урок', cond:()=>userProgress.totalAnswered>0 },
@@ -407,124 +329,113 @@ const ACHIEVEMENTS_LIST = [
   { id:'solve50', icon:'📚', title:'50 вопросов', cond:()=>userProgress.totalAnswered>=50, max:50, progress:()=>Math.min(userProgress.totalAnswered,50) },
   { id:'xp500', icon:'⭐', title:'500 XP', cond:()=>userProgress.xp>=500, max:500, progress:()=>Math.min(userProgress.xp,500) },
 ];
-
 const AchievementSystem = {
   check() {
     if (!userProgress.achievements) userProgress.achievements = {};
     const now = new Date().toISOString();
     ACHIEVEMENTS_LIST.forEach(a => {
       if (userProgress.achievements[a.id]?.unlocked) return;
-      const unlocked = a.cond();
-      const progress = a.progress ? a.progress() : (unlocked ? 1 : 0);
-      if (!userProgress.achievements[a.id]) userProgress.achievements[a.id] = { progress, unlocked, date: unlocked?now:null, chestGiven:false };
+      const unlocked = a.cond(), progress = a.progress ? a.progress() : (unlocked?1:0);
+      if (!userProgress.achievements[a.id]) userProgress.achievements[a.id] = { progress, unlocked, date:unlocked?now:null, chestGiven:false };
       else {
         userProgress.achievements[a.id].progress = progress;
         if (unlocked && !userProgress.achievements[a.id].unlocked) {
           userProgress.achievements[a.id].unlocked = true; userProgress.achievements[a.id].date = now;
-          showToast('🏆 ' + a.title, 'achievement');
-          if (!userProgress.achievements[a.id].chestGiven) {
-            ChestSystem.give('achievement'); userProgress.achievements[a.id].chestGiven = true;
-          }
+          showToast('🏆 '+a.title, 'achievement');
+          if (!userProgress.achievements[a.id].chestGiven) { ChestSystem.give('achievement'); userProgress.achievements[a.id].chestGiven = true; }
         }
       }
     });
     saveProgress();
   }
 };
-
 const ChestSystem = {
-  give(type) { if (!userProgress.chests) userProgress.chests = []; userProgress.chests.push({type}); saveProgress(); },
-  giveDaily() { const today = new Date().toISOString().slice(0,10); if (userProgress.lastDailyChestDate!==today) { userProgress.lastDailyChestDate=today; this.give('daily'); } },
-  giveStreak() { const s = userProgress.streak||0; const given = userProgress.streakChestsGiven||{}; [3,7,14,30].forEach(t => { if (s>=t && !given[t]) { this.give('streak'); given[t]=true; } }); userProgress.streakChestsGiven=given; saveProgress(); }
+  give(type) { if(!userProgress.chests) userProgress.chests=[]; userProgress.chests.push({type}); saveProgress(); },
+  giveDaily() { const t=new Date().toISOString().slice(0,10); if(userProgress.lastDailyChestDate!==t){userProgress.lastDailyChestDate=t; this.give('daily');} },
+  giveStreak() { const s=userProgress.streak||0, g=userProgress.streakChestsGiven||{}; [3,7,14,30].forEach(t=>{if(s>=t&&!g[t]){this.give('streak');g[t]=true;}}); userProgress.streakChestsGiven=g; saveProgress(); }
 };
 
-// ---------- PROFESSOR GEO ----------
+// ---------- PROFESSOR GEO & CHAT ----------
 const ProfessorGeo = {
   HAPPY: ["Отлично! 🎉","Верно! 🎉","Так держать! 🎉","Молодец! 🎉","Правильно! 🎉"],
   SAD: ["Не страшно 🤔","Запомни эту тему 🤔","Подумай ещё 🤔","Ошибки учат 🤔","Разберёмся! 🤔"],
   timer: null,
-  show(text, duration=3000) {
-    const el = document.getElementById('professor-speech');
-    if (!el) return; if (this.timer) clearTimeout(this.timer);
+  show(text, dur=3000) {
+    const el = document.getElementById('professor-speech'); if(!el) return;
+    if(this.timer) clearTimeout(this.timer);
     el.textContent = text; el.classList.remove('hidden');
-    this.timer = setTimeout(() => this.hide(), duration);
+    this.timer = setTimeout(()=>this.hide(), dur);
   },
-  hide() { const el = document.getElementById('professor-speech'); if(el) el.classList.add('hidden'); if(this.timer) clearTimeout(this.timer); },
+  hide() { const el=document.getElementById('professor-speech'); if(el) el.classList.add('hidden'); if(this.timer) clearTimeout(this.timer); },
   showHappy() { this.show(this.HAPPY[Math.floor(Math.random()*this.HAPPY.length)]); },
   showSad() { this.show(this.SAD[Math.floor(Math.random()*this.SAD.length)]); },
-  showHint(text) { this.show('💡 ' + text, 4000); }
+  showHint(t) { this.show('💡 '+t, 4000); }
 };
 
-// ---------- PROFESSOR CHAT ----------
 const ProfessorChat = {
-  history: [],
-  currentTopic: 'Общая подготовка',
-  isOpen: false,
+  history:[], currentTopic:'Общая подготовка', isOpen:false,
   open() {
-    if (this.isOpen) return;
-    this.isOpen = true;
+    if(this.isOpen) return; this.isOpen = true;
     try { this.currentTopic = document.getElementById('s-quiz').classList.contains('active') ? QuestionSystem.getTopicTitle() : 'Общая подготовка'; } catch(e) {}
-    document.getElementById('chat-current-topic').textContent = '📚 ' + this.currentTopic;
+    document.getElementById('chat-current-topic').textContent = '📚 '+this.currentTopic;
     document.getElementById('chat-overlay').style.display = 'flex';
-    if (!this.history.length) this.addMessage('professor', 'Привет! Я твой AI-наставник. Задай вопрос по географии или выбери тему.');
+    if(!this.history.length) this.addMessage('professor','Привет! Я твой AI-наставник. Задай вопрос по географии.');
     this.render();
   },
-  close() { this.isOpen = false; document.getElementById('chat-overlay').style.display = 'none'; },
-  addMessage(role, text) { this.history.push({role, text}); this.render(); },
+  close() { this.isOpen=false; document.getElementById('chat-overlay').style.display='none'; },
+  addMessage(role,text) { this.history.push({role,text}); this.render(); },
   render() {
-    const c = document.getElementById('chat-messages');
-    if (!c) return;
+    const c = document.getElementById('chat-messages'); if(!c) return;
     c.innerHTML = this.history.map(m => {
-      if (m.role === 'loading') return '<div class="chat-msg loading">⏳ Профессор думает...</div>';
+      if(m.role==='loading') return '<div class="chat-msg loading">⏳ Профессор думает...</div>';
       return `<div class="chat-msg ${m.role}">${m.text.replace(/\n/g,'<br>')}</div>`;
     }).join('');
     c.scrollTop = c.scrollHeight;
   },
   async sendMessage(text) {
-    if (!text?.trim()) return;
-    const input = document.getElementById('chat-input'); if (input) input.value = '';
+    if(!text?.trim()) return;
+    const input = document.getElementById('chat-input'); if(input) input.value='';
     this.addMessage('user', text.trim());
-    this.history.push({role:'loading', text:''}); this.render();
+    this.history.push({role:'loading',text:''}); this.render();
     try {
       const reply = await sendToProfessor(text, this.currentTopic);
-      this.history = this.history.filter(m => m.role !== 'loading');
+      this.history = this.history.filter(m=>m.role!=='loading');
       this.addMessage('professor', reply);
     } catch(e) {
-      this.history = this.history.filter(m => m.role !== 'loading');
+      this.history = this.history.filter(m=>m.role!=='loading');
       this.addMessage('professor', '⚠️ Ошибка связи.');
     }
   }
 };
-
 async function sendToProfessor(msg, topic) {
-  await new Promise(r => setTimeout(r, 800 + Math.random()*1200));
+  await new Promise(r=>setTimeout(r, 800+Math.random()*1200));
   const m = msg.toLowerCase();
-  if (m.includes('объясни')) return `📘 Тема «${topic}» важна для ОГЭ. Повтори основные понятия и выполни тесты.`;
-  if (m.includes('подсказк')) return `💡 Обрати внимание на ключевые слова вопроса – они часто ведут к ответу.`;
-  if (m.includes('огэ')) return `❓ На ОГЭ спрашивают карты, климат, население, регионы России. Тренируйся на реальных заданиях.`;
-  return `🤔 Интересно! По теме «${topic}» могу сказать: практика и повторение — твои лучшие помощники.`;
+  if(m.includes('объясни')) return `📘 Тема «${topic}» важна для ОГЭ. Повтори основные понятия.`;
+  if(m.includes('подсказк')) return '💡 Обрати внимание на ключевые слова вопроса.';
+  if(m.includes('огэ')) return '❓ На ОГЭ спрашивают карты, климат, население, регионы России.';
+  return `🤔 По теме «${topic}» могу сказать: практика — твой лучший помощник.`;
 }
 
-document.getElementById('professor-fab').addEventListener('click', () => { ProfessorGeo.hide(); ProfessorChat.open(); });
-document.getElementById('chat-overlay').addEventListener('click', e => { if (e.target === e.currentTarget) ProfessorChat.close(); });
+document.getElementById('professor-fab').addEventListener('click', ()=>{ ProfessorGeo.hide(); ProfessorChat.open(); });
+document.getElementById('chat-overlay').addEventListener('click', e=>{ if(e.target===e.currentTarget) ProfessorChat.close(); });
 
-// ---------- QUIZ SYSTEM ----------
+// ---------- QUIZ ----------
 const QuestionSystem = {
   curQ:0, score:0, answered:false, shuffled:[], curLesson:0, lives:3, hintUsed:false, isBoss:false,
   start(idx) {
-    const all = getAllLessons(); this.curLesson = idx; this.shuffled = all[idx].questions;
+    const all = getAllLessons(); this.curLesson=idx; this.shuffled=all[idx].questions;
     this.curQ=0; this.score=0; this.lives=3; this.hintUsed=false; this.isBoss=false;
     goScreen('s-quiz'); this.renderQ();
   },
   startBoss() {
-    const all = getAllLessons(); let qs = []; all.forEach(l => qs = qs.concat(l.questions));
+    const all = getAllLessons(); let qs=[]; all.forEach(l=>qs=qs.concat(l.questions));
     qs = qs.sort(()=>Math.random()-0.5).slice(0,30);
-    this.isBoss = true; this.shuffled = qs; this.curQ=0; this.score=0; this.lives=999; this.hintUsed=false;
+    this.isBoss=true; this.shuffled=qs; this.curQ=0; this.score=0; this.lives=999; this.hintUsed=false;
     goScreen('s-quiz'); this.renderQ();
   },
-  replay() { if (this.isBoss) this.startBoss(); else this.start(this.curLesson); },
+  replay() { if(this.isBoss) this.startBoss(); else this.start(this.curLesson); },
   renderQ() {
-    const q = this.shuffled[this.curQ]; this.answered = false; this.hintUsed = false;
+    const q = this.shuffled[this.curQ]; this.answered=false; this.hintUsed=false;
     document.getElementById('quiz-topic-lbl').textContent = this.getTopicTitle();
     document.getElementById('lesson-badge').textContent = `${this.getTopicTitle()} · Вопрос ${this.curQ+1}/${this.shuffled.length}`;
     document.getElementById('quiz-counter').textContent = `${this.curQ+1}/${this.shuffled.length}`;
@@ -533,51 +444,47 @@ const QuestionSystem = {
     document.getElementById('btn-hint').style.display='flex'; document.getElementById('btn-hint').disabled=false;
     document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
     const next = document.getElementById('btn-next'); next.classList.remove('show');
-    next.textContent = this.curQ < this.shuffled.length-1 ? 'Следующий вопрос →' : 'Результат →';
-    const ans = document.getElementById('answers'); ans.innerHTML = '';
-    ['А','Б','В','Г'].forEach((l,i) => {
+    next.textContent = this.curQ<this.shuffled.length-1 ? 'Следующий вопрос →' : 'Результат →';
+    const ans = document.getElementById('answers'); ans.innerHTML='';
+    ['А','Б','В','Г'].forEach((l,i)=>{
       const b = document.createElement('button'); b.className='ans-btn';
       b.innerHTML = `<div class="ans-letter">${l}</div><span>${q.answers[i]}</span>`;
-      b.onclick = () => this.selectAns(i, q.correct);
+      b.onclick = ()=>this.selectAns(i, q.correct);
       ans.appendChild(b);
     });
   },
-  getTopicTitle() { return this.isBoss ? 'Финальный босс' : (getAllLessons()[this.curLesson]?.title || 'Тренировка'); },
-  getTopicKey() { return this.isBoss ? 'topo' : (getAllLessons()[this.curLesson]?.key || 'topo'); },
+  getTopicTitle() { return this.isBoss?'Финальный босс':(getAllLessons()[this.curLesson]?.title||'Тренировка'); },
   selectAns(idx, correct) {
-    if (this.answered) return; this.answered = true;
-    if (idx === correct && isTelegram && tgApp.HapticFeedback) tgApp.HapticFeedback.notificationOccurred('success');
+    if(this.answered) return; this.answered=true;
+    if(idx===correct && isTelegram && tgApp.HapticFeedback) tgApp.HapticFeedback.notificationOccurred('success');
     const btns = document.querySelectorAll('.ans-btn');
     btns[idx].classList.add(idx===correct?'correct':'wrong');
-    if (idx !== correct) { btns[correct].classList.add('correct'); this.lives--; ProfessorGeo.showSad(); }
+    if(idx!==correct) { btns[correct].classList.add('correct'); this.lives--; ProfessorGeo.showSad(); }
     else { this.score++; XPSystem.addXP(10); ProfessorGeo.showHappy(); }
     document.getElementById('btn-hint').style.display='none';
     document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
     document.getElementById('btn-next').classList.add('show');
-    if (this.lives<=0) document.getElementById('btn-next').textContent = '😔 Жизни кончились';
+    if(this.lives<=0) document.getElementById('btn-next').textContent='😔 Жизни кончились';
     DailyQuestSystem.incrementCounters(1,0); DailyQuestSystem.update();
   },
-  next() { this.curQ++; if (this.curQ >= this.shuffled.length) this.showResult(); else this.renderQ(); },
-  getHint() { if (this.hintUsed) return; this.hintUsed = true; ProfessorGeo.showHint('Подумай, какие ключевые слова в вопросе.'); document.getElementById('btn-hint').disabled = true; },
+  next() { this.curQ++; if(this.curQ>=this.shuffled.length) this.showResult(); else this.renderQ(); },
+  getHint() { if(this.hintUsed) return; this.hintUsed=true; ProfessorGeo.showHint('Подумай, какие ключевые слова в вопросе.'); document.getElementById('btn-hint').disabled=true; },
   showResult() {
-    const total = this.shuffled.length, pct = Math.round(this.score/total*100);
-    if (this.isBoss) {
-      userProgress.bossCompleted = true; saveProgress();
+    const total=this.shuffled.length, pct=Math.round(this.score/total*100);
+    if(this.isBoss) {
+      userProgress.bossCompleted=true; saveProgress();
       document.getElementById('boss-sub').textContent = `${this.score}/${total} (${pct}%)`;
       document.getElementById('boss-num').textContent = this.score; goScreen('s-boss-result');
       setTimeout(()=>document.getElementById('boss-ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
       this.isBoss=false; DailyQuestSystem.update(); return;
     }
     let e='😔', t='Нужно повторить';
-    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хорошо!'; }
-    document.getElementById('res-emoji').textContent = e; document.getElementById('res-title').textContent = t;
-    document.getElementById('res-sub').textContent = `${pct}% правильных`;
-    document.getElementById('ring-num').textContent = this.score;
-    document.getElementById('ring-denom').textContent = `из ${total}`;
-    document.getElementById('res-c').textContent = this.score;
-    document.getElementById('res-w').textContent = total-this.score;
-    const xp = this.score*20 + (this.score===total?50:0);
-    document.getElementById('res-xp').textContent = '+'+xp;
+    if(pct>=80){e='🏆';t='Отлично!';}else if(pct>=60){e='👍';t='Хорошо!';}
+    document.getElementById('res-emoji').textContent=e; document.getElementById('res-title').textContent=t;
+    document.getElementById('res-sub').textContent=`${pct}% правильных`;
+    document.getElementById('ring-num').textContent=this.score; document.getElementById('ring-denom').textContent=`из ${total}`;
+    document.getElementById('res-c').textContent=this.score; document.getElementById('res-w').textContent=total-this.score;
+    const xp = this.score*20+(this.score===total?50:0); document.getElementById('res-xp').textContent='+'+xp;
     this.saveLesson(this.curLesson, this.score, total);
     goScreen('s-result');
     setTimeout(()=>document.getElementById('ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
@@ -588,7 +495,7 @@ const QuestionSystem = {
     const key = getAllLessons()[idx]?.title || String(idx);
     userProgress.completedLessons[key] = { score:sc, total, date:today };
     userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
-    XPSystem.addXP(sc*20 + (sc===total?50:0));
+    XPSystem.addXP(sc*20+(sc===total?50:0));
     checkStreak(); saveProgress();
     if (!userProgress.completedLessons[key].chestGiven) {
       ChestSystem.give('achievement'); userProgress.completedLessons[key].chestGiven = true; saveProgress();
@@ -598,64 +505,96 @@ const QuestionSystem = {
 
 // ---------- RENDERING ----------
 function goScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  if (id === 's-home') renderHomePath();
-  if (id === 's-profile') renderProfile();
+  if(id==='s-home') renderHomePath();
+  if(id==='s-profile') renderProfile();
 }
-
 function getPredictedGrade() {
-  if (!userProgress.totalAnswered) return '—';
-  const acc = userProgress.totalCorrect / userProgress.totalAnswered;
-  if (acc >= 0.85) return '5'; if (acc >= 0.7) return '4'; if (acc >= 0.55) return '3'; return '2';
+  if(!userProgress.totalAnswered) return '—';
+  const acc = userProgress.totalCorrect/userProgress.totalAnswered;
+  if(acc>=0.85) return '5'; if(acc>=0.7) return '4'; if(acc>=0.55) return '3'; return '2';
 }
-
 async function renderHomePath() {
   const container = document.getElementById('home-content');
-  if (!lessonsLoaded.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю...</div>'; await loadAllLessons(); }
+  if(!lessonsLoaded.length) { container.innerHTML='<div style="padding:40px;text-align:center">⏳ Загружаю...</div>'; await loadAllLessons(); }
   const all = getAllLessons();
-  if (!all.length) { container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Ошибка загрузки</div>'; return; }
+  if(!all.length) { container.innerHTML='<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Ошибка загрузки</div>'; return; }
 
   const today = new Date().toISOString().slice(0,10);
-  if (userProgress.professorGreetingDate !== today) {
-    userProgress.professorGreetingDate = today; saveProgress();
+  if(userProgress.professorGreetingDate!==today) {
+    userProgress.professorGreetingDate=today; saveProgress();
     ProfessorGeo.show("Привет! Готов продолжить подготовку? 🚀", 5000);
   }
-
-  const completedCount = Object.keys(userProgress.completedLessons).length;
-  const totalCount = all.length;
-  const pct = totalCount ? Math.round(completedCount/totalCount*100) : 0;
+  const completed = Object.keys(userProgress.completedLessons).length;
+  const total = all.length; const pct = total?Math.round(completed/total*100):0;
   const grade = getPredictedGrade();
   let html = `<div class="path-progress-card"><b>Прогноз ОГЭ</b><div style="font-size:42px;color:var(--gold)">${grade}</div>`;
-  html += `<div style="font-size:11px;color:var(--muted)">🔥 ${userProgress.streak||0} дней подряд · ${getDaysUntilOGE()} дн. до ОГЭ</div></div>`;
+  html += `<div style="font-size:11px;color:var(--muted)">🔥 ${userProgress.streak||0} дней · ${getDaysUntilOGE()} дн. до ОГЭ</div></div>`;
   html += `<div class="path-progress-card"><div style="display:flex;justify-content:space-between"><span>Прогресс</span><span>${pct}%</span></div><div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="${pct}%"></div></div></div>`;
 
-  const nextIdx = all.findIndex((l,i) => !userProgress.completedLessons[l.title]);
-  const nextLesson = nextIdx >= 0 ? all[nextIdx] : null;
-  if (nextLesson) {
-    html += `<div class="continue-card" onclick="QuestionSystem.start(${nextIdx})"><span>▶️</span><div><div class="continue-label">Продолжить</div><div>${nextLesson.title}</div></div></div>`;
+  DailyQuestSystem.update();
+  const tasks = userProgress.dailyTasks||{}, dq=userProgress.dailyQuestions||0, dx=userProgress.dailyXP||0;
+  html += `<div class="path-progress-card"><b>🎯 Ежедневные задания</b>`;
+  html += `<div style="font-size:13px"><span class="task-check${tasks.solve10?' done':''}">${tasks.solve10?'✅':'⬜'}</span> 10 вопросов (${Math.min(dq,10)}/10)</div>`;
+  html += `<div style="font-size:13px"><span class="task-check${tasks.earn50XP?' done':''}">${tasks.earn50XP?'✅':'⬜'}</span> 50 XP (${Math.min(dx,50)}/50)</div>`;
+  if(userProgress.allDailyTasksDone) html += `<div style="color:var(--primary2)">Все задания дня выполнены!</div>`;
+  html += `</div>`;
+
+  const nextIdx = all.findIndex((l,i)=>!userProgress.completedLessons[l.title]);
+  if(nextIdx>=0) {
+    const nl = all[nextIdx];
+    html += `<div class="continue-card" onclick="QuestionSystem.start(${nextIdx})"><span>▶️</span><div><div class="continue-label">Продолжить</div><div>${nl.title}</div></div></div>`;
   } else {
     html += `<div class="continue-card" onclick="QuestionSystem.startBoss()"><span>👑</span><div>Финальный босс</div></div>`;
   }
+
+  html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0">';
+  all.forEach((l,i)=>{
+    const done = userProgress.completedLessons[l.title];
+    const prev = i>0 ? all[i-1].title : null;
+    const prevDone = i===0 || userProgress.completedLessons[prev];
+    const locked = !prevDone && i>0;
+    const state = done ? (done.score===done.total?'perfect':'done') : (locked?'locked':'current');
+    const icon = done ? (done.score===done.total?'🏆':'✅') : (locked?'🔒':'▶');
+    if(i>0) html += `<div class="path-connector" style="background:${userProgress.completedLessons[all[i-1].title]?'var(--primary2)':'var(--border)'}"></div>`;
+    html += `<div class="path-node-row" style="opacity:${locked?0.45:1}"><div class="node-circle ${state}" ${!locked?`onclick="QuestionSystem.start(${i})"`:''}>${icon}</div><div>${l.title}</div></div>`;
+  });
+  html += `<div class="path-connector" style="background:${completed===total?'var(--primary2)':'var(--border)'}"></div>`;
+  html += `<div class="path-node-row"><div class="boss-node${completed===total?'':' locked'}" ${completed===total?'onclick="QuestionSystem.startBoss()"':''}>${completed===total?'👑':'🔒'}</div><div>Финальный босс</div></div></div>`;
+
   container.innerHTML = html;
-  setTimeout(() => container.querySelectorAll('.path-progress-fill[data-target]').forEach(f => f.style.width = f.dataset.target), 50);
-  document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
-  document.getElementById('home-sublabel').textContent = `${completedCount}/${totalCount} тем`;
+  setTimeout(()=>container.querySelectorAll('.path-progress-fill[data-target]').forEach(f=>f.style.width=f.dataset.target),50);
+  document.getElementById('home-streak').textContent = '🔥 '+(userProgress.streak||0);
+  document.getElementById('home-sublabel').textContent = `${completed}/${total} тем`;
 }
 
 function renderProfile() {
   const container = document.getElementById('profile-content');
-  const rank = userProgress.xp >= 5000 ? 'Мастер' : userProgress.xp >= 1000 ? 'Ученик' : 'Новичок';
-  container.innerHTML = `<div class="profile-header-card"><div class="profile-avatar-big">🧑‍🎓</div><div><div class="profile-name-big">Ученик <span style="background:var(--primary);padding:2px 8px;border-radius:10px;font-size:12px">${rank}</span></div><div>⚡ Ур.${userProgress.level} · ${userProgress.xp} XP</div></div></div>`;
+  const rank = userProgress.xp>=5000?'Мастер':userProgress.xp>=1000?'Ученик':'Новичок';
+  const completed = Object.keys(userProgress.completedLessons).length;
+  const acc = userProgress.totalAnswered?Math.round(userProgress.totalCorrect/userProgress.totalAnswered*100):0;
+  const chests = userProgress.chests?.length||0;
+  let html = `<div class="profile-header-card"><div class="profile-avatar-big">🧑‍🎓</div><div><div class="profile-name-big">Ученик <span style="background:var(--primary);padding:2px 8px;border-radius:10px;font-size:12px">${rank}</span></div><div>⚡ Ур.${userProgress.level} · ${userProgress.xp} XP</div></div></div>`;
+  html += `<div class="res-stats"><div class="res-stat"><div class="res-num">${completed}/${getAllLessons().length}</div><div class="res-label">Тем</div></div><div class="res-stat"><div class="res-num">${acc}%</div><div class="res-label">Точность</div></div><div class="res-stat"><div class="res-num">🔥 ${userProgress.streak||0}</div><div class="res-label">Дней</div></div></div>`;
+  html += `<div class="path-progress-card" style="display:flex;justify-content:space-between">🎁 Сундуки: ${chests} ${chests?'🎉':'😴'}</div>`;
+  AchievementSystem.check();
+  html += '<div><b>Достижения</b></div><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  ACHIEVEMENTS_LIST.forEach(a=>{
+    const ach = userProgress.achievements?.[a.id] || {};
+    html += `<div class="res-stat" style="opacity:${ach.unlocked?1:0.4}"><div>${a.icon}</div><div style="font-size:10px">${a.title}</div></div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 function getDaysUntilOGE() {
-  const now = new Date(); const oge = new Date(now.getFullYear(), 5, 19);
-  if (now > oge) oge.setFullYear(oge.getFullYear()+1);
-  return Math.ceil((oge - now)/86400000);
+  const now = new Date(); const oge = new Date(now.getFullYear(),5,19);
+  if(now>oge) oge.setFullYear(oge.getFullYear()+1);
+  return Math.ceil((oge-now)/86400000);
 }
 
-loadProgress(() => { checkStreak(); renderHomePath(); DailyQuestSystem.update(); AchievementSystem.check(); });
+loadProgress(()=>{ checkStreak(); renderHomePath(); DailyQuestSystem.update(); AchievementSystem.check(); });
 </script>
 </body>
 </html>
