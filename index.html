@@ -1,835 +1,136 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>ГеоПро — Подготовка к ОГЭ</title>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #0d1117;
-  --card: #161b22;
-  --card2: #1c2333;
-  --primary: #58a6ff;
-  --primary2: #3fb950;
-  --text: #f0f6fc;
-  --muted: #8b949e;
-  --danger: #f85149;
-  --gold: #d29922;
-  --border: #ffffff0c;
-  --radius: 18px;
-  --font-h: 'Unbounded', sans-serif;
-  --font-b: 'Onest', sans-serif;
-}
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
-
-body::before {
-  content:''; position:fixed; inset:0;
-  background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
-              radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
-  pointer-events:none; z-index:0;
-}
-
-.screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
-.screen.active { display:flex; animation: fadeUp .3s ease; }
-@keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-
-.topbar {
-  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
-  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
-}
-.avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
-.username { font-family:var(--font-h); font-size:13px; font-weight:700; }
-.sublabel { font-size:10px; color:var(--muted); }
-.streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
-
-.scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
-.scroll::-webkit-scrollbar { width:3px; }
-.scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
-
-/* ── Анимации появления карточек ── */
-.card-animate {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-}
-@keyframes cardAppear {
-  to { opacity:1; transform:translateY(0); }
-}
-
-/* ── Кнопки ── */
-.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
-  transform: scale(0.97) !important;
-}
-
-/* ── Прогресс-бары ── */
-.path-progress-fill, .q-progress-fill {
-  transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-
-/* ── Ежедневные задания: анимация выполнения ── */
-.task-check {
-  display: inline-block;
-  transition: transform 0.25s ease, color 0.25s ease;
-}
-.task-check.done {
-  color: var(--primary2) !important;
-  animation: taskPop 0.35s ease;
-}
-@keyframes taskPop {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-/* ── Toast ── */
-.toast-container {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  background: rgba(28, 35, 51, 0.92);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 18px;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
-  pointer-events: auto;
-  max-width: 90vw;
-  text-align: center;
-}
-.toast.xp { border-left: 3px solid var(--primary2); }
-.toast.chest { border-left: 3px solid var(--gold); }
-.toast.achievement { border-left: 3px solid #c084fc; }
-.toast.streak { border-left: 3px solid #f97316; }
-@keyframes toastIn {
-  from { opacity:0; transform:translateY(-16px); }
-  to { opacity:1; transform:translateY(0); }
-}
-@keyframes toastOut {
-  from { opacity:1; transform:translateY(0); }
-  to { opacity:0; transform:translateY(-12px); }
-}
-
-/* ── AI PANEL (Профессор Гео) ── */
-.ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
-.ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
-.ai-header-left { display:flex; align-items:center; gap:10px; }
-.ai-avatar { width:32px; height:32px; border-radius:10px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:16px; }
-.ai-name { font-size:13px; font-weight:700; color:var(--primary); }
-.ai-tagline { font-size:10px; color:var(--muted); }
-.ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
-.ai-toggle.open { transform:rotate(180deg); }
-
-.ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
-.ai-body.open { display:flex; animation: fadeUp .25s ease; }
-
-.ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
-.ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
-.ai-prompt-btn:active { background:#58a6ff30; }
-
-.ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
-.ai-messages::-webkit-scrollbar { width:2px; }
-.ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
-
-.msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
-.msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
-.msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
-.msg.loading { color:var(--muted); font-style:italic; }
-
-.ai-input-row { display:flex; gap:8px; align-items:flex-end; }
-.ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
-.ai-input:focus { border-color:#58a6ff60; }
-.ai-input::placeholder { color:var(--muted); }
-.ai-send { width:40px; height:40px; border-radius:12px; flex-shrink:0; background:linear-gradient(135deg,var(--primary),var(--primary2)); border:none; color:#fff; font-size:18px; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:transform .15s; }
-.ai-send:active { transform:scale(.93); }
-.ai-send:disabled { opacity:.5; cursor:default; }
-.ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
-
-/* ── QUIZ ── */
-.quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
-.quiz-wrap::-webkit-scrollbar { width:3px; }
-.q-header { display:flex; justify-content:space-between; align-items:center; }
-.q-progress { height:4px; background:var(--card2); border-radius:8px; overflow:hidden; }
-.q-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); transition:width .4s ease; }
-.q-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:18px; }
-.q-tag { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--primary); margin-bottom:10px; }
-.q-text { font-size:15px; line-height:1.55; font-weight:500; }
-.answers { display:flex; flex-direction:column; gap:8px; }
-.ans-btn { background:var(--card2); border:1.5px solid var(--border); border-radius:14px; padding:13px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; font-family:var(--font-b); font-size:13px; color:var(--text); transition:.15s; }
-.ans-btn:active { transform:scale(.98); }
-.ans-btn.correct { border-color:var(--primary2); background:rgba(63,185,80,.1); }
-.ans-btn.wrong { border-color:var(--danger); background:rgba(248,81,73,.1); }
-.ans-letter { width:26px; height:26px; border-radius:8px; background:#2a3a55; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; transition:.15s; }
-.ans-btn.correct .ans-letter { background:var(--primary2); }
-.ans-btn.wrong .ans-letter { background:var(--danger); }
-.btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
-.btn-next.show { display:block; animation: fadeUp .3s ease; }
-.btn-next:active { transform:scale(.97); }
-
-/* ── RESULT ── */
-.result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
-.result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
-@keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
-.result-title { font-family:var(--font-h); font-size:22px; font-weight:800; letter-spacing:-.02em; }
-.result-sub { font-size:14px; color:var(--muted); }
-.ring-wrap { position:relative; width:130px; height:130px; }
-.ring-wrap svg { transform:rotate(-90deg); }
-.ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
-.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
-.ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
-.ring-num { font-family:var(--font-h); font-size:28px; font-weight:800; }
-.ring-denom { font-size:12px; color:var(--muted); }
-.res-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; width:100%; }
-.res-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 8px; text-align:center; }
-.res-num { font-family:var(--font-h); font-size:18px; font-weight:800; }
-.res-num.g{color:var(--primary2)} .res-num.r{color:var(--danger)} .res-num.y{color:var(--gold)}
-.res-label { font-size:10px; color:var(--muted); margin-top:3px; }
-.res-btns { width:100%; display:flex; flex-direction:column; gap:8px; }
-.btn-full { width:100%; padding:16px; border-radius:var(--radius); font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; transition:.15s; }
-.btn-full:active { transform:scale(.97); }
-.btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
-.btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
-
-/* ── PATH (главный экран) ── */
-.path-progress-card {
-  background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
-  padding:16px; margin-bottom:6px;
-}
-.path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
-.path-progress-label { font-size:13px; font-weight:600; }
-.path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
-.path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
-.path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
-
-.continue-card {
-  background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
-  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
-}
-.continue-card:active { transform:scale(.98); }
-.continue-icon { font-size:32px; flex-shrink:0; }
-.continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
-.continue-title { font-size:15px; font-weight:700; margin-top:2px; }
-.continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
-
-.path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
-.path-connector { width:3px; height:24px; margin:0 auto; }
-
-.node-circle {
-  width:56px; height:56px; border-radius:50%; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; font-size:22px;
-}
-.node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
-.node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
-.node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
-.node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
-@keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-
-.boss-node {
-  width:72px; height:72px; border-radius:20px; flex-shrink:0;
-  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
-  display:flex; align-items:center; justify-content:center; font-size:30px;
-}
-.boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
-
-/* ── PROFILE ── */
-.profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
-.profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
-.profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
-.profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
-
-.profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
-.profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
-.profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
-.profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
-
-.badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
-.badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
-.badge-item-p.locked { opacity:.3; }
-.badge-icon-p { font-size:22px; margin-bottom:4px; }
-.badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
-
-.sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
-.sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
-
-/* ── СУНДУКИ (анимации) ── */
-@keyframes chestGlow {
-  0% { box-shadow: 0 0 5px #d29922; }
-  50% { box-shadow: 0 0 20px #d29922; }
-  100% { box-shadow: 0 0 5px #d29922; }
-}
-@keyframes chestPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-
-/* Модальное окно профессора (для подсказок) */
-.professor-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 1000;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  animation: fadeInOverlay 0.25s ease;
-}
-.professor-modal-card {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 24px 24px 0 0;
-  padding: 24px 20px 32px;
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-}
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.professor-avatar {
-  width: 64px; height: 64px; margin: 0 auto;
-  background: transparent;
-  border-radius: 24px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
-  overflow: hidden;
-}
-.professor-avatar img {
-  width: 100%; height: 100%; object-fit: cover; border-radius: 24px;
-}
-.professor-message {
-  font-size: 15px; line-height: 1.6; color: var(--text);
-  padding: 0 8px;
-}
-.professor-actions {
-  display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
-}
-.professor-btn {
-  width: 100%; padding: 14px; border-radius: var(--radius);
-  font-family: var(--font-h); font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: transform 0.12s ease, background 0.2s ease;
-  border: none;
-}
-.professor-btn:active { transform: scale(0.97); }
-.professor-btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary2));
-  color: #fff;
-}
-.professor-btn-secondary {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-}
-.professor-btn:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
-
-/* ========== ВИДЖЕТ ПРОФЕССОРА С АНИМАЦИЯМИ ========== */
-.prof-geo-widget {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 950;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-
-/* Кнопка с портретом */
-.prof-geo-btn {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: #1e2a3a;
-  background-image: url('https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png');
-  background-size: cover;
-  background-position: center;
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-image 0.2s ease;
-  pointer-events: auto;
-  will-change: transform;
-  animation: subtlePulse 3s infinite ease-in-out, idleBreathing 4s infinite ease-in-out;
-}
-.prof-geo-btn:active {
-  transform: scale(0.95);
-  box-shadow: 0 0 18px rgba(210, 153, 34, 0.7), 0 2px 8px rgba(0,0,0,0.3);
-}
-/* idle-анимации */
-@keyframes subtlePulse {
-  0% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
-  50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); }
-  100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
-}
-@keyframes idleBreathing {
-  0%, 100% { transform: scale(1) translateY(0); }
-  50% { transform: scale(1.03) translateY(-1px); }
-}
-
-/* Состояние "говорит" (наклон вперёд) */
-.prof-geo-btn.talking {
-  transform: translateY(-3px) rotate(-2deg);
-  animation: none; /* временно убираем idle, чтобы не конфликтовало */
-}
-
-/* Анимации для событий (добавляются как дополнительные классы) */
-.prof-geo-btn.correct-bounce {
-  animation: correctBounce 0.6s ease-out;
-}
-.prof-geo-btn.wrong-tilt {
-  animation: wrongTilt 0.6s ease-out;
-}
-.prof-geo-btn.hint-explain {
-  animation: hintExplain 0.8s ease-in-out;
-}
-.prof-geo-btn.chest-jump {
-  animation: chestJump 0.7s ease-out;
-}
-.prof-geo-btn.levelup-glow {
-  animation: levelUpGlow 0.8s ease-out;
-}
-
-@keyframes correctBounce {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.1) translateY(-8px); }
-  60% { transform: scale(0.95) translateY(0); }
-  100% { transform: scale(1); }
-}
-@keyframes wrongTilt {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-6deg); }
-  75% { transform: rotate(2deg); }
-  100% { transform: rotate(0deg); }
-}
-@keyframes hintExplain {
-  0% { transform: rotate(0deg); }
-  25% { transform: rotate(-4deg); }
-  75% { transform: rotate(4deg); }
-  100% { transform: rotate(0deg); }
-}
-@keyframes chestJump {
-  0% { transform: scale(1); }
-  30% { transform: scale(1.15) translateY(-10px); }
-  60% { transform: scale(0.95) translateY(0); }
-  100% { transform: scale(1); }
-}
-@keyframes levelUpGlow {
-  0% { transform: scale(1); filter: brightness(1); }
-  50% { transform: scale(1.12); filter: brightness(1.3); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-
-/* Облачко речи */
-.prof-geo-speech {
-  position: relative;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 14px 16px;
-  max-width: 240px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-  pointer-events: none;
-}
-.prof-geo-speech.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-.prof-geo-speech::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  right: 24px;
-  width: 0;
-  height: 0;
-  border-left: 8px solid transparent;
-  border-right: 8px solid transparent;
-  border-top: 8px solid var(--card2);
-}
-.prof-geo-speech::before {
-  content: '';
-  position: absolute;
-  bottom: -9px;
-  right: 23px;
-  width: 0;
-  height: 0;
-  border-left: 9px solid transparent;
-  border-right: 9px solid transparent;
-  border-top: 9px solid var(--border);
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ГеоПро — Подготовка к ОГЭ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div id="modal-container"></div>
-<div id="toast-container" class="toast-container"></div>
-<div id="professor-modal-container"></div>
+  <div id="modal-container"></div>
 
-<!-- Экраны приложения (без изменений) -->
-<div class="screen active" id="s-home">
-  <div class="topbar">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div class="avatar">🌍</div>
-      <div><div class="username">ГеоПро</div><div class="sublabel" id="home-sublabel">Подготовка к ОГЭ</div></div>
+  <!-- Главный экран -->
+  <div class="screen active" id="s-home">
+    <div class="topbar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar">🌍</div>
+        <div><div class="username">ГеоПро</div><div class="sublabel" id="home-sublabel">Подготовка к ОГЭ</div></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="streak" id="home-streak">🔥 0</div>
+        <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
+      </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px">
-      <div class="streak" id="home-streak">🔥 0</div>
-      <div onclick="goScreen('s-profile')" style="width:36px;height:36px;border-radius:50%;background:var(--card2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer">👤</div>
-    </div>
-  </div>
-  <div class="scroll" id="home-content" style="padding-top:8px">
-    <div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>
-  </div>
-</div>
-
-<div class="screen" id="s-topic">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
-  <div class="scroll" id="topic-content"></div>
-</div>
-
-<div class="screen" id="s-quiz">
-  <div class="topbar">
-    <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
-    <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
-    <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
-  </div>
-  <div class="quiz-wrap">
-    <div style="display:flex;align-items:center;gap:10px">
-      <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
-      <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
-    </div>
-    <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
-    <div class="q-card">
-      <div class="q-tag" id="q-tag">Задание</div>
-      <div class="q-text" id="q-text">...</div>
-    </div>
-    <div class="answers" id="answers"></div>
-    <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
-    <div id="ai-quiz" class="ai-panel" style="display:none"></div>
-    <button class="btn-next" id="btn-next" onclick="QuestionSystem.next()">Следующий вопрос →</button>
-  </div>
-</div>
-
-<div class="screen" id="s-result">
-  <div class="result-wrap">
-    <div class="result-emoji" id="res-emoji">🎉</div>
-    <div class="result-title" id="res-title">Отлично!</div>
-    <div class="result-sub" id="res-sub">Ты справился!</div>
-    <div class="ring-wrap">
-      <svg width="130" height="130" viewBox="0 0 130 130">
-        <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
-        <circle class="ring-bg" cx="65" cy="65" r="54"/>
-        <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
-      </svg>
-      <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
-    </div>
-    <div class="res-stats">
-      <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
-      <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
-      <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
-    </div>
-    <div class="res-btns">
-      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="QuestionSystem.replay()">🔄 Ещё раз</button>
+    <div class="scroll" id="home-content" style="padding-top:8px">
+      <div style="padding:20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>
     </div>
   </div>
-</div>
 
-<div class="screen" id="s-boss-result">
-  <div class="result-wrap">
-    <div class="result-emoji">👑</div>
-    <div class="result-title">Финальный босс пройден!</div>
-    <div class="result-sub" id="boss-sub">Ты прошёл все темы ОГЭ</div>
-    <div class="ring-wrap">
-      <svg width="130" height="130" viewBox="0 0 130 130">
-        <circle class="ring-bg" cx="65" cy="65" r="54"/>
-        <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/>
-      </svg>
-      <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div>
+  <!-- Экран темы -->
+  <div class="screen" id="s-topic">
+    <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title" id="topic-title">Тема</div><div style="width:60px"></div></div>
+    <div class="scroll" id="topic-content"></div>
+  </div>
+
+  <!-- Экран квиза -->
+  <div class="screen" id="s-quiz">
+    <div class="topbar">
+      <span class="back-link" onclick="goScreen('s-home')">← Выйти</span>
+      <div id="quiz-topic-lbl" style="font-size:11px;color:var(--muted)">Тренировка</div>
+      <div id="quiz-counter" style="font-family:var(--font-h);font-size:13px;font-weight:700;color:var(--primary)">1/5</div>
     </div>
-    <div class="res-btns">
-      <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
-      <button class="btn-full sec" onclick="shareBossResult()">📤 Похвастаться результатом</button>
+    <div class="quiz-wrap">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="q-progress" style="flex:1"><div class="q-progress-fill" id="qpf" style="width:0%"></div></div>
+        <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
+      </div>
+      <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
+      <div class="q-card">
+        <div class="q-tag" id="q-tag">Задание</div>
+        <div class="q-text" id="q-text">...</div>
+      </div>
+      <div class="answers" id="answers"></div>
+      <button id="btn-hint" onclick="askProfessor()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
+      <div id="ai-explain" style="display:none;background:#58a6ff0a;border:1px solid #58a6ff20;border-radius:14px;padding:14px;font-size:13px;line-height:1.6;color:#c8d8e8;margin-top:8px"></div>
+      <button id="btn-ask-ai" style="display:none;width:100%;background:transparent;border:1.5px solid #58a6ff40;border-radius:var(--radius);padding:12px;color:var(--primary);font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;margin-top:8px" onclick="openAIChat()">💬 Обсудить с Профессором</button>
+      <div id="ai-quiz" class="ai-panel" style="display:none"></div>
+      <button class="btn-next" id="btn-next" onclick="nextQ()">Следующий вопрос →</button>
     </div>
   </div>
-</div>
 
-<div class="screen" id="s-profile">
-  <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
-  <div class="scroll" id="profile-content"></div>
-</div>
+  <!-- Экран результата -->
+  <div class="screen" id="s-result">
+    <div class="result-wrap">
+      <div class="result-emoji" id="res-emoji">🎉</div>
+      <div class="result-title" id="res-title">Отлично!</div>
+      <div class="result-sub" id="res-sub">Ты справился!</div>
+      <div class="ring-wrap">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <defs><linearGradient id="rg" x1="0%" y1="0%" x2="100%"><stop offset="0%" stop-color="#58a6ff"/><stop offset="100%" stop-color="#3fb950"/></linearGradient></defs>
+          <circle class="ring-bg" cx="65" cy="65" r="54"/>
+          <circle class="ring-fill" id="ring-fill" cx="65" cy="65" r="54" stroke-dasharray="339" stroke-dashoffset="339"/>
+        </svg>
+        <div class="ring-text"><div class="ring-num" id="ring-num">0</div><div class="ring-denom" id="ring-denom">из 5</div></div>
+      </div>
+      <div class="res-stats">
+        <div class="res-stat"><div class="res-num g" id="res-c">0</div><div class="res-label">Верно</div></div>
+        <div class="res-stat"><div class="res-num r" id="res-w">0</div><div class="res-label">Ошибки</div></div>
+        <div class="res-stat"><div class="res-num y" id="res-xp">+0</div><div class="res-label">XP</div></div>
+      </div>
+      <div class="res-btns">
+        <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+        <button class="btn-full sec" onclick="replayLesson()">🔄 Ещё раз</button>
+      </div>
+    </div>
+  </div>
 
-<!-- ========== ВИДЖЕТ ПРОФЕССОРА GEO ========== -->
-<div id="professor-geo-widget" class="prof-geo-widget">
-  <div id="prof-geo-speech" class="prof-geo-speech"></div>
-  <div id="prof-geo-btn" class="prof-geo-btn" title="Профессор Гео"></div>
-</div>
+  <!-- Экран результата босса -->
+  <div class="screen" id="s-boss-result">
+    <div class="result-wrap">
+      <div class="result-emoji">👑</div>
+      <div class="result-title">Финальный босс пройден!</div>
+      <div class="result-sub" id="boss-sub">Ты прошёл все темы ОГЭ</div>
+      <div class="ring-wrap">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle class="ring-bg" cx="65" cy="65" r="54"/>
+          <circle class="ring-fill" id="boss-ring-fill" cx="65" cy="65" r="54" stroke="#d29922" stroke-dasharray="339" stroke-dashoffset="339"/>
+        </svg>
+        <div class="ring-text"><div class="ring-num" id="boss-num">0</div><div class="ring-denom" id="boss-denom">из 30</div></div>
+      </div>
+      <div class="res-btns">
+        <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
+        <button class="btn-full sec" onclick="shareBossResult()">📤 Похвастаться результатом</button>
+      </div>
+    </div>
+  </div>
 
-<script>
-// ========== КОНСТАНТЫ ИЗОБРАЖЕНИЙ И СООБЩЕНИЙ ==========
-const PROF_IMAGES = {
-  default: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png',
-  greeting: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  correct: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  wrong: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_sad.png',
-  hint: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hint.png',
-  chest: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  levelup: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png'
-};
+  <!-- Экран профиля -->
+  <div class="screen" id="s-profile">
+    <div class="topbar"><span class="back-link" onclick="goScreen('s-home')">← Назад</span><div class="sec-title">👤 Профиль</div><div style="width:60px"></div></div>
+    <div class="scroll" id="profile-content"></div>
+  </div>
 
-const ProfessorMessages = {
-  greetingMessages: [
-    "Здравствуйте!<br>Сегодня отличный день для новых открытий 🌍",
-    "Привет! Давай покорим ещё одну тему! 🚀",
-    "Добрый день! Готов к географии?"
-  ],
-  correctAnswerMessages: [
-    "Верно! Так держать! 🎉",
-    "Отлично! Ты настоящий географ!",
-    "Молодец! Всё правильно."
-  ],
-  wrongAnswerMessages: [
-    "Ничего, ошибка — это шаг к знанию 🤔",
-    "Подумай ещё, ты запомнишь!",
-    "Не страшно, в следующий раз получится."
-  ],
-  hintMessages: [
-    "Давай подумаем вместе...",
-    "Обрати внимание на ключевые слова.",
-    "Попробуй исключить неверные варианты."
-  ],
-  levelUpMessages: [
-    "Новый уровень! 🌟",
-    "Растёшь как настоящий исследователь!",
-    "Ещё одна ступенька к мастерству."
-  ],
-  streakMessages: [
-    "Ого, {n} дней подряд! 🔥",
-    "Серия из {n} дней! Впечатляет!"
-  ],
-  chestMessages: [
-    "Сундук открыт! Держи награду 🎁",
-    "Сокровища географа твои!"
-  ],
-  finishTopicMessages: [
-    "Тема пройдена! 💪",
-    "Отлично! Ещё один раздел позади."
-  ],
-  dailyTaskMessages: [
-    "Ежедневное задание выполнено! 🎯",
-    "Ты справился с задачей дня!"
-  ]
-};
-
-// ========== ВИДЖЕТ ПРОФЕССОРА ==========
-const ProfessorGeoWidget = {
-  greetShownToday: false,
-  timer: null,
-  lastIndexes: {},
-  currentEmotion: 'default',
-
-  init() {
-    const today = new Date().toISOString().slice(0,10);
-    this.greetShownToday = (userProgress.professorGreetingDate === today);
-    if (!this.greetShownToday) {
-      setTimeout(() => this.showGreeting(), 1200);
-      userProgress.professorGreetingDate = today;
-      saveProgress();
-    }
-  },
-
-  getRandomIndex(arr, type) {
-    if (!this.lastIndexes[type]) this.lastIndexes[type] = -1;
-    if (arr.length === 1) return 0;
-    let idx = Math.floor(Math.random() * arr.length);
-    if (arr.length > 1 && idx === this.lastIndexes[type]) {
-      idx = (idx + 1) % arr.length;
-    }
-    this.lastIndexes[type] = idx;
-    return idx;
-  },
-
-  setEmotion(type) {
-    const btn = document.getElementById('prof-geo-btn');
-    if (!btn) return;
-    const img = PROF_IMAGES[type] || PROF_IMAGES.default;
-    btn.style.backgroundImage = `url('${img}')`;
-    this.currentEmotion = type;
-  },
-
-  resetEmotion() {
-    this.setEmotion('default');
-  },
-
-  triggerAnimation(type) {
-    const btn = document.getElementById('prof-geo-btn');
-    if (!btn) return;
-    const animClass = {
-      correct: 'correct-bounce',
-      wrong: 'wrong-tilt',
-      hint: 'hint-explain',
-      chest: 'chest-jump',
-      levelup: 'levelup-glow',
-      greeting: null
-    }[type] || null;
-
-    if (animClass) {
-      btn.classList.add(animClass);
-      const onEnd = () => {
-        btn.classList.remove(animClass);
-        btn.removeEventListener('animationend', onEnd);
-      };
-      btn.addEventListener('animationend', onEnd);
-      // fallback
-      setTimeout(() => {
-        if (btn.classList.contains(animClass)) {
-          btn.classList.remove(animClass);
-        }
-      }, 1000);
-    }
-  },
-
-  showGreeting() {
-    const arr = ProfessorMessages.greetingMessages;
-    const idx = this.getRandomIndex(arr, 'greeting');
-    this.showMessage(arr[idx], 5000, 'greeting');
-  },
-
-  showCorrectAnswer() {
-    const arr = ProfessorMessages.correctAnswerMessages;
-    const idx = this.getRandomIndex(arr, 'correct');
-    this.showMessage(arr[idx], 3500, 'correct');
-  },
-
-  showWrongAnswer() {
-    const arr = ProfessorMessages.wrongAnswerMessages;
-    const idx = this.getRandomIndex(arr, 'wrong');
-    this.showMessage(arr[idx], 4000, 'wrong');
-  },
-
-  showHint() {
-    const arr = ProfessorMessages.hintMessages;
-    const idx = this.getRandomIndex(arr, 'hint');
-    this.showMessage(arr[idx], 4000, 'hint');
-  },
-
-  showLevelUp(level) {
-    const arr = ProfessorMessages.levelUpMessages;
-    const idx = this.getRandomIndex(arr, 'levelup');
-    this.showMessage(arr[idx], 4000, 'levelup');
-  },
-
-  showStreak(streak) {
-    const arr = ProfessorMessages.streakMessages;
-    const idx = this.getRandomIndex(arr, 'streak');
-    let msg = arr[idx].replace('{n}', streak);
-    this.showMessage(msg, 4000, 'levelup'); // используем анимацию levelup
-  },
-
-  showChest() {
-    const arr = ProfessorMessages.chestMessages;
-    const idx = this.getRandomIndex(arr, 'chest');
-    this.showMessage(arr[idx], 4000, 'chest');
-  },
-
-  showFinishTopic() {
-    const arr = ProfessorMessages.finishTopicMessages;
-    const idx = this.getRandomIndex(arr, 'finish');
-    this.showMessage(arr[idx], 4000, 'levelup');
-  },
-
-  showDailyTask() {
-    const arr = ProfessorMessages.dailyTaskMessages;
-    const idx = this.getRandomIndex(arr, 'daily');
-    this.showMessage(arr[idx], 4000, 'levelup');
-  },
-
-  showMessage(text, duration = 4000, eventType = null) {
-    const speechEl = document.getElementById('prof-geo-speech');
-    const btn = document.getElementById('prof-geo-btn');
-    if (!speechEl || !btn) return;
-
-    // Скрыть текущее облако
-    this.hideSpeech();
-
-    setTimeout(() => {
-      // Эмоция и анимация
-      if (eventType) {
-        this.setEmotion(eventType);
-        this.triggerAnimation(eventType);
-      }
-      // Наклон при разговоре
-      btn.classList.add('talking');
-
-      speechEl.innerHTML = text;
-      speechEl.classList.add('visible');
-
-      if (this.timer) clearTimeout(this.timer);
-      this.timer = setTimeout(() => {
-        speechEl.classList.remove('visible');
-        btn.classList.remove('talking');
-        this.resetEmotion();
-      }, duration);
-    }, 60);
-  },
-
-  hideSpeech() {
-    const speechEl = document.getElementById('prof-geo-speech');
-    const btn = document.getElementById('prof-geo-btn');
-    if (speechEl) speechEl.classList.remove('visible');
-    if (btn) btn.classList.remove('talking');
-    if (this.timer) clearTimeout(this.timer);
-  }
-};
-
-// ========== ВСЯ ОСТАЛЬНАЯ ИГРОВАЯ ЛОГИКА БЕЗ ИЗМЕНЕНИЙ ==========
-// (вставьте сюда оригинальный код, начиная с "const PROXY = ...")
-// ... (весь код из предыдущего ответа, идентичный вашему, включая ProfessorModal с вызовом ProfessorGeoWidget.showHint())
-
-// Для краткости я не дублирую весь код здесь, но он полностью сохранён.
-// В ProfessorModal.openHint() нужно добавить вызов: ProfessorGeoWidget.showHint();
-// В QuestionSystem.selectAns() уже вызывает ProfessorGeoWidget.showCorrectAnswer() / showWrongAnswer()
-// В XPSystem.addXP() уже вызывает ProfessorGeoWidget.showLevelUp()
-// В ChestSystem.open() уже вызывает ProfessorGeoWidget.showChest()
-// В DailyQuestSystem.update() вызывает ProfessorGeoWidget.showDailyTask()
-// В checkStreak() уже вызывает ProfessorGeoWidget.showStreak()
-// В QuestionSystem.saveLesson() вызывает ProfessorGeoWidget.showFinishTopic()
-
-</script>
+  <!-- Подключение скриптов (порядок важен!) -->
+  <script src="js/config.js"></script>
+  <script src="data/professor-messages.js"></script>
+  <script src="data/questions.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/animations.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/ui/toast.js"></script>
+  <script src="js/ui/modal.js"></script>
+  <script src="js/systems/xp-system.js"></script>
+  <script src="js/systems/streak.js"></script>
+  <script src="js/systems/daily-quest.js"></script>
+  <script src="js/systems/achievements.js"></script>
+  <script src="js/systems/theory.js"></script>
+  <script src="js/systems/quiz-system.js"></script>
+  <script src="js/systems/chest-system.js"></script>
+  <script src="js/systems/professor.js"></script>
+  <script src="js/ui/components.js"></script>
+  <script src="js/ui/screens.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
