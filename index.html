@@ -23,111 +23,39 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
-
 body::before {
   content:''; position:fixed; inset:0;
   background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
               radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
   pointer-events:none; z-index:0;
 }
-
 .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
 .screen.active { display:flex; animation: fadeUp .3s ease; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-
-.topbar {
-  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
-  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
-}
+.topbar { padding:16px 18px; display:flex; align-items:center; justify-content:space-between; background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0; }
 .avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
 .username { font-family:var(--font-h); font-size:13px; font-weight:700; }
 .sublabel { font-size:10px; color:var(--muted); }
 .streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
-
 .scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
 .scroll::-webkit-scrollbar { width:3px; }
 .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
-
-/* ── Анимации появления карточек ── */
-.card-animate {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
-}
-@keyframes cardAppear {
-  to { opacity:1; transform:translateY(0); }
-}
-
-/* ── Кнопки ── */
-.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
-  transition: transform 0.12s ease, opacity 0.12s ease;
-}
-.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
-  transform: scale(0.97) !important;
-}
-
-/* ── Прогресс-бары ── */
-.path-progress-fill, .q-progress-fill {
-  transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
-}
-
-/* ── Ежедневные задания: анимация выполнения ── */
-.task-check {
-  display: inline-block;
-  transition: transform 0.25s ease, color 0.25s ease;
-}
-.task-check.done {
-  color: var(--primary2) !important;
-  animation: taskPop 0.35s ease;
-}
-@keyframes taskPop {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-/* ── Toast ── */
-.toast-container {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9999;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  background: rgba(28, 35, 51, 0.92);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: #fff;
-  padding: 12px 20px;
-  border-radius: 18px;
-  font-weight: 600;
-  font-size: 14px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
-  pointer-events: auto;
-  max-width: 90vw;
-  text-align: center;
-}
+.card-animate { opacity:0; transform: translateY(20px); animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
+@keyframes cardAppear { to { opacity:1; transform:translateY(0); } }
+.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button { transition: transform 0.12s ease, opacity 0.12s ease; }
+.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active { transform: scale(0.97) !important; }
+.path-progress-fill, .q-progress-fill { transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1); }
+.task-check { display: inline-block; transition: transform 0.25s ease, color 0.25s ease; }
+.task-check.done { color: var(--primary2) !important; animation: taskPop 0.35s ease; }
+@keyframes taskPop { 0% { transform: scale(0.8); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
+.toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
+.toast { background: rgba(28, 35, 51, 0.92); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 12px 20px; border-radius: 18px; font-weight: 600; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards; pointer-events: auto; max-width: 90vw; text-align: center; }
 .toast.xp { border-left: 3px solid var(--primary2); }
 .toast.chest { border-left: 3px solid var(--gold); }
 .toast.achievement { border-left: 3px solid #c084fc; }
 .toast.streak { border-left: 3px solid #f97316; }
-@keyframes toastIn {
-  from { opacity:0; transform:translateY(-16px); }
-  to { opacity:1; transform:translateY(0); }
-}
-@keyframes toastOut {
-  from { opacity:1; transform:translateY(0); }
-  to { opacity:0; transform:translateY(-12px); }
-}
-
-/* ── AI PANEL (Профессор Гео) ── */
+@keyframes toastIn { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+@keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-12px); } }
 .ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
 .ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
 .ai-header-left { display:flex; align-items:center; gap:10px; }
@@ -136,23 +64,18 @@ body::before {
 .ai-tagline { font-size:10px; color:var(--muted); }
 .ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
 .ai-toggle.open { transform:rotate(180deg); }
-
 .ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
 .ai-body.open { display:flex; animation: fadeUp .25s ease; }
-
 .ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
 .ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
 .ai-prompt-btn:active { background:#58a6ff30; }
-
 .ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
 .ai-messages::-webkit-scrollbar { width:2px; }
 .ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
-
 .msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
 .msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
 .msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
 .msg.loading { color:var(--muted); font-style:italic; }
-
 .ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 .ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
 .ai-input:focus { border-color:#58a6ff60; }
@@ -161,8 +84,6 @@ body::before {
 .ai-send:active { transform:scale(.93); }
 .ai-send:disabled { opacity:.5; cursor:default; }
 .ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
-
-/* ── QUIZ ── */
 .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
 .quiz-wrap::-webkit-scrollbar { width:3px; }
 .q-header { display:flex; justify-content:space-between; align-items:center; }
@@ -182,8 +103,6 @@ body::before {
 .btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
 .btn-next.show { display:block; animation: fadeUp .3s ease; }
 .btn-next:active { transform:scale(.97); }
-
-/* ── RESULT ── */
 .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
 .result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
 @keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
@@ -206,364 +125,102 @@ body::before {
 .btn-full:active { transform:scale(.97); }
 .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
 .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
-
-/* ── PATH (главный экран) ── */
-.path-progress-card {
-  background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
-  padding:16px; margin-bottom:6px;
-}
+.path-progress-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:6px; }
 .path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .path-progress-label { font-size:13px; font-weight:600; }
 .path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
 .path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
 .path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
-
-.continue-card {
-  background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
-  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
-}
+.continue-card { background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s; }
 .continue-card:active { transform:scale(.98); }
 .continue-icon { font-size:32px; flex-shrink:0; }
 .continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
 .continue-title { font-size:15px; font-weight:700; margin-top:2px; }
 .continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
-
 .path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
 .path-connector { width:3px; height:24px; margin:0 auto; }
-
-.node-circle {
-  width:56px; height:56px; border-radius:50%; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; font-size:22px;
-}
+.node-circle { width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
 .node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
 .node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
 .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
 .node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
 @keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-
-.boss-node {
-  width:72px; height:72px; border-radius:20px; flex-shrink:0;
-  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
-  display:flex; align-items:center; justify-content:center; font-size:30px;
-}
+.boss-node { width:72px; height:72px; border-radius:20px; flex-shrink:0; background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922; display:flex; align-items:center; justify-content:center; font-size:30px; }
 .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
-
-/* ── PROFILE ── */
 .profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
 .profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
 .profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
 .profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
-
 .profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
 .profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
 .profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
 .profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
-
 .badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
 .badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
 .badge-item-p.locked { opacity:.3; }
 .badge-icon-p { font-size:22px; margin-bottom:4px; }
 .badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
-
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
-
-/* ── СУНДУКИ (анимации) ── */
-@keyframes chestGlow {
-  0% { box-shadow: 0 0 5px #d29922; }
-  50% { box-shadow: 0 0 20px #d29922; }
-  100% { box-shadow: 0 0 5px #d29922; }
-}
-@keyframes chestPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
+@keyframes chestGlow { 0% { box-shadow: 0 0 5px #d29922; } 50% { box-shadow: 0 0 20px #d29922; } 100% { box-shadow: 0 0 5px #d29922; } }
+@keyframes chestPulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
 
 /* Модальное окно профессора (для подсказок) */
-.professor-modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.6);
-  z-index: 1000;
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  animation: fadeInOverlay 0.25s ease;
-}
-.professor-modal-card {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 24px 24px 0 0;
-  padding: 24px 20px 32px;
-  width: 100%;
-  max-width: 420px;
-  text-align: center;
-  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
-}
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.professor-avatar {
-  width: 64px; height: 64px; margin: 0 auto;
-  background: transparent;
-  border-radius: 24px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 34px;
-  overflow: hidden;
-}
-.professor-avatar img {
-  width: 100%; height: 100%; object-fit: cover; border-radius: 24px;
-}
-.professor-message {
-  font-size: 15px; line-height: 1.6; color: var(--text);
-  padding: 0 8px;
-}
-.professor-actions {
-  display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
-}
-.professor-btn {
-  width: 100%; padding: 14px; border-radius: var(--radius);
-  font-family: var(--font-h); font-size: 14px; font-weight: 700;
-  cursor: pointer; transition: transform 0.12s ease, background 0.2s ease;
-  border: none;
-}
+.professor-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; animation: fadeInOverlay 0.25s ease; }
+.professor-modal-card { background: var(--card2); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 24px 20px 32px; width: 100%; max-width: 420px; text-align: center; animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); display: flex; flex-direction: column; gap: 16px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.professor-avatar { width: 64px; height: 64px; margin: 0 auto; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 34px; overflow: hidden; }
+.professor-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
+.professor-message { font-size: 15px; line-height: 1.6; color: var(--text); padding: 0 8px; }
+.professor-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
+.professor-btn { width: 100%; padding: 14px; border-radius: var(--radius); font-family: var(--font-h); font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.12s ease, background 0.2s ease; border: none; }
 .professor-btn:active { transform: scale(0.97); }
-.professor-btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary2));
-  color: #fff;
-}
-.professor-btn-secondary {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-}
-.professor-btn:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
+.professor-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; }
+.professor-btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.professor-btn:disabled { opacity: 0.4; pointer-events: none; }
 
-/* ── МОДАЛЬНЫЕ ОКНА НАГРАД (сундуки) ── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.6);
-  z-index: 1100; display: flex; align-items: center; justify-content: center;
-  animation: fadeInOverlay 0.25s ease;
-}
-.modal-card {
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 24px;
-  width: 90%;
-  max-width: 320px;
-  text-align: center;
-  animation: slideUpModal 0.3s ease;
-}
-@keyframes slideUpModal {
-  from { transform: translateY(40px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-.modal-title {
-  font-family: var(--font-h);
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 8px;
-}
-.modal-sub {
-  font-size: 14px;
-  color: var(--muted);
-  margin-bottom: 12px;
-}
-.modal-reward {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--gold);
-  margin: 12px 0;
-}
-.modal-btn {
-  width: 100%;
-  padding: 14px;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 14px;
-  font-family: var(--font-b);
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: transform 0.12s ease;
-}
+/* Модальные окна наград (сундуки) */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1100; display: flex; align-items: center; justify-content: center; animation: fadeInOverlay 0.25s ease; }
+.modal-card { background: var(--card2); border: 1px solid var(--border); border-radius: 24px; padding: 24px; width: 90%; max-width: 320px; text-align: center; animation: slideUpModal 0.3s ease; }
+@keyframes slideUpModal { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+.modal-title { font-family: var(--font-h); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
+.modal-sub { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
+.modal-reward { font-size: 28px; font-weight: 700; color: var(--gold); margin: 12px 0; }
+.modal-btn { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 14px; font-family: var(--font-b); font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.12s ease; }
 .modal-btn:active { transform: scale(0.97); }
+.xp-pop { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); background: var(--primary2); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 18px; z-index: 9999; pointer-events: none; animation: xpPopAnim 0.6s ease-out forwards; }
+@keyframes xpPopAnim { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -70%) scale(1); } }
 
-/* ── ВСПЛЫВАЮЩАЯ ПОДСКАЗКА XP ── */
-.xp-pop {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(0.5);
-  background: var(--primary2);
-  color: #fff;
-  padding: 8px 16px;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 18px;
-  z-index: 9999;
-  pointer-events: none;
-  animation: xpPopAnim 0.6s ease-out forwards;
-}
-@keyframes xpPopAnim {
-  0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); }
-  50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); }
-  100% { opacity: 0; transform: translate(-50%, -70%) scale(1); }
-}
+/* Анимация открытия сундука */
+.chest-open-anim { position: relative; display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
+.chest-body { font-size: 64px; z-index: 2; }
+.chest-lid { position: absolute; top: -32px; left: 50%; transform: translateX(-50%) rotate(0deg); width: 60px; height: 30px; background: linear-gradient(145deg, #d29922, #b8860b); border-radius: 10px 10px 0 0; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transform-origin: bottom center; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 3; }
+.chest-lid.open { transform: translateX(-50%) rotate(-120deg); }
+.particle { position: absolute; top: 30px; left: 50%; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; opacity: 0; z-index: 1; animation: particleFly 0.8s ease-out forwards; }
+@keyframes particleFly { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0); } }
 
-/* ========== АНИМАЦИЯ ОТКРЫТИЯ СУНДУКА ========== */
-.chest-open-anim {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px 0;
-}
-.chest-body {
-  font-size: 64px;
-  z-index: 2;
-}
-.chest-lid {
-  position: absolute;
-  top: -32px;
-  left: 50%;
-  transform: translateX(-50%) rotate(0deg);
-  width: 60px;
-  height: 30px;
-  background: linear-gradient(145deg, #d29922, #b8860b);
-  border-radius: 10px 10px 0 0;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.4);
-  transform-origin: bottom center;
-  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-  z-index: 3;
-}
-.chest-lid.open {
-  transform: translateX(-50%) rotate(-120deg);
-}
-.particle {
-  position: absolute;
-  top: 30px;
-  left: 50%;
-  width: 8px;
-  height: 8px;
-  background: var(--gold);
-  border-radius: 50%;
-  opacity: 0;
-  z-index: 1;
-  animation: particleFly 0.8s ease-out forwards;
-}
-@keyframes particleFly {
-  0% { opacity: 1; transform: translate(0, 0) scale(1); }
-  100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0); }
-}
-
-/* ========== ВИДЖЕТ ПРОФЕССОРА С АНИМАЦИЯМИ ========== */
-.prof-geo-widget {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  z-index: 950;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
-}
-.prof-geo-btn {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background-color: #1e2a3a;
-  background-image: url('https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png');
-  background-size: cover;
-  background-position: center;
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3);
-  cursor: pointer;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, background-image 0.2s ease;
-  pointer-events: auto;
-  will-change: transform;
-  animation: subtlePulse 3s infinite ease-in-out, idleBreathing 4s infinite ease-in-out;
-}
+/* Виджет Профессора */
+.prof-geo-widget { position: fixed; bottom: 24px; right: 24px; z-index: 950; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.prof-geo-btn { width: 64px; height: 64px; border-radius: 50%; background-color: #1e2a3a; background-image: url('https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png'); background-size: cover; background-position: center; border: 2px solid var(--gold); box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, background-image 0.2s ease; pointer-events: auto; will-change: transform; animation: subtlePulse 3s infinite ease-in-out, idleBreathing 4s infinite ease-in-out; }
 .prof-geo-btn:active { transform: scale(0.95); box-shadow: 0 0 18px rgba(210, 153, 34, 0.7), 0 2px 8px rgba(0,0,0,0.3); }
-@keyframes subtlePulse {
-  0% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
-  50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); }
-  100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
-}
-@keyframes idleBreathing {
-  0%, 100% { transform: scale(1) translateY(0); }
-  50% { transform: scale(1.03) translateY(-1px); }
-}
+@keyframes subtlePulse { 0% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); } 50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); } 100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); } }
+@keyframes idleBreathing { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.03) translateY(-1px); } }
 .prof-geo-btn.talking { transform: translateY(-3px) rotate(-2deg); animation: none; }
 .prof-geo-btn.correct-bounce { animation: correctBounce 0.6s ease-out; }
 .prof-geo-btn.wrong-tilt { animation: wrongTilt 0.6s ease-out; }
 .prof-geo-btn.hint-explain { animation: hintExplain 0.8s ease-in-out; }
 .prof-geo-btn.chest-jump { animation: chestJump 0.7s ease-out; }
 .prof-geo-btn.levelup-glow { animation: levelUpGlow 0.8s ease-out; }
-@keyframes correctBounce {
-  0% { transform: scale(1); } 30% { transform: scale(1.1) translateY(-8px); }
-  60% { transform: scale(0.95) translateY(0); } 100% { transform: scale(1); }
-}
-@keyframes wrongTilt {
-  0% { transform: rotate(0deg); } 25% { transform: rotate(-6deg); }
-  75% { transform: rotate(2deg); } 100% { transform: rotate(0deg); }
-}
-@keyframes hintExplain {
-  0% { transform: rotate(0deg); } 25% { transform: rotate(-4deg); }
-  75% { transform: rotate(4deg); } 100% { transform: rotate(0deg); }
-}
-@keyframes chestJump {
-  0% { transform: scale(1); } 30% { transform: scale(1.15) translateY(-10px); }
-  60% { transform: scale(0.95) translateY(0); } 100% { transform: scale(1); }
-}
-@keyframes levelUpGlow {
-  0% { transform: scale(1); filter: brightness(1); }
-  50% { transform: scale(1.12); filter: brightness(1.3); }
-  100% { transform: scale(1); filter: brightness(1); }
-}
-
-.prof-geo-speech {
-  position: relative;
-  background: var(--card2);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  padding: 14px 16px;
-  max-width: 240px;
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--text);
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-  opacity: 0;
-  transform: translateY(10px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-  pointer-events: none;
-}
+@keyframes correctBounce { 0% { transform: scale(1); } 30% { transform: scale(1.1) translateY(-8px); } 60% { transform: scale(0.95) translateY(0); } 100% { transform: scale(1); } }
+@keyframes wrongTilt { 0% { transform: rotate(0deg); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(2deg); } 100% { transform: rotate(0deg); } }
+@keyframes hintExplain { 0% { transform: rotate(0deg); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } 100% { transform: rotate(0deg); } }
+@keyframes chestJump { 0% { transform: scale(1); } 30% { transform: scale(1.15) translateY(-10px); } 60% { transform: scale(0.95) translateY(0); } 100% { transform: scale(1); } }
+@keyframes levelUpGlow { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.12); filter: brightness(1.3); } 100% { transform: scale(1); filter: brightness(1); } }
+.prof-geo-speech { position: relative; background: var(--card2); border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; max-width: 240px; font-size: 13px; line-height: 1.5; color: var(--text); box-shadow: 0 10px 25px rgba(0,0,0,0.5); opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease, transform 0.35s ease; pointer-events: none; }
 .prof-geo-speech.visible { opacity: 1; transform: translateY(0); }
-.prof-geo-speech::after {
-  content: ''; position: absolute; bottom: -8px; right: 24px;
-  width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent;
-  border-top: 8px solid var(--card2);
-}
-.prof-geo-speech::before {
-  content: ''; position: absolute; bottom: -9px; right: 23px;
-  width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent;
-  border-top: 9px solid var(--border);
-}
+.prof-geo-speech::after { content: ''; position: absolute; bottom: -8px; right: 24px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid var(--card2); }
+.prof-geo-speech::before { content: ''; position: absolute; bottom: -9px; right: 23px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 9px solid var(--border); }
 </style>
 </head>
 <body>
@@ -571,7 +228,7 @@ body::before {
 <div id="toast-container" class="toast-container"></div>
 <div id="professor-modal-container"></div>
 
-<!-- Экраны приложения -->
+<!-- Экраны приложения (ВСЕ из исходного файла) -->
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -669,7 +326,7 @@ body::before {
 </div>
 
 <script>
-// ========== КОНСТАНТЫ ==========
+// ========== КОНСТАНТЫ И ВИДЖЕТ ==========
 const PROF_IMAGES = {
   default: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png',
   greeting: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
@@ -691,14 +348,11 @@ const ProfessorMessages = {
   finishTopicMessages: ["Тема пройдена! 💪","Отлично! Ещё один раздел позади."],
   dailyTaskMessages: ["Ежедневное задание выполнено! 🎯","Ты справился с задачей дня!"]
 };
-
-// ========== ВИДЖЕТ ПРОФЕССОРА ==========
 const ProfessorGeoWidget = {
-  greetShownToday: false, timer: null, lastIndexes: {},
+  timer: null, lastIndexes: {},
   init() {
     const today = new Date().toISOString().slice(0,10);
-    this.greetShownToday = (userProgress.professorGreetingDate === today);
-    if (!this.greetShownToday) {
+    if (userProgress.professorGreetingDate !== today) {
       setTimeout(() => this.showGreeting(), 1200);
       userProgress.professorGreetingDate = today; saveProgress();
     }
@@ -748,7 +402,7 @@ const ProfessorGeoWidget = {
   }
 };
 
-// ========== ДАННЫЕ И ЛОГИКА ==========
+// ========== ОСНОВНАЯ ЛОГИКА (как в исходном файле) ==========
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 const QUESTIONS_FILES = [
@@ -784,11 +438,7 @@ const HINTS_DB = {
 function getProfessorHint(topicKey, level) { const h = HINTS_DB[topicKey]||HINTS_DB.topo; return h[Math.min(level, h.length-1)]; }
 
 var lessonsLoaded = [];
-async function fetchJSON(filename) {
-  var r = await fetch(GITHUB_RAW+filename+'?nocache='+Date.now());
-  if (!r.ok) throw new Error('Ошибка загрузки: '+filename);
-  return r.json();
-}
+async function fetchJSON(filename) { var r = await fetch(GITHUB_RAW+filename+'?nocache='+Date.now()); if (!r.ok) throw new Error('Ошибка'); return r.json(); }
 async function loadAllLessons() {
   lessonsLoaded = [];
   for (var f of QUESTIONS_FILES) {
@@ -902,20 +552,12 @@ var ChestSystem = {
     { type:'boost_x2', duration:15, label:'Бустер x2 XP' },
     { type:'free_hint', value:1, label:'Бесплатная подсказка' }
   ],
-  give(type) {
-    if (!userProgress.chests) userProgress.chests=[];
-    userProgress.chests.push({type:type||'daily'});
-    saveProgress();
-  },
-  giveDaily() {
-    var today = new Date().toISOString().slice(0,10);
-    if (userProgress.lastDailyChestDate===today) return;
-    userProgress.lastDailyChestDate=today; this.give('daily');
-  },
+  give(type) { if(!userProgress.chests) userProgress.chests=[]; userProgress.chests.push({type:type||'daily'}); saveProgress(); },
+  giveDaily() { var t=new Date().toISOString().slice(0,10); if(userProgress.lastDailyChestDate===t) return; userProgress.lastDailyChestDate=t; this.give('daily'); },
   giveStreak() {
-    var s=userProgress.streak||0, given=userProgress.streakChestsGiven||{};
-    [3,7,14,30].forEach(t=>{ if(s>=t&&!given[t]){ this.give('streak'); given[t]=true; ProfessorGeoWidget.showStreak(s); } });
-    userProgress.streakChestsGiven=given; saveProgress();
+    var s=userProgress.streak||0, g=userProgress.streakChestsGiven||{};
+    [3,7,14,30].forEach(t=>{ if(s>=t&&!g[t]){ this.give('streak'); g[t]=true; ProfessorGeoWidget.showStreak(s); } });
+    userProgress.streakChestsGiven=g; saveProgress();
   },
   open() {
     if (this.isOpening || !userProgress.chests||!userProgress.chests.length) return;
@@ -941,30 +583,15 @@ var ChestSystem = {
   },
   showRewardModal(reward) {
     var c = document.getElementById('modal-container');
-    c.innerHTML = `<div class="modal-overlay" id="reward-modal">
-      <div class="modal-card">
-        <div class="modal-title">🎉 Поздравляем!</div>
-        <div class="modal-sub">Ты получил:</div>
-        <div class="modal-reward">${reward.label}</div>
-        <button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить</button>
-      </div>
-    </div>`;
+    c.innerHTML = `<div class="modal-overlay" id="reward-modal"><div class="modal-card"><div class="modal-title">🎉 Поздравляем!</div><div class="modal-sub">Ты получил:</div><div class="modal-reward">${reward.label}</div><button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить</button></div></div>`;
   },
-  closeRewardModal() {
-    document.getElementById('modal-container').innerHTML='';
-    renderProfile();
-  }
+  closeRewardModal() { document.getElementById('modal-container').innerHTML=''; renderProfile(); }
 };
 function showChestOpeningAnimation(cb) {
   var c = document.getElementById('modal-container');
   var p = '';
-  for (var i=0;i<12;i++) {
-    var a = (i/12)*Math.PI*2;
-    p += `<div class="particle" style="--x:${Math.cos(a)*40}px;--y:${Math.sin(a)*40}px;animation-delay:${i*0.03}s"></div>`;
-  }
-  c.innerHTML = `<div class="modal-overlay" id="chest-opening"><div class="modal-card" style="background:transparent;box-shadow:none;border:none;display:flex;align-items:center;justify-content:center;">
-    <div class="chest-open-anim"><div class="chest-body">🎁</div><div class="chest-lid" id="chestLid"></div>${p}</div>
-  </div></div>`;
+  for (var i=0;i<12;i++) { var a=(i/12)*Math.PI*2; p+=`<div class="particle" style="--x:${Math.cos(a)*40}px;--y:${Math.sin(a)*40}px;animation-delay:${i*0.03}s"></div>`; }
+  c.innerHTML = `<div class="modal-overlay" id="chest-opening"><div class="modal-card" style="background:transparent;box-shadow:none;border:none;display:flex;align-items:center;justify-content:center;"><div class="chest-open-anim"><div class="chest-body">🎁</div><div class="chest-lid" id="chestLid"></div>${p}</div></div></div>`;
   setTimeout(()=>{ var lid=document.getElementById('chestLid'); if(lid) lid.classList.add('open'); }, 300);
   setTimeout(()=>{ c.innerHTML=''; if(cb) cb(); }, 1300);
 }
@@ -972,10 +599,7 @@ function showChestOpeningAnimation(cb) {
 // ── ProfessorModal ──
 var ProfessorModal = {
   level:0, key:'',
-  openHint(key) { this.key=key; this.level=0; ProfessorGeoWidget.showHint(); this._show(getProfessorHint(key,0), [
-    { text:'Закрыть', cls:'professor-btn-secondary', onClick:()=>this.close() },
-    { text:'Ещё подсказка', cls:'professor-btn-primary', onClick:()=>this.nextHint() }
-  ]);},
+  openHint(key) { this.key=key; this.level=0; ProfessorGeoWidget.showHint(); this._show(getProfessorHint(key,0), [{ text:'Закрыть', cls:'professor-btn-secondary', onClick:()=>this.close() }, { text:'Ещё подсказка', cls:'professor-btn-primary', onClick:()=>this.nextHint() }]); },
   nextHint() { this.level++; if(this.level>2) this.level=2;
     var btns = [{ text:'Закрыть', cls:'professor-btn-secondary', onClick:()=>this.close() }];
     if (this.level<2) btns.push({ text:'Ещё подсказка', cls:'professor-btn-primary', onClick:()=>this.nextHint() });
@@ -984,11 +608,7 @@ var ProfessorModal = {
   },
   _show(msg, btns) {
     var c = document.getElementById('professor-modal-container');
-    c.innerHTML = `<div class="professor-modal-overlay" id="prof-overlay"><div class="professor-modal-card">
-      <div class="professor-avatar"><img src="${PROF_IMAGES.chat}" alt="Профессор"></div>
-      <div class="professor-message">${msg}</div>
-      <div class="professor-actions">${btns.map(b=>`<button class="professor-btn ${b.cls}" ${b.disabled?'disabled':''}>${b.text}</button>`).join('')}</div>
-    </div></div>`;
+    c.innerHTML = `<div class="professor-modal-overlay" id="prof-overlay"><div class="professor-modal-card"><div class="professor-avatar"><img src="${PROF_IMAGES.chat}" alt="Профессор"></div><div class="professor-message">${msg}</div><div class="professor-actions">${btns.map(b=>`<button class="professor-btn ${b.cls}" ${b.disabled?'disabled':''}>${b.text}</button>`).join('')}</div></div></div>`;
     var ov = document.getElementById('prof-overlay');
     [...ov.querySelectorAll('.professor-btn')].forEach((b,i)=>{ if(btns[i].onClick) b.addEventListener('click', btns[i].onClick); });
     ov.addEventListener('click', e=>{ if(e.target===ov) this.close(); });
@@ -999,18 +619,8 @@ var ProfessorModal = {
 // ── QuestionSystem ──
 var QuestionSystem = {
   curQ:0, score:0, answered:false, shuffled:[], curLesson:0, lives:3, hintUsed:false, isBossMode:false,
-  start(idx) {
-    var all = getAllLessons(); this.curLesson=idx; this.shuffled=all[idx].questions;
-    this.curQ=0; this.score=0; this.answered=false; this.lives=3; this.hintUsed=false; this.isBossMode=false;
-    goScreen('s-quiz'); this.renderQ();
-  },
-  startBoss() {
-    var allQs = []; getAllLessons().forEach(l=>{ if(l.questions) allQs=allQs.concat(l.questions); });
-    allQs = allQs.sort(()=>Math.random()-0.5).slice(0,30);
-    this.isBossMode=true; this.shuffled=allQs; this.curLesson=-1;
-    this.curQ=0; this.score=0; this.answered=false; this.lives=999; this.hintUsed=false;
-    goScreen('s-quiz'); this.renderQ();
-  },
+  start(idx) { var all = getAllLessons(); this.curLesson=idx; this.shuffled=all[idx].questions; this.curQ=0; this.score=0; this.answered=false; this.lives=3; this.hintUsed=false; this.isBossMode=false; goScreen('s-quiz'); this.renderQ(); },
+  startBoss() { var allQs = []; getAllLessons().forEach(l=>{ if(l.questions) allQs=allQs.concat(l.questions); }); allQs = allQs.sort(()=>Math.random()-0.5).slice(0,30); this.isBossMode=true; this.shuffled=allQs; this.curLesson=-1; this.curQ=0; this.score=0; this.answered=false; this.lives=999; this.hintUsed=false; goScreen('s-quiz'); this.renderQ(); },
   replay() { if(this.isBossMode||this.curLesson<0) this.startBoss(); else this.start(this.curLesson); },
   renderQ() {
     var q = this.shuffled[this.curQ], title = this.getTopicTitle();
@@ -1021,8 +631,7 @@ var QuestionSystem = {
     document.getElementById('qpf').style.width=`${(this.curQ/this.shuffled.length)*100}%`;
     document.getElementById('q-tag').textContent=q.tag;
     document.getElementById('q-text').textContent=q.text;
-    var btnHint = document.getElementById('btn-hint');
-    btnHint.style.display='flex'; btnHint.disabled=false;
+    document.getElementById('btn-hint').style.display='flex'; document.getElementById('btn-hint').disabled=false;
     document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
     var next = document.getElementById('btn-next'); next.classList.remove('show');
     next.textContent = this.curQ<this.shuffled.length-1?'Следующий вопрос →':'Посмотреть результат →';
@@ -1085,9 +694,7 @@ var QuestionSystem = {
     XPSystem.addXP(sc*20+(sc===total?50:0));
     checkStreak(); saveProgress();
     if (!userProgress.chests) userProgress.chests=[];
-    if (!userProgress.completedLessons[key].chestGiven) {
-      ChestSystem.give('achievement'); userProgress.completedLessons[key].chestGiven=true; saveProgress();
-    }
+    if (!userProgress.completedLessons[key].chestGiven) { ChestSystem.give('achievement'); userProgress.completedLessons[key].chestGiven=true; saveProgress(); }
     if (wasNew) ProfessorGeoWidget.showFinishTopic();
   },
   getHint() { if (this.hintUsed) return; this.hintUsed=true; ProfessorModal.openHint(this.getTopicKey()); }
