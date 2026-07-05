@@ -23,39 +23,111 @@
 }
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 body { font-family:var(--font-b); background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
 body::before {
   content:''; position:fixed; inset:0;
   background: radial-gradient(circle at 15% 15%, #58a6ff14 0%, transparent 50%),
               radial-gradient(circle at 85% 85%, #3fb95010 0%, transparent 50%);
   pointer-events:none; z-index:0;
 }
+
 .screen { display:none; flex-direction:column; min-height:100vh; position:relative; z-index:1; }
 .screen.active { display:flex; animation: fadeUp .3s ease; }
 @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
-.topbar { padding:16px 18px; display:flex; align-items:center; justify-content:space-between; background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0; }
+
+.topbar {
+  padding:16px 18px; display:flex; align-items:center; justify-content:space-between;
+  background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
+}
 .avatar { width:38px; height:38px; border-radius:50%; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:20px; }
 .username { font-family:var(--font-h); font-size:13px; font-weight:700; }
 .sublabel { font-size:10px; color:var(--muted); }
 .streak { background:#f8514915; color:#f85149; font-weight:700; font-size:12px; padding:6px 12px; border-radius:20px; }
+
 .scroll { flex:1; padding:16px; overflow-y:auto; display:flex; flex-direction:column; gap:14px; padding-bottom:88px; }
 .scroll::-webkit-scrollbar { width:3px; }
 .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
-.card-animate { opacity:0; transform: translateY(20px); animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards; }
-@keyframes cardAppear { to { opacity:1; transform:translateY(0); } }
-.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button { transition: transform 0.12s ease, opacity 0.12s ease; }
-.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active { transform: scale(0.97) !important; }
-.path-progress-fill, .q-progress-fill { transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1); }
-.task-check { display: inline-block; transition: transform 0.25s ease, color 0.25s ease; }
-.task-check.done { color: var(--primary2) !important; animation: taskPop 0.35s ease; }
-@keyframes taskPop { 0% { transform: scale(0.8); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-.toast-container { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; display: flex; flex-direction: column; align-items: center; gap: 8px; pointer-events: none; }
-.toast { background: rgba(28, 35, 51, 0.92); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); color: #fff; padding: 12px 20px; border-radius: 18px; font-weight: 600; font-size: 14px; box-shadow: 0 8px 20px rgba(0,0,0,0.3); animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards; pointer-events: auto; max-width: 90vw; text-align: center; }
+
+/* ── Анимации появления карточек ── */
+.card-animate {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardAppear 0.45s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+}
+@keyframes cardAppear {
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ── Кнопки ── */
+.btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
+  transition: transform 0.12s ease, opacity 0.12s ease;
+}
+.btn:active, .btn-full:active, .btn-next:active, .ans-btn:active, .continue-card:active, .modal-btn:active, button:active {
+  transform: scale(0.97) !important;
+}
+
+/* ── Прогресс-бары ── */
+.path-progress-fill, .q-progress-fill {
+  transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/* ── Ежедневные задания: анимация выполнения ── */
+.task-check {
+  display: inline-block;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+.task-check.done {
+  color: var(--primary2) !important;
+  animation: taskPop 0.35s ease;
+}
+@keyframes taskPop {
+  0% { transform: scale(0.8); }
+  50% { transform: scale(1.3); }
+  100% { transform: scale(1); }
+}
+
+/* ── Toast ── */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: rgba(28, 35, 51, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 18px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+  animation: toastIn 0.3s ease, toastOut 0.3s ease 2.3s forwards;
+  pointer-events: auto;
+  max-width: 90vw;
+  text-align: center;
+}
 .toast.xp { border-left: 3px solid var(--primary2); }
 .toast.chest { border-left: 3px solid var(--gold); }
 .toast.achievement { border-left: 3px solid #c084fc; }
 .toast.streak { border-left: 3px solid #f97316; }
-@keyframes toastIn { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
-@keyframes toastOut { from { opacity:1; transform:translateY(0); } to { opacity:0; transform:translateY(-12px); } }
+@keyframes toastIn {
+  from { opacity:0; transform:translateY(-16px); }
+  to { opacity:1; transform:translateY(0); }
+}
+@keyframes toastOut {
+  from { opacity:1; transform:translateY(0); }
+  to { opacity:0; transform:translateY(-12px); }
+}
+
+/* ── AI PANEL (Профессор Гео) ── */
 .ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
 .ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
 .ai-header-left { display:flex; align-items:center; gap:10px; }
@@ -64,18 +136,23 @@ body::before {
 .ai-tagline { font-size:10px; color:var(--muted); }
 .ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
 .ai-toggle.open { transform:rotate(180deg); }
+
 .ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
 .ai-body.open { display:flex; animation: fadeUp .25s ease; }
+
 .ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
 .ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
 .ai-prompt-btn:active { background:#58a6ff30; }
+
 .ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
 .ai-messages::-webkit-scrollbar { width:2px; }
 .ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
+
 .msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
 .msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
 .msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
 .msg.loading { color:var(--muted); font-style:italic; }
+
 .ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 .ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
 .ai-input:focus { border-color:#58a6ff60; }
@@ -84,6 +161,8 @@ body::before {
 .ai-send:active { transform:scale(.93); }
 .ai-send:disabled { opacity:.5; cursor:default; }
 .ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
+
+/* ── QUIZ ── */
 .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
 .quiz-wrap::-webkit-scrollbar { width:3px; }
 .q-header { display:flex; justify-content:space-between; align-items:center; }
@@ -103,6 +182,8 @@ body::before {
 .btn-next { width:100%; background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; border-radius:var(--radius); padding:16px; font-family:var(--font-h); font-size:13px; font-weight:700; cursor:pointer; display:none; transition:transform .15s; margin-top:4px; }
 .btn-next.show { display:block; animation: fadeUp .3s ease; }
 .btn-next:active { transform:scale(.97); }
+
+/* ── RESULT ── */
 .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
 .result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
 @keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
@@ -125,110 +206,244 @@ body::before {
 .btn-full:active { transform:scale(.97); }
 .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
 .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
-.path-progress-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:6px; }
+
+/* ── PATH (главный экран) ── */
+.path-progress-card {
+  background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px; margin-bottom:6px;
+}
 .path-progress-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
 .path-progress-label { font-size:13px; font-weight:600; }
 .path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
 .path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
 .path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
-.continue-card { background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s; }
+
+.continue-card {
+  background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
+  padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
+}
 .continue-card:active { transform:scale(.98); }
 .continue-icon { font-size:32px; flex-shrink:0; }
 .continue-label { font-size:10px; color:var(--primary); font-weight:700; text-transform:uppercase; letter-spacing:.05em; }
 .continue-title { font-size:15px; font-weight:700; margin-top:2px; }
 .continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
+
 .path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
 .path-connector { width:3px; height:24px; margin:0 auto; }
-.node-circle { width:56px; height:56px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:22px; }
+
+.node-circle {
+  width:56px; height:56px; border-radius:50%; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+}
 .node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
 .node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
 .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
 .node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
 @keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-.boss-node { width:72px; height:72px; border-radius:20px; flex-shrink:0; background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922; display:flex; align-items:center; justify-content:center; font-size:30px; }
+
+.boss-node {
+  width:72px; height:72px; border-radius:20px; flex-shrink:0;
+  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
+  display:flex; align-items:center; justify-content:center; font-size:30px;
+}
 .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
+
+/* ── PROFILE ── */
 .profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
 .profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
 .profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
 .profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
+
 .profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
 .profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
 .profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
 .profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
+
 .badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
 .badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
 .badge-item-p.locked { opacity:.3; }
 .badge-icon-p { font-size:22px; margin-bottom:4px; }
 .badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
+
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
-@keyframes chestGlow { 0% { box-shadow: 0 0 5px #d29922; } 50% { box-shadow: 0 0 20px #d29922; } 100% { box-shadow: 0 0 5px #d29922; } }
-@keyframes chestPulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+
+/* ── СУНДУКИ (анимации) ── */
+@keyframes chestGlow {
+  0% { box-shadow: 0 0 5px #d29922; }
+  50% { box-shadow: 0 0 20px #d29922; }
+  100% { box-shadow: 0 0 5px #d29922; }
+}
+@keyframes chestPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
 
 /* Модальное окно профессора (для подсказок) */
-.professor-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1000; display: flex; align-items: flex-end; justify-content: center; animation: fadeInOverlay 0.25s ease; }
-.professor-modal-card { background: var(--card2); border: 1px solid var(--border); border-radius: 24px 24px 0 0; padding: 24px 20px 32px; width: 100%; max-width: 420px; text-align: center; animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1); display: flex; flex-direction: column; gap: 16px; box-shadow: 0 -10px 30px rgba(0,0,0,0.5); }
-@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.professor-avatar { width: 64px; height: 64px; margin: 0 auto; background: transparent; border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 34px; overflow: hidden; }
-.professor-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; }
-.professor-message { font-size: 15px; line-height: 1.6; color: var(--text); padding: 0 8px; }
-.professor-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 8px; }
-.professor-btn { width: 100%; padding: 14px; border-radius: var(--radius); font-family: var(--font-h); font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.12s ease, background 0.2s ease; border: none; }
+.professor-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeInOverlay 0.25s ease;
+}
+.professor-modal-card {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 24px 24px 0 0;
+  padding: 24px 20px 32px;
+  width: 100%;
+  max-width: 420px;
+  text-align: center;
+  animation: slideUp 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
+}
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+.professor-avatar {
+  width: 64px; height: 64px; margin: 0 auto;
+  background: transparent;
+  border-radius: 24px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 34px;
+  overflow: hidden;
+}
+.professor-avatar img {
+  width: 100%; height: 100%; object-fit: cover; border-radius: 24px;
+}
+.professor-message {
+  font-size: 15px; line-height: 1.6; color: var(--text);
+  padding: 0 8px;
+}
+.professor-actions {
+  display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
+}
+.professor-btn {
+  width: 100%; padding: 14px; border-radius: var(--radius);
+  font-family: var(--font-h); font-size: 14px; font-weight: 700;
+  cursor: pointer; transition: transform 0.12s ease, background 0.2s ease;
+  border: none;
+}
 .professor-btn:active { transform: scale(0.97); }
-.professor-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; }
-.professor-btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); }
-.professor-btn:disabled { opacity: 0.4; pointer-events: none; }
+.professor-btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  color: #fff;
+}
+.professor-btn-secondary {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--border);
+}
+.professor-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
 
-/* Модальные окна наград (сундуки) */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 1100; display: flex; align-items: center; justify-content: center; animation: fadeInOverlay 0.25s ease; }
-.modal-card { background: var(--card2); border: 1px solid var(--border); border-radius: 24px; padding: 24px; width: 90%; max-width: 320px; text-align: center; animation: slideUpModal 0.3s ease; }
-@keyframes slideUpModal { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.modal-title { font-family: var(--font-h); font-size: 20px; font-weight: 800; margin-bottom: 8px; }
-.modal-sub { font-size: 14px; color: var(--muted); margin-bottom: 12px; }
-.modal-reward { font-size: 28px; font-weight: 700; color: var(--gold); margin: 12px 0; }
-.modal-btn { width: 100%; padding: 14px; background: var(--primary); color: #fff; border: none; border-radius: 14px; font-family: var(--font-b); font-size: 14px; font-weight: 700; cursor: pointer; transition: transform 0.12s ease; }
-.modal-btn:active { transform: scale(0.97); }
-.xp-pop { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.5); background: var(--primary2); color: #fff; padding: 8px 16px; border-radius: 20px; font-weight: 800; font-size: 18px; z-index: 9999; pointer-events: none; animation: xpPopAnim 0.6s ease-out forwards; }
-@keyframes xpPopAnim { 0% { opacity: 1; transform: translate(-50%, -50%) scale(0.5); } 50% { opacity: 1; transform: translate(-50%, -60%) scale(1.2); } 100% { opacity: 0; transform: translate(-50%, -70%) scale(1); } }
+/* ========== НОВЫЙ ВИДЖЕТ ПРОФЕССОРА GEO ========== */
+.prof-geo-widget {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 950; /* выше экранов, но ниже тостов и модалок */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
 
-/* Анимация открытия сундука */
-.chest-open-anim { position: relative; display: flex; flex-direction: column; align-items: center; margin: 20px 0; }
-.chest-body { font-size: 64px; z-index: 2; }
-.chest-lid { position: absolute; top: -32px; left: 50%; transform: translateX(-50%) rotate(0deg); width: 60px; height: 30px; background: linear-gradient(145deg, #d29922, #b8860b); border-radius: 10px 10px 0 0; box-shadow: 0 4px 8px rgba(0,0,0,0.4); transform-origin: bottom center; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); z-index: 3; }
-.chest-lid.open { transform: translateX(-50%) rotate(-120deg); }
-.particle { position: absolute; top: 30px; left: 50%; width: 8px; height: 8px; background: var(--gold); border-radius: 50%; opacity: 0; z-index: 1; animation: particleFly 0.8s ease-out forwards; }
-@keyframes particleFly { 0% { opacity: 1; transform: translate(0, 0) scale(1); } 100% { opacity: 0; transform: translate(var(--x), var(--y)) scale(0); } }
+/* Кнопка с портретом */
+.prof-geo-btn {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #1e2a3a;
+  background-image: url('https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png');
+  background-size: cover;
+  background-position: center;
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  pointer-events: auto;
+  animation: subtlePulse 3s infinite ease-in-out;
+}
+.prof-geo-btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 18px rgba(210, 153, 34, 0.7), 0 2px 8px rgba(0,0,0,0.3);
+}
+@keyframes subtlePulse {
+  0% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); }
+  100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
+}
 
-/* Виджет Профессора */
-.prof-geo-widget { position: fixed; bottom: 24px; right: 24px; z-index: 950; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-.prof-geo-btn { width: 64px; height: 64px; border-radius: 50%; background-color: #1e2a3a; background-image: url('https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png'); background-size: cover; background-position: center; border: 2px solid var(--gold); box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3); cursor: pointer; transition: transform 0.3s ease, box-shadow 0.3s ease, background-image 0.2s ease; pointer-events: auto; will-change: transform; animation: subtlePulse 3s infinite ease-in-out, idleBreathing 4s infinite ease-in-out; }
-.prof-geo-btn:active { transform: scale(0.95); box-shadow: 0 0 18px rgba(210, 153, 34, 0.7), 0 2px 8px rgba(0,0,0,0.3); }
-@keyframes subtlePulse { 0% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); } 50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); } 100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); } }
-@keyframes idleBreathing { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.03) translateY(-1px); } }
-.prof-geo-btn.talking { transform: translateY(-3px) rotate(-2deg); animation: none; }
-.prof-geo-btn.correct-bounce { animation: correctBounce 0.6s ease-out; }
-.prof-geo-btn.wrong-tilt { animation: wrongTilt 0.6s ease-out; }
-.prof-geo-btn.hint-explain { animation: hintExplain 0.8s ease-in-out; }
-.prof-geo-btn.chest-jump { animation: chestJump 0.7s ease-out; }
-.prof-geo-btn.levelup-glow { animation: levelUpGlow 0.8s ease-out; }
-@keyframes correctBounce { 0% { transform: scale(1); } 30% { transform: scale(1.1) translateY(-8px); } 60% { transform: scale(0.95) translateY(0); } 100% { transform: scale(1); } }
-@keyframes wrongTilt { 0% { transform: rotate(0deg); } 25% { transform: rotate(-6deg); } 75% { transform: rotate(2deg); } 100% { transform: rotate(0deg); } }
-@keyframes hintExplain { 0% { transform: rotate(0deg); } 25% { transform: rotate(-4deg); } 75% { transform: rotate(4deg); } 100% { transform: rotate(0deg); } }
-@keyframes chestJump { 0% { transform: scale(1); } 30% { transform: scale(1.15) translateY(-10px); } 60% { transform: scale(0.95) translateY(0); } 100% { transform: scale(1); } }
-@keyframes levelUpGlow { 0% { transform: scale(1); filter: brightness(1); } 50% { transform: scale(1.12); filter: brightness(1.3); } 100% { transform: scale(1); filter: brightness(1); } }
-.prof-geo-speech { position: relative; background: var(--card2); border: 1px solid var(--border); border-radius: 18px; padding: 14px 16px; max-width: 240px; font-size: 13px; line-height: 1.5; color: var(--text); box-shadow: 0 10px 25px rgba(0,0,0,0.5); opacity: 0; transform: translateY(10px); transition: opacity 0.35s ease, transform 0.35s ease; pointer-events: none; }
-.prof-geo-speech.visible { opacity: 1; transform: translateY(0); }
-.prof-geo-speech::after { content: ''; position: absolute; bottom: -8px; right: 24px; width: 0; height: 0; border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 8px solid var(--card2); }
-.prof-geo-speech::before { content: ''; position: absolute; bottom: -9px; right: 23px; width: 0; height: 0; border-left: 9px solid transparent; border-right: 9px solid transparent; border-top: 9px solid var(--border); }
+/* Облачко приветствия */
+.prof-geo-speech {
+  position: relative;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px 16px;
+  max-width: 240px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+  opacity: 0;
+  transform: translateY(10px);
+  transition: opacity 0.35s ease, transform 0.35s ease;
+  pointer-events: none;
+}
+.prof-geo-speech.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+/* Стрелка к кнопке */
+.prof-geo-speech::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 24px;
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid var(--card2);
+}
+/* Тонкая рамка стрелки */
+.prof-geo-speech::before {
+  content: '';
+  position: absolute;
+  bottom: -9px;
+  right: 23px;
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-top: 9px solid var(--border);
+}
 </style>
 </head>
 <body>
+
 <div id="modal-container"></div>
 <div id="toast-container" class="toast-container"></div>
 <div id="professor-modal-container"></div>
 
-<!-- Экраны приложения (ВСЕ из исходного файла) -->
+<!-- Экраны приложения -->
 <div class="screen active" id="s-home">
   <div class="topbar">
     <div style="display:flex;align-items:center;gap:10px">
@@ -262,7 +477,10 @@ body::before {
       <div id="lives-row" style="display:flex;gap:3px;font-size:16px;flex-shrink:0"></div>
     </div>
     <div id="lesson-badge" style="background:#58a6ff12;border:1px solid #58a6ff25;border-radius:12px;padding:8px 12px;font-size:12px;color:var(--primary);font-weight:600"></div>
-    <div class="q-card"><div class="q-tag" id="q-tag">Задание</div><div class="q-text" id="q-text">...</div></div>
+    <div class="q-card">
+      <div class="q-tag" id="q-tag">Задание</div>
+      <div class="q-text" id="q-text">...</div>
+    </div>
     <div class="answers" id="answers"></div>
     <button id="btn-hint" onclick="QuestionSystem.getHint()" style="width:100%;background:transparent;border:1.5px solid #f5a62330;border-radius:var(--radius);padding:13px;color:#f5a623;font-family:var(--font-b);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">🎓 Спросить профессора Гео</button>
     <div id="ai-quiz" class="ai-panel" style="display:none"></div>
@@ -319,92 +537,84 @@ body::before {
   <div class="scroll" id="profile-content"></div>
 </div>
 
-<!-- ========== ВИДЖЕТ ПРОФЕССОРА GEO ========== -->
+<!-- ========== НОВЫЙ ВИДЖЕТ ПРОФЕССОРА GEO ========== -->
 <div id="professor-geo-widget" class="prof-geo-widget">
   <div id="prof-geo-speech" class="prof-geo-speech"></div>
   <div id="prof-geo-btn" class="prof-geo-btn" title="Профессор Гео"></div>
 </div>
 
 <script>
-// ========== КОНСТАНТЫ И ВИДЖЕТ ==========
-const PROF_IMAGES = {
-  default: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png',
-  greeting: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  correct: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  wrong: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_sad.png',
-  hint: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hint.png',
-  chest: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  levelup: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
-  chat: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png'
-};
-const ProfessorMessages = {
-  greetingMessages: ["Здравствуйте!<br>Сегодня отличный день для новых открытий 🌍","Привет! Давай покорим ещё одну тему! 🚀","Добрый день! Готов к географии?"],
-  correctAnswerMessages: ["Верно! Так держать! 🎉","Отлично! Ты настоящий географ!","Молодец! Всё правильно."],
-  wrongAnswerMessages: ["Ничего, ошибка — это шаг к знанию 🤔","Подумай ещё, ты запомнишь!","Не страшно, в следующий раз получится."],
-  hintMessages: ["Давай подумаем вместе...","Обрати внимание на ключевые слова.","Попробуй исключить неверные варианты."],
-  levelUpMessages: ["Новый уровень! 🌟","Растёшь как настоящий исследователь!","Ещё одна ступенька к мастерству."],
-  streakMessages: ["Ого, {n} дней подряд! 🔥","Серия из {n} дней! Впечатляет!"],
-  chestMessages: ["Сундук открыт! Держи награду 🎁","Сокровища географа твои!"],
-  finishTopicMessages: ["Тема пройдена! 💪","Отлично! Ещё один раздел позади."],
-  dailyTaskMessages: ["Ежедневное задание выполнено! 🎯","Ты справился с задачей дня!"]
-};
+// ========== ProfessorGeoWidget (единый компонент) ==========
 const ProfessorGeoWidget = {
-  timer: null, lastIndexes: {},
+  greetShownToday: false,
+  timer: null,
+
   init() {
     const today = new Date().toISOString().slice(0,10);
-    if (userProgress.professorGreetingDate !== today) {
+    this.greetShownToday = (userProgress.professorGreetingDate === today);
+    if (!this.greetShownToday) {
       setTimeout(() => this.showGreeting(), 1200);
-      userProgress.professorGreetingDate = today; saveProgress();
+      userProgress.professorGreetingDate = today;
+      saveProgress();
     }
   },
-  getRandomIndex(arr, type) {
-    if (!this.lastIndexes[type]) this.lastIndexes[type] = -1;
-    if (arr.length === 1) return 0;
-    let idx = Math.floor(Math.random() * arr.length);
-    if (arr.length > 1 && idx === this.lastIndexes[type]) idx = (idx + 1) % arr.length;
-    this.lastIndexes[type] = idx; return idx;
+
+  showGreeting() {
+    const speechEl = document.getElementById('prof-geo-speech');
+    if (!speechEl) return;
+    const phrases = [
+      "Здравствуйте!<br><br>Сегодня отличный день, чтобы узнать что-то новое о нашей планете 🌍<br><br>У тебя всё получится!",
+      "Привет! Рад снова видеть тебя.<br>Давай сегодня покорим ещё одну тему по географии! 🚀",
+      "Добрый день! Помни: каждая решённая задача — это шаг к пятёрке на ОГЭ.",
+      "Приветствую, исследователь! 🌏<br>Готов продолжить путешествие по миру географии?"
+    ];
+    speechEl.innerHTML = phrases[Math.floor(Math.random() * phrases.length)];
+    speechEl.classList.add('visible');
+    if (this.timer) clearTimeout(this.timer);
+    this.timer = setTimeout(() => {
+      speechEl.classList.remove('visible');
+    }, 6000);
   },
-  setEmotion(type) {
-    const btn = document.getElementById('prof-geo-btn');
-    if (btn) btn.style.backgroundImage = `url('${PROF_IMAGES[type] || PROF_IMAGES.default}')`;
+
+  showMessage(text, duration = 4000) {
+    const speechEl = document.getElementById('prof-geo-speech');
+    if (!speechEl) return;
+    if (this.timer) clearTimeout(this.timer);
+    speechEl.innerHTML = text;
+    speechEl.classList.add('visible');
+    this.timer = setTimeout(() => {
+      speechEl.classList.remove('visible');
+    }, duration);
   },
-  triggerAnimation(type) {
-    const btn = document.getElementById('prof-geo-btn');
-    if (!btn) return;
-    const animClass = { correct:'correct-bounce', wrong:'wrong-tilt', hint:'hint-explain', chest:'chest-jump', levelup:'levelup-glow' }[type];
-    if (animClass) { btn.classList.add(animClass); setTimeout(() => btn.classList.remove(animClass), 1000); }
-  },
-  showGreeting() { this.showMessage(this.getRandomIndex(ProfessorMessages.greetingMessages,'greeting'), 5000, 'greeting'); },
-  showCorrectAnswer() { this.showMessage(this.getRandomIndex(ProfessorMessages.correctAnswerMessages,'correct'), 3500, 'correct'); },
-  showWrongAnswer() { this.showMessage(this.getRandomIndex(ProfessorMessages.wrongAnswerMessages,'wrong'), 4000, 'wrong'); },
-  showHint() { this.showMessage(this.getRandomIndex(ProfessorMessages.hintMessages,'hint'), 4000, 'hint'); },
-  showLevelUp() { this.showMessage(this.getRandomIndex(ProfessorMessages.levelUpMessages,'levelup'), 4000, 'levelup'); },
-  showStreak(streak) { this.showMessage(this.getRandomIndex(ProfessorMessages.streakMessages,'streak').replace('{n}',streak), 4000, 'levelup'); },
-  showChest() { this.showMessage(this.getRandomIndex(ProfessorMessages.chestMessages,'chest'), 4000, 'chest'); },
-  showFinishTopic() { this.showMessage(this.getRandomIndex(ProfessorMessages.finishTopicMessages,'finish'), 4000, 'levelup'); },
-  showDailyTask() { this.showMessage(this.getRandomIndex(ProfessorMessages.dailyTaskMessages,'daily'), 4000, 'levelup'); },
-  showMessage(text, duration=4000, eventType=null) {
-    const speech = document.getElementById('prof-geo-speech'), btn = document.getElementById('prof-geo-btn');
-    if (!speech || !btn) return;
-    this.hideSpeech();
-    setTimeout(() => {
-      if (eventType) { this.setEmotion(eventType); this.triggerAnimation(eventType); }
-      btn.classList.add('talking'); speech.innerHTML = text; speech.classList.add('visible');
-      if (this.timer) clearTimeout(this.timer);
-      this.timer = setTimeout(() => { speech.classList.remove('visible'); btn.classList.remove('talking'); this.setEmotion('default'); }, duration);
-    }, 60);
-  },
+
   hideSpeech() {
-    const speech = document.getElementById('prof-geo-speech'), btn = document.getElementById('prof-geo-btn');
-    if (speech) speech.classList.remove('visible');
-    if (btn) btn.classList.remove('talking');
+    const speechEl = document.getElementById('prof-geo-speech');
+    if (speechEl) speechEl.classList.remove('visible');
     if (this.timer) clearTimeout(this.timer);
   }
 };
 
-// ========== ОСНОВНАЯ ЛОГИКА (как в исходном файле) ==========
+// ========== ДАННЫЕ И ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ) ==========
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
+
+const THEORY_FILES = [
+  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo.json', tasks:'Задания 1-4' },
+  { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_student.json', tasks:'Задания 5-6' },
+  { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
+  { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
+  { key:'timezone', title:'🕐 Часовые пояса', file:'theory_timezone.json', tasks:'Задание 17' },
+  { key:'zones', title:'🌲 Природные зоны', file:'theory_zones.json', tasks:'Задание 28' },
+  { key:'population', title:'👥 Население России', file:'theory_population.json', tasks:'Задания 23-25'},
+  { key:'economy', title:'🏭 Хозяйство России', file:'theory_economy.json', tasks:'Задание 27' },
+  { key:'regions', title:'📍 Регионы России', file:'theory_regions.json', tasks:'Задания 20-21'},
+  { key:'world', title:'🌍 Страны и материки', file:'theory_world.json', tasks:'Задания 20-21'},
+  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
+  { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
+  { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
+  { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' },
+];
+
 const QUESTIONS_FILES = [
   { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
   { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
@@ -420,374 +630,1097 @@ const QUESTIONS_FILES = [
   { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json', tasks:'Задание 27' },
   { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
 ];
+
+// База подсказок профессора (три уровня для каждой темы)
 const HINTS_DB = {
-  topo: ["Давай подумаем...","Обрати внимание на масштаб...","Мысленно проложи маршрут."],
-  climat: ["Посмотри на график...","Определи самый тёплый месяц...","Сравни с известными типами."],
-  nature_russia: ["Вспомни природные зоны...","Какие факторы влияют...","Сопоставь описание."],
-  ecology: ["Как человек влияет на природу?","Меры по снижению воздействия.","Примеры рационального использования."],
-  timezone: ["Вспомни разницу во времени.","Карта часовых поясов.","Прибавь или вычти часы."],
-  world: ["Особенности положения стран.","Природные условия региона.","Сравни с соседями."],
-  regions: ["Экономическая специализация.","Природные ресурсы и климат.","Какие отрасли развиты?"],
-  litosphere: ["Какие формы рельефа бывают?","Внутренние и внешние силы.","Сопоставь с конкретной формой."],
-  hydro: ["Водные объекты гидросферы.","Режим питания рек.","Факторы полноводности."],
-  population: ["Показатели населения.","Плотность и естественный прирост.","Факторы размещения."],
-  geopos: ["С какими странами граничит?","Преимущества положения.","Моря России."],
-  economy: ["Отрасли хозяйства.","Факторы размещения.","Необходимые ресурсы."],
-  zones: ["Природные зоны России.","Изменение с севера на юг.","Почвы и растительность."]
+  topo: [
+    "Давай подумаем: что означают условные знаки на топографической карте?",
+    "Обрати внимание на направление и масштаб — это поможет определить расположение объектов.",
+    "Попробуй мысленно проложить маршрут от одного объекта к другому, учитывая рельеф."
+  ],
+  climat: [
+    "Посмотри на график температуры и осадков. Что можно сказать о климате?",
+    "Определи самый тёплый и самый холодный месяц — это ключ к типу климата.",
+    "Сравни полученные данные с характеристиками известных типов климата."
+  ],
+  nature_russia: [
+    "Вспомни основные природные зоны России и их особенности.",
+    "Подумай, какие факторы влияют на размещение природных зон.",
+    "Сопоставь описание с конкретной природной зоной."
+  ],
+  ecology: [
+    "Подумай, как деятельность человека влияет на окружающую среду.",
+    "Какие меры помогают снизить негативное воздействие?",
+    "Вспомни примеры рационального природопользования."
+  ],
+  timezone: [
+    "Вспомни, как определяется разница во времени между городами.",
+    "Используй карту часовых поясов России — это твой главный помощник.",
+    "Прибавь или вычти нужное количество часов в зависимости от направления."
+  ],
+  world: [
+    "Вспомни особенности географического положения стран и материков.",
+    "Подумай, какие природные условия характерны для указанного региона.",
+    "Сравни с соседними территориями — это может дать подсказку."
+  ],
+  regions: [
+    "Вспомни экономическую специализацию регионов России.",
+    "Обрати внимание на природные ресурсы и климатические условия региона.",
+    "Подумай, какие отрасли промышленности здесь наиболее развиты."
+  ],
+  litosphere: [
+    "Вспомни, какие формы рельефа бывают и как они образуются.",
+    "Подумай о внутренних и внешних силах, формирующих рельеф.",
+    "Сопоставь описание с конкретной формой рельефа."
+  ],
+  hydro: [
+    "Вспомни, какие водные объекты относятся к гидросфере.",
+    "Подумай о режиме питания рек и особенностях озёр.",
+    "Какие факторы влияют на полноводность реки?"
+  ],
+  population: [
+    "Вспомни, какие показатели характеризуют население.",
+    "Подумай, как рассчитывается плотность населения и естественный прирост.",
+    "Какие факторы влияют на размещение населения по территории?"
+  ],
+  geopos: [
+    "Вспомни, с какими странами граничит Россия.",
+    "Подумай о преимуществах и недостатках географического положения.",
+    "Какие моря омывают территорию России?"
+  ],
+  economy: [
+    "Вспомни основные отрасли хозяйства России.",
+    "Подумай, какие факторы влияют на размещение предприятий.",
+    "Какие ресурсы необходимы для развития данной отрасли?"
+  ],
+  zones: [
+    "Вспомни, какие природные зоны есть на территории России.",
+    "Подумай, как изменяются природные зоны с севера на юг.",
+    "Какие почвы и растительность характерны для каждой зоны?"
+  ]
 };
-function getProfessorHint(topicKey, level) { const h = HINTS_DB[topicKey]||HINTS_DB.topo; return h[Math.min(level, h.length-1)]; }
+
+function getProfessorHint(topicKey, level) {
+  const hints = HINTS_DB[topicKey] || HINTS_DB['topo'];
+  return hints[Math.min(level, hints.length - 1)];
+}
 
 var lessonsLoaded = [];
-async function fetchJSON(filename) { var r = await fetch(GITHUB_RAW+filename+'?nocache='+Date.now()); if (!r.ok) throw new Error('Ошибка'); return r.json(); }
+
+async function fetchJSON(filename) {
+  var url = GITHUB_RAW + filename + '?nocache=' + Date.now();
+  var r = await fetch(url);
+  if (!r.ok) throw new Error('Ошибка загрузки: ' + filename);
+  return await r.json();
+}
+
 async function loadAllLessons() {
   lessonsLoaded = [];
-  for (var f of QUESTIONS_FILES) {
+  for (var i = 0; i < QUESTIONS_FILES.length; i++) {
+    var f = QUESTIONS_FILES[i];
     try {
       var data = await fetchJSON(f.file);
-      var qs = (Array.isArray(data)?data:[]).filter(q=>q.tag&&q.text&&q.answers);
-      if (qs.length) lessonsLoaded.push({...f, questions:qs});
-    } catch(e) { console.warn(e); }
+      var questions = [];
+      if (Array.isArray(data)) {
+        data.forEach(function(item) {
+          if (item.tag && item.text && item.answers) {
+            questions.push(item);
+          }
+        });
+      }
+      if (questions.length > 0) {
+        lessonsLoaded.push({ title: f.title, tasks: f.tasks, questions: questions, key: f.key });
+      }
+    } catch(e) {
+      console.warn('Не удалось загрузить', f.file, e);
+    }
   }
   return lessonsLoaded;
 }
-function getAllLessons() { return lessonsLoaded.length?lessonsLoaded:[]; }
+
+function getAllLessons() {
+  return lessonsLoaded.length > 0 ? lessonsLoaded : [];
+}
 
 const tgApp = window.Telegram?.WebApp;
-const isTelegram = !!tgApp?.initData;
-if (isTelegram) { tgApp.ready(); tgApp.expand(); }
-
-function showToastMsg(text, type='info') {
-  if (window._suppressToast) return;
-  var c = document.getElementById('toast-container');
-  var t = document.createElement('div'); t.className='toast '+type; t.textContent=text;
-  c.appendChild(t); setTimeout(()=>{ if(t.parentNode) t.remove(); }, 2600);
+const isTelegram = !!tgApp && typeof tgApp.initData !== 'undefined';
+if (isTelegram) {
+  tgApp.ready();
+  tgApp.expand();
 }
+
+// ── Единый Toast ──
+function showToastMsg(text, type) {
+  type = type || 'info';
+  var container = document.getElementById('toast-container');
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(function() {
+    if (toast.parentNode) toast.remove();
+  }, 2600);
+}
+
+// ── Анимация появления карточек ──
 function animateCards(container) {
-  container.querySelectorAll('.path-progress-card,.continue-card,.profile-header-card,.profile-stats-grid>div,.badge-item-p,.sub-status-card,.profile-stat,.badges-grid-profile>div')
-  .forEach((el,i)=>{ el.classList.add('card-animate'); el.style.animationDelay=(i*0.05)+'s'; });
+  var cards = container.querySelectorAll('.path-progress-card, .continue-card, .profile-header-card, .profile-stats-grid > div, .badge-item-p, .sub-status-card, .profile-stat, .badges-grid-profile > div');
+  cards.forEach(function(card, index) {
+    card.classList.add('card-animate');
+    card.style.animationDelay = (index * 0.05) + 's';
+  });
 }
 
 // ── XPSystem ──
 var XPSystem = {
-  addXP(amount, silent) {
-    if (amount<=0) return;
-    if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil)>new Date()) amount*=2;
-    var oldLvl = userProgress.level;
-    userProgress.xp += amount;
-    userProgress.level = Math.floor(userProgress.xp/200)+1;
-    saveProgress();
-    if (!silent) showToastMsg('⚡ +'+amount+' XP','xp');
-    if (userProgress.level>oldLvl) ProfessorGeoWidget.showLevelUp();
-    AchievementSystem.check();
-    DailyQuestSystem.incrementCounters(0, amount);
+  addXP: function(amount) {
+    if (amount > 0) {
+      if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
+        amount *= 2;
+      }
+      userProgress.xp += amount;
+      userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+      saveProgress();
+      showToastMsg('⚡ +' + amount + ' XP', 'xp');
+      AchievementSystem.check();
+      DailyQuestSystem.incrementCounters(0, amount);
+    }
   }
 };
 
 // ── DailyQuestSystem ──
 var DailyQuestSystem = {
-  update() {
+  update: function() {
     var today = new Date().toISOString().slice(0,10);
-    if (userProgress.dailyTasksDate!==today) {
-      userProgress.dailyTasksDate=today;
-      userProgress.dailyTasks={solve10:false,earn50XP:false,loginToday:true};
-      userProgress.dailyTasksCollected={solve10:false,earn50XP:false,loginToday:false};
-      userProgress.allDailyTasksDone=false; saveProgress();
+    if (!userProgress.dailyTasksDate || userProgress.dailyTasksDate !== today) {
+      userProgress.dailyTasksDate = today;
+      userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
+      userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
+      userProgress.allDailyTasksDone = false;
+      saveProgress();
     }
-    var tasks=userProgress.dailyTasks, col=userProgress.dailyTasksCollected;
-    var dQ=userProgress.dailyQuestions||0, dXP=userProgress.dailyXP||0, done=false;
-    if (dQ>=10&&!tasks.solve10) { tasks.solve10=true; if(!col.solve10){col.solve10=true;XPSystem.addXP(20);done=true;} }
-    if (dXP>=50&&!tasks.earn50XP) { tasks.earn50XP=true; if(!col.earn50XP){col.earn50XP=true;XPSystem.addXP(20);done=true;} }
-    if (!tasks.loginToday) { tasks.loginToday=true; if(!col.loginToday){col.loginToday=true;XPSystem.addXP(20);done=true;} }
-    if (tasks.solve10&&tasks.earn50XP&&tasks.loginToday&&!userProgress.allDailyTasksDone) {
-      userProgress.allDailyTasksDone=true; XPSystem.addXP(100); ChestSystem.give('achievement');
+    var tasks = userProgress.dailyTasks || {};
+    var collected = userProgress.dailyTasksCollected || {};
+    var dailyXP = (userProgress.dailyXP || 0);
+    var dailyQuestions = (userProgress.dailyQuestions || 0);
+
+    if (dailyQuestions >= 10 && !tasks.solve10) {
+      tasks.solve10 = true;
+      if (!collected.solve10) {
+        collected.solve10 = true;
+        XPSystem.addXP(20);
+        showToastMsg('🎯 Задание дня: решено 10 вопросов', 'info');
+      }
     }
-    if (done) ProfessorGeoWidget.showDailyTask();
+    if (dailyXP >= 50 && !tasks.earn50XP) {
+      tasks.earn50XP = true;
+      if (!collected.earn50XP) {
+        collected.earn50XP = true;
+        XPSystem.addXP(20);
+        showToastMsg('🎯 Задание дня: получено 50 XP', 'info');
+      }
+    }
+    if (!tasks.loginToday) {
+      tasks.loginToday = true;
+      if (!collected.loginToday) {
+        collected.loginToday = true;
+        XPSystem.addXP(20);
+      }
+    }
+
+    if (tasks.solve10 && tasks.earn50XP && tasks.loginToday && !userProgress.allDailyTasksDone) {
+      userProgress.allDailyTasksDone = true;
+      XPSystem.addXP(100);
+      ChestSystem.give('achievement');
+      showToastMsg('🎁 Сундук за все задания дня!', 'chest');
+    }
     saveProgress();
   },
-  incrementCounters(q, xp) {
+  incrementCounters: function(questionsCount, xpAmount) {
     var today = new Date().toISOString().slice(0,10);
-    if (userProgress.dailyTasksDate!==today) { userProgress.dailyQuestions=0; userProgress.dailyXP=0; }
-    userProgress.dailyQuestions += q; userProgress.dailyXP += xp;
-    saveProgress(); this.update();
+    if (userProgress.dailyTasksDate !== today) {
+      userProgress.dailyTasksDate = today;
+      userProgress.dailyQuestions = 0;
+      userProgress.dailyXP = 0;
+    }
+    userProgress.dailyQuestions = (userProgress.dailyQuestions || 0) + questionsCount;
+    userProgress.dailyXP = (userProgress.dailyXP || 0) + xpAmount;
+    saveProgress();
+    this.update();
   }
 };
 
-// ── Achievements ──
+// ── AchievementSystem ──
 var ACHIEVEMENTS_LIST = [
-  { id:'first_login', icon:'🏆', title:'Первый вход', cond:()=>true },
-  { id:'first_lesson', icon:'🏆', title:'Первый урок', cond:()=>userProgress.totalAnswered>0 },
-  { id:'first_theme', icon:'🏆', title:'Первая завершённая тема', cond:()=>Object.keys(userProgress.completedLessons).length>0 },
-  { id:'streak3', icon:'🔥', title:'3 дня подряд', cond:()=>(userProgress.streak||0)>=3 },
-  { id:'streak7', icon:'🔥', title:'7 дней подряд', cond:()=>(userProgress.streak||0)>=7 },
-  { id:'solve50', icon:'📚', title:'50 вопросов', cond:()=>userProgress.totalAnswered>=50, max:50, progress:()=>Math.min(userProgress.totalAnswered,50) },
-  { id:'xp500', icon:'⭐', title:'500 XP', cond:()=>userProgress.xp>=500, max:500, progress:()=>Math.min(userProgress.xp,500) }
+  { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
+  { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
+  { id: 'first_theme', icon: '🏆', title: 'Первая завершённая тема', cond: function() { return Object.keys(userProgress.completedLessons).length > 0; } },
+  { id: 'streak3', icon: '🔥', title: '3 дня подряд', cond: function() { return (userProgress.streak||0) >= 3; } },
+  { id: 'streak7', icon: '🔥', title: '7 дней подряд', cond: function() { return (userProgress.streak||0) >= 7; } },
+  { id: 'streak14', icon: '🔥', title: '14 дней подряд', cond: function() { return (userProgress.streak||0) >= 14; } },
+  { id: 'streak30', icon: '🔥', title: '30 дней подряд', cond: function() { return (userProgress.streak||0) >= 30; } },
+  { id: 'solve50', icon: '📚', title: 'Решить 50 вопросов', cond: function() { return userProgress.totalAnswered >= 50; }, max: 50, progress: function() { return Math.min(userProgress.totalAnswered, 50); } },
+  { id: 'solve100', icon: '📚', title: 'Решить 100 вопросов', cond: function() { return userProgress.totalAnswered >= 100; }, max: 100, progress: function() { return Math.min(userProgress.totalAnswered, 100); } },
+  { id: 'solve500', icon: '📚', title: 'Решить 500 вопросов', cond: function() { return userProgress.totalAnswered >= 500; }, max: 500, progress: function() { return Math.min(userProgress.totalAnswered, 500); } },
+  { id: 'solve1000', icon: '📚', title: 'Решить 1000 вопросов', cond: function() { return userProgress.totalAnswered >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.totalAnswered, 1000); } },
+  { id: 'xp500', icon: '⭐', title: 'Получить 500 XP', cond: function() { return userProgress.xp >= 500; }, max: 500, progress: function() { return Math.min(userProgress.xp, 500); } },
+  { id: 'xp1000', icon: '⭐', title: 'Получить 1000 XP', cond: function() { return userProgress.xp >= 1000; }, max: 1000, progress: function() { return Math.min(userProgress.xp, 1000); } },
+  { id: 'xp3000', icon: '⭐', title: 'Получить 3000 XP', cond: function() { return userProgress.xp >= 3000; }, max: 3000, progress: function() { return Math.min(userProgress.xp, 3000); } },
+  { id: 'xp5000', icon: '⭐', title: 'Получить 5000 XP', cond: function() { return userProgress.xp >= 5000; }, max: 5000, progress: function() { return Math.min(userProgress.xp, 5000); } },
+  { id: 'all_themes', icon: '🌍', title: 'Завершить все темы', cond: function() { var all = getAllLessons(); return all.length > 0 && Object.keys(userProgress.completedLessons).length >= all.length; } },
+  { id: 'pred4', icon: '🎯', title: 'Получить прогноз 4', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 4; } },
+  { id: 'pred5', icon: '🎯', title: 'Получить прогноз 5', cond: function() { return getPredictedGrade() !== '—' && parseInt(getPredictedGrade()) >= 5; } }
 ];
+
 var AchievementSystem = {
-  check() {
-    if (!userProgress.achievements) userProgress.achievements={};
+  check: function() {
+    if (!userProgress.achievements) userProgress.achievements = {};
     var now = new Date().toISOString();
-    ACHIEVEMENTS_LIST.forEach(a=>{
-      var rec=userProgress.achievements[a.id]||{};
+    ACHIEVEMENTS_LIST.forEach(function(a) {
+      if (userProgress.achievements[a.id] && userProgress.achievements[a.id].unlocked) return;
       var unlocked = a.cond();
-      var prog = a.progress?a.progress():(unlocked?(a.max||1):0);
-      if (!rec.unlocked) rec={progress:prog, unlocked, date:unlocked?now:null, chestGiven:false};
-      else rec.progress=prog;
-      if (unlocked && !rec.unlocked) {
-        rec.unlocked=true; rec.date=now;
-        if (!rec.chestGiven) { ChestSystem.give('achievement'); rec.chestGiven=true; }
+      var progress = a.progress ? a.progress() : (unlocked ? (a.max || 1) : 0);
+      var wasUnlocked = userProgress.achievements[a.id]?.unlocked;
+      if (!userProgress.achievements[a.id]) {
+        userProgress.achievements[a.id] = { progress: progress, unlocked: unlocked, date: unlocked ? now : null, chestGiven: false };
+      } else {
+        userProgress.achievements[a.id].progress = progress;
+        if (unlocked && !wasUnlocked) {
+          userProgress.achievements[a.id].unlocked = true;
+          userProgress.achievements[a.id].date = now;
+          showToastMsg('🏆 ' + a.title, 'achievement');
+          if (!userProgress.achievements[a.id].chestGiven) {
+            ChestSystem.give('achievement');
+            userProgress.achievements[a.id].chestGiven = true;
+            showToastMsg('🎁 Сундук за достижение!', 'chest');
+          }
+        }
       }
-      userProgress.achievements[a.id]=rec;
     });
     saveProgress();
   }
 };
 
-// ── Сундуки ──
+// ── ChestSystem ──
 var ChestSystem = {
   isOpening: false,
   rewardPool: [
-    { type:'xp', value:20, label:'+20 XP' },
-    { type:'xp', value:50, label:'+50 XP' },
-    { type:'xp', value:100, label:'+100 XP' },
-    { type:'boost_x2', duration:15, label:'Бустер x2 XP' },
-    { type:'free_hint', value:1, label:'Бесплатная подсказка' }
+    { type: 'xp', value: 20, label: '+20 XP' },
+    { type: 'xp', value: 50, label: '+50 XP' },
+    { type: 'xp', value: 100, label: '+100 XP' },
+    { type: 'streak_day', value: 1, label: '+1 день серии' },
+    { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
+    { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
+    { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
   ],
-  give(type) { if(!userProgress.chests) userProgress.chests=[]; userProgress.chests.push({type:type||'daily'}); saveProgress(); },
-  giveDaily() { var t=new Date().toISOString().slice(0,10); if(userProgress.lastDailyChestDate===t) return; userProgress.lastDailyChestDate=t; this.give('daily'); },
-  giveStreak() {
-    var s=userProgress.streak||0, g=userProgress.streakChestsGiven||{};
-    [3,7,14,30].forEach(t=>{ if(s>=t&&!g[t]){ this.give('streak'); g[t]=true; ProfessorGeoWidget.showStreak(s); } });
-    userProgress.streakChestsGiven=g; saveProgress();
+  give: function(type) {
+    if (!userProgress.chests) userProgress.chests = [];
+    userProgress.chests.push({ type: type || 'daily', rewardType: 'xp' });
+    saveProgress();
+    showToastMsg('🎁 Получен сундук!', 'chest');
   },
-  open() {
-    if (this.isOpening || !userProgress.chests||!userProgress.chests.length) return;
+  giveDaily: function() {
+    var today = new Date().toISOString().slice(0,10);
+    if (userProgress.lastDailyChestDate === today) return;
+    userProgress.lastDailyChestDate = today;
+    this.give('daily');
+  },
+  giveStreak: function() {
+    var streak = userProgress.streak || 0;
+    var given = userProgress.streakChestsGiven || {};
+    var thresholds = [3, 7, 14, 30];
+    for (var i = 0; i < thresholds.length; i++) {
+      var t = thresholds[i];
+      if (streak >= t && !given[t]) {
+        this.give('streak');
+        given[t] = true;
+        showToastMsg('🔥 Серия ' + t + ' дней — сундук!', 'streak');
+      }
+    }
+    userProgress.streakChestsGiven = given;
+    saveProgress();
+  },
+  open: function() {
+    if (this.isOpening) return;
+    if (!userProgress.chests || userProgress.chests.length === 0) return;
     this.isOpening = true;
-    var chest = userProgress.chests.shift(); saveProgress();
+    var chest = userProgress.chests.shift();
+    saveProgress();
     var self = this;
-    window._suppressToast = true;
-    showChestOpeningAnimation(()=>{
+    showChestOpeningAnimation(function() {
       var reward = self.getRandomReward();
-      self.applyReward(reward, true);
+      self.applyReward(reward);
       self.showRewardModal(reward);
       self.isOpening = false;
-      window._suppressToast = false;
     });
   },
-  getRandomReward() { return this.rewardPool[Math.floor(Math.random()*this.rewardPool.length)]; },
-  applyReward(reward, silent) {
+  getRandomReward: function() {
+    var idx = Math.floor(Math.random() * this.rewardPool.length);
+    return this.rewardPool[idx];
+  },
+  applyReward: function(reward) {
     switch(reward.type) {
-      case 'xp': XPSystem.addXP(reward.value, silent); break;
-      case 'boost_x2': userProgress.doubleXPUntil = new Date(Date.now()+reward.duration*60000).toISOString(); saveProgress(); break;
-      case 'free_hint': userProgress.freeHints = (userProgress.freeHints||0)+1; saveProgress(); break;
+      case 'xp': XPSystem.addXP(reward.value); break;
+      case 'streak_day': showToastMsg('🎁 +1 день серии (скоро)', 'info'); break;
+      case 'boost_x2':
+        userProgress.doubleXPUntil = new Date(Date.now() + reward.duration * 60000).toISOString();
+        saveProgress();
+        showToastMsg('⚡ Бустер x2 XP на 15 минут!', 'xp');
+        break;
+      case 'free_hint':
+        userProgress.freeHints = (userProgress.freeHints || 0) + 1;
+        saveProgress();
+        showToastMsg('💡 Бесплатная подсказка доступна!', 'info');
+        break;
+      case 'badge':
+        if (!userProgress.rareBadges) userProgress.rareBadges = [];
+        userProgress.rareBadges.push(reward.id);
+        saveProgress();
+        showToastMsg('🏅 Редкий бейдж!', 'achievement');
+        break;
     }
   },
-  showRewardModal(reward) {
-    var c = document.getElementById('modal-container');
-    c.innerHTML = `<div class="modal-overlay" id="reward-modal"><div class="modal-card"><div class="modal-title">🎉 Поздравляем!</div><div class="modal-sub">Ты получил:</div><div class="modal-reward">${reward.label}</div><button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить</button></div></div>`;
+  showRewardModal: function(reward) {
+    var container = document.getElementById('modal-container');
+    container.innerHTML = `
+      <div class="modal-overlay" id="reward-modal">
+        <div class="modal-card">
+          <div class="modal-title">🎉 Поздравляем!</div>
+          <div class="modal-sub">Ты получил:</div>
+          <div class="modal-reward">${reward.label}</div>
+          <button class="modal-btn" onclick="ChestSystem.closeRewardModal()">Продолжить обучение</button>
+        </div>
+      </div>`;
   },
-  closeRewardModal() { document.getElementById('modal-container').innerHTML=''; renderProfile(); }
+  closeRewardModal: function() {
+    document.getElementById('modal-container').innerHTML = '';
+    renderProfile();
+  }
 };
-function showChestOpeningAnimation(cb) {
-  var c = document.getElementById('modal-container');
-  var p = '';
-  for (var i=0;i<12;i++) { var a=(i/12)*Math.PI*2; p+=`<div class="particle" style="--x:${Math.cos(a)*40}px;--y:${Math.sin(a)*40}px;animation-delay:${i*0.03}s"></div>`; }
-  c.innerHTML = `<div class="modal-overlay" id="chest-opening"><div class="modal-card" style="background:transparent;box-shadow:none;border:none;display:flex;align-items:center;justify-content:center;"><div class="chest-open-anim"><div class="chest-body">🎁</div><div class="chest-lid" id="chestLid"></div>${p}</div></div></div>`;
-  setTimeout(()=>{ var lid=document.getElementById('chestLid'); if(lid) lid.classList.add('open'); }, 300);
-  setTimeout(()=>{ c.innerHTML=''; if(cb) cb(); }, 1300);
+
+function showChestOpeningAnimation(callback) {
+  var container = document.getElementById('modal-container');
+  var particlesHtml = '';
+  for (var i=0; i<12; i++) {
+    var angle = (i/12)*Math.PI*2;
+    var x = Math.cos(angle) * 40 + 'px';
+    var y = Math.sin(angle) * 40 + 'px';
+    particlesHtml += '<div class="particle" style="--x:'+x+'; --y:'+y+'; animation-delay:'+(i*0.03)+'s"></div>';
+  }
+  container.innerHTML = `
+    <div class="modal-overlay" id="chest-opening">
+      <div class="modal-card" style="background:transparent; box-shadow:none; border:none;">
+        <div class="chest-open-anim">
+          <div class="chest-body">🎁</div>
+          <div class="chest-lid" id="chestLid"></div>
+          ${particlesHtml}
+        </div>
+        <div style="color:var(--text); margin-top:16px; font-weight:700;">Открываем сундук...</div>
+      </div>
+    </div>`;
+  setTimeout(function() {
+    var lid = document.getElementById('chestLid');
+    if (lid) lid.classList.add('open');
+  }, 400);
+  setTimeout(function() {
+    container.innerHTML = '';
+    if (callback) callback();
+  }, 1200);
 }
 
-// ── ProfessorModal ──
+// ── Professor Modal ──
 var ProfessorModal = {
-  level:0, key:'',
-  openHint(key) { this.key=key; this.level=0; ProfessorGeoWidget.showHint(); this._show(getProfessorHint(key,0), [{ text:'Закрыть', cls:'professor-btn-secondary', onClick:()=>this.close() }, { text:'Ещё подсказка', cls:'professor-btn-primary', onClick:()=>this.nextHint() }]); },
-  nextHint() { this.level++; if(this.level>2) this.level=2;
-    var btns = [{ text:'Закрыть', cls:'professor-btn-secondary', onClick:()=>this.close() }];
-    if (this.level<2) btns.push({ text:'Ещё подсказка', cls:'professor-btn-primary', onClick:()=>this.nextHint() });
-    else btns.push({ text:'Подсказок больше нет', cls:'professor-btn-primary', disabled:true });
-    this._show(getProfessorHint(this.key, this.level), btns);
+  currentHintLevel: 0,
+  topicKey: '',
+  openHint: function(topicKey) {
+    this.topicKey = topicKey;
+    this.currentHintLevel = 0;
+    var hint = getProfessorHint(topicKey, 0);
+    this._show(hint, [
+      { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } },
+      { text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } }
+    ]);
   },
-  _show(msg, btns) {
-    var c = document.getElementById('professor-modal-container');
-    c.innerHTML = `<div class="professor-modal-overlay" id="prof-overlay"><div class="professor-modal-card"><div class="professor-avatar"><img src="${PROF_IMAGES.chat}" alt="Профессор"></div><div class="professor-message">${msg}</div><div class="professor-actions">${btns.map(b=>`<button class="professor-btn ${b.cls}" ${b.disabled?'disabled':''}>${b.text}</button>`).join('')}</div></div></div>`;
-    var ov = document.getElementById('prof-overlay');
-    [...ov.querySelectorAll('.professor-btn')].forEach((b,i)=>{ if(btns[i].onClick) b.addEventListener('click', btns[i].onClick); });
-    ov.addEventListener('click', e=>{ if(e.target===ov) this.close(); });
+  nextHint: function() {
+    this.currentHintLevel++;
+    if (this.currentHintLevel >= 3) {
+      this.currentHintLevel = 2;
+    }
+    var hint = getProfessorHint(this.topicKey, this.currentHintLevel);
+    var buttons = [
+      { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } }
+    ];
+    if (this.currentHintLevel < 2) {
+      buttons.push({ text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } });
+    } else {
+      buttons.push({ text: 'Подсказок больше нет', cls: 'professor-btn-primary', disabled: true });
+    }
+    this._show(hint, buttons);
   },
-  close() { document.getElementById('professor-modal-container').innerHTML=''; }
+  showExplanation: function(message, isCorrect, usedHint) {
+    var fullMessage = message;
+    if (isCorrect && usedHint && Math.random() < 0.5) {
+      fullMessage = "Отлично! Ты справился сам — именно так знания запоминаются лучше. " + message;
+    } else if (!isCorrect) {
+      fullMessage = "Ничего страшного. Ошибки помогают понять тему лучше. " + message;
+    }
+    this._show(fullMessage, [
+      { text: 'Понятно', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.close(); } }
+    ]);
+  },
+  _show: function(message, buttons) {
+    var container = document.getElementById('professor-modal-container');
+    var btnsHtml = buttons.map(function(b) {
+      return '<button class="professor-btn ' + b.cls + '"' + (b.disabled ? ' disabled' : '') + '>' + b.text + '</button>';
+    }).join('');
+    container.innerHTML = `
+      <div class="professor-modal-overlay" id="professor-overlay">
+        <div class="professor-modal-card">
+          <div class="professor-avatar">
+            <img src="https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_chat_avatar.png" alt="Профессор Гео">
+          </div>
+          <div class="professor-message">${message}</div>
+          <div class="professor-actions">${btnsHtml}</div>
+        </div>
+      </div>`;
+    var overlay = document.getElementById('professor-overlay');
+    var btns = overlay.querySelectorAll('.professor-btn');
+    buttons.forEach(function(b, idx) {
+      if (b.onClick) {
+        btns[idx].addEventListener('click', b.onClick);
+      }
+    });
+    overlay.addEventListener('click', function(e) {
+      if (e.target === overlay) ProfessorModal.close();
+    });
+  },
+  close: function() {
+    document.getElementById('professor-modal-container').innerHTML = '';
+  }
 };
 
 // ── QuestionSystem ──
 var QuestionSystem = {
-  curQ:0, score:0, answered:false, shuffled:[], curLesson:0, lives:3, hintUsed:false, isBossMode:false,
-  start(idx) { var all = getAllLessons(); this.curLesson=idx; this.shuffled=all[idx].questions; this.curQ=0; this.score=0; this.answered=false; this.lives=3; this.hintUsed=false; this.isBossMode=false; goScreen('s-quiz'); this.renderQ(); },
-  startBoss() { var allQs = []; getAllLessons().forEach(l=>{ if(l.questions) allQs=allQs.concat(l.questions); }); allQs = allQs.sort(()=>Math.random()-0.5).slice(0,30); this.isBossMode=true; this.shuffled=allQs; this.curLesson=-1; this.curQ=0; this.score=0; this.answered=false; this.lives=999; this.hintUsed=false; goScreen('s-quiz'); this.renderQ(); },
-  replay() { if(this.isBossMode||this.curLesson<0) this.startBoss(); else this.start(this.curLesson); },
-  renderQ() {
-    var q = this.shuffled[this.curQ], title = this.getTopicTitle();
-    this.answered=false; this.hintUsed=false;
-    document.getElementById('quiz-topic-lbl').textContent=title;
-    document.getElementById('lesson-badge').textContent=`${title} · Вопрос ${this.curQ+1}/${this.shuffled.length}`;
-    document.getElementById('quiz-counter').textContent=`${this.curQ+1}/${this.shuffled.length}`;
-    document.getElementById('qpf').style.width=`${(this.curQ/this.shuffled.length)*100}%`;
-    document.getElementById('q-tag').textContent=q.tag;
-    document.getElementById('q-text').textContent=q.text;
-    document.getElementById('btn-hint').style.display='flex'; document.getElementById('btn-hint').disabled=false;
-    document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
-    var next = document.getElementById('btn-next'); next.classList.remove('show');
-    next.textContent = this.curQ<this.shuffled.length-1?'Следующий вопрос →':'Посмотреть результат →';
-    var ans = document.getElementById('answers'); ans.innerHTML='';
-    ['А','Б','В','Г'].forEach((l,i)=>{
-      var b = document.createElement('button'); b.className='ans-btn';
-      b.innerHTML=`<div class="ans-letter">${l}</div><span>${q.answers[i]}</span>`;
-      b.onclick=()=>this.selectAns(i, q.correct);
+  curQ: 0, score: 0, answered: false, shuffled: [],
+  curLesson: 0, lives: 3, hintUsed: false,
+  lastExplainText: '', isBossMode: false,
+
+  start: function(idx) {
+    var allLessons = getAllLessons();
+    this.curLesson = idx;
+    this.shuffled = allLessons[idx].questions;
+    this.curQ = 0; this.score = 0; this.answered = false;
+    this.lives = 3; this.hintUsed = false; this.isBossMode = false;
+    goScreen('s-quiz'); this.renderQ();
+  },
+  startBoss: function() {
+    var allLessons = getAllLessons();
+    var allQuestions = [];
+    allLessons.forEach(function(l) { if (l.questions) allQuestions = allQuestions.concat(l.questions); });
+    allQuestions = allQuestions.sort(function(){ return Math.random()-0.5; }).slice(0, 30);
+    this.isBossMode = true; this.shuffled = allQuestions; this.curLesson = -1;
+    this.curQ = 0; this.score = 0; this.answered = false; this.lives = 999; this.hintUsed = false;
+    goScreen('s-quiz'); this.renderQ();
+  },
+  replay: function() {
+    if (this.isBossMode || this.curLesson < 0) { this.startBoss(); return; }
+    var allLessons = getAllLessons();
+    this.shuffled = allLessons[this.curLesson].questions;
+    this.curQ = 0; this.score = 0; this.answered = false; this.lives = 3; this.hintUsed = false;
+    goScreen('s-quiz'); this.renderQ();
+  },
+  renderQ: function() {
+    const q = this.shuffled[this.curQ];
+    const topicTitle = this.getTopicTitle();
+    this.answered = false; this.hintUsed = false; this.lastExplainText = '';
+
+    document.getElementById('quiz-topic-lbl').textContent = topicTitle;
+    document.getElementById('lesson-badge').textContent = topicTitle + ' · Вопрос '+(this.curQ+1)+' из '+this.shuffled.length;
+    document.getElementById('quiz-counter').textContent = (this.curQ+1)+'/'+this.shuffled.length;
+    document.getElementById('qpf').style.width = ((this.curQ/this.shuffled.length)*100)+'%';
+    document.getElementById('q-tag').textContent = q.tag;
+    document.getElementById('q-text').textContent = q.text;
+    var btnHint = document.getElementById('btn-hint');
+    btnHint.style.display = 'flex'; btnHint.disabled = false;
+    btnHint.textContent = '🎓 Спросить профессора Гео';
+
+    var livesEl = document.getElementById('lives-row');
+    livesEl.innerHTML = '';
+    for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
+
+    const btn = document.getElementById('btn-next');
+    btn.classList.remove('show');
+    btn.textContent = this.curQ < this.shuffled.length-1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
+
+    const ans = document.getElementById('answers');
+    ans.innerHTML = '';
+    ['А','Б','В','Г'].forEach(function(l, i){
+      const b = document.createElement('button');
+      b.className = 'ans-btn';
+      b.innerHTML = '<div class="ans-letter">'+l+'</div><span>'+q.answers[i]+'</span>';
+      b.onclick = function(){ QuestionSystem.selectAns(i, q.correct, q.text, topicTitle, q); };
       ans.appendChild(b);
     });
   },
-  getTopicTitle() { return this.isBossMode?'Финальный босс':(getAllLessons()[this.curLesson]?.title||'Тренировка'); },
-  getTopicKey() { return this.isBossMode?'topo':(getAllLessons()[this.curLesson]?.key||'topo'); },
-  selectAns(idx, correct) {
-    if (this.answered) return; this.answered=true;
-    if (idx===correct && isTelegram && tgApp.HapticFeedback) tgApp.HapticFeedback.notificationOccurred('success');
-    var btns = document.querySelectorAll('.ans-btn');
-    btns[idx].classList.add(idx===correct?'correct':'wrong');
-    if (idx!==correct) { btns[correct].classList.add('correct'); this.lives--; }
-    if (idx===correct) { this.score++; XPSystem.addXP(10); }
-    document.getElementById('btn-hint').style.display='none';
-    document.getElementById('lives-row').innerHTML = Array.from({length:3},(_,i)=>`<span>${i<this.lives?'❤️':'🖤'}</span>`).join('');
-    if (idx===correct) ProfessorGeoWidget.showCorrectAnswer(); else ProfessorGeoWidget.showWrongAnswer();
-    var next = document.getElementById('btn-next'); next.classList.add('show');
-    if (this.lives<=0) next.textContent='😔 Жизни кончились — попробуй ещё раз';
-    DailyQuestSystem.incrementCounters(1,0);
+  getTopicTitle: function() {
+    if (this.isBossMode) return 'Финальный босс';
+    var all = getAllLessons();
+    return (all[this.curLesson] && all[this.curLesson].title) || 'Тренировка';
   },
-  next() { this.curQ++; if(this.curQ>=this.shuffled.length) this.showResult(); else this.renderQ(); },
-  showResult() {
-    var total=this.shuffled.length, pct=Math.round(this.score/total*100);
-    if (this.isBossMode) {
-      userProgress.bossCompleted=true; saveProgress();
-      document.getElementById('boss-sub').textContent=`${this.score}/${total} (${pct}%)`;
-      document.getElementById('boss-num').textContent=this.score;
-      goScreen('s-boss-result');
-      setTimeout(()=>document.getElementById('boss-ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
-      this.isBossMode=false; DailyQuestSystem.update(); return;
+  getTopicKey: function() {
+    if (this.isBossMode) return 'topo';
+    var all = getAllLessons();
+    return (all[this.curLesson] && all[this.curLesson].key) || 'topo';
+  },
+  selectAns: function(idx, correct, qText, topic, question) {
+    if (this.answered) return;
+    this.answered = true;
+
+    if (idx === correct && isTelegram && tgApp.HapticFeedback) {
+      try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e){}
     }
-    var e='😔', t='Нужно повторить';
-    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хорошо!'; }
-    document.getElementById('res-emoji').textContent=e;
-    document.getElementById('res-title').textContent=t;
-    document.getElementById('res-sub').textContent=`${pct}% правильных`;
-    document.getElementById('ring-num').textContent=this.score;
-    document.getElementById('res-c').textContent=this.score;
-    document.getElementById('res-w').textContent=total-this.score;
-    var xp=this.score*20+(this.score===total?50:0);
-    document.getElementById('res-xp').textContent='+'+xp;
-    this.saveLesson(this.curLesson, this.score, total);
-    goScreen('s-result');
-    setTimeout(()=>document.getElementById('ring-fill').style.strokeDashoffset=339*(1-this.score/total),100);
+
+    const btns = document.querySelectorAll('.ans-btn');
+    btns[idx].classList.add(idx===correct?'correct':'wrong');
+    if (idx !== correct) {
+      btns[correct].classList.add('correct');
+      this.lives--;
+    }
+    if (idx === correct) {
+      this.score++;
+      this.showXPPopup(10);
+      XPSystem.addXP(10);
+    }
+
+    document.getElementById('btn-hint').style.display = 'none';
+    var livesEl = document.getElementById('lives-row');
+    livesEl.innerHTML = '';
+    for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
+
+    this.showProfessorExplanation(idx===correct, question);
+    document.getElementById('btn-next').classList.add('show');
+    if (this.lives <= 0) {
+      document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
+    }
+    DailyQuestSystem.incrementCounters(1, 0);
     DailyQuestSystem.update();
   },
-  saveLesson(idx, sc, total) {
-    var today = new Date().toISOString().slice(0,10);
-    var all = getAllLessons(), key = all[idx]?.title||String(idx);
-    var wasNew = !userProgress.completedLessons[key];
-    userProgress.completedLessons[key] = { score:sc, total, date:today };
-    userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
-    XPSystem.addXP(sc*20+(sc===total?50:0));
-    checkStreak(); saveProgress();
-    if (!userProgress.chests) userProgress.chests=[];
-    if (!userProgress.completedLessons[key].chestGiven) { ChestSystem.give('achievement'); userProgress.completedLessons[key].chestGiven=true; saveProgress(); }
-    if (wasNew) ProfessorGeoWidget.showFinishTopic();
+  showXPPopup: function(amount) {
+    var popup = document.createElement('div');
+    popup.className = 'xp-pop';
+    popup.textContent = '+' + amount + ' XP';
+    document.body.appendChild(popup);
+    setTimeout(function(){ popup.remove(); }, 1000);
   },
-  getHint() { if (this.hintUsed) return; this.hintUsed=true; ProfessorModal.openHint(this.getTopicKey()); }
+  showProfessorExplanation: function(isCorrect, question) {
+    var correctAnswerText = question.answers[question.correct];
+    var message = isCorrect
+      ? 'Правильно! ' + correctAnswerText + ' — верный ответ.'
+      : 'Правильный ответ — ' + correctAnswerText + '.';
+    ProfessorModal.showExplanation(message, isCorrect, this.hintUsed);
+  },
+  next: function() {
+    this.curQ++;
+    if (this.curQ >= this.shuffled.length) this.showResult();
+    else this.renderQ();
+  },
+  showResult: function() {
+    const total = this.shuffled.length;
+    const pct = Math.round(this.score/total*100);
+
+    if (this.isBossMode) {
+      userProgress.bossCompleted = true; saveProgress();
+      document.getElementById('boss-sub').textContent = this.score+'/'+total+' правильных ответов ('+pct+'%)';
+      document.getElementById('boss-num').textContent = this.score;
+      document.getElementById('boss-denom').textContent = 'из ' + total;
+      goScreen('s-boss-result');
+      setTimeout(()=>{ document.getElementById('boss-ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
+      this.isBossMode = false; DailyQuestSystem.update(); return;
+    }
+
+    let e='😔', t='Нужно повторить';
+    if (pct>=80) { e='🏆'; t='Отлично!'; } else if (pct>=60) { e='👍'; t='Хороший результат!'; } else if (pct>=40) { e='📖'; t='Продолжай учиться'; }
+    document.getElementById('res-emoji').textContent = e;
+    document.getElementById('res-title').textContent = t;
+    document.getElementById('res-sub').textContent = `${pct}% правильных ответов`;
+    document.getElementById('ring-num').textContent = this.score;
+    document.getElementById('ring-denom').textContent = `из ${total}`;
+    document.getElementById('res-c').textContent = this.score;
+    document.getElementById('res-w').textContent = total-this.score;
+    var xpGain = this.score*20 + (this.score===total ? 50 : 0);
+    document.getElementById('res-xp').textContent = '+'+xpGain;
+    this.saveLesson(this.curLesson, this.score, total);
+    goScreen('s-result');
+    setTimeout(()=>{ document.getElementById('ring-fill').style.strokeDashoffset = 339*(1-this.score/total); }, 100);
+    DailyQuestSystem.update();
+  },
+  saveLesson: function(lessonIdx, sc, total) {
+    var today = new Date().toISOString().slice(0,10);
+    var allLessons = getAllLessons();
+    var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+    userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
+    userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
+    var xpGain = sc * 20 + (sc === total ? 50 : 0);
+    XPSystem.addXP(xpGain);
+    checkStreak(); saveProgress();
+    if (!userProgress.chests) userProgress.chests = [];
+    if (!userProgress.completedLessons[lessonKey].chestGiven) {
+      ChestSystem.give('achievement');
+      userProgress.completedLessons[lessonKey].chestGiven = true;
+      saveProgress();
+    }
+  },
+  getHint: function() {
+    if (this.hintUsed) return;
+    this.hintUsed = true;
+    var topicKey = this.getTopicKey();
+    ProfessorModal.openHint(topicKey);
+  }
 };
 
-// ── Home & Profile ──
-function getRank(xp) { return xp>=10000?'Легенда':xp>=5000?'Мастер':xp>=3000?'Эксперт':xp>=500?'Ученик':'Новичок'; }
+// ── AISystem ──
+var AISystem = {
+  openChat: function() {
+    const aiPanel = document.getElementById('ai-quiz');
+    const topic = QuestionSystem.getTopicTitle();
+    const ctx = 'Вопрос ОГЭ: ' + (QuestionSystem.shuffled[QuestionSystem.curQ]?.text || '');
+    if (!aiPanel.dataset.initialized) {
+      this.initAI('ai-quiz', ctx, [], false);
+      aiPanel.dataset.initialized = '1';
+    }
+    aiPanel.style.display = 'block';
+    const body = aiPanel.querySelector('.ai-body');
+    if (body) {
+      body.classList.add('open');
+      const msgs = document.getElementById('msgs-ai-quiz');
+      if (msgs && QuestionSystem.lastExplainText.trim()) {
+        msgs.innerHTML = '';
+        msgs.innerHTML += `<div class="msg ai">${QuestionSystem.lastExplainText.replace(/\n/g,'<br>')}</div>`;
+      }
+    }
+    const toggle = aiPanel.querySelector('.ai-toggle');
+    if (toggle) toggle.classList.add('open');
+  },
+  initAI: function(cid, ctx, prompts, autoOpen) {
+    const el = document.getElementById(cid);
+    if (!el) return;
+    const escCtx = ctx.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+    el.innerHTML = `
+      <div class="ai-header" onclick="AISystem.toggle(this)">
+        <div class="ai-header-left">
+          <div class="ai-avatar">🎓</div>
+          <div><div class="ai-name">Профессор Гео</div><div class="ai-tagline">Спроси — объясню как наставник</div></div>
+        </div>
+        <div class="ai-toggle ${autoOpen?'open':''}">▼</div>
+      </div>
+      <div class="ai-body ${autoOpen?'open':''}">
+        <div class="ai-context">📌 ${ctx}</div>
+        <div class="ai-prompts">${prompts.map(p=>`<button class="ai-prompt-btn" onclick="AISystem.sendP('${cid}','${escCtx}','${p.replace(/'/g,"\\'")}')">${p}</button>`).join('')}</div>
+        <div class="ai-messages" id="msgs-${cid}"></div>
+        <div class="ai-input-row">
+          <textarea class="ai-input" id="inp-${cid}" placeholder="Спроси Профессора..." rows="1"
+            onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();AISystem.sendM('${cid}','${escCtx}');}"></textarea>
+          <button class="ai-send" id="snd-${cid}" onclick="AISystem.sendM('${cid}','${escCtx}')">➤</button>
+        </div>
+      </div>
+    `;
+  },
+  toggle: function(h) { const b = h.nextElementSibling; const t = h.querySelector('.ai-toggle'); b.classList.toggle('open'); t.classList.toggle('open'); },
+  sendP: function(cid, ctx, text) { document.getElementById(`inp-${cid}`).value = text; this.sendM(cid, ctx); },
+  sendM: async function(cid, ctx) {
+    const inp = document.getElementById(`inp-${cid}`); const snd = document.getElementById(`snd-${cid}`);
+    const msgs = document.getElementById(`msgs-${cid}`); const text = inp.value.trim(); if (!text) return;
+    inp.value = ''; snd.disabled = true;
+    msgs.innerHTML += `<div class="msg user">${text}</div>`;
+    const lid = 'l'+Date.now(); msgs.innerHTML += `<div class="msg ai loading" id="${lid}">⏳ Профессор Гео думает...</div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+    try {
+      const r = await fetch(PROXY, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({question:text, context:ctx})});
+      const d = await r.json(); const ans = d.answer || 'Не удалось получить ответ';
+      document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai">${ans.replace(/\n/g,'<br>')}</div>`;
+    } catch(e) { document.getElementById(lid)?.remove(); msgs.innerHTML += `<div class="msg ai" style="color:var(--danger)">⚠️ Ошибка соединения</div>`; }
+    snd.disabled = false; msgs.scrollTop = msgs.scrollHeight;
+  }
+};
+
+// ── Profile & Home rendering ──
+function getRank(xp) {
+  if (xp >= 10000) return 'Легенда';
+  if (xp >= 5000) return 'Мастер';
+  if (xp >= 3000) return 'Эксперт';
+  if (xp >= 500) return 'Ученик';
+  return 'Новичок';
+}
+
+function getNextRank(xp) {
+  const ranks = [
+    { name: 'Ученик', min: 500 }, { name: 'Эксперт', min: 3000 },
+    { name: 'Мастер', min: 5000 }, { name: 'Легенда', min: 10000 }
+  ];
+  for (var i = 0; i < ranks.length; i++) { if (xp < ranks[i].min) return ranks[i]; }
+  return null;
+}
+
 function goScreen(id) {
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
-  if (id==='s-home') renderHomePath();
-  if (id==='s-profile') renderProfile();
+  if (id === 's-home') renderHomePath();
+  if (id === 's-profile') renderProfile();
 }
-function getDaysUntilOGE() { var d=new Date(); d.setHours(0,0,0,0); var oge=new Date(d.getFullYear(),5,19); if (d>oge) oge.setFullYear(oge.getFullYear()+1); return Math.ceil((oge-d)/86400000); }
-function getPredictedGrade() { if (!userProgress.totalAnswered) return '—'; var a=userProgress.totalCorrect/userProgress.totalAnswered; return a>=0.85?'5':a>=0.7?'4':a>=0.55?'3':'2'; }
 
+function getDaysUntilOGE() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const currentYear = today.getFullYear();
+  const ogeThisYear = new Date(currentYear, 5, 19);
+  if (today <= ogeThisYear) return Math.ceil((ogeThisYear - today) / 86400000);
+  const ogeNextYear = new Date(currentYear + 1, 5, 19);
+  return Math.ceil((ogeNextYear - today) / 86400000);
+}
+
+function getPredictedGrade() {
+  if (userProgress.totalAnswered === 0) return '—';
+  var acc = userProgress.totalCorrect / userProgress.totalAnswered;
+  if (acc >= 0.85) return '5';
+  if (acc >= 0.70) return '4';
+  if (acc >= 0.55) return '3';
+  return '2';
+}
+
+function getPredictedScore(grade) {
+  if (grade === '5') return '28–31'; if (grade === '4') return '19–25';
+  if (grade === '3') return '12–18'; if (grade === '2') return '0–11';
+  return '—';
+}
+
+function getCorrectAnswersNeededForGrade(targetGrade) {
+  var total = userProgress.totalAnswered; var correct = userProgress.totalCorrect;
+  var target = 0;
+  if (targetGrade === 3) target = 0.55; else if (targetGrade === 4) target = 0.70; else if (targetGrade === 5) target = 0.85;
+  var needed = Math.ceil(target * total) - correct;
+  return Math.max(0, needed);
+}
+
+// ── Ежедневное приветствие профессора (теперь через виджет) ──
+// Старая функция showDailyProfessorGreeting() удалена, используется ProfessorGeoWidget.showGreeting()
+
+// Обновлённый renderHomePath
 async function renderHomePath() {
-  var c = document.getElementById('home-content');
-  if (!lessonsLoaded.length) { c.innerHTML='<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю...</div>'; await loadAllLessons(); }
-  var all = getAllLessons(); if (!all.length) { c.innerHTML='<div style="padding:40px;color:var(--danger)">⚠️ Ошибка загрузки</div>'; return; }
-  ProfessorGeoWidget.init();
-  var doneCount = Object.keys(userProgress.completedLessons).length;
-  var pct = Math.round(doneCount/all.length*100);
-  var allDone = doneCount>=all.length;
-  var grade = getPredictedGrade();
-  var streak = userProgress.streak||0;
-  var days = getDaysUntilOGE();
-  var html = `<div class="path-progress-card"><b>Прогноз ОГЭ</b><div style="font-size:42px;color:var(--gold)">${grade}</div><div style="font-size:11px;color:var(--muted)">🔥 ${streak} дней · ${days} дн. до ОГЭ</div></div>`;
-  html += `<div class="path-progress-card"><div class="path-progress-top"><span>Прогресс</span><span>${pct}%</span></div><div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="${pct}%"></div></div></div>`;
-  DailyQuestSystem.update();
-  var tasks = userProgress.dailyTasks||{}, dQ=userProgress.dailyQuestions||0, dXP=userProgress.dailyXP||0;
-  html += `<div class="path-progress-card"><div style="font-weight:700;margin-bottom:8px;">🎯 Ежедневные задания</div>`;
-  html += `<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">`;
-  html += `<div><span class="task-check${tasks.solve10?' done':''}" style="color:${tasks.solve10?'var(--primary2)':'var(--muted)'}">${tasks.solve10?'✅':'⬜'}</span> Решить 10 вопросов <span style="float:right;font-size:11px;color:var(--muted)">${Math.min(dQ,10)}/10</span></div>`;
-  html += `<div><span class="task-check${tasks.earn50XP?' done':''}" style="color:${tasks.earn50XP?'var(--primary2)':'var(--muted)'}">${tasks.earn50XP?'✅':'⬜'}</span> Получить 50 XP <span style="float:right;font-size:11px;color:var(--muted)">${Math.min(dXP,50)}/50</span></div>`;
-  html += `<div><span class="task-check${tasks.loginToday?' done':''}" style="color:${tasks.loginToday?'var(--primary2)':'var(--muted)'}">${tasks.loginToday?'✅':'⬜'}</span> Зайти сегодня</div></div></div>`;
-  if (!allDone) {
-    var nextIdx = all.findIndex((l,i)=>!userProgress.completedLessons[l.title]);
-    if (nextIdx>=0) html += `<div class="continue-card" onclick="QuestionSystem.start(${nextIdx})"><div class="continue-icon">${all[nextIdx].title.match(/^\S+/)?.[0]||'▶️'}</div><div><div class="continue-label">Продолжить</div><div class="continue-title">${all[nextIdx].title}</div></div></div>`;
-  } else {
-    html += `<div class="continue-card" onclick="QuestionSystem.startBoss()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250"><div class="continue-icon">👑</div><div><div class="continue-label" style="color:#d29922">Финальный босс</div><div class="continue-title">Все темы</div></div></div>`;
+  var container = document.getElementById('home-content');
+  if (lessonsLoaded.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
+    await loadAllLessons();
   }
-  c.innerHTML = html;
-  document.getElementById('home-streak').textContent = '🔥 '+(userProgress.streak||0);
-  document.getElementById('home-sublabel').textContent = `${doneCount}/${all.length} тем`;
-  setTimeout(()=>c.querySelectorAll('.path-progress-fill[data-target]').forEach(f=>f.style.width=f.dataset.target), 50);
-  animateCards(c);
+  var allLessons = getAllLessons();
+  if (allLessons.length === 0) {
+    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания. Проверь интернет.</div>';
+    return;
+  }
+
+  // Инициализация виджета профессора (проверка приветствия)
+  ProfessorGeoWidget.init();
+
+  var nextIdx = 0;
+  for (var i = 0; i < allLessons.length; i++) {
+    var key = allLessons[i].title;
+    if (!userProgress.completedLessons[key]) { nextIdx = i; break; }
+    if (i === allLessons.length - 1) nextIdx = allLessons.length;
+  }
+
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var totalCount = allLessons.length;
+  var pct = totalCount > 0 ? Math.round((completedCount/totalCount)*100) : 0;
+  var allDone = completedCount >= totalCount;
+  var daysLeft = getDaysUntilOGE();
+  var predictedGrade = getPredictedGrade();
+  var streak = userProgress.streak || 0;
+  var predictedScore = getPredictedScore(predictedGrade);
+
+  var html = '';
+  html += '<div class="path-progress-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:6px">Твой прогноз ОГЭ</div>';
+  if (predictedGrade !== '—') {
+    var currentGrade = parseInt(predictedGrade);
+    html += '<div style="font-size:42px;font-weight:800;color:var(--gold);line-height:1">' + predictedGrade + '</div>';
+    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Прогноз: ' + predictedScore + ' баллов</div>';
+    if (currentGrade < 5) {
+      var nextGrade = currentGrade + 1;
+      var needed = getCorrectAnswersNeededForGrade(nextGrade);
+      html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">До ' + nextGrade + ' осталось ' + needed + ' баллов</div>';
+      var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
+      progressPercent = Math.min(100, Math.round(progressPercent));
+      html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="' + progressPercent + '%"></div></div>';
+    } else {
+      html += '<div style="font-size:13px;color:var(--primary2);margin-bottom:8px">Ты на высшем уровне!</div>';
+    }
+  } else {
+    html += '<div style="font-size:16px;color:var(--muted)">Недостаточно данных</div>';
+  }
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px">Подготовка: ' + streak + ' ' + getDayWord(streak) + ' подряд · До ОГЭ ' + daysLeft + ' ' + getDayWord(daysLeft) + '</div>';
+  html += '</div>';
+
+  html += '<div class="path-progress-card">';
+  html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">'+pct+'%</span></div>';
+  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:0%" data-target="'+pct+'%"></div></div>';
+  html += '</div>';
+
+  DailyQuestSystem.update();
+  var tasks = userProgress.dailyTasks || {};
+  var dailyQ = userProgress.dailyQuestions || 0;
+  var dailyXP = userProgress.dailyXP || 0;
+  html += '<div class="path-progress-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.solve10?' done':'')+'" style="color:'+(tasks.solve10?'var(--primary2)':'var(--muted)')+'">'+(tasks.solve10?'✅':'⬜')+'</span> Решить 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyQ,10)+'/10</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.earn50XP?' done':'')+'" style="color:'+(tasks.earn50XP?'var(--primary2)':'var(--muted)')+'">'+(tasks.earn50XP?'✅':'⬜')+'</span> Получить 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">'+Math.min(dailyXP,50)+'/50</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span class="task-check'+(tasks.loginToday?' done':'')+'" style="color:'+(tasks.loginToday?'var(--primary2)':'var(--muted)')+'">'+(tasks.loginToday?'✅':'⬜')+'</span> Зайти сегодня</div>';
+  html += '</div>';
+  if (userProgress.allDailyTasksDone) {
+    html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">🎉 Все задания выполнены! +100 XP и сундук</div>';
+  } else {
+    html += '<div style="margin-top:8px;font-size:12px;color:var(--muted)">За каждое задание +20 XP</div>';
+  }
+  html += '</div>';
+
+  if (!allDone) {
+    var nextLesson = allLessons[nextIdx];
+    html += '<div class="continue-card" onclick="QuestionSystem.start('+nextIdx+')">';
+    html += '<div class="continue-icon">'+(nextLesson.title.match(/^\S+/)?nextLesson.title.match(/^\S+/)[0]:'▶')+'</div>';
+    html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">'+nextLesson.title.replace(/^\S+\s*/,'')+'</div></div>';
+    html += '<div class="continue-arrow">→</div></div>';
+  } else {
+    html += '<div class="continue-card" onclick="QuestionSystem.startBoss()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+    html += '<div class="continue-icon">👑</div>';
+    html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс — все темы</div></div>';
+    html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+  }
+
+  html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
+  allLessons.forEach(function(l, i) {
+    var done = userProgress.completedLessons[l.title];
+    var prevKey = i > 0 ? allLessons[i-1].title : null;
+    var prevDone = i === 0 || userProgress.completedLessons[prevKey];
+    var isLocked = !prevDone && i > 0;
+    var isCurrent = !isLocked && !done;
+    var perfect = done && done.score === done.total;
+
+    var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
+    var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var onclk = isLocked ? '' : ' onclick="QuestionSystem.start('+i+')"';
+
+    if (i > 0) {
+      var connDone = userProgress.completedLessons[allLessons[i-1].title];
+      html += '<div class="path-connector" style="background:'+(connDone?'var(--primary2)':'var(--border)')+'"></div>';
+    }
+    var isRight = i % 2 === 1;
+    html += '<div class="path-node-row" style="flex-direction:'+(isRight?'row-reverse':'row')+';opacity:'+(isLocked?'0.45':'1')+'">';
+    html += '<div class="node-circle '+stateClass+'"'+onclk+' style="cursor:'+(isLocked?'default':'pointer')+'">'+nodeIcon+'</div>';
+    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">'+l.title+'</div>';
+    if (done) {
+      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">'+done.score+'/'+done.total+' верно</div>';
+    } else {
+      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(l.questions?l.questions.length:0)+' вопр.'+(l.tasks?' · '+l.tasks:'')+'</div>';
+    }
+    html += '</div></div>';
+  });
+
+  html += '<div class="path-connector" style="background:'+(allDone?'var(--primary2)':'var(--border)')+'"></div>';
+  html += '<div class="path-node-row">';
+  html += '<div class="boss-node'+(allDone?'':' locked')+'"'+(allDone?' onclick="QuestionSystem.startBoss()"':'')+' style="cursor:'+(allDone?'pointer':'default')+'">'+(allDone?'👑':'🔒')+'</div>';
+  html += '<div style="flex:1"><div style="font-weight:800;font-size:15px;color:'+(allDone?'#d29922':'var(--muted)')+'">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">'+(allDone?'Тест по всем темам — открыт!':'Пройди все темы чтобы открыть')+'</div></div>';
+  html += '</div>';
+
+  html += '</div>';
+  container.innerHTML = html;
+
+  document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak||0);
+  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+
+  setTimeout(function() {
+    var fills = container.querySelectorAll('.path-progress-fill[data-target]');
+    fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
+  }, 50);
+  animateCards(container);
 }
 
 function renderProfile() {
-  var all = getAllLessons(), done = Object.keys(userProgress.completedLessons).length;
-  var acc = userProgress.totalAnswered?Math.round(userProgress.totalCorrect/userProgress.totalAnswered*100):0;
-  var grade = getPredictedGrade(), rank = getRank(userProgress.xp), chests = (userProgress.chests||[]).length;
-  var html = `<div class="profile-header-card"><div class="profile-avatar-big">🧑‍🎓</div><div><div class="profile-name-big">Ученик <span style="background:var(--primary);padding:2px 8px;border-radius:10px;font-size:12px">${rank}</span></div><div class="profile-level-big">⚡ Ур.${userProgress.level} · ${userProgress.xp} XP</div></div></div>`;
-  html += `<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px"><div style="font-size:32px">🎯</div><div><div style="font-weight:700;">Прогноз ОГЭ</div><div style="color:var(--muted);">Оценка <span style="color:var(--gold);font-weight:800">${grade}</span></div></div></div>`;
-  html += `<div class="profile-stats-grid"><div class="profile-stat"><div class="profile-stat-num">${done}/${all.length}</div><div class="profile-stat-label">Тем</div></div><div class="profile-stat"><div class="profile-stat-num">${acc}%</div><div class="profile-stat-label">Точность</div></div><div class="profile-stat"><div class="profile-stat-num">🔥 ${userProgress.streak||0}</div><div class="profile-stat-label">Дней</div></div></div>`;
-  html += `<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;${chests>0?'animation:chestGlow 2s infinite,chestPulse 1.5s infinite':''}"><div><div style="font-weight:700;">🎁 Сундуки</div><div style="font-size:12px;color:var(--muted);">${chests>0?chests+' шт.':'Нет сундуков'}</div></div><button onclick="ChestSystem.open()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-weight:700;cursor:pointer;${chests===0?'opacity:0.5;background:gray;color:#fff;':''}" ${chests===0?'disabled':''}>Открыть</button></div>`;
+  var allLessons = getAllLessons();
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect/userProgress.totalAnswered)*100) : 0;
+  var predictedGrade = getPredictedGrade();
+  var rank = getRank(userProgress.xp);
+  var chestCount = (userProgress.chests || []).length;
+
+  var html = '';
+  html += '<div class="profile-header-card">';
+  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
+  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">'+rank+'</span></div>';
+  html += '<div class="profile-level-big">⚡ Уровень '+userProgress.level+' · '+userProgress.xp+' XP</div>';
+
+  var nextRank = getNextRank(userProgress.xp);
+  if (nextRank) {
+    var xpNeeded = nextRank.min; var currentXP = userProgress.xp;
+    var progressPct = Math.min(100, Math.round((currentXP / xpNeeded)*100));
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "'+nextRank.name+'" осталось '+(xpNeeded - currentXP)+' XP</div>';
+    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:0%" data-target="'+progressPct+'%"></div></div>';
+  }
+  html += '</div></div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div style="font-size:32px">🎯</div>';
+  html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">'+predictedGrade+'</span></div></div>';
+  html += '</div>';
+
+  html += '<div class="profile-stats-grid">';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+completedCount+'/'+allLessons.length+'</div><div class="profile-stat-label">Тем пройдено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">'+acc+'%</div><div class="profile-stat-label">Точность</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 '+(userProgress.streak||0)+'</div><div class="profile-stat-label">Дней подряд</div></div>';
+  html += '</div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
+  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
+  if (chestCount > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
+  }
+  html += '</div>';
+  html += '<button onclick="ChestSystem.open()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount===0?' disabled':'')+'>'+(chestCount>0?'Открыть сундук':'Нет сундуков')+'</button>';
+  html += '</div>';
+
+  var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
+  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
+  html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
+  html += '<div style="font-size:13px;color:'+(isTelegram?'var(--primary2)':'var(--danger)')+';margin-top:6px">'+notifText+'</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">'+notifDesc+'</div>';
+  html += '</div>';
+
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
+  html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
+  html += '</div>';
+
+  AchievementSystem.check();
+  var achievements = userProgress.achievements || {};
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  ACHIEVEMENTS_LIST.forEach(function(a) {
+    var ach = achievements[a.id] || { progress: 0, unlocked: false };
+    var isUnlocked = ach.unlocked;
+    var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
+    var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
+    html += '<div class="badge-item-p'+(isUnlocked?'':' locked')+'" style="position:relative">';
+    html += '<div class="badge-icon-p">'+a.icon+'</div>';
+    html += '<div class="badge-name-p">'+a.title+'</div>';
+    if (a.max) { html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">'+progress+'/'+a.max+'</div>'; }
+    if (isUnlocked && dateStr) { html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">'+dateStr+'</div>'; }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+
   document.getElementById('profile-content').innerHTML = html;
+
+  setTimeout(function() {
+    var fills = document.querySelectorAll('#profile-content .path-progress-fill[data-target]');
+    fills.forEach(function(f) { f.style.width = f.getAttribute('data-target'); });
+  }, 50);
   animateCards(document.getElementById('profile-content'));
 }
-function inviteFriend() {}
-function shareBossResult() {}
+
+function inviteFriend() {
+  const inviteUrl = 'https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text=Готовишься%20к%20ОГЭ%3F%20Присоединяйся%20ко%20мне%20в%20приложении%20подготовки%20и%20прокачивай%20свои%20знания%20каждый%20день.';
+  if (isTelegram) { tgApp.openTelegramLink(inviteUrl); } else { window.open(inviteUrl, '_blank'); }
+  if (!userProgress.invitedFriend) { userProgress.invitedFriend = true; XPSystem.addXP(50); saveProgress(); }
+}
+
+function shareBossResult() {
+  const total = QuestionSystem.shuffled.length;
+  const text = '🏆 Я прошёл финального босса по географии ОГЭ на '+QuestionSystem.score+'/'+total+'! Попробуй и ты!';
+  if (isTelegram) { tgApp.openTelegramLink('https://t.me/share/url?url=https://t.me/TestOgeEge_bot&text='+encodeURIComponent(text)); }
+  else { prompt('Скопируй текст для друзей:', text); }
+}
 
 var userProgress = {
-  xp:0, level:1, streak:0, lastDate:'', completedLessons:{}, totalAnswered:0, totalCorrect:0,
-  bossCompleted:false, freezes:1, lastFreezeMonday:'', chests:[], invitedFriend:false,
-  dailyTasksDate:'', dailyTasks:{solve10:false,earn50XP:false,loginToday:false},
-  dailyTasksCollected:{solve10:false,earn50XP:false,loginToday:false},
-  allDailyTasksDone:false, dailyQuestions:0, dailyXP:0, achievements:{},
-  lastDailyChestDate:'', streakChestsGiven:{}, doubleXPUntil:null, professorGreetingDate:''
+  xp: 0, level: 1, streak: 0, lastDate: '',
+  completedLessons: {}, totalAnswered: 0, totalCorrect: 0,
+  bossCompleted: false, freezes: 1, lastFreezeMonday: '',
+  chests: [], invitedFriend: false,
+  dailyTasksDate: '', dailyTasks: { solve10: false, earn50XP: false, loginToday: false },
+  dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
+  allDailyTasksDone: false, dailyQuestions: 0, dailyXP: 0,
+  achievements: {},
+  lastDailyChestDate: '', streakChestsGiven: {},
+  friends: [], freeHints: 0, rareBadges: [], doubleXPUntil: null,
+  professorGreetingDate: ''
 };
-function saveProgress() { var d=JSON.stringify(userProgress); if (isTelegram) tgApp.CloudStorage.setItem('progress',d,()=>{}); else try{localStorage.setItem('geo_progress',d)}catch(e){} }
-function loadProgress(cb) {
-  if (isTelegram) tgApp.CloudStorage.getItem('progress',(err,val)=>{ if(!err&&val) try{userProgress=JSON.parse(val)}catch(e){} refreshFreeze(); cb(); });
-  else { try{var s=localStorage.getItem('geo_progress'); if(s) userProgress=JSON.parse(s)}catch(e){} refreshFreeze(); cb(); }
-}
-function refreshFreeze() {
-  var d=new Date(); d.setHours(0,0,0,0); var day=d.getDay(); var mon=new Date(d.setDate(d.getDate()-((day+6)%7))).toISOString().slice(0,10);
-  if (!userProgress.lastFreezeMonday||userProgress.lastFreezeMonday<mon) { userProgress.freezes=1; userProgress.lastFreezeMonday=mon; saveProgress(); }
-}
-function checkStreak() {
-  var today=new Date().toISOString().slice(0,10);
-  if (userProgress.lastDate===today) return;
-  var yesterday=new Date(Date.now()-86400000).toISOString().slice(0,10);
-  if (userProgress.lastDate===yesterday) userProgress.streak++;
-  else if (userProgress.lastDate!==today) { if (userProgress.freezes>0) { userProgress.freezes=0; userProgress.streak++; } else userProgress.streak=1; }
-  userProgress.lastDate=today; saveProgress();
-  AchievementSystem.check(); ChestSystem.giveDaily(); ChestSystem.giveStreak();
-}
-function getDayWord(n) { return n%10===1&&n%100!==11?'день':[2,3,4].includes(n%10)&&![12,13,14].includes(n%100)?'дня':'дней'; }
 
-loadProgress(()=>{ checkStreak(); renderHomePath(); DailyQuestSystem.update(); AchievementSystem.check(); });
+function saveProgress() {
+  var data = JSON.stringify(userProgress);
+  if (isTelegram && tgApp.CloudStorage) { tgApp.CloudStorage.setItem('progress', data, function(){}); }
+  else { try { localStorage.setItem('geo_progress', data); } catch(e){} }
+}
+
+function loadProgress(callback) {
+  if (isTelegram && tgApp.CloudStorage) {
+    tgApp.CloudStorage.getItem('progress', function(err, val) {
+      if (!err && val) { try { userProgress = JSON.parse(val); } catch(e){} }
+      refreshFreeze(); callback();
+    });
+  } else {
+    try { var saved = localStorage.getItem('geo_progress'); if (saved) userProgress = JSON.parse(saved); } catch(e){}
+    refreshFreeze(); callback();
+  }
+}
+
+function getMonday(date) {
+  var d = new Date(date); d.setHours(0,0,0,0);
+  var day = d.getDay(); var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff)).toISOString().slice(0,10);
+}
+
+function refreshFreeze() {
+  var todayMonday = getMonday(new Date());
+  if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < todayMonday) {
+    userProgress.freezes = 1; userProgress.lastFreezeMonday = todayMonday; saveProgress();
+  }
+}
+
+function checkStreak() {
+  var today = new Date().toISOString().slice(0,10);
+  if (userProgress.lastDate === today) return;
+  var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  if (userProgress.lastDate === yesterday) { userProgress.streak++; }
+  else if (userProgress.lastDate !== today) {
+    if (userProgress.freezes > 0) { userProgress.freezes = 0; userProgress.lastFreezeMonday = getMonday(new Date()); userProgress.streak++; }
+    else { userProgress.streak = 1; }
+  }
+  userProgress.lastDate = today; saveProgress();
+  AchievementSystem.check();
+  ChestSystem.giveDaily();
+  ChestSystem.giveStreak();
+}
+
+function getDayWord(n) {
+  if (n % 10 === 1 && n % 100 !== 11) return 'день';
+  if ([2,3,4].includes(n%10) && ![12,13,14].includes(n%100)) return 'дня';
+  return 'дней';
+}
+
+// ── INIT ──
+loadProgress(function() {
+  checkStreak();
+  renderHomePath();
+  DailyQuestSystem.update();
+  AchievementSystem.check();
+});
 </script>
 </body>
 </html>
