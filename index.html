@@ -352,19 +352,18 @@ body::before {
   pointer-events: none;
 }
 
-/* ========== НОВЫЙ ВИДЖЕТ ПРОФЕССОРА GEO ========== */
+/* ========== ВИДЖЕТ ПРОФЕССОРА С АНИМАЦИЯМИ ========== */
 .prof-geo-widget {
   position: fixed;
   bottom: 24px;
   right: 24px;
-  z-index: 950; /* выше экранов, но ниже тостов и модалок */
+  z-index: 950;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
 }
 
-/* Кнопка с портретом */
 .prof-geo-btn {
   width: 64px;
   height: 64px;
@@ -376,9 +375,10 @@ body::before {
   border: 2px solid var(--gold);
   box-shadow: 0 0 12px rgba(210, 153, 34, 0.4), 0 4px 12px rgba(0,0,0,0.3);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-image 0.2s ease;
   pointer-events: auto;
-  animation: subtlePulse 3s infinite ease-in-out;
+  will-change: transform;
+  animation: subtlePulse 3s infinite ease-in-out, idleBreathing 4s infinite ease-in-out;
 }
 .prof-geo-btn:active {
   transform: scale(0.95);
@@ -389,8 +389,62 @@ body::before {
   50% { box-shadow: 0 0 16px rgba(210,153,34,0.6), 0 4px 12px rgba(0,0,0,0.3); }
   100% { box-shadow: 0 0 8px rgba(210,153,34,0.3), 0 4px 12px rgba(0,0,0,0.3); }
 }
+@keyframes idleBreathing {
+  0%, 100% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.03) translateY(-1px); }
+}
 
-/* Облачко приветствия */
+.prof-geo-btn.talking {
+  transform: translateY(-3px) rotate(-2deg);
+  animation: none;
+}
+
+.prof-geo-btn.correct-bounce {
+  animation: correctBounce 0.6s ease-out;
+}
+.prof-geo-btn.wrong-tilt {
+  animation: wrongTilt 0.6s ease-out;
+}
+.prof-geo-btn.hint-explain {
+  animation: hintExplain 0.8s ease-in-out;
+}
+.prof-geo-btn.chest-jump {
+  animation: chestJump 0.7s ease-out;
+}
+.prof-geo-btn.levelup-glow {
+  animation: levelUpGlow 0.8s ease-out;
+}
+
+@keyframes correctBounce {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.1) translateY(-8px); }
+  60% { transform: scale(0.95) translateY(0); }
+  100% { transform: scale(1); }
+}
+@keyframes wrongTilt {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(2deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes hintExplain {
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(-4deg); }
+  75% { transform: rotate(4deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes chestJump {
+  0% { transform: scale(1); }
+  30% { transform: scale(1.15) translateY(-10px); }
+  60% { transform: scale(0.95) translateY(0); }
+  100% { transform: scale(1); }
+}
+@keyframes levelUpGlow {
+  0% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.12); filter: brightness(1.3); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+
 .prof-geo-speech {
   position: relative;
   background: var(--card2);
@@ -411,7 +465,6 @@ body::before {
   opacity: 1;
   transform: translateY(0);
 }
-/* Стрелка к кнопке */
 .prof-geo-speech::after {
   content: '';
   position: absolute;
@@ -423,7 +476,6 @@ body::before {
   border-right: 8px solid transparent;
   border-top: 8px solid var(--card2);
 }
-/* Тонкая рамка стрелки */
 .prof-geo-speech::before {
   content: '';
   position: absolute;
@@ -537,17 +589,74 @@ body::before {
   <div class="scroll" id="profile-content"></div>
 </div>
 
-<!-- ========== НОВЫЙ ВИДЖЕТ ПРОФЕССОРА GEO ========== -->
+<!-- ========== ВИДЖЕТ ПРОФЕССОРА GEO ========== -->
 <div id="professor-geo-widget" class="prof-geo-widget">
   <div id="prof-geo-speech" class="prof-geo-speech"></div>
   <div id="prof-geo-btn" class="prof-geo-btn" title="Профессор Гео"></div>
 </div>
 
 <script>
-// ========== ProfessorGeoWidget (единый компонент) ==========
+// ========== КОНСТАНТЫ ИЗОБРАЖЕНИЙ И СООБЩЕНИЙ ==========
+const PROF_IMAGES = {
+  default: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_default.png',
+  greeting: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
+  correct: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
+  wrong: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_sad.png',
+  hint: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_hint.png',
+  chest: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png',
+  levelup: 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/images/professor_happy.png'
+};
+
+const ProfessorMessages = {
+  greetingMessages: [
+    "Здравствуйте!<br>Сегодня отличный день для новых открытий 🌍",
+    "Привет! Давай покорим ещё одну тему! 🚀",
+    "Добрый день! Готов к географии?"
+  ],
+  correctAnswerMessages: [
+    "Верно! Так держать! 🎉",
+    "Отлично! Ты настоящий географ!",
+    "Молодец! Всё правильно."
+  ],
+  wrongAnswerMessages: [
+    "Ничего, ошибка — это шаг к знанию 🤔",
+    "Подумай ещё, ты запомнишь!",
+    "Не страшно, в следующий раз получится."
+  ],
+  hintMessages: [
+    "Давай подумаем вместе...",
+    "Обрати внимание на ключевые слова.",
+    "Попробуй исключить неверные варианты."
+  ],
+  levelUpMessages: [
+    "Новый уровень! 🌟",
+    "Растёшь как настоящий исследователь!",
+    "Ещё одна ступенька к мастерству."
+  ],
+  streakMessages: [
+    "Ого, {n} дней подряд! 🔥",
+    "Серия из {n} дней! Впечатляет!"
+  ],
+  chestMessages: [
+    "Сундук открыт! Держи награду 🎁",
+    "Сокровища географа твои!"
+  ],
+  finishTopicMessages: [
+    "Тема пройдена! 💪",
+    "Отлично! Ещё один раздел позади."
+  ],
+  dailyTaskMessages: [
+    "Ежедневное задание выполнено! 🎯",
+    "Ты справился с задачей дня!"
+  ]
+};
+
+// ========== ВИДЖЕТ ПРОФЕССОРА ==========
 const ProfessorGeoWidget = {
   greetShownToday: false,
   timer: null,
+  lastIndexes: {},
+  currentEmotion: 'default',
 
   init() {
     const today = new Date().toISOString().slice(0,10);
@@ -559,42 +668,140 @@ const ProfessorGeoWidget = {
     }
   },
 
-  showGreeting() {
-    const speechEl = document.getElementById('prof-geo-speech');
-    if (!speechEl) return;
-    const phrases = [
-      "Здравствуйте!<br><br>Сегодня отличный день, чтобы узнать что-то новое о нашей планете 🌍<br><br>У тебя всё получится!",
-      "Привет! Рад снова видеть тебя.<br>Давай сегодня покорим ещё одну тему по географии! 🚀",
-      "Добрый день! Помни: каждая решённая задача — это шаг к пятёрке на ОГЭ.",
-      "Приветствую, исследователь! 🌏<br>Готов продолжить путешествие по миру географии?"
-    ];
-    speechEl.innerHTML = phrases[Math.floor(Math.random() * phrases.length)];
-    speechEl.classList.add('visible');
-    if (this.timer) clearTimeout(this.timer);
-    this.timer = setTimeout(() => {
-      speechEl.classList.remove('visible');
-    }, 6000);
+  getRandomIndex(arr, type) {
+    if (!this.lastIndexes[type]) this.lastIndexes[type] = -1;
+    if (arr.length === 1) return 0;
+    let idx = Math.floor(Math.random() * arr.length);
+    if (arr.length > 1 && idx === this.lastIndexes[type]) {
+      idx = (idx + 1) % arr.length;
+    }
+    this.lastIndexes[type] = idx;
+    return idx;
   },
 
-  showMessage(text, duration = 4000) {
+  setEmotion(type) {
+    const btn = document.getElementById('prof-geo-btn');
+    if (!btn) return;
+    const img = PROF_IMAGES[type] || PROF_IMAGES.default;
+    btn.style.backgroundImage = `url('${img}')`;
+    this.currentEmotion = type;
+  },
+
+  resetEmotion() {
+    this.setEmotion('default');
+  },
+
+  triggerAnimation(type) {
+    const btn = document.getElementById('prof-geo-btn');
+    if (!btn) return;
+    const animClass = {
+      correct: 'correct-bounce',
+      wrong: 'wrong-tilt',
+      hint: 'hint-explain',
+      chest: 'chest-jump',
+      levelup: 'levelup-glow',
+      greeting: null
+    }[type] || null;
+
+    if (animClass) {
+      btn.classList.add(animClass);
+      setTimeout(() => {
+        btn.classList.remove(animClass);
+      }, 1000);
+    }
+  },
+
+  showGreeting() {
+    const arr = ProfessorMessages.greetingMessages;
+    const idx = this.getRandomIndex(arr, 'greeting');
+    this.showMessage(arr[idx], 5000, 'greeting');
+  },
+
+  showCorrectAnswer() {
+    const arr = ProfessorMessages.correctAnswerMessages;
+    const idx = this.getRandomIndex(arr, 'correct');
+    this.showMessage(arr[idx], 3500, 'correct');
+  },
+
+  showWrongAnswer() {
+    const arr = ProfessorMessages.wrongAnswerMessages;
+    const idx = this.getRandomIndex(arr, 'wrong');
+    this.showMessage(arr[idx], 4000, 'wrong');
+  },
+
+  showHint() {
+    const arr = ProfessorMessages.hintMessages;
+    const idx = this.getRandomIndex(arr, 'hint');
+    this.showMessage(arr[idx], 4000, 'hint');
+  },
+
+  showLevelUp(level) {
+    const arr = ProfessorMessages.levelUpMessages;
+    const idx = this.getRandomIndex(arr, 'levelup');
+    this.showMessage(arr[idx], 4000, 'levelup');
+  },
+
+  showStreak(streak) {
+    const arr = ProfessorMessages.streakMessages;
+    const idx = this.getRandomIndex(arr, 'streak');
+    let msg = arr[idx].replace('{n}', streak);
+    this.showMessage(msg, 4000, 'levelup');
+  },
+
+  showChest() {
+    const arr = ProfessorMessages.chestMessages;
+    const idx = this.getRandomIndex(arr, 'chest');
+    this.showMessage(arr[idx], 4000, 'chest');
+  },
+
+  showFinishTopic() {
+    const arr = ProfessorMessages.finishTopicMessages;
+    const idx = this.getRandomIndex(arr, 'finish');
+    this.showMessage(arr[idx], 4000, 'levelup');
+  },
+
+  showDailyTask() {
+    const arr = ProfessorMessages.dailyTaskMessages;
+    const idx = this.getRandomIndex(arr, 'daily');
+    this.showMessage(arr[idx], 4000, 'levelup');
+  },
+
+  showMessage(text, duration = 4000, eventType = null) {
     const speechEl = document.getElementById('prof-geo-speech');
-    if (!speechEl) return;
-    if (this.timer) clearTimeout(this.timer);
-    speechEl.innerHTML = text;
-    speechEl.classList.add('visible');
-    this.timer = setTimeout(() => {
-      speechEl.classList.remove('visible');
-    }, duration);
+    const btn = document.getElementById('prof-geo-btn');
+    if (!speechEl || !btn) return;
+
+    this.hideSpeech();
+
+    setTimeout(() => {
+      if (eventType) {
+        this.setEmotion(eventType);
+        this.triggerAnimation(eventType);
+      }
+      btn.classList.add('talking');
+
+      speechEl.innerHTML = text;
+      speechEl.classList.add('visible');
+
+      if (this.timer) clearTimeout(this.timer);
+      this.timer = setTimeout(() => {
+        speechEl.classList.remove('visible');
+        btn.classList.remove('talking');
+        this.resetEmotion();
+      }, duration);
+    }, 60);
   },
 
   hideSpeech() {
     const speechEl = document.getElementById('prof-geo-speech');
+    const btn = document.getElementById('prof-geo-btn');
     if (speechEl) speechEl.classList.remove('visible');
+    if (btn) btn.classList.remove('talking');
     if (this.timer) clearTimeout(this.timer);
   }
 };
 
-// ========== ДАННЫЕ И ЛОГИКА (БЕЗ ИЗМЕНЕНИЙ) ==========
+// ========== ДАННЫЕ И ИГРОВАЯ ЛОГИКА ==========
 const PROXY = 'https://yandex-proxy.mixakuznetsov15.workers.dev';
 const GITHUB_RAW = 'https://raw.githubusercontent.com/mixakuznetsov15-droid/ogebot/main/theory/';
 
@@ -631,7 +838,6 @@ const QUESTIONS_FILES = [
   { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
 ];
 
-// База подсказок профессора (три уровня для каждой темы)
 const HINTS_DB = {
   topo: [
     "Давай подумаем: что означают условные знаки на топографической карте?",
@@ -749,7 +955,6 @@ if (isTelegram) {
   tgApp.expand();
 }
 
-// ── Единый Toast ──
 function showToastMsg(text, type) {
   type = type || 'info';
   var container = document.getElementById('toast-container');
@@ -762,7 +967,6 @@ function showToastMsg(text, type) {
   }, 2600);
 }
 
-// ── Анимация появления карточек ──
 function animateCards(container) {
   var cards = container.querySelectorAll('.path-progress-card, .continue-card, .profile-header-card, .profile-stats-grid > div, .badge-item-p, .sub-status-card, .profile-stat, .badges-grid-profile > div');
   cards.forEach(function(card, index) {
@@ -771,24 +975,26 @@ function animateCards(container) {
   });
 }
 
-// ── XPSystem ──
 var XPSystem = {
   addXP: function(amount) {
     if (amount > 0) {
       if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
         amount *= 2;
       }
+      var oldLevel = userProgress.level;
       userProgress.xp += amount;
       userProgress.level = Math.floor(userProgress.xp / 200) + 1;
       saveProgress();
       showToastMsg('⚡ +' + amount + ' XP', 'xp');
+      if (userProgress.level > oldLevel) {
+        ProfessorGeoWidget.showLevelUp(userProgress.level);
+      }
       AchievementSystem.check();
       DailyQuestSystem.incrementCounters(0, amount);
     }
   }
 };
 
-// ── DailyQuestSystem ──
 var DailyQuestSystem = {
   update: function() {
     var today = new Date().toISOString().slice(0,10);
@@ -804,12 +1010,15 @@ var DailyQuestSystem = {
     var dailyXP = (userProgress.dailyXP || 0);
     var dailyQuestions = (userProgress.dailyQuestions || 0);
 
+    var somethingNewDone = false;
+
     if (dailyQuestions >= 10 && !tasks.solve10) {
       tasks.solve10 = true;
       if (!collected.solve10) {
         collected.solve10 = true;
         XPSystem.addXP(20);
         showToastMsg('🎯 Задание дня: решено 10 вопросов', 'info');
+        somethingNewDone = true;
       }
     }
     if (dailyXP >= 50 && !tasks.earn50XP) {
@@ -818,6 +1027,7 @@ var DailyQuestSystem = {
         collected.earn50XP = true;
         XPSystem.addXP(20);
         showToastMsg('🎯 Задание дня: получено 50 XP', 'info');
+        somethingNewDone = true;
       }
     }
     if (!tasks.loginToday) {
@@ -825,6 +1035,7 @@ var DailyQuestSystem = {
       if (!collected.loginToday) {
         collected.loginToday = true;
         XPSystem.addXP(20);
+        somethingNewDone = true;
       }
     }
 
@@ -834,6 +1045,11 @@ var DailyQuestSystem = {
       ChestSystem.give('achievement');
       showToastMsg('🎁 Сундук за все задания дня!', 'chest');
     }
+
+    if (somethingNewDone) {
+      ProfessorGeoWidget.showDailyTask();
+    }
+
     saveProgress();
   },
   incrementCounters: function(questionsCount, xpAmount) {
@@ -850,7 +1066,6 @@ var DailyQuestSystem = {
   }
 };
 
-// ── AchievementSystem ──
 var ACHIEVEMENTS_LIST = [
   { id: 'first_login', icon: '🏆', title: 'Первый вход', cond: function() { return true; } },
   { id: 'first_lesson', icon: '🏆', title: 'Первый урок', cond: function() { return userProgress.totalAnswered > 0; } },
@@ -901,7 +1116,6 @@ var AchievementSystem = {
   }
 };
 
-// ── ChestSystem ──
 var ChestSystem = {
   isOpening: false,
   rewardPool: [
@@ -935,6 +1149,7 @@ var ChestSystem = {
         this.give('streak');
         given[t] = true;
         showToastMsg('🔥 Серия ' + t + ' дней — сундук!', 'streak');
+        ProfessorGeoWidget.showStreak(streak);
       }
     }
     userProgress.streakChestsGiven = given;
@@ -952,6 +1167,7 @@ var ChestSystem = {
       self.applyReward(reward);
       self.showRewardModal(reward);
       self.isOpening = false;
+      ProfessorGeoWidget.showChest();
     });
   },
   getRandomReward: function() {
@@ -1028,7 +1244,6 @@ function showChestOpeningAnimation(callback) {
   }, 1200);
 }
 
-// ── Professor Modal ──
 var ProfessorModal = {
   currentHintLevel: 0,
   topicKey: '',
@@ -1036,6 +1251,7 @@ var ProfessorModal = {
     this.topicKey = topicKey;
     this.currentHintLevel = 0;
     var hint = getProfessorHint(topicKey, 0);
+    ProfessorGeoWidget.showHint();
     this._show(hint, [
       { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } },
       { text: 'Ещё подсказка', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.nextHint(); } }
@@ -1058,15 +1274,11 @@ var ProfessorModal = {
     this._show(hint, buttons);
   },
   showExplanation: function(message, isCorrect, usedHint) {
-    var fullMessage = message;
-    if (isCorrect && usedHint && Math.random() < 0.5) {
-      fullMessage = "Отлично! Ты справился сам — именно так знания запоминаются лучше. " + message;
-    } else if (!isCorrect) {
-      fullMessage = "Ничего страшного. Ошибки помогают понять тему лучше. " + message;
+    if (isCorrect) {
+      ProfessorGeoWidget.showCorrectAnswer();
+    } else {
+      ProfessorGeoWidget.showWrongAnswer();
     }
-    this._show(fullMessage, [
-      { text: 'Понятно', cls: 'professor-btn-primary', onClick: function() { ProfessorModal.close(); } }
-    ]);
   },
   _show: function(message, buttons) {
     var container = document.getElementById('professor-modal-container');
@@ -1099,7 +1311,6 @@ var ProfessorModal = {
   }
 };
 
-// ── QuestionSystem ──
 var QuestionSystem = {
   curQ: 0, score: 0, answered: false, shuffled: [],
   curLesson: 0, lives: 3, hintUsed: false,
@@ -1197,7 +1408,12 @@ var QuestionSystem = {
     livesEl.innerHTML = '';
     for (var i=0; i<3; i++) { livesEl.innerHTML += '<span>'+(i<this.lives?'❤️':'🖤')+'</span>'; }
 
-    this.showProfessorExplanation(idx===correct, question);
+    if (idx === correct) {
+      ProfessorGeoWidget.showCorrectAnswer();
+    } else {
+      ProfessorGeoWidget.showWrongAnswer();
+    }
+
     document.getElementById('btn-next').classList.add('show');
     if (this.lives <= 0) {
       document.getElementById('btn-next').textContent = '😔 Жизни кончились — попробуй ещё раз';
@@ -1211,13 +1427,6 @@ var QuestionSystem = {
     popup.textContent = '+' + amount + ' XP';
     document.body.appendChild(popup);
     setTimeout(function(){ popup.remove(); }, 1000);
-  },
-  showProfessorExplanation: function(isCorrect, question) {
-    var correctAnswerText = question.answers[question.correct];
-    var message = isCorrect
-      ? 'Правильно! ' + correctAnswerText + ' — верный ответ.'
-      : 'Правильный ответ — ' + correctAnswerText + '.';
-    ProfessorModal.showExplanation(message, isCorrect, this.hintUsed);
   },
   next: function() {
     this.curQ++;
@@ -1258,6 +1467,7 @@ var QuestionSystem = {
     var today = new Date().toISOString().slice(0,10);
     var allLessons = getAllLessons();
     var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
+    var wasNew = !userProgress.completedLessons[lessonKey];
     userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
     userProgress.totalAnswered += total; userProgress.totalCorrect += sc;
     var xpGain = sc * 20 + (sc === total ? 50 : 0);
@@ -1269,6 +1479,9 @@ var QuestionSystem = {
       userProgress.completedLessons[lessonKey].chestGiven = true;
       saveProgress();
     }
+    if (wasNew) {
+      ProfessorGeoWidget.showFinishTopic();
+    }
   },
   getHint: function() {
     if (this.hintUsed) return;
@@ -1278,7 +1491,6 @@ var QuestionSystem = {
   }
 };
 
-// ── AISystem ──
 var AISystem = {
   openChat: function() {
     const aiPanel = document.getElementById('ai-quiz');
@@ -1343,7 +1555,6 @@ var AISystem = {
   }
 };
 
-// ── Profile & Home rendering ──
 function getRank(xp) {
   if (xp >= 10000) return 'Легенда';
   if (xp >= 5000) return 'Мастер';
@@ -1401,10 +1612,6 @@ function getCorrectAnswersNeededForGrade(targetGrade) {
   return Math.max(0, needed);
 }
 
-// ── Ежедневное приветствие профессора (теперь через виджет) ──
-// Старая функция showDailyProfessorGreeting() удалена, используется ProfessorGeoWidget.showGreeting()
-
-// Обновлённый renderHomePath
 async function renderHomePath() {
   var container = document.getElementById('home-content');
   if (lessonsLoaded.length === 0) {
@@ -1417,7 +1624,6 @@ async function renderHomePath() {
     return;
   }
 
-  // Инициализация виджета профессора (проверка приветствия)
   ProfessorGeoWidget.init();
 
   var nextIdx = 0;
