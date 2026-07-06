@@ -7,6 +7,7 @@ var curQ = 0, score = 0, answered = false, shuffled = [];
 var curLesson = 0, lives = 3, hintUsed = false;
 var isBossMode = false;
 var lastExplainText = '';
+var currentHintLevel = 0;           // <-- добавлено для подсказок профессора
 
 // Получить название текущей темы
 function getCurrentTopicTitle() {
@@ -43,6 +44,7 @@ function renderQ() {
   document.getElementById('btn-ask-ai').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'flex';
   document.getElementById('btn-hint').textContent = '🎓 Спросить профессора Гео';
+  document.getElementById('btn-hint').disabled = false;   // сбрасываем блокировку
 
   // Жизни
   var livesEl = document.getElementById('lives-row');
@@ -86,6 +88,17 @@ function selectAns(idx, correct, qText, topic, hint) {
     lives--;
   }
   if (idx === correct) score++;
+
+  // ===== РЕАКЦИЯ ПРОФЕССОРА ГЕО =====
+  if (typeof professor !== 'undefined') {
+    if (idx === correct) {
+      professor.onCorrect(getCurrentTopicKey());
+    } else {
+      var rightAnswerText = shuffled[curQ].answers[correct];
+      professor.onWrong(getCurrentTopicKey(), rightAnswerText);
+    }
+  }
+  // ==================================
 
   document.getElementById('btn-hint').style.display = 'none';
 
@@ -266,3 +279,25 @@ function goBossLevel() {
   goScreen('s-quiz');
   renderQ();
 }
+
+// ==========================================
+//  КНОПКА ПОДСКАЗКИ ПРОФЕССОРА ГЕО
+// ==========================================
+window.askProfessor = function() {
+  if (answered) return;               // не даём подсказку, если уже ответил
+  hintUsed = true;
+  currentHintLevel = (currentHintLevel || 0) + 1;
+  var hint = professor.getHint(getCurrentTopicKey(), currentHintLevel);
+  var box = document.getElementById('ai-explain');
+  if (box) {
+    box.style.display = 'block';
+    box.textContent = '💡 ' + hint.text;
+  }
+  if (!hint.hasMore) {
+    var btnHint = document.getElementById('btn-hint');
+    if (btnHint) {
+      btnHint.textContent = '🔒 Подсказки закончились';
+      btnHint.disabled = true;
+    }
+  }
+};
