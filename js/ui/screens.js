@@ -11,8 +11,32 @@ function goScreen(id) {
   });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
-  if (id === 's-home') renderHomePath();
-  if (id === 's-profile') renderProfile();
+ function renderHomePath() {
+    ...
+}
+
+// ==========================================
+// ЭКРАН ТЕОРИИ
+// ==========================================
+
+function openLessonTheory(index) {
+    ...
+}
+
+function showTheoryScreen(lesson) {
+    ...
+}
+
+function startLessonPractice() {
+    ...
+}
+
+// ==========================================
+// ПРОФИЛЬ
+// ==========================================
+
+function renderProfile() {
+    ...
 }
 
 // --------------------------------------------------
