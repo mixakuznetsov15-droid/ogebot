@@ -288,10 +288,9 @@ window.askProfessor = function() {
   hintUsed = true;
   currentHintLevel = (currentHintLevel || 0) + 1;
   var hint = professor.getHint(getCurrentTopicKey(), currentHintLevel);
-  var box = document.getElementById('ai-explain');
-  if (box) {
-    box.style.display = 'block';
-    box.textContent = '💡 ' + hint.text;
+  // Отправляем подсказку в очередь профессора
+  if (typeof professor !== 'undefined') {
+    professor.showHint(hint.text);
   }
   if (!hint.hasMore) {
     var btnHint = document.getElementById('btn-hint');
