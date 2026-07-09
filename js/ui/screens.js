@@ -11,7 +11,89 @@ function goScreen(id) {
   });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
- function renderHomePath() {
+ function renderHomePath()
+  // ==========================================
+// ТЕОРИЯ
+// ==========================================
+
+var currentLessonIndex = 0;
+var theoryLoaded = [];
+
+async function openLessonTheory(index) {
+
+    currentLessonIndex = index;
+
+    var lesson = QUESTIONS_FILES[index];
+    var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
+
+    if (!theoryInfo) {
+        goQuizFromLoaded(index);
+        return;
+    }
+
+    try {
+
+        var theory = await fetchJSON(theoryInfo.file);
+
+        theoryLoaded = theory;
+
+        showTheoryScreen(theoryInfo);
+
+    } catch (e) {
+
+        console.error(e);
+
+        goQuizFromLoaded(index);
+
+    }
+
+}
+  function showTheoryScreen(theoryInfo) {
+
+    goScreen('s-topic');
+
+    document.getElementById('topic-title').textContent =
+        theoryInfo.title;
+
+    var html = '';
+
+    theoryLoaded.forEach(function(item){
+
+        html += `
+        <div class="theory-card">
+
+            <div class="theory-topic">
+                ${item.topic}
+            </div>
+
+            <div class="theory-text">
+                ${item.content.replace(/\n/g,"<br>")}
+            </div>
+
+        </div>
+        `;
+
+    });
+
+    html += `
+
+    <button class="btn-full primary"
+            onclick="startLessonPractice()">
+
+        🚀 Начать практику
+
+    </button>
+
+    `;
+
+    document.getElementById("topic-content").innerHTML = html;
+
+}
+  function startLessonPractice(){
+
+    goQuizFromLoaded(currentLessonIndex);
+
+}
     ...
 }
 
