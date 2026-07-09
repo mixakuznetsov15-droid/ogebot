@@ -303,3 +303,42 @@ body::before {
 .prof-modal-btn.close { background:var(--card); border:1px solid var(--border); color:var(--text); }
 .prof-modal-btn.more { background:linear-gradient(135deg,#f5a623,#d29922); color:#241900; }
 .prof-modal-btn.more:disabled { opacity:.35; cursor:default; }
+.theory-card{
+
+    background:var(--card);
+
+    border:1px solid var(--border);
+
+    border-radius:22px;
+
+    padding:20px;
+
+    margin-bottom:18px;
+
+    animation:fadeIn .35s;
+
+}
+
+.theory-topic{
+
+    font-size:20px;
+
+    font-weight:700;
+
+    margin-bottom:14px;
+
+    color:var(--primary);
+
+}
+
+.theory-text{
+
+    white-space:pre-line;
+
+    line-height:1.7;
+
+    color:var(--text);
+
+    font-size:15px;
+
+}
