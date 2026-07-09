@@ -11,114 +11,156 @@ function goScreen(id) {
   });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
- function renderHomePath()
-  // ==========================================
+}
+
+// ==========================================
 // ТЕОРИЯ
 // ==========================================
-
 var currentLessonIndex = 0;
 var theoryLoaded = [];
 
 async function openLessonTheory(index) {
-
     currentLessonIndex = index;
-
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
-
     if (!theoryInfo) {
         goQuizFromLoaded(index);
         return;
     }
-
     try {
-
         var theory = await fetchJSON(theoryInfo.file);
-
         theoryLoaded = theory;
-
         showTheoryScreen(theoryInfo);
-
     } catch (e) {
-
         console.error(e);
-
         goQuizFromLoaded(index);
-
     }
-
 }
-  function showTheoryScreen(theoryInfo) {
 
+function showTheoryScreen(theoryInfo) {
     goScreen('s-topic');
-
-    document.getElementById('topic-title').textContent =
-        theoryInfo.title;
-
+    document.getElementById('topic-title').textContent = theoryInfo.title;
     var html = '';
-
     theoryLoaded.forEach(function(item){
-
         html += `
         <div class="theory-card">
-
-            <div class="theory-topic">
-                ${item.topic}
-            </div>
-
-            <div class="theory-text">
-                ${item.content.replace(/\n/g,"<br>")}
-            </div>
-
-        </div>
-        `;
-
+            <div class="theory-topic">${item.topic}</div>
+            <div class="theory-text">${item.content.replace(/\n/g,"<br>")}</div>
+        </div>`;
     });
-
     html += `
-
-    <button class="btn-full primary"
-            onclick="startLessonPractice()">
-
+    <button class="btn-full primary" onclick="startLessonPractice()">
         🚀 Начать практику
-
-    </button>
-
-    `;
-
+    </button>`;
     document.getElementById("topic-content").innerHTML = html;
-
 }
-  function startLessonPractice(){
 
+function startLessonPractice(){
     goQuizFromLoaded(currentLessonIndex);
-
-}
-    ...
-}
-
-// ==========================================
-// ЭКРАН ТЕОРИИ
-// ==========================================
-
-function openLessonTheory(index) {
-    ...
-}
-
-function showTheoryScreen(lesson) {
-    ...
-}
-
-function startLessonPractice() {
-    ...
 }
 
 // ==========================================
 // ПРОФИЛЬ
 // ==========================================
-
 function renderProfile() {
-    ...
+  var container = document.getElementById('profile-content');
+  if (!container) return;
+
+  var allLessons = getAllLessons();
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect / userProgress.totalAnswered) * 100) : 0;
+  var predictedGrade = getPredictedGrade();
+  var rank = getRank(userProgress.xp);
+  var chestCount = (userProgress.chests || []).length;
+
+  var html = '';
+
+  // Заголовок профиля
+  html += '<div class="profile-header-card">';
+  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
+  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">' + rank + '</span></div>';
+  html += '<div class="profile-level-big">⚡ Уровень ' + userProgress.level + ' · ' + userProgress.xp + ' XP</div>';
+  var nextRank = getNextRank(userProgress.xp);
+  if (nextRank) {
+    var xpNeeded = nextRank.min;
+    var currentXP = userProgress.xp;
+    var progressPct = Math.min(100, Math.round((currentXP / xpNeeded) * 100));
+    html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "' + nextRank.name + '" осталось ' + (xpNeeded - currentXP) + ' XP</div>';
+    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:' + progressPct + '%"></div></div>';
+  }
+  html += '</div></div>';
+
+  // Прогноз на ОГЭ
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div style="font-size:32px">🎯</div>';
+  html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + predictedGrade + '</span></div></div>';
+  html += '</div>';
+
+  // Статистика
+  html += '<div class="profile-stats-grid">';
+  html += '<div class="profile-stat"><div class="profile-stat-num">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">' + acc + '%</div><div class="profile-stat-label">Точность</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
+  html += '</div>';
+
+  // Сундуки
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
+  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
+  if (chestCount > 0) {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
+  } else {
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
+  }
+  html += '</div>';
+  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
+  html += '</div>';
+
+  // Напоминания (Telegram)
+  var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
+  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
+  html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
+  html += '<div style="font-size:13px;color:' + (isTelegram ? 'var(--primary2)' : 'var(--danger)') + ';margin-top:6px">' + notifText + '</div>';
+  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">' + notifDesc + '</div>';
+  html += '</div>';
+
+  // Мой класс (заглушка)
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
+  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
+  html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
+  html += '</div>';
+
+  // Достижения
+  checkAchievements();
+  var achievements = userProgress.achievements || {};
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  ACHIEVEMENTS_LIST.forEach(function(a) {
+    var ach = achievements[a.id] || { progress: 0, unlocked: false };
+    var isUnlocked = ach.unlocked;
+    var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
+    var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
+    html += '<div class="badge-item-p' + (isUnlocked ? '' : ' locked') + '" style="position:relative">';
+    html += '<div class="badge-icon-p">' + a.icon + '</div>';
+    html += '<div class="badge-name-p">' + a.title + '</div>';
+    if (a.max) {
+      html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">' + progress + '/' + a.max + '</div>';
+    }
+    if (isUnlocked && dateStr) {
+      html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">' + dateStr + '</div>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+
+  // Подписка
+  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+
+  container.innerHTML = html;
 }
 
 // --------------------------------------------------
@@ -323,108 +365,4 @@ function renderHomePath() {
   // Обновляем шапку
   document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak || 0);
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
-}
-
-// --------------------------------------------------
-//  Профиль
-// --------------------------------------------------
-function renderProfile() {
-  var container = document.getElementById('profile-content');
-  if (!container) return;
-
-  var allLessons = getAllLessons();
-  var completedCount = Object.keys(userProgress.completedLessons).length;
-  var acc = userProgress.totalAnswered > 0 ? Math.round((userProgress.totalCorrect / userProgress.totalAnswered) * 100) : 0;
-  var predictedGrade = getPredictedGrade();
-  var rank = getRank(userProgress.xp);
-  var chestCount = (userProgress.chests || []).length;
-
-  var html = '';
-
-  // Заголовок профиля
-  html += '<div class="profile-header-card">';
-  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
-  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">' + rank + '</span></div>';
-  html += '<div class="profile-level-big">⚡ Уровень ' + userProgress.level + ' · ' + userProgress.xp + ' XP</div>';
-  var nextRank = getNextRank(userProgress.xp);
-  if (nextRank) {
-    var xpNeeded = nextRank.min;
-    var currentXP = userProgress.xp;
-    var progressPct = Math.min(100, Math.round((currentXP / xpNeeded) * 100));
-    html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ранга "' + nextRank.name + '" осталось ' + (xpNeeded - currentXP) + ' XP</div>';
-    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:' + progressPct + '%"></div></div>';
-  }
-  html += '</div></div>';
-
-  // Прогноз на ОГЭ
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
-  html += '<div style="font-size:32px">🎯</div>';
-  html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
-  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + predictedGrade + '</span></div></div>';
-  html += '</div>';
-
-  // Статистика
-  html += '<div class="profile-stats-grid">';
-  html += '<div class="profile-stat"><div class="profile-stat-num">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
-  html += '<div class="profile-stat"><div class="profile-stat-num">' + acc + '%</div><div class="profile-stat-label">Точность</div></div>';
-  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
-  html += '</div>';
-
-  // Сундуки
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
-  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
-  if (chestCount > 0) {
-    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
-  } else {
-    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
-  }
-  html += '</div>';
-  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
-  html += '</div>';
-
-  // Напоминания (Telegram)
-  var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
-  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
-  html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
-  html += '<div style="font-size:13px;color:' + (isTelegram ? 'var(--primary2)' : 'var(--danger)') + ';margin-top:6px">' + notifText + '</div>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">' + notifDesc + '</div>';
-  html += '</div>';
-
-  // Мой класс (заглушка)
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
-  html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
-  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
-  html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
-  html += '</div>';
-
-  // Достижения
-  checkAchievements();
-  var achievements = userProgress.achievements || {};
-  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
-  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
-  ACHIEVEMENTS_LIST.forEach(function(a) {
-    var ach = achievements[a.id] || { progress: 0, unlocked: false };
-    var isUnlocked = ach.unlocked;
-    var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
-    var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
-    html += '<div class="badge-item-p' + (isUnlocked ? '' : ' locked') + '" style="position:relative">';
-    html += '<div class="badge-icon-p">' + a.icon + '</div>';
-    html += '<div class="badge-name-p">' + a.title + '</div>';
-    if (a.max) {
-      html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">' + progress + '/' + a.max + '</div>';
-    }
-    if (isUnlocked && dateStr) {
-      html += '<div style="font-size:7px;color:var(--primary2);margin-top:2px">' + dateStr + '</div>';
-    }
-    html += '</div>';
-  });
-  html += '</div>';
-
-  // Подписка
-  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
-  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
-
-  container.innerHTML = html;
 }
