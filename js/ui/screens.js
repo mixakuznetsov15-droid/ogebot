@@ -182,7 +182,9 @@ function renderHomePath() {
 
     var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
     var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
-    var onclk = isLocked ? '' : ' onclick="goQuizFromLoaded(' + i + ')"';
+    var onclk = isLocked
+      ? '' 
+      : ' onclick="openLessonTheory(' + i + ')"';
 
     if (i > 0) {
       var connDone = userProgress.completedLessons[allLessons[i-1].title];
