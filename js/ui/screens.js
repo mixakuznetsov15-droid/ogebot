@@ -11,6 +11,13 @@ function goScreen(id) {
   });
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
+
+  // Автоматически наполняем контентом нужные экраны
+  if (id === 's-profile') {
+    renderProfile();
+  } else if (id === 's-home') {
+    renderHomePath();   // на случай, если нужно обновить главный экран
+  }
 }
 
 // ==========================================
