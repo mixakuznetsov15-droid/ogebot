@@ -12,11 +12,10 @@ function goScreen(id) {
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 
-  // Автоматически наполняем контентом нужные экраны
   if (id === 's-profile') {
     renderProfile();
   } else if (id === 's-home') {
-    renderHomePath();   // на случай, если нужно обновить главный экран
+    renderHomePath();
   }
 }
 
@@ -37,7 +36,6 @@ async function openLessonTheory(index) {
     try {
         var theory = await fetchJSON(theoryInfo.file);
         theoryLoaded = theory;
-        // Новая система карточек вместо длинной статьи
         startTheoryCards(theoryInfo, theory);
     } catch (e) {
         console.error(e);
@@ -45,10 +43,8 @@ async function openLessonTheory(index) {
     }
 }
 
-// Старая функция showTheoryScreen больше не используется
-// (удалена или оставлена пустой, чтобы не ломать возможные вызовы)
 function showTheoryScreen(theoryInfo) {
-    // заглушка — не используется
+    // не используется, оставлена для совместимости
 }
 
 function startLessonPractice(){
@@ -71,7 +67,6 @@ function renderProfile() {
 
   var html = '';
 
-  // Заголовок профиля
   html += '<div class="profile-header-card">';
   html += '<div class="profile-avatar-big">🧑‍🎓</div>';
   html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">' + rank + '</span></div>';
@@ -86,21 +81,18 @@ function renderProfile() {
   }
   html += '</div></div>';
 
-  // Прогноз на ОГЭ
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
   html += '<div style="font-size:32px">🎯</div>';
   html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
   html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + predictedGrade + '</span></div></div>';
   html += '</div>';
 
-  // Статистика
   html += '<div class="profile-stats-grid">';
   html += '<div class="profile-stat"><div class="profile-stat-num">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">' + acc + '%</div><div class="profile-stat-label">Точность</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  // Сундуки
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
   if (chestCount > 0) {
@@ -112,7 +104,6 @@ function renderProfile() {
   html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
   html += '</div>';
 
-  // Напоминания (Telegram)
   var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
   var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
@@ -121,7 +112,6 @@ function renderProfile() {
   html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">' + notifDesc + '</div>';
   html += '</div>';
 
-  // Мой класс (заглушка)
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
@@ -129,7 +119,6 @@ function renderProfile() {
   html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
 
-  // Достижения
   checkAchievements();
   var achievements = userProgress.achievements || {};
   html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
@@ -152,7 +141,6 @@ function renderProfile() {
   });
   html += '</div>';
 
-  // Подписка
   html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
   html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
 
@@ -166,7 +154,7 @@ function getDaysUntilOGE() {
   var today = new Date();
   today.setHours(0,0,0,0);
   var currentYear = today.getFullYear();
-  var ogeThisYear = new Date(currentYear, 5, 19); // 19 июня
+  var ogeThisYear = new Date(currentYear, 5, 19);
   if (today <= ogeThisYear) {
     return Math.ceil((ogeThisYear - today) / 86400000);
   } else {
@@ -216,11 +204,10 @@ function renderHomePath() {
   var container = document.getElementById('home-content');
   if (!container) return;
 
-  // Если уроки ещё не загружены — запускаем загрузку и показываем заглушку
   if (lessonsLoaded.length === 0) {
     container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
     loadAllLessons().then(function() {
-      renderHomePath(); // повторно после загрузки
+      renderHomePath();
     });
     return;
   }
@@ -233,7 +220,6 @@ function renderHomePath() {
 
   updateDailyTasks();
 
-  // Определяем следующий незавершённый урок
   var nextIdx = 0;
   for (var i = 0; i < allLessons.length; i++) {
     var key = allLessons[i].title;
@@ -300,7 +286,7 @@ function renderHomePath() {
   }
   html += '</div>';
 
-  // --- Карточка «Что делать сейчас» (персональный маршрут) ---
+  // --- Карточка «Что делать сейчас» ---
   var nextAction = getNextAction();
   if (nextAction) {
     html += '<div class="path-progress-card" style="cursor:' + (nextAction.disabled ? 'default' : 'pointer') + '"';
@@ -310,6 +296,22 @@ function renderHomePath() {
     html += '>';
     html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">📍 Что делать сейчас</div>';
     html += '<div style="font-size:15px;font-weight:600;color:' + (nextAction.disabled ? 'var(--muted)' : 'var(--primary)') + '">' + nextAction.text + '</div>';
+    html += '</div>';
+  }
+
+  // --- Умное повторение ---
+  var reviewTopics = getTodayReviewTopics();
+  if (reviewTopics.length > 0) {
+    html += '<div class="path-progress-card" style="border-color: #f5a62340;">';
+    html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🧠 Сегодня нужно повторить</div>';
+    for (var r = 0; r < reviewTopics.length; r++) {
+      var topicTitle = reviewTopics[r];
+      var idx = getReviewLessonIndex(topicTitle);
+      var onclick = idx >= 0 ? ' onclick="goQuizFromLoaded(' + idx + ')"' : '';
+      html += '<div style="font-size:13px;padding:8px 0;display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);"' + onclick + '>';
+      html += '<span>🔄</span> <span>' + topicTitle + '</span>';
+      html += '</div>';
+    }
     html += '</div>';
   }
 
@@ -327,21 +329,18 @@ function renderHomePath() {
     html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
   }
 
-  // --- Узлы пути (темы) ---
+  // --- Узлы пути ---
   html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
   allLessons.forEach(function(l, i) {
     var done = userProgress.completedLessons[l.title];
     var prevKey = i > 0 ? allLessons[i-1].title : null;
     var prevDone = i === 0 || userProgress.completedLessons[prevKey];
     var isLocked = !prevDone && i > 0;
-    var isCurrent = !isLocked && !done;
     var perfect = done && done.score === done.total;
 
     var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
     var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
-    var onclk = isLocked
-      ? '' 
-      : ' onclick="openLessonTheory(' + i + ')"';
+    var onclk = isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"';
 
     if (i > 0) {
       var connDone = userProgress.completedLessons[allLessons[i-1].title];
@@ -360,7 +359,7 @@ function renderHomePath() {
     html += '</div></div>';
   });
 
-  // --- Узел финального босса ---
+  // Узел босса
   html += '<div class="path-connector" style="background:' + (allDone ? 'var(--primary2)' : 'var(--border)') + '"></div>';
   html += '<div class="path-node-row">';
   html += '<div class="boss-node' + (allDone ? '' : ' locked') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + ' style="cursor:' + (allDone ? 'pointer' : 'default') + '">' + (allDone ? '👑' : '🔒') + '</div>';
@@ -371,7 +370,6 @@ function renderHomePath() {
   html += '</div>';
   container.innerHTML = html;
 
-  // Обновляем шапку
   document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak || 0);
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 }
