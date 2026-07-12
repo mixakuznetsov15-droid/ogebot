@@ -205,171 +205,175 @@ function renderHomePath() {
   if (!container) return;
 
   if (lessonsLoaded.length === 0) {
-    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
-    loadAllLessons().then(function() {
-      renderHomePath();
-    });
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
+    loadAllLessons().then(function() { renderHomePath(); });
     return;
   }
 
   var allLessons = getAllLessons();
   if (allLessons.length === 0) {
-    container.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания. Проверь интернет.</div>';
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания</div>';
     return;
   }
 
   updateDailyTasks();
 
-  var nextIdx = 0;
-  for (var i = 0; i < allLessons.length; i++) {
-    var key = allLessons[i].title;
-    if (!userProgress.completedLessons[key]) { nextIdx = i; break; }
-    if (i === allLessons.length - 1) nextIdx = allLessons.length;
-  }
-
   var completedCount = Object.keys(userProgress.completedLessons).length;
   var totalCount = allLessons.length;
   var pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
   var allDone = completedCount >= totalCount;
-
-  var daysLeft = getDaysUntilOGE();
-  var predictedGrade = getPredictedGrade();
   var streak = userProgress.streak || 0;
+  var predictedGrade = getPredictedGrade();
   var predictedScore = getPredictedScore(predictedGrade);
+  var reviewTopics = getTodayReviewTopics();
 
   var html = '';
 
-  // --- Карточка прогноза ---
-  html += '<div class="path-progress-card">';
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:6px">Твой прогноз ОГЭ</div>';
+  // --- Карусель ---
+  html += '<div class="carousel" id="home-carousel">';
+
+  // Карточка 1: Прогноз ОГЭ
+  html += '<div class="carousel-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">Твой прогноз ОГЭ</div>';
   if (predictedGrade !== '—') {
-    var currentGrade = parseInt(predictedGrade);
     html += '<div style="font-size:42px;font-weight:800;color:var(--gold);line-height:1">' + predictedGrade + '</div>';
-    html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">Прогноз: ' + predictedScore + ' баллов</div>';
+    html += '<div style="font-size:13px;color:var(--muted)">Прогноз: ' + predictedScore + ' баллов</div>';
+    var currentGrade = parseInt(predictedGrade);
     if (currentGrade < 5) {
       var nextGrade = currentGrade + 1;
       var needed = getCorrectAnswersNeededForGrade(nextGrade);
-      html += '<div style="font-size:13px;color:var(--muted);margin-bottom:8px">До ' + nextGrade + ' осталось ' + needed + ' ' + getDayWord(needed) + '</div>';
       var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
       progressPercent = Math.min(100, Math.round(progressPercent));
-      html += '<div class="path-progress-bar" style="height:8px"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
+      html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ' + nextGrade + ' ещё ' + needed + ' ' + getDayWord(needed) + '</div>';
+      html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
     } else {
-      html += '<div style="font-size:13px;color:var(--primary2);margin-bottom:8px">Ты на высшем уровне!</div>';
+      html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">Ты на высшем уровне!</div>';
     }
   } else {
     html += '<div style="font-size:16px;color:var(--muted)">Недостаточно данных</div>';
   }
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:10px">Подготовка: ' + streak + ' ' + getDayWord(streak) + ' подряд · До ОГЭ ' + daysLeft + ' ' + getDayWord(daysLeft) + '</div>';
   html += '</div>';
 
-  // --- Прогресс по темам ---
-  html += '<div class="path-progress-card">';
-  html += '<div class="path-progress-top"><span class="path-progress-label">📈 Прогресс по темам</span><span class="path-progress-pct">' + pct + '%</span></div>';
-  html += '<div class="path-progress-bar"><div class="path-progress-fill" style="width:' + pct + '%"></div></div>';
-  html += '</div>';
-
-  // --- Ежедневные задания ---
+  // Карточка 2: Ежедневные задания
   var tasks = userProgress.dailyTasks || {};
   var dailyQ = userProgress.dailyQuestions || 0;
   var dailyXP = userProgress.dailyXP || 0;
-  html += '<div class="path-progress-card">';
+  html += '<div class="carousel-card">';
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
   html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.solve10 ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.solve10 ? '✅' : '⬜') + '</span> Решить 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">' + Math.min(dailyQ, 10) + '/10</span></div>';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.earn50XP ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.earn50XP ? '✅' : '⬜') + '</span> Получить 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">' + Math.min(dailyXP, 50) + '/50</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.solve10 ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.solve10 ? '✅' : '⬜') + '</span> 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">' + Math.min(dailyQ,10) + '/10</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.earn50XP ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.earn50XP ? '✅' : '⬜') + '</span> 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">' + Math.min(dailyXP,50) + '/50</span></div>';
   html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.loginToday ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.loginToday ? '✅' : '⬜') + '</span> Зайти сегодня</div>';
   html += '</div>';
-  if (userProgress.allDailyTasksDone) {
-    html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">🎉 Все задания выполнены! +100 XP и сундук</div>';
-  } else {
-    html += '<div style="margin-top:8px;font-size:12px;color:var(--muted)">За каждое задание +20 XP</div>';
-  }
   html += '</div>';
 
-  // --- Карточка «Что делать сейчас» ---
-  var nextAction = getNextAction();
-  if (nextAction) {
-    html += '<div class="path-progress-card" style="cursor:' + (nextAction.disabled ? 'default' : 'pointer') + '"';
-    if (!nextAction.disabled && nextAction.action) {
-      html += ' onclick="(' + nextAction.action.toString() + ')()"';
-    }
-    html += '>';
-    html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">📍 Что делать сейчас</div>';
-    html += '<div style="font-size:15px;font-weight:600;color:' + (nextAction.disabled ? 'var(--muted)' : 'var(--primary)') + '">' + nextAction.text + '</div>';
-    html += '</div>';
-  }
+  // Карточка 3: Стрик
+  html += '<div class="carousel-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">🔥 Серия</div>';
+  html += '<div style="font-size:42px;font-weight:800;color:#f85149;line-height:1">' + streak + '</div>';
+  html += '<div style="font-size:13px;color:var(--muted)">' + getDayWord(streak) + ' подряд</div>';
+  html += '<div style="margin-top:8px;font-size:13px;">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
+  html += '</div>';
 
-  // --- Умное повторение ---
-  var reviewTopics = getTodayReviewTopics();
+  html += '</div>'; // .carousel
+
+  // Точки-индикаторы
+  html += '<div class="carousel-dots" id="carousel-dots">';
+  html += '<div class="carousel-dot active"></div>';
+  html += '<div class="carousel-dot"></div>';
+  html += '<div class="carousel-dot"></div>';
+  html += '</div>';
+
+  // --- Кнопка действия ---
   if (reviewTopics.length > 0) {
-    html += '<div class="path-progress-card" style="border-color: #f5a62340;">';
-    html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🧠 Сегодня нужно повторить</div>';
-    for (var r = 0; r < reviewTopics.length; r++) {
-      var topicTitle = reviewTopics[r];
-      var idx = getReviewLessonIndex(topicTitle);
-      var onclick = idx >= 0 ? ' onclick="goQuizFromLoaded(' + idx + ')"' : '';
-      html += '<div style="font-size:13px;padding:8px 0;display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);"' + onclick + '>';
-      html += '<span>🔄</span> <span>' + topicTitle + '</span>';
-      html += '</div>';
-    }
-    html += '</div>';
-  }
-
-  // --- Кнопка "Продолжить" или Финальный босс ---
-  if (!allDone) {
-    var nextLesson = allLessons[nextIdx];
-    html += '<div class="continue-card" onclick="goQuizFromLoaded(' + nextIdx + ')">';
-    html += '<div class="continue-icon">' + (nextLesson.title.match(/^\S+/) ? nextLesson.title.match(/^\S+/)[0] : '▶') + '</div>';
-    html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextLesson.title.replace(/^\S+\s*/, '') + '</div></div>';
+    var firstReviewTopic = reviewTopics[0];
+    var reviewIdx = getReviewLessonIndex(firstReviewTopic);
+    html += '<div class="continue-card" onclick="goQuizFromLoaded(' + reviewIdx + ')">';
+    html += '<div class="continue-icon">🔄</div>';
+    html += '<div><div class="continue-label">Повторить сегодня</div><div class="continue-title">' + firstReviewTopic + '</div></div>';
     html += '<div class="continue-arrow">→</div></div>';
   } else {
-    html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
-    html += '<div class="continue-icon">👑</div>';
-    html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс — все темы</div></div>';
-    html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+    if (!allDone) {
+      var nextIdx = 0;
+      for (var i = 0; i < allLessons.length; i++) {
+        if (!userProgress.completedLessons[allLessons[i].title]) { nextIdx = i; break; }
+      }
+      var nextLesson = allLessons[nextIdx];
+      html += '<div class="continue-card" onclick="goQuizFromLoaded(' + nextIdx + ')">';
+      html += '<div class="continue-icon">' + (nextLesson.title.match(/^\S+/) ? nextLesson.title.match(/^\S+/)[0] : '▶') + '</div>';
+      html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextLesson.title.replace(/^\S+\s*/, '') + '</div></div>';
+      html += '<div class="continue-arrow">→</div></div>';
+    } else {
+      html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+      html += '<div class="continue-icon">👑</div>';
+      html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс</div></div>';
+      html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+    }
   }
 
-  // --- Узлы пути ---
-  html += '<div style="display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 0 0">';
-  allLessons.forEach(function(l, i) {
-    var done = userProgress.completedLessons[l.title];
-    var prevKey = i > 0 ? allLessons[i-1].title : null;
-    var prevDone = i === 0 || userProgress.completedLessons[prevKey];
-    var isLocked = !prevDone && i > 0;
-    var perfect = done && done.score === done.total;
+  // --- Путь-змейка ---
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
+  html += '<div class="path-zigzag">';
 
+  function getZigzagOffset(i) {
+    var pattern = [0, -40, -80, -40, 0, 40, 80, 40];
+    return pattern[i % pattern.length];
+  }
+
+  for (var i = 0; i < allLessons.length; i++) {
+    var lesson = allLessons[i];
+    var done = userProgress.completedLessons[lesson.title];
+    var perfect = done && done.score === done.total;
+    var isLocked = i > 0 && !userProgress.completedLessons[allLessons[i-1].title];
     var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
     var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
-    var onclk = isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"';
+    var isReview = reviewTopics.indexOf(lesson.title) !== -1;
+    var offset = getZigzagOffset(i);
 
-    if (i > 0) {
-      var connDone = userProgress.completedLessons[allLessons[i-1].title];
-      html += '<div class="path-connector" style="background:' + (connDone ? 'var(--primary2)' : 'var(--border)') + '"></div>';
+    html += '<div class="zigzag-node" style="transform: translateX(' + offset + 'px); opacity: ' + (isLocked ? '0.45' : '1') + ';">';
+    if (isReview) {
+      html += '<div class="review-badge">🔄</div>';
     }
-
-    var isRight = i % 2 === 1;
-    html += '<div class="path-node-row" style="flex-direction:' + (isRight ? 'row-reverse' : 'row') + ';opacity:' + (isLocked ? '0.45' : '1') + '">';
-    html += '<div class="node-circle ' + stateClass + '"' + onclk + ' style="cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
-    html += '<div style="flex:1"><div style="font-weight:700;font-size:14px">' + l.title + '</div>';
+    html += '<div class="node-circle ' + stateClass + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + ' style="cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
+    html += '<div style="flex:1; margin-left:12px;">';
+    html += '<div style="font-weight:700;font-size:14px;">' + lesson.title + '</div>';
     if (done) {
-      html += '<div style="font-size:11px;color:var(--primary2);margin-top:3px">' + done.score + '/' + done.total + ' верно</div>';
+      html += '<div style="font-size:11px;color:var(--primary2);">' + done.score + '/' + done.total + ' верно</div>';
     } else {
-      html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + (l.questions ? l.questions.length : 0) + ' вопр.' + (l.tasks ? ' · ' + l.tasks : '') + '</div>';
+      html += '<div style="font-size:11px;color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопр.</div>';
     }
     html += '</div></div>';
-  });
 
-  // Узел босса
-  html += '<div class="path-connector" style="background:' + (allDone ? 'var(--primary2)' : 'var(--border)') + '"></div>';
-  html += '<div class="path-node-row">';
+    if (i < allLessons.length - 1) {
+      html += '<div class="zigzag-connector" style="transform: rotate(15deg) translateX(' + (offset * 0.7) + 'px);"></div>';
+    }
+  }
+
+  // Финальный босс
+  html += '<div class="zigzag-connector" style="background:' + (allDone ? 'var(--primary2)' : 'var(--border)') + ';"></div>';
+  html += '<div class="zigzag-node" style="transform: translateX(0px);">';
   html += '<div class="boss-node' + (allDone ? '' : ' locked') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + ' style="cursor:' + (allDone ? 'pointer' : 'default') + '">' + (allDone ? '👑' : '🔒') + '</div>';
-  html += '<div style="flex:1"><div style="font-weight:800;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:3px">' + (allDone ? 'Тест по всем темам — открыт!' : 'Пройди все темы чтобы открыть') + '</div></div>';
-  html += '</div>';
+  html += '<div style="flex:1; margin-left:12px;">';
+  html += '<div style="font-weight:800;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);">' + (allDone ? 'Открыт!' : 'Пройди все темы') + '</div>';
+  html += '</div></div>';
 
-  html += '</div>';
+  html += '</div>'; // .path-zigzag
+
   container.innerHTML = html;
 
-  document.getElementById('home-streak').textContent = '🔥 ' + (userProgress.streak || 0);
+  document.getElementById('home-streak').textContent = '🔥 ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+
+  // Слушатель прокрутки карусели для точек
+  var carousel = document.getElementById('home-carousel');
+  var dots = document.querySelectorAll('#carousel-dots .carousel-dot');
+  if (carousel && dots.length) {
+    carousel.addEventListener('scroll', function() {
+      var scrollLeft = carousel.scrollLeft;
+      var cardWidth = carousel.querySelector('.carousel-card').offsetWidth + 12;
+      var activeIndex = Math.round(scrollLeft / cardWidth);
+      dots.forEach(function(d, idx) { d.classList.toggle('active', idx === activeIndex); });
+    });
+  }
 }
