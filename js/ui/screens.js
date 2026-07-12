@@ -277,11 +277,12 @@ function renderHomePath() {
 
   html += '</div>'; // .carousel
 
-  // Точки-индикаторы
+  // Динамические точки-индикаторы (по количеству .carousel-card)
+  var carouselCardsCount = 3; // фиксировано, можно сделать document.querySelectorAll('.carousel-card').length, но на момент рендера их ещё нет в DOM
   html += '<div class="carousel-dots" id="carousel-dots">';
-  html += '<div class="carousel-dot active"></div>';
-  html += '<div class="carousel-dot"></div>';
-  html += '<div class="carousel-dot"></div>';
+  for (var dotIdx = 0; dotIdx < carouselCardsCount; dotIdx++) {
+    html += '<div class="carousel-dot' + (dotIdx === 0 ? ' active' : '') + '"></div>';
+  }
   html += '</div>';
 
   // --- Кнопка действия ---
@@ -330,11 +331,12 @@ function renderHomePath() {
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var offset = getZigzagOffset(i);
 
-    html += '<div class="zigzag-node" style="transform: translateX(' + offset + 'px); opacity: ' + (isLocked ? '0.45' : '1') + ';">';
+    // overflow:visible и кликабельность всего узла
+    html += '<div class="zigzag-node" style="transform: translateX(' + offset + 'px); opacity: ' + (isLocked ? '0.45' : '1') + '; overflow: visible;' + (isLocked ? '' : ' cursor:pointer;') + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + '>';
     if (isReview) {
       html += '<div class="review-badge">🔄</div>';
     }
-    html += '<div class="node-circle ' + stateClass + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + ' style="cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
+    html += '<div class="node-circle ' + stateClass + '" style="cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
     html += '<div style="flex:1; margin-left:12px;">';
     html += '<div style="font-weight:700;font-size:14px;">' + lesson.title + '</div>';
     if (done) {
@@ -344,14 +346,15 @@ function renderHomePath() {
     }
     html += '</div></div>';
 
+    // Коннектор между темами, но НЕ после последней
     if (i < allLessons.length - 1) {
       html += '<div class="zigzag-connector" style="transform: rotate(15deg) translateX(' + (offset * 0.7) + 'px);"></div>';
     }
   }
 
-  // Финальный босс
+  // Финальный босс — один коннектор перед ним
   html += '<div class="zigzag-connector" style="background:' + (allDone ? 'var(--primary2)' : 'var(--border)') + ';"></div>';
-  html += '<div class="zigzag-node" style="transform: translateX(0px);">';
+  html += '<div class="zigzag-node" style="transform: translateX(0px); overflow: visible;">';
   html += '<div class="boss-node' + (allDone ? '' : ' locked') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + ' style="cursor:' + (allDone ? 'pointer' : 'default') + '">' + (allDone ? '👑' : '🔒') + '</div>';
   html += '<div style="flex:1; margin-left:12px;">';
   html += '<div style="font-weight:800;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
@@ -365,15 +368,21 @@ function renderHomePath() {
   document.getElementById('home-streak').textContent = '🔥 ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 
-  // Слушатель прокрутки карусели для точек
+  // Слушатель прокрутки карусели (удаляем старый, чтобы не копился)
   var carousel = document.getElementById('home-carousel');
-  var dots = document.querySelectorAll('#carousel-dots .carousel-dot');
-  if (carousel && dots.length) {
-    carousel.addEventListener('scroll', function() {
+  if (carousel) {
+    function updateCarouselDots() {
       var scrollLeft = carousel.scrollLeft;
-      var cardWidth = carousel.querySelector('.carousel-card').offsetWidth + 12;
+      var card = carousel.querySelector('.carousel-card');
+      if (!card) return;
+      var cardWidth = card.offsetWidth + 12; // gap
       var activeIndex = Math.round(scrollLeft / cardWidth);
+      var dots = document.querySelectorAll('#carousel-dots .carousel-dot');
       dots.forEach(function(d, idx) { d.classList.toggle('active', idx === activeIndex); });
-    });
+    }
+    // Удаляем предыдущий обработчик, если он был назначен
+    carousel.removeEventListener('scroll', carousel._scrollHandler);
+    carousel.addEventListener('scroll', updateCarouselDots);
+    carousel._scrollHandler = updateCarouselDots;
   }
 }
