@@ -11,8 +11,15 @@ function addXP(amount) {
     amount *= 2;
   }
 
+  var oldLevel = userProgress.level;                // запоминаем старый уровень
+
   userProgress.xp += amount;
   userProgress.level = Math.floor(userProgress.xp / 200) + 1;
+
+  // Если уровень повысился — вызываем профессора
+  if (userProgress.level > oldLevel && typeof professor !== 'undefined') {
+    professor.onLevelUp(userProgress.level);
+  }
 
   saveProgress();
   showXPToast(amount);
