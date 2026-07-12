@@ -2,28 +2,26 @@
 //  СИСТЕМА ВИКТОРИНЫ
 // ==========================================
 
-// Переменные текущей сессии
 var curQ = 0, score = 0, answered = false, shuffled = [];
 var curLesson = 0, lives = 3, hintUsed = false;
 var isBossMode = false;
 var lastExplainText = '';
-var currentHintLevel = 0;           // <-- добавлено для подсказок профессора
+var currentHintLevel = 0;
+var lastAnswerWasWrong = false;   // для отслеживания первой верной после ошибки
+var correctStreak = 0;           // счётчик правильных подряд
 
-// Получить название текущей темы
 function getCurrentTopicTitle() {
   if (isBossMode) return 'Финальный босс';
   var all = getAllLessons();
   return (all[curLesson] && all[curLesson].title) || 'Тренировка';
 }
 
-// Получить ключ текущей темы (для подсказок)
 function getCurrentTopicKey() {
   if (isBossMode) return 'default';
   var all = getAllLessons();
   return (all[curLesson] && all[curLesson].key) || 'default';
 }
 
-// Отрисовка вопроса
 function renderQ() {
   var q = shuffled[curQ];
   var topicTitle = getCurrentTopicTitle();
@@ -44,21 +42,18 @@ function renderQ() {
   document.getElementById('btn-ask-ai').style.display = 'none';
   document.getElementById('btn-hint').style.display = 'flex';
   document.getElementById('btn-hint').textContent = '🎓 Спросить профессора Гео';
-  document.getElementById('btn-hint').disabled = false;   // сбрасываем блокировку
+  document.getElementById('btn-hint').disabled = false;
 
-  // Жизни
   var livesEl = document.getElementById('lives-row');
   livesEl.innerHTML = '';
   for (var i = 0; i < 3; i++) {
     livesEl.innerHTML += '<span>' + (i < lives ? '❤️' : '🖤') + '</span>';
   }
 
-  // Кнопка "Следующий вопрос"
   var btn = document.getElementById('btn-next');
   btn.classList.remove('show');
   btn.textContent = curQ < shuffled.length - 1 ? 'Следующий вопрос →' : 'Посмотреть результат →';
 
-  // Варианты ответов
   var ans = document.getElementById('answers');
   ans.innerHTML = '';
   ['А', 'Б', 'В', 'Г'].forEach(function(l, i) {
@@ -70,13 +65,11 @@ function renderQ() {
   });
 }
 
-// Выбор ответа
 function selectAns(idx, correct, qText, topic, hint) {
   if (answered) return;
   answered = true;
   closeProfessorModal();
 
-  // Тактильный отклик в Telegram
   if (idx === correct && isTelegram && tgApp.HapticFeedback) {
     try { tgApp.HapticFeedback.notificationOccurred('success'); } catch(e) {}
   }
@@ -86,23 +79,33 @@ function selectAns(idx, correct, qText, topic, hint) {
   if (idx !== correct) {
     btns[correct].classList.add('correct');
     lives--;
-  }
-  if (idx === correct) score++;
-
-  // ===== РЕАКЦИЯ ПРОФЕССОРА ГЕО =====
-  if (typeof professor !== 'undefined') {
-    if (idx === correct) {
-      professor.onCorrect(getCurrentTopicKey());
-    } else {
-      var rightAnswerText = shuffled[curQ].answers[correct];
-      professor.onWrong(getCurrentTopicKey(), rightAnswerText);
+    correctStreak = 0;
+    lastAnswerWasWrong = true;
+  } else {
+    score++;
+    correctStreak++;
+    if (lastAnswerWasWrong) {
+      professor.showMessage('Отлично! Видишь? Уже получается.', 'happy', 3000, 'success');
+      lastAnswerWasWrong = false;
+    }
+    if (correctStreak === 3) {
+      professor.showMessage('🔥 Отличная серия! Ты начинаешь чувствовать тему.', 'happy', 4000, 'success');
     }
   }
-  // ==================================
+
+  if (idx === correct) {
+    professor.onCorrect(getCurrentTopicKey());
+  } else {
+    var rightAnswerText = shuffled[curQ].answers[correct];
+    professor.onWrong(getCurrentTopicKey(), rightAnswerText);
+  }
+
+  if (lives === 1) {
+    professor.showMessage('Осторожно. Сейчас лучше не спешить.', 'sad', 3000, 'hint');
+  }
 
   document.getElementById('btn-hint').style.display = 'none';
 
-  // Обновление жизней
   var livesEl = document.getElementById('lives-row');
   livesEl.innerHTML = '';
   for (var i = 0; i < 3; i++) {
@@ -120,7 +123,6 @@ function selectAns(idx, correct, qText, topic, hint) {
   updateDailyTasks();
 }
 
-// Запрос объяснения от AI
 async function requestAIExplanation(isCorrect, qText, topic) {
   var explainBox = document.getElementById('ai-explain');
   var askBtn = document.getElementById('btn-ask-ai');
@@ -158,14 +160,12 @@ async function requestAIExplanation(isCorrect, qText, topic) {
   }
 }
 
-// Следующий вопрос
 function nextQ() {
   curQ++;
   if (curQ >= shuffled.length) showResult();
   else renderQ();
 }
 
-// Показать результат
 function showResult() {
   var total = shuffled.length;
   var pct = Math.round(score / total * 100);
@@ -200,6 +200,9 @@ function showResult() {
   var xpGain = score * 20 + (score === total ? 50 : 0);
   document.getElementById('res-xp').textContent = '+' + xpGain;
 
+  // реакция на завершение темы
+  professor.onTopicComplete(getCurrentTopicTitle());
+
   saveLesson(curLesson, score, total);
   goScreen('s-result');
   setTimeout(function() {
@@ -208,12 +211,12 @@ function showResult() {
   updateDailyTasks();
 }
 
-// Сохранить урок
 function saveLesson(lessonIdx, sc, total) {
   var today = new Date().toISOString().slice(0,10);
   var allLessons = getAllLessons();
   var lessonKey = allLessons[lessonIdx] ? allLessons[lessonIdx].title : String(lessonIdx);
-  userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx };
+  var oldChestGiven = userProgress.completedLessons[lessonKey] && userProgress.completedLessons[lessonKey].chestGiven;
+  userProgress.completedLessons[lessonKey] = { score: sc, total: total, date: today, idx: lessonIdx, chestGiven: oldChestGiven || false };
   userProgress.totalAnswered += total;
   userProgress.totalCorrect += sc;
   var xpGain = sc * 20 + (sc === total ? 50 : 0);
@@ -229,7 +232,6 @@ function saveLesson(lessonIdx, sc, total) {
   }
 }
 
-// Переход к квизу по индексу урока
 function goQuizFromLoaded(idx) {
   var allLessons = getAllLessons();
   curLesson = idx;
@@ -239,11 +241,19 @@ function goQuizFromLoaded(idx) {
   answered = false;
   lives = 3;
   hintUsed = false;
+  correctStreak = 0;
+  lastAnswerWasWrong = false;
   goScreen('s-quiz');
+
+  // первое открытие темы
+  var lesson = allLessons[idx];
+  if (lesson && !userProgress.completedLessons[lesson.title]) {
+    professor.showMessage('📚 Начинаем новую тему! Не переживай, будем идти шаг за шагом.', 'default', 4000, 'greeting');
+  }
+
   renderQ();
 }
 
-// Повторить урок
 function replayLesson() {
   if (isBossMode || curLesson < 0) {
     goBossLevel();
@@ -256,11 +266,12 @@ function replayLesson() {
   answered = false;
   lives = 3;
   hintUsed = false;
+  correctStreak = 0;
+  lastAnswerWasWrong = false;
   goScreen('s-quiz');
   renderQ();
 }
 
-// Финальный босс
 function goBossLevel() {
   var allLessons = getAllLessons();
   var allQuestions = [];
@@ -276,19 +287,17 @@ function goBossLevel() {
   answered = false;
   lives = 999;
   hintUsed = false;
+  correctStreak = 0;
+  lastAnswerWasWrong = false;
   goScreen('s-quiz');
   renderQ();
 }
 
-// ==========================================
-//  КНОПКА ПОДСКАЗКИ ПРОФЕССОРА ГЕО
-// ==========================================
 window.askProfessor = function() {
-  if (answered) return;               // не даём подсказку, если уже ответил
+  if (answered) return;
   hintUsed = true;
   currentHintLevel = (currentHintLevel || 0) + 1;
   var hint = professor.getHint(getCurrentTopicKey(), currentHintLevel);
-  // Отправляем подсказку в очередь профессора
   if (typeof professor !== 'undefined') {
     professor.showHint(hint.text);
   }
