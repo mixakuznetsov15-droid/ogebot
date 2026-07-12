@@ -45,6 +45,14 @@ async function openLessonTheory(index) {
 }
 
 function showTheoryScreen(theoryInfo) {
+    // Сохраняем, что теория прочитана
+    if (!userProgress.theoryRead) userProgress.theoryRead = {};
+    var lesson = QUESTIONS_FILES[currentLessonIndex];
+    if (lesson) {
+        userProgress.theoryRead[lesson.title] = true;
+        saveProgress();
+    }
+
     goScreen('s-topic');
     document.getElementById('topic-title').textContent = theoryInfo.title;
     var html = '';
@@ -310,6 +318,19 @@ function renderHomePath() {
     html += '<div style="margin-top:8px;font-size:12px;color:var(--muted)">За каждое задание +20 XP</div>';
   }
   html += '</div>';
+
+  // --- Карточка «Что делать сейчас» (персональный маршрут) ---
+  var nextAction = getNextAction();
+  if (nextAction) {
+    html += '<div class="path-progress-card" style="cursor:' + (nextAction.disabled ? 'default' : 'pointer') + '"';
+    if (!nextAction.disabled && nextAction.action) {
+      html += ' onclick="(' + nextAction.action.toString() + ')()"';
+    }
+    html += '>';
+    html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">📍 Что делать сейчас</div>';
+    html += '<div style="font-size:15px;font-weight:600;color:' + (nextAction.disabled ? 'var(--muted)' : 'var(--primary)') + '">' + nextAction.text + '</div>';
+    html += '</div>';
+  }
 
   // --- Кнопка "Продолжить" или Финальный босс ---
   if (!allDone) {
