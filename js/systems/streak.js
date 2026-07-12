@@ -8,6 +8,8 @@ function checkStreak() {
   if (userProgress.lastDate === today) return;
 
   var yesterday = new Date(Date.now() - 86400000).toISOString().slice(0,10);
+  var oldStreak = userProgress.streak || 0;
+
   if (userProgress.lastDate === yesterday) {
     userProgress.streak++;
   } else if (userProgress.lastDate !== today) {
@@ -22,6 +24,12 @@ function checkStreak() {
 
   userProgress.lastDate = today;
   saveProgress();
+
+  // Если серия увеличилась – профессор реагирует
+  if (userProgress.streak > oldStreak && typeof professor !== 'undefined') {
+    professor.onStreak(userProgress.streak);
+  }
+
   checkAchievements();
   giveDailyChest();
   giveStreakChests();
