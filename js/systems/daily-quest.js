@@ -45,6 +45,11 @@ function updateDailyTasks() {
     addXP(100);
     giveChest('achievement');
     showToast('🎁 Сундук за все задания дня!');
+
+    // Реакция профессора: все ежедневные задания выполнены
+    if (typeof professor !== 'undefined') {
+      professor.onDailyTaskDone();
+    }
   }
   saveProgress();
 }
