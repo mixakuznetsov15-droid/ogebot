@@ -37,37 +37,18 @@ async function openLessonTheory(index) {
     try {
         var theory = await fetchJSON(theoryInfo.file);
         theoryLoaded = theory;
-        showTheoryScreen(theoryInfo);
+        // Новая система карточек вместо длинной статьи
+        startTheoryCards(theoryInfo, theory);
     } catch (e) {
         console.error(e);
         goQuizFromLoaded(index);
     }
 }
 
+// Старая функция showTheoryScreen больше не используется
+// (удалена или оставлена пустой, чтобы не ломать возможные вызовы)
 function showTheoryScreen(theoryInfo) {
-    // Сохраняем, что теория прочитана
-    if (!userProgress.theoryRead) userProgress.theoryRead = {};
-    var lesson = QUESTIONS_FILES[currentLessonIndex];
-    if (lesson) {
-        userProgress.theoryRead[lesson.title] = true;
-        saveProgress();
-    }
-
-    goScreen('s-topic');
-    document.getElementById('topic-title').textContent = theoryInfo.title;
-    var html = '';
-    theoryLoaded.forEach(function(item){
-        html += `
-        <div class="theory-card">
-            <div class="theory-topic">${item.topic}</div>
-            <div class="theory-text">${item.content.replace(/\n/g,"<br>")}</div>
-        </div>`;
-    });
-    html += `
-    <button class="btn-full primary" onclick="startLessonPractice()">
-        🚀 Начать практику
-    </button>`;
-    document.getElementById("topic-content").innerHTML = html;
+    // заглушка — не используется
 }
 
 function startLessonPractice(){
