@@ -9,12 +9,13 @@ class ProfessorSystem {
     this.characterEl = null;
     this.bubbleEl = null;
 
-    // Конечный автомат
     this.currentState = 'idle';
-
-    // Очередь сообщений
     this.messageQueue = [];
-    this.isShowing = false;        // активно ли сообщение сейчас
+    this.isShowing = false;
+
+    // Счётчики для персонализации
+    this.consecutiveCorrect = 0;
+    this.consecutiveErrors = 0;
   }
 
   init() {
@@ -89,6 +90,20 @@ class ProfessorSystem {
         border-right: 10px solid transparent;
         border-top: 10px solid #ffffff;
       }
+      .prof-bubble .btn-study-theory {
+        display: inline-block;
+        margin-top: 8px;
+        background: var(--primary, #58a6ff);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        padding: 6px 14px;
+        font-family: 'Onest', sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        pointer-events: auto;
+      }
     `;
     document.head.appendChild(style);
 
@@ -115,75 +130,60 @@ class ProfessorSystem {
     return this;
   }
 
-  // --------------------------------------------------
-  //  Управление состоянием конечного автомата
-  // --------------------------------------------------
-  _setState(state, duration = 5000) {
-    this.currentState = state;
-    clearTimeout(this.stateTimer);
-    if (state !== 'idle') {
-      this.stateTimer = setTimeout(() => {
-        this.currentState = 'idle';
-      }, duration);
-    }
+  // Определение уровня пользователя
+  getUserLevel() {
+    const xp = userProgress.xp || 0;
+    if (xp < 100) return 'beginner';
+    if (xp < 500) return 'intermediate';
+    return 'advanced';
   }
 
-  // --------------------------------------------------
-  //  Очередь сообщений
-  // --------------------------------------------------
-  _enqueue(text, emotion, duration, state) {
-    this.messageQueue.push({ text, emotion, duration, state });
-    if (!this.isShowing) {
-      this._processQueue();
+  // Персонализированное сообщение для правильных/неправильных ответов
+  getPersonalizedMessage(type, correctAnswerText = '') {
+    const level = this.getUserLevel();
+    const basePool = this.messages[level] && this.messages[level][type];
+    if (basePool && basePool.length > 0) {
+      let msg = this._randomFromArray(basePool);
+      if (correctAnswerText) {
+        msg = msg.replace('{correctAnswer}', correctAnswerText);
+      }
+      return msg;
     }
+    // Запасной вариант из общих сообщений
+    let fallback = this._randomFromArray(this.messages[type] || []);
+    if (correctAnswerText) {
+      fallback = fallback.replace('{correctAnswer}', correctAnswerText);
+    }
+    return fallback;
   }
 
-  _processQueue() {
-    if (this.messageQueue.length === 0) {
-      this.isShowing = false;
-      this.hideSpeech();
-      return;
+  // Отслеживание ответов и возврат особых флагов
+  trackAnswer(isCorrect) {
+    if (isCorrect) {
+      this.consecutiveCorrect++;
+      this.consecutiveErrors = 0;
+    } else {
+      this.consecutiveErrors++;
+      this.consecutiveCorrect = 0;
     }
 
-    this.isShowing = true;
-    const { text, emotion, duration, state } = this.messageQueue.shift();
-    this._showMessageInternal(text, emotion, duration, state, () => {
-      // По завершении текущего сообщения запускаем следующее
-      this._processQueue();
-    });
+    const flags = {
+      fiveCorrect: this.consecutiveCorrect >= 5,
+      threeErrors: this.consecutiveErrors >= 3
+    };
+
+    // Сброс счётчиков при особых событиях, чтобы не срабатывало повторно подряд
+    if (flags.fiveCorrect) {
+      this.consecutiveCorrect = 0; // сбрасываем, чтобы не спамить
+    }
+    if (flags.threeErrors) {
+      this.consecutiveErrors = 0; // сбрасываем после обработки
+    }
+
+    return flags;
   }
 
-  _showMessageInternal(text, emotion, duration, state, onComplete) {
-    if (!this.containerEl) {
-      onComplete();
-      return;
-    }
-
-    this._setState(state, duration);
-
-    this.bubbleEl.textContent = text;
-    this.bubbleEl.classList.add('visible');
-
-    const src = this.images[emotion] || this.images.default;
-    if (src) {
-      this.characterEl.src = src;
-    }
-
-    this.characterEl.classList.add('prof-leaning');
-
-    clearTimeout(this.speechTimer);
-    this.speechTimer = setTimeout(() => {
-      this.bubbleEl.classList.remove('visible');
-      this.characterEl.classList.remove('prof-leaning');
-      this.characterEl.classList.add('prof-idle');
-      this.currentState = 'idle';
-      onComplete();
-    }, duration);
-  }
-
-  // --------------------------------------------------
-  //  Публичные методы (ставят события в очередь)
-  // --------------------------------------------------
+  // Основные методы (с персонализацией)
   showGreeting() {
     const today = new Date().toISOString().slice(0, 10);
     const lastDate = localStorage.getItem('prof_greet_date');
@@ -195,14 +195,13 @@ class ProfessorSystem {
   }
 
   onCorrect(topicKey) {
-    const text = this._randomFromArray(this.messages.correct);
+    const text = this.getPersonalizedMessage('correct');
     this._enqueue(text, 'happy', 4000, 'success');
     return this;
   }
 
   onWrong(topicKey, correctAnswerText) {
-    let template = this._randomFromArray(this.messages.wrong);
-    const text = template.replace('{correctAnswer}', correctAnswerText);
+    const text = this.getPersonalizedMessage('wrong', correctAnswerText);
     this._enqueue(text, 'sad', 5000, 'error');
     return this;
   }
@@ -277,9 +276,105 @@ class ProfessorSystem {
     return this;
   }
 
-  // --------------------------------------------------
-  //  Вспомогательные
-  // --------------------------------------------------
+  // Особые события
+  showThreeErrorsMessage() {
+    const msg = this.messages.threeErrorsInRow;
+    // Добавляем кнопку "Изучить теорию" в облачко
+    this._enqueueWithButton(msg, 'Изучить теорию', () => {
+      if (typeof openLessonTheory === 'function' && typeof currentLessonIndex !== 'undefined') {
+        openLessonTheory(currentLessonIndex);
+      }
+    }, 'sad', 6000, 'error');
+    return this;
+  }
+
+  showFiveCorrectMessage() {
+    const msg = this.messages.fiveCorrectInRow;
+    this._enqueue(msg, 'happy', 5000, 'success');
+    return this;
+  }
+
+  // Очередь с кнопкой (для кнопки "Изучить теорию")
+  _enqueueWithButton(text, buttonText, onClick, emotion, duration, state) {
+    const messageObj = { text, emotion, duration, state, button: { text: buttonText, onClick } };
+    this.messageQueue.push(messageObj);
+    if (!this.isShowing) {
+      this._processQueue();
+    }
+  }
+
+  _processQueue() {
+    if (this.messageQueue.length === 0) {
+      this.isShowing = false;
+      this.hideSpeech();
+      return;
+    }
+
+    this.isShowing = true;
+    const { text, emotion, duration, state, button } = this.messageQueue.shift();
+    this._showMessageInternal(text, emotion, duration, state, () => {
+      this._processQueue();
+    }, button);
+  }
+
+  _showMessageInternal(text, emotion, duration, state, onComplete, button) {
+    if (!this.containerEl) {
+      onComplete();
+      return;
+    }
+
+    this._setState(state, duration);
+
+    this.bubbleEl.innerHTML = ''; // очищаем
+    this.bubbleEl.appendChild(document.createTextNode(text));
+
+    if (button) {
+      const btn = document.createElement('button');
+      btn.className = 'btn-study-theory';
+      btn.textContent = button.text;
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (button.onClick) button.onClick();
+      });
+      this.bubbleEl.appendChild(btn);
+    }
+
+    this.bubbleEl.classList.add('visible');
+
+    const src = this.images[emotion] || this.images.default;
+    if (src) {
+      this.characterEl.src = src;
+    }
+
+    this.characterEl.classList.add('prof-leaning');
+
+    clearTimeout(this.speechTimer);
+    this.speechTimer = setTimeout(() => {
+      this.bubbleEl.classList.remove('visible');
+      this.characterEl.classList.remove('prof-leaning');
+      this.characterEl.classList.add('prof-idle');
+      this.currentState = 'idle';
+      onComplete();
+    }, duration);
+  }
+
+  _enqueue(text, emotion, duration, state) {
+    this.messageQueue.push({ text, emotion, duration, state });
+    if (!this.isShowing) {
+      this._processQueue();
+    }
+  }
+
+  _setState(state, duration = 5000) {
+    this.currentState = state;
+    clearTimeout(this.stateTimer);
+    if (state !== 'idle') {
+      this.stateTimer = setTimeout(() => {
+        this.currentState = 'idle';
+      }, duration);
+    }
+  }
+
   hideSpeech() {
     if (!this.bubbleEl) return;
     this.bubbleEl.classList.remove('visible');
