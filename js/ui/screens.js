@@ -278,7 +278,7 @@ function renderHomePath() {
   html += '</div>'; // .carousel
 
   // Динамические точки-индикаторы (по количеству .carousel-card)
-  var carouselCardsCount = 3; // фиксировано, можно сделать document.querySelectorAll('.carousel-card').length, но на момент рендера их ещё нет в DOM
+  var carouselCardsCount = 3;
   html += '<div class="carousel-dots" id="carousel-dots">';
   for (var dotIdx = 0; dotIdx < carouselCardsCount; dotIdx++) {
     html += '<div class="carousel-dot' + (dotIdx === 0 ? ' active' : '') + '"></div>';
@@ -316,8 +316,9 @@ function renderHomePath() {
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
   html += '<div class="path-zigzag">';
 
+  // Новый органичный паттерн смещений (9 значений)
   function getZigzagOffset(i) {
-    var pattern = [0, -40, -80, -40, 0, 40, 80, 40];
+    var pattern = [0, -35, -65, -35, 10, 55, 80, 45, -10];
     return pattern[i % pattern.length];
   }
 
@@ -331,12 +332,14 @@ function renderHomePath() {
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var offset = getZigzagOffset(i);
 
-    // overflow:visible и кликабельность всего узла
+    // Активный узел крупнее (64px) и с усиленной тенью
+    var nodeSizeStyle = stateClass === 'current' ? 'width:64px;height:64px;font-size:24px;box-shadow:0 0 0 8px #f5a62330;' : '';
+
     html += '<div class="zigzag-node" style="transform: translateX(' + offset + 'px); opacity: ' + (isLocked ? '0.45' : '1') + '; overflow: visible;' + (isLocked ? '' : ' cursor:pointer;') + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + '>';
     if (isReview) {
       html += '<div class="review-badge">🔄</div>';
     }
-    html += '<div class="node-circle ' + stateClass + '" style="cursor:' + (isLocked ? 'default' : 'pointer') + '">' + nodeIcon + '</div>';
+    html += '<div class="node-circle ' + stateClass + '" style="cursor:' + (isLocked ? 'default' : 'pointer') + '; ' + nodeSizeStyle + '">' + nodeIcon + '</div>';
     html += '<div style="flex:1; margin-left:12px;">';
     html += '<div style="font-weight:700;font-size:14px;">' + lesson.title + '</div>';
     if (done) {
@@ -346,13 +349,12 @@ function renderHomePath() {
     }
     html += '</div></div>';
 
-    // Коннектор между темами, но НЕ после последней
     if (i < allLessons.length - 1) {
       html += '<div class="zigzag-connector" style="transform: rotate(15deg) translateX(' + (offset * 0.7) + 'px);"></div>';
     }
   }
 
-  // Финальный босс — один коннектор перед ним
+  // Финальный босс
   html += '<div class="zigzag-connector" style="background:' + (allDone ? 'var(--primary2)' : 'var(--border)') + ';"></div>';
   html += '<div class="zigzag-node" style="transform: translateX(0px); overflow: visible;">';
   html += '<div class="boss-node' + (allDone ? '' : ' locked') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + ' style="cursor:' + (allDone ? 'pointer' : 'default') + '">' + (allDone ? '👑' : '🔒') + '</div>';
@@ -368,21 +370,30 @@ function renderHomePath() {
   document.getElementById('home-streak').textContent = '🔥 ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 
-  // Слушатель прокрутки карусели (удаляем старый, чтобы не копился)
+  // Слушатель прокрутки карусели с обновлением активного класса карточек
   var carousel = document.getElementById('home-carousel');
   if (carousel) {
-    function updateCarouselDots() {
+    function updateCarouselActive() {
+      var cards = carousel.querySelectorAll('.carousel-card');
+      if (!cards.length) return;
       var scrollLeft = carousel.scrollLeft;
-      var card = carousel.querySelector('.carousel-card');
-      if (!card) return;
-      var cardWidth = card.offsetWidth + 12; // gap
+      var cardWidth = cards[0].offsetWidth + 12; // gap
       var activeIndex = Math.round(scrollLeft / cardWidth);
+      cards.forEach(function(card, idx) {
+        if (idx === activeIndex) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
       var dots = document.querySelectorAll('#carousel-dots .carousel-dot');
       dots.forEach(function(d, idx) { d.classList.toggle('active', idx === activeIndex); });
     }
-    // Удаляем предыдущий обработчик, если он был назначен
+    // Удаляем старый обработчик
     carousel.removeEventListener('scroll', carousel._scrollHandler);
-    carousel.addEventListener('scroll', updateCarouselDots);
-    carousel._scrollHandler = updateCarouselDots;
+    carousel.addEventListener('scroll', updateCarouselActive);
+    carousel._scrollHandler = updateCarouselActive;
+    // Инициализация первого активного состояния
+    updateCarouselActive();
   }
 }
