@@ -1,17 +1,19 @@
 // ==========================================
-//  КАРТОЧКИ ТЕОРИИ (как в Duolingo)
+//  МИКРОУРОКИ (КАРТОЧКИ + ВСТРОЕННЫЕ ВОПРОСЫ)
 // ==========================================
 
-var theoryCardSteps = [];
-var currentCardStep = 0;
+var microSteps = [];
+var microStepIndex = 0;
+var microTopicKey = '';
 
 /**
- * Запускает показ карточек теории.
+ * Запускает показ микроуроков.
  * @param {object} theoryInfo - { title, key, ... }
- * @param {Array} theoryData - массив объектов { topic, content } из JSON теории
+ * @param {Array} theoryData - массив шагов { type: 'lesson'|'quiz', ... }
+ * @param {string} topicKey - ключ темы (например, 'topo')
  */
-function startTheoryCards(theoryInfo, theoryData) {
-  // Сохраняем, что теория прочитана
+function startTheoryCards(theoryInfo, theoryData, topicKey) {
+  // Сохраняем, что теория открыта
   if (!userProgress.theoryRead) userProgress.theoryRead = {};
   var lesson = QUESTIONS_FILES[currentLessonIndex];
   if (lesson) {
@@ -19,140 +21,111 @@ function startTheoryCards(theoryInfo, theoryData) {
     saveProgress();
   }
 
-  goScreen('s-topic');
-  document.getElementById('topic-title').textContent = theoryInfo.title;
-
-  // Формируем шаги
-  theoryCardSteps = [];
-
-  // Шаг 0: Вступление
-  theoryCardSteps.push({
-    title: '👋 Добро пожаловать!',
-    text: 'Сегодня мы изучим тему «' + theoryInfo.title + '». ' +
-          (theoryData[0] ? theoryData[0].content.split('.')[0] + '.' : ''),
-    icon: '📖'
-  });
-
-  // Шаги из данных теории
-  theoryData.forEach(function(item) {
-    theoryCardSteps.push({
-      title: item.topic || 'Материал',
-      text: item.content,
-      icon: '📘'
-    });
-  });
-
-  // Пример из реальной жизни
-  theoryCardSteps.push({
-    title: '🌍 Пример из жизни',
-    text: 'Представь, что ты планируешь поход и используешь карту, чтобы рассчитать расстояние до озера. ' +
-          'Знание масштаба и условных знаков поможет тебе не заблудиться!',
-    icon: '🗺️'
-  });
-
-  // Схема / иллюстрация
-  theoryCardSteps.push({
-    title: '🖼️ Схема',
-    text: 'Здесь могла бы быть наглядная схема или карта. ' +
-          'Пока представь её мысленно: основные элементы, связи между ними.',
-    icon: '🧩'
-  });
-
-  // Блок «Запомни»
-  var ruleText = 'Главное правило этой темы: всегда проверяй масштаб и единицы измерения.';
-  if (theoryData.length > 0) {
-    // Берём последнее предложение из последнего блока как правило (условно)
-    var lastContent = theoryData[theoryData.length - 1].content;
-    var sentences = lastContent.split('.');
-    if (sentences.length > 0) ruleText = '🔑 ' + sentences[sentences.length - 2] + '.';
+  // Если данные — массив с типом, запускаем микроуроки
+  if (Array.isArray(theoryData) && theoryData.length > 0 && theoryData[0].type) {
+    microSteps = theoryData;
+    microStepIndex = 0;
+    microTopicKey = topicKey || 'micro';
+    goScreen('s-topic');
+    document.getElementById('topic-title').textContent = theoryInfo.title;
+    renderMicroStep();
+  } else {
+    // Старый формат не поддерживается — сообщаем об ошибке
+    console.warn('Неверный формат теории. Ожидается массив шагов с полем "type".');
+    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Новый формат теории не загружен.</div>';
   }
-  theoryCardSteps.push({
-    title: '🧠 Запомни',
-    text: ruleText,
-    icon: '💡'
-  });
-
-  // Мини-вопрос
-  theoryCardSteps.push({
-    title: '❓ Проверь себя',
-    text: 'Какой масштаб используется на топографических картах?',
-    icon: '🤔'
-    // В будущем можно добавить интерактивный ответ
-  });
-
-  // Завершающая карточка
-  theoryCardSteps.push({
-    title: '🚀 Ты готов!',
-    text: 'Теперь ты знаешь основы. Давай применим знания на практике!',
-    icon: '🎯',
-    isLast: true
-  });
-
-  currentCardStep = 0;
-  renderTheoryCard();
 }
 
-/**
- * Отрисовывает текущую карточку в #topic-content
- */
-function renderTheoryCard() {
+/** Отрисовывает текущий шаг (урок или вопрос) */
+function renderMicroStep() {
   var container = document.getElementById('topic-content');
   if (!container) return;
 
-  var step = theoryCardSteps[currentCardStep];
-  var progress = (currentCardStep + 1) + '/' + theoryCardSteps.length;
-
+  var step = microSteps[microStepIndex];
   var html = '';
 
-  // Индикатор прогресса (точки)
-  html += '<div style="display:flex;justify-content:center;gap:6px;margin-bottom:16px">';
-  for (var i = 0; i < theoryCardSteps.length; i++) {
-    html += '<div style="width:8px;height:8px;border-radius:50%;background:' +
-            (i === currentCardStep ? 'var(--primary)' : 'var(--border)') + '"></div>';
-  }
-  html += '</div>';
-
-  // Карточка
-  html += '<div class="theory-card" style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:24px 20px;text-align:center">';
-  html += '<div style="font-size:40px;margin-bottom:12px">' + (step.icon || '📘') + '</div>';
-  html += '<div style="font-family:var(--font-h);font-size:18px;font-weight:700;margin-bottom:12px">' + step.title + '</div>';
-  html += '<div style="font-size:15px;line-height:1.6;color:var(--text);margin-bottom:20px">' + step.text + '</div>';
-
-  // Кнопка
-  if (step.isLast) {
-    html += '<button class="btn-full primary" onclick="startLessonPractice()">🚀 Начать практику</button>';
-  } else {
-    html += '<button class="btn-full primary" onclick="nextTheoryCard()">Продолжить →</button>';
-  }
-
-  html += '</div>';
-
-  // Можно добавить кнопку "Назад", если нужно
-  if (currentCardStep > 0) {
-    html += '<div style="text-align:center;margin-top:10px"><span style="color:var(--muted);cursor:pointer;font-size:13px" onclick="prevTheoryCard()">← Назад</span></div>';
+  if (step.type === 'lesson') {
+    // Обычный текстовый экран
+    html += '<div class="theory-card">';
+    html += '<div class="theory-topic">' + step.title + '</div>';
+    html += '<div class="theory-text">' + step.text.replace(/\n/g, '<br>') + '</div>';
+    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
+    html += '</div>';
+  } else if (step.type === 'quiz') {
+    // Встроенный вопрос
+    html += '<div class="quiz-wrap" style="padding:0">';
+    html += '<div class="q-card"><div class="q-text">' + step.question + '</div></div>';
+    html += '<div class="answers" id="micro-answers">';
+    step.answers.forEach(function(ans, idx) {
+      html += '<button class="ans-btn" onclick="answerMicroQuestion(' + idx + ')"><div class="ans-letter">' + 'АБВГ'[idx] + '</div><span>' + ans + '</span></button>';
+    });
+    html += '</div>';
+    html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
+    html += '</div>';
   }
 
   container.innerHTML = html;
 }
 
-/**
- * Переход к следующей карточке
- */
-function nextTheoryCard() {
-  if (currentCardStep < theoryCardSteps.length - 1) {
-    currentCardStep++;
-    renderTheoryCard();
+/** Переход к следующему шагу (для типа lesson) */
+function nextMicroStep() {
+  microStepIndex++;
+  if (microStepIndex < microSteps.length) {
+    renderMicroStep();
   } else {
-    // Последняя карточка уже имеет кнопку запуска практики
+    // Микроурок завершён — переходим к практике
+    startLessonPractice();
   }
 }
 
-/**
- * Переход к предыдущей карточке
- */
-function prevTheoryCard() {
-  if (currentCardStep > 0) {
-    currentCardStep--;
-    renderTheoryCard();
+/** Обработка ответа на микро-вопрос */
+function answerMicroQuestion(chosen) {
+  var step = microSteps[microStepIndex];
+  var correct = step.correct;
+  var isCorrect = (chosen === correct);
+  var feedbackDiv = document.getElementById('micro-feedback');
+  var btns = document.querySelectorAll('#micro-answers .ans-btn');
+
+  // Блокируем кнопки
+  btns.forEach(function(b) { b.disabled = true; });
+
+  if (isCorrect) {
+    // Правильный ответ
+    addXP(5); // небольшой бонус
+    btns[correct].classList.add('correct');
+    feedbackDiv.innerHTML = '<div style="color:var(--primary2);margin-bottom:8px;">✅ Правильно! ' + (step.explanation || '') + '</div>';
+
+    if (typeof professor !== 'undefined') {
+      professor.onCorrect(microTopicKey);
+    }
+
+    // Кнопка «Продолжить»
+    var btn = document.createElement('button');
+    btn.className = 'btn-full primary';
+    btn.textContent = 'Продолжить →';
+    btn.onclick = function() {
+      microStepIndex++;
+      if (microStepIndex < microSteps.length) {
+        renderMicroStep();
+      } else {
+        startLessonPractice();
+      }
+    };
+    feedbackDiv.appendChild(btn);
+
+  } else {
+    // Неправильный ответ
+    btns[chosen].classList.add('wrong');
+    btns[correct].classList.add('correct'); // подсвечиваем правильный
+    feedbackDiv.innerHTML = '<div style="color:var(--danger);margin-bottom:8px;">❌ Неверно. ' + (step.explanation || 'Попробуй ещё раз.') + '</div>';
+
+    if (typeof professor !== 'undefined') {
+      professor.onWrong(microTopicKey, step.answers[correct]);
+    }
+
+    // Автоматически перерисовываем этот же вопрос через 2 секунды
+    setTimeout(function() {
+      renderMicroStep();
+    }, 2000);
   }
 }
