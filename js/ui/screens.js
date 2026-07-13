@@ -16,6 +16,8 @@ function goScreen(id) {
     renderProfile();
   } else if (id === 's-home') {
     renderHomePath();
+  } else if (id === 's-session-summary') {
+    renderSessionSummary();
   }
 }
 
@@ -316,7 +318,6 @@ function renderHomePath() {
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
   html += '<div class="path-zigzag">';
 
-  // Новый органичный паттерн смещений (9 значений)
   function getZigzagOffset(i) {
     var pattern = [0, -35, -65, -35, 10, 55, 80, 45, -10];
     return pattern[i % pattern.length];
@@ -397,3 +398,98 @@ function renderHomePath() {
     updateCarouselActive();
   }
 }
+
+// ==========================================
+// ИТОГИ ЗАНЯТИЯ (Session Summary)
+// ==========================================
+function renderSessionSummary() {
+  var container = document.getElementById('session-summary-content');
+  if (!container) return;
+
+  // Данные сессии (устанавливаются перед переходом)
+  var data = window._sessionData || {};
+  var totalQuestions = data.total || 0;
+  var score = data.score || 0;
+  var xpGain = data.xpGain || 0;
+  var streak = userProgress.streak || 0;
+  var topicTitle = data.topicTitle || 'занятие';
+  var accuracy = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
+
+  // Новый уровень?
+  var levelUp = data.levelUp || false;
+  // Получен сундук?
+  var chestReceived = data.chestReceived || false;
+
+  // Рекомендация
+  var nextAction = getNextAction(); // из learning-path.js
+
+  // Комментарий профессора
+  var professorComment = '';
+  if (typeof professor !== 'undefined' && professor.generateSessionComment) {
+    professorComment = professor.generateSessionComment(topicTitle, accuracy, streak);
+  } else {
+    professorComment = 'Продолжай в том же духе!';
+  }
+
+  var html = '';
+
+  // Заголовок
+  html += '<div class="result-emoji">🎉</div>';
+  html += '<div class="result-title">Отличная работа!</div>';
+
+  // Статистика
+  html += '<div class="res-stats" style="margin-top:12px">';
+  html += '<div class="res-stat"><div class="res-num g">' + totalQuestions + '</div><div class="res-label">Решено вопросов</div></div>';
+  html += '<div class="res-stat"><div class="res-num y">+' + xpGain + '</div><div class="res-label">XP</div></div>';
+  html += '<div class="res-stat"><div class="res-num" style="color:#f85149">🔥 ' + streak + '</div><div class="res-label">Серия дней</div></div>';
+  html += '</div>';
+
+  // Особые достижения
+  if (levelUp) {
+    html += '<div class="res-stat" style="background:rgba(63,185,80,0.15);border-color:var(--primary2);margin-top:8px">';
+    html += '<div class="res-num g">🏆</div><div class="res-label">Новый уровень!</div>';
+    html += '</div>';
+  }
+  if (chestReceived) {
+    html += '<div class="res-stat" style="background:rgba(210,153,34,0.2);border-color:var(--gold);margin-top:8px">';
+    html += '<div class="res-num y">🎁</div><div class="res-label">Получен сундук!</div>';
+    html += '</div>';
+  }
+
+  // Комментарий профессора
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:16px;text-align:left">';
+  html += '<div style="font-weight:700;margin-bottom:4px">🧑‍🏫 Профессор Гео:</div>';
+  html += '<div style="font-size:14px;line-height:1.5;color:var(--text)">' + professorComment + '</div>';
+  html += '</div>';
+
+  // Рекомендация
+  html += '<div style="margin-top:20px;font-size:15px;font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
+  html += '<div class="continue-card" style="margin-top:8px" onclick="executeNextAction()">';
+  if (nextAction && nextAction.action) {
+    html += '<div class="continue-icon">▶</div>';
+    html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + nextAction.text + '</div></div>';
+    html += '<div class="continue-arrow">→</div>';
+  } else {
+    html += '<div class="continue-icon">🌟</div>';
+    html += '<div><div class="continue-title">Отдохнуть. Сегодня план выполнен.</div></div>';
+  }
+  html += '</div>';
+
+  // Кнопки
+  html += '<div class="res-btns" style="margin-top:20px">';
+  html += '<button class="btn-full primary" onclick="executeNextAction()">Продолжить обучение</button>';
+  html += '<button class="btn-full sec" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+// Выполнить рекомендованное действие (из learning-path)
+window.executeNextAction = function() {
+  var action = getNextAction();
+  if (action && action.action) {
+    action.action();
+  } else {
+    goScreen('s-home');
+  }
+};
