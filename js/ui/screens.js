@@ -493,4 +493,4 @@ window.executeNextAction = function() {
   } else {
     goScreen('s-home');
   }
-};
+}; 
