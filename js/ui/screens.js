@@ -38,7 +38,8 @@ async function openLessonTheory(index) {
     try {
         var theory = await fetchJSON(theoryInfo.file);
         theoryLoaded = theory;
-        startTheoryCards(theoryInfo, theory);
+        // Передаём ключ темы третьим параметром для микроуроков
+        startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
         console.error(e);
         goQuizFromLoaded(index);
