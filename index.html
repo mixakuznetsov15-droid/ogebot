@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <!-- Экран результата -->
+  <!-- Экран результата (старый, больше не используется для обычного квиза, оставлен на случай) -->
   <div class="screen" id="s-result">
     <div class="result-wrap">
       <div class="result-emoji" id="res-emoji">🎉</div>
@@ -103,6 +103,13 @@
         <button class="btn-full primary" onclick="goScreen('s-home')">🏠 На главную</button>
         <button class="btn-full sec" onclick="shareBossResult()">📤 Похвастаться результатом</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Экран итогов занятия (Session Summary) -->
+  <div class="screen" id="s-session-summary">
+    <div class="result-wrap" id="session-summary-content">
+      <!-- Наполняется динамически через renderSessionSummary() -->
     </div>
   </div>
 
