@@ -172,12 +172,11 @@ class ProfessorSystem {
       threeErrors: this.consecutiveErrors >= 3
     };
 
-    // Сброс счётчиков при особых событиях, чтобы не срабатывало повторно подряд
     if (flags.fiveCorrect) {
-      this.consecutiveCorrect = 0; // сбрасываем, чтобы не спамить
+      this.consecutiveCorrect = 0;
     }
     if (flags.threeErrors) {
-      this.consecutiveErrors = 0; // сбрасываем после обработки
+      this.consecutiveErrors = 0;
     }
 
     return flags;
@@ -279,7 +278,6 @@ class ProfessorSystem {
   // Особые события
   showThreeErrorsMessage() {
     const msg = this.messages.threeErrorsInRow;
-    // Добавляем кнопку "Изучить теорию" в облачко
     this._enqueueWithButton(msg, 'Изучить теорию', () => {
       if (typeof openLessonTheory === 'function' && typeof currentLessonIndex !== 'undefined') {
         openLessonTheory(currentLessonIndex);
@@ -294,7 +292,48 @@ class ProfessorSystem {
     return this;
   }
 
-  // Очередь с кнопкой (для кнопки "Изучить теорию")
+  /**
+   * Генерация персонального комментария по итогам занятия (Session Summary).
+   * @param {string} topicTitle - название темы
+   * @param {number} accuracy - процент правильных ответов (0-100)
+   * @param {number} streak - текущая серия дней
+   * @returns {string}
+   */
+  generateSessionComment(topicTitle, accuracy, streak) {
+    const level = this.getUserLevel();
+    let base = '';
+
+    if (accuracy === 100) {
+      base = 'Идеально! Ты справился со всеми вопросами без единой ошибки. ';
+    } else if (accuracy >= 80) {
+      base = 'Отличный результат! Видно, что ты хорошо подготовился. ';
+    } else if (accuracy >= 60) {
+      base = 'Хорошая работа, но есть куда расти. ';
+    } else {
+      base = 'Неплохо для начала, но стоит ещё повторить материал. ';
+    }
+
+    // Упоминание темы
+    base += 'Тема «' + topicTitle + '» ' + (accuracy >= 80 ? 'далась тебе уверенно.' : 'потребует дополнительного внимания.');
+
+    // Добавка про серию
+    if (streak >= 7) {
+      base += ' Твоя серия впечатляет — продолжай в том же духе!';
+    } else if (streak >= 3) {
+      base += ' Не прерывай серию, ты на правильном пути.';
+    }
+
+    // Рекомендация на основе уровня
+    if (level === 'beginner') {
+      base += ' Помни, что каждая ошибка — это шаг к знаниям.';
+    } else if (level === 'advanced') {
+      base += ' Ты уже почти эксперт, осталось лишь немного отточить навыки.';
+    }
+
+    return base;
+  }
+
+  // Очередь с кнопкой
   _enqueueWithButton(text, buttonText, onClick, emotion, duration, state) {
     const messageObj = { text, emotion, duration, state, button: { text: buttonText, onClick } };
     this.messageQueue.push(messageObj);
@@ -325,7 +364,7 @@ class ProfessorSystem {
 
     this._setState(state, duration);
 
-    this.bubbleEl.innerHTML = ''; // очищаем
+    this.bubbleEl.innerHTML = '';
     this.bubbleEl.appendChild(document.createTextNode(text));
 
     if (button) {
