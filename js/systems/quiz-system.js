@@ -222,12 +222,20 @@ function showResult() {
     professor.onTopicComplete(getCurrentTopicTitle());
   }
 
-  saveLesson(curLesson, score, total);
-  goScreen('s-result');
-  setTimeout(function() {
-    document.getElementById('ring-fill').style.strokeDashoffset = 339 * (1 - score / total);
-  }, 100);
-  updateDailyTasks();
+  // Сохраняем данные сессии для итогового экрана
+  window._sessionData = {
+    total: total,
+    score: score,
+    xpGain: xpGain,
+    topicTitle: getCurrentTopicTitle(),
+    levelUp: !!window.sessionLevelUp,
+    chestReceived: !!window._chestGivenThisSession
+  };
+  // Сбрасываем флаги сессии
+  window.sessionLevelUp = false;
+  window._chestGivenThisSession = false;
+
+  goScreen('s-session-summary');
 }
 
 function saveLesson(lessonIdx, sc, total) {
@@ -250,6 +258,7 @@ function saveLesson(lessonIdx, sc, total) {
   if (!userProgress.completedLessons[lessonKey].chestGiven) {
     giveChest('achievement');
     userProgress.completedLessons[lessonKey].chestGiven = true;
+    window._chestGivenThisSession = true;
     saveProgress();
     showToast('🎁 Сундук за завершение темы!');
   }
