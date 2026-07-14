@@ -319,9 +319,13 @@ function renderHomePath() {
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
   html += '<div class="path-zigzag">';
 
+  // Адаптивные смещения для зигзага (не вылезают за края на узких экранах)
   function getZigzagOffset(i) {
     var pattern = [0, -35, -65, -35, 10, 55, 80, 45, -10];
-    return pattern[i % pattern.length];
+    var baseOffset = pattern[i % pattern.length];
+    var maxWidth = Math.min(window.innerWidth, 400);
+    var scale = maxWidth / 400; // коэффициент масштабирования
+    return Math.round(baseOffset * scale);
   }
 
   for (var i = 0; i < allLessons.length; i++) {
@@ -493,4 +497,4 @@ window.executeNextAction = function() {
   } else {
     goScreen('s-home');
   }
-}; 
+};
