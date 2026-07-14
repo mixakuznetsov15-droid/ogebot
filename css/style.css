@@ -217,18 +217,21 @@ body::before {
 }
 .carousel-dot.active { background: var(--primary); }
 
+/* Зигзаг с защитой от выхода за экран */
 .path-zigzag {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 0 20px;
+  padding: 0 20px 20px;      /* ← боковые отступы */
+  overflow-x: hidden;        /* ← обрезаем случайный выход */
 }
 .zigzag-node {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: 360px;
+  max-width: calc(100% - 40px);  /* ← учитываем отступы */
+  box-sizing: border-box;
   margin-bottom: 8px;
 }
 
@@ -275,6 +278,7 @@ body::before {
   display:flex; align-items:center; justify-content:center; font-size:30px;
 }
 .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
+
 /* ── ПРОГРЕСС МИКРОУРОКА ── */
 .theory-progress {
   display: flex;
