@@ -13,6 +13,10 @@ var currentLessonIndex = 0;
 var lastAnswerWasWrong = false;
 var correctStreak = 0;
 
+// Адаптивные переменные
+var sessionMistakes = {};          // { skill: count } ошибки подряд в текущей сессии
+var currentReviewMastery = null;   // mastery при запуске из повторения
+
 function getCurrentTopicTitle() {
   if (isBossMode) return 'Финальный босс';
   var all = getAllLessons();
@@ -101,10 +105,12 @@ function selectAns(idx, correct, qText, topic, hint) {
     specialFlags = professor.trackAnswer(idx === correct);
   }
 
-  // Реакция профессора с учётом персонализации
+  // Реакция профессора с учётом персонализации и диагностики
   if (typeof professor !== 'undefined') {
     if (specialFlags.threeErrors) {
-      professor.showThreeErrorsMessage(shuffled[curQ].skill);
+      var weakest = getWeakestSkill(getCurrentTopicKey());
+      professor.showThreeErrorsMessage(weakest || (shuffled[curQ].skill || 'общее'));
+      if (weakest) professor.showDiagnosis(weakest);
     } else if (specialFlags.fiveCorrect) {
       professor.showFiveCorrectMessage();
     } else {
@@ -123,7 +129,25 @@ function selectAns(idx, correct, qText, topic, hint) {
 
   // ===== АДАПТИВНЫЙ СЕЛЕКТОР: обновление статистики навыка =====
   var currentQues = shuffled[curQ];
-  updateSkillStats(getCurrentTopicKey(), currentQues.skill || 'общее', idx === correct);
+  var currentSkill = currentQues.skill || 'общее';
+  updateSkillStats(getCurrentTopicKey(), currentSkill, idx === correct);
+
+  // Обновление счётчика ошибок подряд по навыку
+  if (idx === correct) {
+    sessionMistakes[currentSkill] = 0;
+  } else {
+    sessionMistakes[currentSkill] = (sessionMistakes[currentSkill] || 0) + 1;
+    // Если ошибок >=2, заменяем следующий вопрос на более лёгкий (если он ещё не показан и не последний)
+    if (sessionMistakes[currentSkill] >= 2 && curQ + 1 < shuffled.length) {
+      var nextQues = shuffled[curQ + 1];
+      if (nextQues.skill === currentSkill && nextQues.difficulty !== 'easy') {
+        var easier = getEasierQuestion(getCurrentTopicKey(), currentSkill, nextQues.difficulty || 'medium', shuffled);
+        if (easier) {
+          shuffled[curQ + 1] = easier;
+        }
+      }
+    }
+  }
 
   document.getElementById('btn-hint').style.display = 'none';
 
@@ -232,12 +256,15 @@ function showResult() {
     score: score,
     xpGain: xpGain,
     topicTitle: getCurrentTopicTitle(),
-    topicKey: getCurrentTopicKey(),   // ← для анализа навыков в generateSessionComment
+    topicKey: getCurrentTopicKey(),
     levelUp: !!window.sessionLevelUp,
     chestReceived: !!window._chestGivenThisSession
   };
   window.sessionLevelUp = false;
   window._chestGivenThisSession = false;
+
+  // Сбрасываем счётчики ошибок сессии
+  sessionMistakes = {};
 
   goScreen('s-session-summary');
 }
@@ -277,7 +304,12 @@ function goQuizFromLoaded(idx) {
   var questions = typeof migrateQuestionsAddSkills === 'function'
     ? migrateQuestionsAddSkills(rawQuestions, allLessons[idx].key)
     : rawQuestions;
-  shuffled = selectNextQuestions(allLessons[idx].key, questions, userProgress, 5);
+  shuffled = selectNextQuestions(allLessons[idx].key, questions, userProgress, 5, {
+    isReview: !!currentReviewMastery,
+    mastery: currentReviewMastery || 50,
+    sessionMistakes: sessionMistakes
+  });
+  currentReviewMastery = null;
   // -------------------------------------------
   curQ = 0;
   score = 0;
@@ -310,7 +342,12 @@ function replayLesson() {
   var questions = typeof migrateQuestionsAddSkills === 'function'
     ? migrateQuestionsAddSkills(rawQuestions, allLessons[curLesson].key)
     : rawQuestions;
-  shuffled = selectNextQuestions(allLessons[curLesson].key, questions, userProgress, 5);
+  shuffled = selectNextQuestions(allLessons[curLesson].key, questions, userProgress, 5, {
+    isReview: !!currentReviewMastery,
+    mastery: currentReviewMastery || 50,
+    sessionMistakes: sessionMistakes
+  });
+  currentReviewMastery = null;
   // -------------------------------------------------------
   curQ = 0;
   score = 0;
@@ -343,6 +380,12 @@ function goBossLevel() {
   lastAnswerWasWrong = false;
   goScreen('s-quiz');
   renderQ();
+}
+
+// Запуск повторения с указанным mastery
+function startReviewLesson(idx, mastery) {
+  currentReviewMastery = mastery;
+  goQuizFromLoaded(idx);
 }
 
 window.askProfessor = function() {
