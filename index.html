@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <!-- Экран результата (старый, больше не используется для обычного квиза, оставлен на случай) -->
+  <!-- Экран результата (старый) -->
   <div class="screen" id="s-result">
     <div class="result-wrap">
       <div class="result-emoji" id="res-emoji">🎉</div>
@@ -106,11 +106,21 @@
     </div>
   </div>
 
-  <!-- Экран итогов занятия (Session Summary) -->
+  <!-- Экран итогов занятия -->
   <div class="screen" id="s-session-summary">
     <div class="result-wrap" id="session-summary-content">
-      <!-- Наполняется динамически через renderSessionSummary() -->
+      <!-- Заполняется динамически -->
     </div>
+  </div>
+
+  <!-- Экран повторения -->
+  <div class="screen" id="s-review">
+    <div class="topbar">
+      <span class="back-link" onclick="goScreen('s-home')">← Назад</span>
+      <div class="sec-title">🔄 Повторение</div>
+      <div style="width:60px"></div>
+    </div>
+    <div class="scroll" id="review-content"></div>
   </div>
 
   <!-- Экран профиля -->
@@ -134,6 +144,8 @@
   <script src="js/systems/achievements.js"></script>
   <script src="js/systems/theory.js"></script>
   <script src="js/systems/theory-cards.js"></script>
+  <script src="js/utils/skill-tagger.js"></script>
+  <script src="js/systems/adaptive-selector.js"></script>
   <script src="js/systems/quiz-system.js"></script>
   <script src="js/systems/chest-system.js"></script>
   <script src="js/systems/professor.js"></script>
