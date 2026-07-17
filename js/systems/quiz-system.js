@@ -104,7 +104,7 @@ function selectAns(idx, correct, qText, topic, hint) {
   // Реакция профессора с учётом персонализации
   if (typeof professor !== 'undefined') {
     if (specialFlags.threeErrors) {
-      professor.showThreeErrorsMessage();
+      professor.showThreeErrorsMessage(shuffled[curQ].skill);
     } else if (specialFlags.fiveCorrect) {
       professor.showFiveCorrectMessage();
     } else {
@@ -232,6 +232,7 @@ function showResult() {
     score: score,
     xpGain: xpGain,
     topicTitle: getCurrentTopicTitle(),
+    topicKey: getCurrentTopicKey(),   // ← для анализа навыков в generateSessionComment
     levelUp: !!window.sessionLevelUp,
     chestReceived: !!window._chestGivenThisSession
   };
