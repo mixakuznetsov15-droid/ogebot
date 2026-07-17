@@ -149,7 +149,6 @@ class ProfessorSystem {
       }
       return msg;
     }
-    // Запасной вариант из общих сообщений
     let fallback = this._randomFromArray(this.messages[type] || []);
     if (correctAnswerText) {
       fallback = fallback.replace('{correctAnswer}', correctAnswerText);
@@ -276,8 +275,10 @@ class ProfessorSystem {
   }
 
   // Особые события
-  showThreeErrorsMessage() {
-    const msg = this.messages.threeErrorsInRow;
+  showThreeErrorsMessage(skill) {
+    const msg = skill 
+      ? 'Три ошибки подряд по навыку «' + skill + '». Давай повторим теорию?' 
+      : this.messages.threeErrorsInRow;
     this._enqueueWithButton(msg, 'Изучить теорию', () => {
       if (typeof openLessonTheory === 'function' && typeof currentLessonIndex !== 'undefined') {
         openLessonTheory(currentLessonIndex);
@@ -292,14 +293,15 @@ class ProfessorSystem {
     return this;
   }
 
-  /**
-   * Генерация персонального комментария по итогам занятия (Session Summary).
-   * @param {string} topicTitle - название темы
-   * @param {number} accuracy - процент правильных ответов (0-100)
-   * @param {number} streak - текущая серия дней
-   * @returns {string}
-   */
-  generateSessionComment(topicTitle, accuracy, streak) {
+  // Новый метод: диагноз по навыку
+  showDiagnosis(skill) {
+    const msg = 'Похоже, нужно подтянуть навык «' + skill + '». Давай уделим ему внимание?';
+    this._enqueue(msg, 'hint', 5000, 'diagnosis');
+    return this;
+  }
+
+  // Обновлённый сессионный комментарий с анализом навыков
+  generateSessionComment(topicTitle, accuracy, streak, topicKey) {
     const level = this.getUserLevel();
     let base = '';
 
@@ -313,17 +315,41 @@ class ProfessorSystem {
       base = 'Неплохо для начала, но стоит ещё повторить материал. ';
     }
 
-    // Упоминание темы
     base += 'Тема «' + topicTitle + '» ' + (accuracy >= 80 ? 'далась тебе уверенно.' : 'потребует дополнительного внимания.');
 
-    // Добавка про серию
+    // Анализ навыков
+    if (topicKey && userProgress.skillStats) {
+      const prefix = topicKey + '_';
+      const skillStats = Object.entries(userProgress.skillStats)
+        .filter(([key]) => key.startsWith(prefix))
+        .map(([key, val]) => ({ skill: key.replace(prefix, ''), ...val }));
+
+      if (skillStats.length > 0) {
+        let weakest = null;
+        let maxWeakness = -1;
+        for (const s of skillStats) {
+          const total = s.correct + s.wrong;
+          if (total === 0) continue;
+          const weakness = s.wrong / total;
+          if (weakness > maxWeakness) {
+            maxWeakness = weakness;
+            weakest = s.skill;
+          }
+        }
+        if (weakest && maxWeakness > 0.5) {
+          base += ' Особенно стоит подтянуть навык «' + weakest + '».';
+        } else if (weakest && maxWeakness > 0.3) {
+          base += ' Немного внимания навыку «' + weakest + '» — и будет отлично.';
+        }
+      }
+    }
+
     if (streak >= 7) {
       base += ' Твоя серия впечатляет — продолжай в том же духе!';
     } else if (streak >= 3) {
       base += ' Не прерывай серию, ты на правильном пути.';
     }
 
-    // Рекомендация на основе уровня
     if (level === 'beginner') {
       base += ' Помни, что каждая ошибка — это шаг к знаниям.';
     } else if (level === 'advanced') {
