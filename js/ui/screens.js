@@ -2,9 +2,6 @@
 //  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ
 // ==========================================
 
-// --------------------------------------------------
-//  Переключение экранов
-// --------------------------------------------------
 function goScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s) {
     s.classList.remove('active');
@@ -40,7 +37,7 @@ async function openLessonTheory(index) {
     try {
         var theory = await fetchJSON(theoryInfo.file);
         theoryLoaded = theory;
-        // Передаём ключ темы третьим параметром для микроуроков
+        // передаём ключ темы третьим параметром
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
         console.error(e);
@@ -282,7 +279,7 @@ function renderHomePath() {
 
   html += '</div>'; // .carousel
 
-  // Динамические точки-индикаторы (по количеству .carousel-card)
+  // Динамические точки-индикаторы
   var carouselCardsCount = 3;
   html += '<div class="carousel-dots" id="carousel-dots">';
   for (var dotIdx = 0; dotIdx < carouselCardsCount; dotIdx++) {
@@ -294,7 +291,10 @@ function renderHomePath() {
   if (reviewTopics.length > 0) {
     var firstReviewTopic = reviewTopics[0];
     var reviewIdx = getReviewLessonIndex(firstReviewTopic);
-    html += '<div class="continue-card" onclick="goQuizFromLoaded(' + reviewIdx + ')">';
+    // передаём mastery из reviewData
+    var reviewData = userProgress.reviewData && userProgress.reviewData[firstReviewTopic];
+    var mastery = reviewData ? reviewData.mastery || 50 : 50;
+    html += '<div class="continue-card" onclick="startReviewLesson(' + reviewIdx + ',' + mastery + ')">';
     html += '<div class="continue-icon">🔄</div>';
     html += '<div><div class="continue-label">Повторить сегодня</div><div class="continue-title">' + firstReviewTopic + '</div></div>';
     html += '<div class="continue-arrow">→</div></div>';
@@ -526,7 +526,7 @@ function renderReviewScreen() {
       html += '<div class="path-progress-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">';
       html += '<div><div style="font-weight:600;">' + item.title + '</div>';
       html += '<div style="font-size:12px; color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
-      html += '<button class="btn-full primary" style="padding:8px 16px; width:auto;" onclick="goQuizFromLoaded(' + getReviewLessonIndex(item.title) + ')">Повторить</button>';
+      html += '<button class="btn-full primary" style="padding:8px 16px; width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">Повторить</button>';
       html += '</div>';
     });
   });
