@@ -18,6 +18,8 @@ function goScreen(id) {
     renderHomePath();
   } else if (id === 's-session-summary') {
     renderSessionSummary();
+  } else if (id === 's-review') {
+    renderReviewScreen();
   }
 }
 
@@ -91,7 +93,7 @@ function renderProfile() {
   html += '</div>';
 
   html += '<div class="profile-stats-grid">';
-  html += '<div class="profile-stat"><div class="profile-stat-num">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num" style="cursor:pointer" onclick="goScreen(\'s-review\')">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">' + acc + '%</div><div class="profile-stat-label">Точность</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
@@ -319,12 +321,11 @@ function renderHomePath() {
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
   html += '<div class="path-zigzag">';
 
-  // Адаптивные смещения для зигзага (не вылезают за края на узких экранах)
   function getZigzagOffset(i) {
     var pattern = [0, -35, -65, -35, 10, 55, 80, 45, -10];
     var baseOffset = pattern[i % pattern.length];
     var maxWidth = Math.min(window.innerWidth, 400);
-    var scale = maxWidth / 400; // коэффициент масштабирования
+    var scale = maxWidth / 400;
     return Math.round(baseOffset * scale);
   }
 
@@ -338,7 +339,6 @@ function renderHomePath() {
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var offset = getZigzagOffset(i);
 
-    // Активный узел крупнее (64px) и с усиленной тенью
     var nodeSizeStyle = stateClass === 'current' ? 'width:64px;height:64px;font-size:24px;box-shadow:0 0 0 8px #f5a62330;' : '';
 
     html += '<div class="zigzag-node" style="transform: translateX(' + offset + 'px); opacity: ' + (isLocked ? '0.45' : '1') + '; overflow: visible;' + (isLocked ? '' : ' cursor:pointer;') + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + '>';
@@ -376,14 +376,13 @@ function renderHomePath() {
   document.getElementById('home-streak').textContent = '🔥 ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 
-  // Слушатель прокрутки карусели с обновлением активного класса карточек
   var carousel = document.getElementById('home-carousel');
   if (carousel) {
     function updateCarouselActive() {
       var cards = carousel.querySelectorAll('.carousel-card');
       if (!cards.length) return;
       var scrollLeft = carousel.scrollLeft;
-      var cardWidth = cards[0].offsetWidth + 12; // gap
+      var cardWidth = cards[0].offsetWidth + 12;
       var activeIndex = Math.round(scrollLeft / cardWidth);
       cards.forEach(function(card, idx) {
         if (idx === activeIndex) {
@@ -395,11 +394,9 @@ function renderHomePath() {
       var dots = document.querySelectorAll('#carousel-dots .carousel-dot');
       dots.forEach(function(d, idx) { d.classList.toggle('active', idx === activeIndex); });
     }
-    // Удаляем старый обработчик
     carousel.removeEventListener('scroll', carousel._scrollHandler);
     carousel.addEventListener('scroll', updateCarouselActive);
     carousel._scrollHandler = updateCarouselActive;
-    // Инициализация первого активного состояния
     updateCarouselActive();
   }
 }
@@ -411,45 +408,38 @@ function renderSessionSummary() {
   var container = document.getElementById('session-summary-content');
   if (!container) return;
 
-  // Данные сессии (устанавливаются перед переходом)
   var data = window._sessionData || {};
   var totalQuestions = data.total || 0;
   var score = data.score || 0;
   var xpGain = data.xpGain || 0;
   var streak = userProgress.streak || 0;
   var topicTitle = data.topicTitle || 'занятие';
+  var topicKey = data.topicKey || '';
   var accuracy = totalQuestions > 0 ? Math.round((score / totalQuestions) * 100) : 0;
 
-  // Новый уровень?
   var levelUp = data.levelUp || false;
-  // Получен сундук?
   var chestReceived = data.chestReceived || false;
 
-  // Рекомендация
-  var nextAction = getNextAction(); // из learning-path.js
+  var nextAction = getNextAction();
 
-  // Комментарий профессора
   var professorComment = '';
   if (typeof professor !== 'undefined' && professor.generateSessionComment) {
-    professorComment = professor.generateSessionComment(topicTitle, accuracy, streak);
+    professorComment = professor.generateSessionComment(topicTitle, accuracy, streak, topicKey);
   } else {
     professorComment = 'Продолжай в том же духе!';
   }
 
   var html = '';
 
-  // Заголовок
   html += '<div class="result-emoji">🎉</div>';
   html += '<div class="result-title">Отличная работа!</div>';
 
-  // Статистика
   html += '<div class="res-stats" style="margin-top:12px">';
   html += '<div class="res-stat"><div class="res-num g">' + totalQuestions + '</div><div class="res-label">Решено вопросов</div></div>';
   html += '<div class="res-stat"><div class="res-num y">+' + xpGain + '</div><div class="res-label">XP</div></div>';
   html += '<div class="res-stat"><div class="res-num" style="color:#f85149">🔥 ' + streak + '</div><div class="res-label">Серия дней</div></div>';
   html += '</div>';
 
-  // Особые достижения
   if (levelUp) {
     html += '<div class="res-stat" style="background:rgba(63,185,80,0.15);border-color:var(--primary2);margin-top:8px">';
     html += '<div class="res-num g">🏆</div><div class="res-label">Новый уровень!</div>';
@@ -461,13 +451,11 @@ function renderSessionSummary() {
     html += '</div>';
   }
 
-  // Комментарий профессора
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:16px;text-align:left">';
   html += '<div style="font-weight:700;margin-bottom:4px">🧑‍🏫 Профессор Гео:</div>';
   html += '<div style="font-size:14px;line-height:1.5;color:var(--text)">' + professorComment + '</div>';
   html += '</div>';
 
-  // Рекомендация
   html += '<div style="margin-top:20px;font-size:15px;font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
   html += '<div class="continue-card" style="margin-top:8px" onclick="executeNextAction()">';
   if (nextAction && nextAction.action) {
@@ -480,7 +468,6 @@ function renderSessionSummary() {
   }
   html += '</div>';
 
-  // Кнопки
   html += '<div class="res-btns" style="margin-top:20px">';
   html += '<button class="btn-full primary" onclick="executeNextAction()">Продолжить обучение</button>';
   html += '<button class="btn-full sec" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
@@ -498,3 +485,55 @@ window.executeNextAction = function() {
     goScreen('s-home');
   }
 };
+
+// ==========================================
+// ЦЕНТР ПОВТОРЕНИЯ (Review Screen)
+// ==========================================
+function renderReviewScreen() {
+  var container = document.getElementById('review-content');
+  if (!container) return;
+
+  var allLessons = getAllLessons();
+  var reviewData = userProgress.reviewData || {};
+  var html = '';
+
+  var statuses = { red: [], yellow: [], green: [] };
+  var today = new Date().toISOString().slice(0,10);
+
+  allLessons.forEach(function(lesson) {
+    var rd = reviewData[lesson.title];
+    if (!rd) return;
+    var mastery = rd.mastery || 0;
+    var nextDate = rd.nextReviewDate || '';
+    if (nextDate && nextDate < today) {
+      statuses.red.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
+    } else if (nextDate && nextDate === today) {
+      statuses.yellow.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
+    } else {
+      statuses.green.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
+    }
+  });
+
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">📊 Статус тем</div>';
+
+  ['red', 'yellow', 'green'].forEach(function(status) {
+    var list = statuses[status];
+    if (list.length === 0) return;
+    var emoji = status === 'red' ? '🔴' : status === 'yellow' ? '🟡' : '🟢';
+    var label = status === 'red' ? 'Требует повторения' : status === 'yellow' ? 'Пора повторить' : 'Изучено';
+
+    list.forEach(function(item) {
+      html += '<div class="path-progress-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">';
+      html += '<div><div style="font-weight:600;">' + item.title + '</div>';
+      html += '<div style="font-size:12px; color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
+      html += '<button class="btn-full primary" style="padding:8px 16px; width:auto;" onclick="goQuizFromLoaded(' + getReviewLessonIndex(item.title) + ')">Повторить</button>';
+      html += '</div>';
+    });
+  });
+
+  if (html.indexOf('path-progress-card') === -1) {
+    html += '<div style="text-align:center; color:var(--muted); padding:40px;">Нет данных для повторения. Пройдите несколько тем!</div>';
+  }
+
+  container.innerHTML = html;
+}
