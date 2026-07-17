@@ -15,6 +15,7 @@ const THEORY_FILES = [
   { key:'regions', title:'📍 Регионы России', file:'theory_regions.json', tasks:'Задания 20-21'},
   { key:'world', title:'🌍 Страны и материки', file:'theory_world.json', tasks:'Задания 20-21'},
   { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
+  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo.json', tasks:'Задания 1-4' },
   { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
   { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
   { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' }
@@ -22,6 +23,7 @@ const THEORY_FILES = [
 
 // Список файлов с вопросами для викторины (основной)
 const QUESTIONS_FILES = [
+  { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
   { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
   { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
   { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json', tasks:'Задания 13-16'},
