@@ -121,6 +121,10 @@ function selectAns(idx, correct, qText, topic, hint) {
     }
   }
 
+  // ===== АДАПТИВНЫЙ СЕЛЕКТОР: обновление статистики навыка =====
+  var currentQues = shuffled[curQ];
+  updateSkillStats(getCurrentTopicKey(), currentQues.skill || 'общее', idx === correct);
+
   document.getElementById('btn-hint').style.display = 'none';
 
   var livesEl = document.getElementById('lives-row');
@@ -231,7 +235,6 @@ function showResult() {
     levelUp: !!window.sessionLevelUp,
     chestReceived: !!window._chestGivenThisSession
   };
-  // Сбрасываем флаги сессии
   window.sessionLevelUp = false;
   window._chestGivenThisSession = false;
 
@@ -268,7 +271,13 @@ function goQuizFromLoaded(idx) {
   var allLessons = getAllLessons();
   curLesson = idx;
   currentLessonIndex = idx;
-  shuffled = allLessons[idx].questions.slice();
+  // ---- АДАПТИВНЫЙ СЕЛЕКТОР: выбор вопросов ----
+  var rawQuestions = allLessons[idx].questions;
+  var questions = typeof migrateQuestionsAddSkills === 'function'
+    ? migrateQuestionsAddSkills(rawQuestions, allLessons[idx].key)
+    : rawQuestions;
+  shuffled = selectNextQuestions(allLessons[idx].key, questions, userProgress, 5);
+  // -------------------------------------------
   curQ = 0;
   score = 0;
   answered = false;
@@ -295,7 +304,13 @@ function replayLesson() {
     return;
   }
   var allLessons = getAllLessons();
-  shuffled = allLessons[curLesson].questions.slice();
+  // ---- АДАПТИВНЫЙ СЕЛЕКТОР: повторный выбор вопросов ----
+  var rawQuestions = allLessons[curLesson].questions;
+  var questions = typeof migrateQuestionsAddSkills === 'function'
+    ? migrateQuestionsAddSkills(rawQuestions, allLessons[curLesson].key)
+    : rawQuestions;
+  shuffled = selectNextQuestions(allLessons[curLesson].key, questions, userProgress, 5);
+  // -------------------------------------------------------
   curQ = 0;
   score = 0;
   answered = false;
@@ -313,6 +328,7 @@ function goBossLevel() {
   allLessons.forEach(function(l) {
     if (l.questions) allQuestions = allQuestions.concat(l.questions);
   });
+  // Для финального босса пока не применяем адаптивный отбор (все темы вперемешку)
   allQuestions = allQuestions.sort(function() { return Math.random() - 0.5; }).slice(0, 30);
   isBossMode = true;
   shuffled = allQuestions;
