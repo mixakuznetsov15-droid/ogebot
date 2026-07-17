@@ -37,7 +37,6 @@ async function openLessonTheory(index) {
     try {
         var theory = await fetchJSON(theoryInfo.file);
         theoryLoaded = theory;
-        // передаём ключ темы третьим параметром
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
         console.error(e);
@@ -200,7 +199,7 @@ function getDayWord(n) {
 }
 
 // --------------------------------------------------
-//  Главный экран (путь обучения)
+//  Главный экран (путь обучения) — без зигзага, вертикальный список
 // --------------------------------------------------
 function renderHomePath() {
   var container = document.getElementById('home-content');
@@ -291,7 +290,6 @@ function renderHomePath() {
   if (reviewTopics.length > 0) {
     var firstReviewTopic = reviewTopics[0];
     var reviewIdx = getReviewLessonIndex(firstReviewTopic);
-    // передаём mastery из reviewData
     var reviewData = userProgress.reviewData && userProgress.reviewData[firstReviewTopic];
     var mastery = reviewData ? reviewData.mastery || 50 : 50;
     html += '<div class="continue-card" onclick="startReviewLesson(' + reviewIdx + ',' + mastery + ')">';
@@ -317,65 +315,47 @@ function renderHomePath() {
     }
   }
 
-  // --- Путь-змейка ---
+  // --- Вертикальный список тем ---
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
-  html += '<div class="path-zigzag">';
-
-  function getZigzagOffset(i) {
-    var pattern = [0, -35, -65, -35, 10, 55, 80, 45, -10];
-    var baseOffset = pattern[i % pattern.length];
-    var maxWidth = Math.min(window.innerWidth, 400);
-    var scale = maxWidth / 400;
-    return Math.round(baseOffset * scale);
-  }
 
   for (var i = 0; i < allLessons.length; i++) {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
     var isLocked = i > 0 && !userProgress.completedLessons[allLessons[i-1].title];
-    var stateClass = perfect ? 'perfect' : done ? 'done' : isLocked ? 'locked' : 'current';
-    var nodeIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var stateIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
-    var offset = getZigzagOffset(i);
+    var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
 
-    var nodeSizeStyle = stateClass === 'current' ? 'width:64px;height:64px;font-size:24px;box-shadow:0 0 0 8px #f5a62330;' : '';
-
-    html += '<div class="zigzag-node" style="transform: translateX(' + offset + 'px); opacity: ' + (isLocked ? '0.45' : '1') + '; overflow: visible;' + (isLocked ? '' : ' cursor:pointer;') + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + '>';
-    if (isReview) {
-      html += '<div class="review-badge">🔄</div>';
-    }
-    html += '<div class="node-circle ' + stateClass + '" style="cursor:' + (isLocked ? 'default' : 'pointer') + '; ' + nodeSizeStyle + '">' + nodeIcon + '</div>';
-    html += '<div style="flex:1; margin-left:12px;">';
-    html += '<div style="font-weight:700;font-size:14px;">' + lesson.title + '</div>';
+    html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin:4px 0;background:' + bgColor + ';border-radius:12px;border:1px solid var(--border);' + (isLocked ? 'opacity:0.45;' : 'cursor:pointer;') + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + '>';
+    html += '<div style="font-size:24px;width:32px;text-align:center;">' + stateIcon + '</div>';
+    html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + lesson.title + '</div>';
     if (done) {
       html += '<div style="font-size:11px;color:var(--primary2);">' + done.score + '/' + done.total + ' верно</div>';
+    } else if (isLocked) {
+      html += '<div style="font-size:11px;color:var(--muted);">Заблокировано</div>';
     } else {
-      html += '<div style="font-size:11px;color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопр.</div>';
+      html += '<div style="font-size:11px;color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопросов</div>';
+    }
+    if (isReview) {
+      html += '<span style="background:#f5a623;color:#000;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px;">🔄 Повторить</span>';
     }
     html += '</div></div>';
-
-    if (i < allLessons.length - 1) {
-      html += '<div class="zigzag-connector" style="transform: rotate(15deg) translateX(' + (offset * 0.7) + 'px);"></div>';
-    }
   }
 
   // Финальный босс
-  html += '<div class="zigzag-connector" style="background:' + (allDone ? 'var(--primary2)' : 'var(--border)') + ';"></div>';
-  html += '<div class="zigzag-node" style="transform: translateX(0px); overflow: visible;">';
-  html += '<div class="boss-node' + (allDone ? '' : ' locked') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + ' style="cursor:' + (allDone ? 'pointer' : 'default') + '">' + (allDone ? '👑' : '🔒') + '</div>';
-  html += '<div style="flex:1; margin-left:12px;">';
-  html += '<div style="font-weight:800;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
-  html += '<div style="font-size:11px;color:var(--muted);">' + (allDone ? 'Открыт!' : 'Пройди все темы') + '</div>';
-  html += '</div></div>';
-
-  html += '</div>'; // .path-zigzag
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin-top:12px;background:' + (allDone ? 'rgba(210,153,34,0.1)' : 'var(--card2)') + ';border-radius:12px;border:1px solid ' + (allDone ? '#d29922' : 'var(--border)') + ';' + (allDone ? 'cursor:pointer;' : 'opacity:0.45;') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + '>';
+  html += '<div style="font-size:32px;">👑</div>';
+  html += '<div style="flex:1;"><div style="font-weight:700;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);">' + (allDone ? 'Тест по всем темам открыт' : 'Пройди все темы') + '</div></div>';
+  html += '</div>';
 
   container.innerHTML = html;
 
   document.getElementById('home-streak').textContent = '🔥 ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 
+  // Карусель: обновление активной точки
   var carousel = document.getElementById('home-carousel');
   if (carousel) {
     function updateCarouselActive() {
