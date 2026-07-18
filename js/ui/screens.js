@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (чистовая)
+// ТЕОРИЯ (исправленная последовательность)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -30,10 +30,19 @@ async function openLessonTheory(index) {
     currentLessonIndex = index;
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
-    if (!theoryInfo) {
-        goQuizFromLoaded(index);   // если теории нет — сразу практика
+
+    // Если тема уже пройдена — пропускаем микроурок, сразу практика
+    if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
+        goQuizFromLoaded(index);
         return;
     }
+
+    // Если теории нет — тоже сразу практика
+    if (!theoryInfo) {
+        goQuizFromLoaded(index);
+        return;
+    }
+
     try {
         var theory = await fetchJSON(theoryInfo.file);
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
@@ -318,7 +327,7 @@ function renderHomePath() {
         if (!userProgress.completedLessons[allLessons[i].title]) { nextIdx = i; break; }
       }
       var nextLesson = allLessons[nextIdx];
-      html += '<div class="continue-card" onclick="goQuizFromLoaded(' + nextIdx + ')">';
+      html += '<div class="continue-card" onclick="openLessonTheory(' + nextIdx + ')">';
       html += '<div class="continue-icon">' + (nextLesson.title.match(/^\S+/) ? nextLesson.title.match(/^\S+/)[0] : '▶') + '</div>';
       html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextLesson.title.replace(/^\S+\s*/, '') + '</div></div>';
       html += '<div class="continue-arrow">→</div></div>';
@@ -341,7 +350,7 @@ function renderHomePath() {
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
 
-    html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin:4px 0;background:' + bgColor + ';border-radius:12px;border:1px solid var(--border);cursor:pointer;" onclick="goQuizFromLoaded(' + i + ')">';
+    html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin:4px 0;background:' + bgColor + ';border-radius:12px;border:1px solid var(--border);cursor:pointer;" onclick="openLessonTheory(' + i + ')">';
     html += '<div style="font-size:24px;width:32px;text-align:center;">' + stateIcon + '</div>';
     html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + lesson.title + '</div>';
     if (done) {
