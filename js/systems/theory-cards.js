@@ -1,18 +1,57 @@
 // ==========================================
-//  МИКРОУРОКИ (теория + мини-вопросы + профессор)
+//  МИКРОУРОКИ (поддержка нового формата)
 // ==========================================
 
 var microSteps = [];
 var microStepIndex = 0;
 var microTopicKey = '';
 
-function startTheoryCards(theoryInfo, steps, topicKey) {
-  if (!Array.isArray(steps) || steps.length === 0 || !steps[0].type) {
-    console.warn('Неверный формат микроуроков. Ожидается массив шагов с полем "type".');
-    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Новый формат теории не загружен.</div>';
+function startTheoryCards(theoryInfo, data, topicKey) {
+  let steps = [];
+
+  // Определяем формат данных
+  if (Array.isArray(data)) {
+    // Старый формат: массив шагов
+    steps = data;
+  } else if (data && Array.isArray(data.cards)) {
+    // Новый формат: объект с полем cards
+    steps = data.cards.map(card => {
+      // Преобразуем тип в понятный движку
+      if (card.type === 'explain') {
+        return {
+          type: 'lesson',
+          title: card.title || '',
+          text: (card.text || '') + (card.example ? '\n\n📝 Пример: ' + card.example : '')
+        };
+      } else if (card.type === 'check') {
+        return {
+          type: 'quiz',
+          quizQuestion: card.question,
+          answers: card.options,   // может быть 3 или 4 варианта
+          correct: card.correct,
+          explanation: card.explanation || ''
+        };
+      } else if (card.type === 'ready') {
+        return {
+          type: 'final',
+          title: '🎉 Готов к практике',
+          text: card.message || 'Ты прошёл весь материал!'
+        };
+      }
+      return card; // fallback
+    });
+  } else {
+    console.warn('Неизвестный формат теории');
+    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Формат урока не поддерживается</div>';
     return;
   }
 
+  if (steps.length === 0) {
+    goQuizFromLoaded(currentLessonIndex);
+    return;
+  }
+
+  // Сохраняем, что теория открыта
   if (!userProgress.theoryRead) userProgress.theoryRead = {};
   var lesson = QUESTIONS_FILES[currentLessonIndex];
   if (lesson) {
@@ -25,7 +64,6 @@ function startTheoryCards(theoryInfo, steps, topicKey) {
   microTopicKey = topicKey || 'micro';
   goScreen('s-topic');
   document.getElementById('topic-title').textContent = theoryInfo.title;
-
   renderMicroStep();
 }
 
@@ -58,11 +96,14 @@ function renderMicroStep() {
     html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
     html += '</div>';
   } else if (step.type === 'quiz') {
+    // quiz с динамическим количеством вариантов (3 или 4)
+    var answers = step.answers || [];
+    var letters = answers.length === 3 ? ['А', 'Б', 'В'] : ['А', 'Б', 'В', 'Г'];
     html += '<div class="quiz-wrap" style="padding:0">';
     html += '<div class="q-card"><div class="q-text">' + (step.quizQuestion || step.question || '') + '</div></div>';
     html += '<div class="answers" id="micro-answers">';
-    step.answers.forEach(function(ans, idx) {
-      html += '<button class="ans-btn" onclick="answerMicroQuestion(' + idx + ')"><div class="ans-letter">' + 'АБВГ'[idx] + '</div><span>' + ans + '</span></button>';
+    answers.forEach(function(ans, idx) {
+      html += '<button class="ans-btn" onclick="answerMicroQuestion(' + idx + ')"><div class="ans-letter">' + letters[idx] + '</div><span>' + ans + '</span></button>';
     });
     html += '</div>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
@@ -107,7 +148,7 @@ function nextMicroStep() {
 }
 
 // Универсальная обработка ответа
-function processMicroAnswer(isCorrect, explanation, correctAnswerText) {
+function processMicroAnswer(isCorrect, explanation) {
   var feedbackDiv = document.getElementById('micro-feedback');
   if (isCorrect) {
     addXP(5);
@@ -134,12 +175,10 @@ function processMicroAnswer(isCorrect, explanation, correctAnswerText) {
   }
 }
 
-// Обработчик обычного quiz
 function answerMicroQuestion(chosen) {
   var step = microSteps[microStepIndex];
   var correctIdx = step.correct;
   var isCorrect = (chosen === correctIdx);
-  // Блокируем кнопки
   var btns = document.querySelectorAll('#micro-answers .ans-btn');
   btns.forEach(function(b) { b.disabled = true; });
   if (isCorrect) {
@@ -148,14 +187,12 @@ function answerMicroQuestion(chosen) {
     btns[chosen].classList.add('wrong');
     btns[correctIdx].classList.add('correct');
   }
-  processMicroAnswer(isCorrect, step.explanation, step.answers[correctIdx]);
+  processMicroAnswer(isCorrect, step.explanation);
 }
 
-// Обработчик true_false
 function answerTrueFalse(value) {
   var step = microSteps[microStepIndex];
   var isCorrect = (value === step.correct);
-  // Блокируем кнопки
   var buttons = document.querySelectorAll('.true-false-btn');
   buttons.forEach(function(b) { b.disabled = true; });
   if (isCorrect) {
@@ -173,20 +210,18 @@ function answerTrueFalse(value) {
       document.querySelector('.true-btn').classList.add('correct-tf');
     }
   }
-  processMicroAnswer(isCorrect, step.explanation, step.correct ? 'Правда' : 'Ложь');
+  processMicroAnswer(isCorrect, step.explanation);
 }
 
-// Обработчик choose_image
 function answerChooseImage(chosen) {
   var step = microSteps[microStepIndex];
   var correctIdx = step.images.findIndex(function(img) { return img.correct === true; });
   var isCorrect = (chosen === correctIdx);
-  // Визуально выделяем выбранное и правильное
   var images = document.querySelectorAll('.image-option');
   images.forEach(function(img, idx) {
     img.style.pointerEvents = 'none';
     if (idx === correctIdx) img.classList.add('correct-img');
     if (idx === chosen && !isCorrect) img.classList.add('wrong-img');
   });
-  processMicroAnswer(isCorrect, step.explanation, 'изображение ' + (correctIdx+1));
+  processMicroAnswer(isCorrect, step.explanation);
 }
