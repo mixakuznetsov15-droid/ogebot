@@ -1,5 +1,5 @@
 // ==========================================
-//  МИКРОУРОКИ (поддержка нового формата)
+//  МИКРОУРОКИ (поддержка нового формата + отладка)
 // ==========================================
 
 var microSteps = [];
@@ -16,18 +16,19 @@ function startTheoryCards(theoryInfo, data, topicKey) {
   } else if (data && Array.isArray(data.cards)) {
     // Новый формат: объект с полем cards
     steps = data.cards.map(card => {
-      // Преобразуем тип в понятный движку
       if (card.type === 'explain') {
+        let text = card.text || '';
+        if (card.example) text += '\n\n📝 Пример: ' + card.example;
         return {
           type: 'lesson',
           title: card.title || '',
-          text: (card.text || '') + (card.example ? '\n\n📝 Пример: ' + card.example : '')
+          text: text
         };
       } else if (card.type === 'check') {
         return {
           type: 'quiz',
           quizQuestion: card.question,
-          answers: card.options,   // может быть 3 или 4 варианта
+          answers: card.options || [],
           correct: card.correct,
           explanation: card.explanation || ''
         };
@@ -41,8 +42,8 @@ function startTheoryCards(theoryInfo, data, topicKey) {
       return card; // fallback
     });
   } else {
-    console.warn('Неизвестный формат теории');
-    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted)">Формат урока не поддерживается</div>';
+    alert('❌ Неизвестный формат теории. Ожидается массив или объект с полем cards.');
+    document.getElementById('topic-content').innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger)">Формат урока не поддерживается</div>';
     return;
   }
 
@@ -89,6 +90,7 @@ function renderMicroStep() {
   }
   html += '</div>';
 
+  // Содержимое шага
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
@@ -96,7 +98,6 @@ function renderMicroStep() {
     html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
     html += '</div>';
   } else if (step.type === 'quiz') {
-    // quiz с динамическим количеством вариантов (3 или 4)
     var answers = step.answers || [];
     var letters = answers.length === 3 ? ['А', 'Б', 'В'] : ['А', 'Б', 'В', 'Г'];
     html += '<div class="quiz-wrap" style="padding:0">';
