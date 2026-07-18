@@ -1,5 +1,5 @@
 // ==========================================
-//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ
+//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ФИНАЛ)
 // ==========================================
 
 function goScreen(id) {
@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (с отладочным alert)
+// ТЕОРИЯ (чистовая)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -31,15 +31,15 @@ async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
     if (!theoryInfo) {
-        alert('❌ Не найдена теория для темы: ' + lesson.title);
+        goQuizFromLoaded(index);   // если теории нет — сразу практика
         return;
     }
     try {
         var theory = await fetchJSON(theoryInfo.file);
-        alert('✅ Теория загружена, шагов: ' + theory.length);
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
-        alert('❌ Ошибка загрузки ' + theoryInfo.file + ': ' + e.message);
+        console.error(e);
+        goQuizFromLoaded(index);
     }
 }
 
@@ -193,7 +193,7 @@ function getDayWord(n) {
 }
 
 // --------------------------------------------------
-//  Главный экран (путь обучения) — исправленный
+//  Главный экран (путь обучения)
 // --------------------------------------------------
 function renderHomePath() {
   var container = document.getElementById('home-content');
