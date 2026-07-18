@@ -1,5 +1,5 @@
 // ==========================================
-//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ОТЛАДКА)
+//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ
 // ==========================================
 
 function goScreen(id) {
@@ -21,17 +21,10 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ — ОТЛАДОЧНАЯ ВЕРСИЯ
+// ТЕОРИЯ
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
-
-// Временная упрощённая fetchJSON
-async function fetchJSON(file) {
-  var response = await fetch('data/' + file);
-  if (!response.ok) throw new Error('Файл не найден: ' + file);
-  return await response.json();
-}
 
 async function openLessonTheory(index) {
     currentLessonIndex = index;
@@ -43,8 +36,7 @@ async function openLessonTheory(index) {
     }
     try {
         var theory = await fetchJSON(theoryInfo.file);
-        alert('✅ Теория загружена, шагов: ' + theory.length);
-        // Если всё ок, запускаем микроуроки
+        // если всё ок, запускаем микроуроки
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
         alert('❌ Ошибка при загрузке теории ' + theoryInfo.file + ': ' + e.message);
@@ -60,7 +52,7 @@ function startLessonPractice(){
 }
 
 // ==========================================
-// ПРОФИЛЬ (без изменений)
+// ПРОФИЛЬ
 // ==========================================
 function renderProfile() {
   var container = document.getElementById('profile-content');
@@ -156,7 +148,7 @@ function renderProfile() {
 }
 
 // --------------------------------------------------
-//  Вспомогательные вычисления (без изменений)
+//  Вспомогательные вычисления
 // --------------------------------------------------
 function getDaysUntilOGE() {
   var today = new Date();
@@ -206,47 +198,189 @@ function getDayWord(n) {
 }
 
 // --------------------------------------------------
-//  ГЛАВНЫЙ ЭКРАН — ОТЛАДОЧНАЯ ВЕРСИЯ (кликабельные темы с alert)
+//  Главный экран (путь обучения) — без зигзага
 // --------------------------------------------------
 function renderHomePath() {
   var container = document.getElementById('home-content');
   if (!container) return;
 
-  if (typeof lessonsLoaded === 'undefined' || lessonsLoaded.length === 0) {
+  if (lessonsLoaded.length === 0) {
     container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
-    if (typeof loadAllLessons === 'function') {
-      loadAllLessons().then(function() { renderHomePath(); });
-    }
+    loadAllLessons().then(function() { renderHomePath(); });
     return;
   }
 
-  var allLessons = getAllLessons ? getAllLessons() : [];
+  var allLessons = getAllLessons();
   if (allLessons.length === 0) {
-    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Нет тем</div>';
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания</div>';
     return;
   }
 
-  var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы (отладка)</div>';
+  updateDailyTasks();
+
+  var completedCount = Object.keys(userProgress.completedLessons).length;
+  var totalCount = allLessons.length;
+  var pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  var allDone = completedCount >= totalCount;
+  var streak = userProgress.streak || 0;
+  var predictedGrade = getPredictedGrade();
+  var predictedScore = getPredictedScore(predictedGrade);
+  var reviewTopics = getTodayReviewTopics();
+
+  var html = '';
+
+  // --- Карусель ---
+  html += '<div class="carousel" id="home-carousel">';
+
+  // Карточка 1: Прогноз ОГЭ
+  html += '<div class="carousel-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">Твой прогноз ОГЭ</div>';
+  if (predictedGrade !== '—') {
+    html += '<div style="font-size:42px;font-weight:800;color:var(--gold);line-height:1">' + predictedGrade + '</div>';
+    html += '<div style="font-size:13px;color:var(--muted)">Прогноз: ' + predictedScore + ' баллов</div>';
+    var currentGrade = parseInt(predictedGrade);
+    if (currentGrade < 5) {
+      var nextGrade = currentGrade + 1;
+      var needed = getCorrectAnswersNeededForGrade(nextGrade);
+      var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
+      progressPercent = Math.min(100, Math.round(progressPercent));
+      html += '<div style="margin-top:8px;font-size:11px;color:var(--muted)">До ' + nextGrade + ' ещё ' + needed + ' ' + getDayWord(needed) + '</div>';
+      html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
+    } else {
+      html += '<div style="margin-top:8px;font-size:13px;color:var(--primary2)">Ты на высшем уровне!</div>';
+    }
+  } else {
+    html += '<div style="font-size:16px;color:var(--muted)">Недостаточно данных</div>';
+  }
+  html += '</div>';
+
+  // Карточка 2: Ежедневные задания
+  var tasks = userProgress.dailyTasks || {};
+  var dailyQ = userProgress.dailyQuestions || 0;
+  var dailyXP = userProgress.dailyXP || 0;
+  html += '<div class="carousel-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.solve10 ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.solve10 ? '✅' : '⬜') + '</span> 10 вопросов <span style="margin-left:auto;font-size:11px;color:var(--muted)">' + Math.min(dailyQ,10) + '/10</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.earn50XP ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.earn50XP ? '✅' : '⬜') + '</span> 50 XP <span style="margin-left:auto;font-size:11px;color:var(--muted)">' + Math.min(dailyXP,50) + '/50</span></div>';
+  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.loginToday ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.loginToday ? '✅' : '⬜') + '</span> Зайти сегодня</div>';
+  html += '</div>';
+  html += '</div>';
+
+  // Карточка 3: Стрик
+  html += '<div class="carousel-card">';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">🔥 Серия</div>';
+  html += '<div style="font-size:42px;font-weight:800;color:#f85149;line-height:1">' + streak + '</div>';
+  html += '<div style="font-size:13px;color:var(--muted)">' + getDayWord(streak) + ' подряд</div>';
+  html += '<div style="margin-top:8px;font-size:13px;">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
+  html += '</div>';
+
+  html += '</div>'; // .carousel
+
+  // Динамические точки-индикаторы
+  var carouselCardsCount = 3;
+  html += '<div class="carousel-dots" id="carousel-dots">';
+  for (var dotIdx = 0; dotIdx < carouselCardsCount; dotIdx++) {
+    html += '<div class="carousel-dot' + (dotIdx === 0 ? ' active' : '') + '"></div>';
+  }
+  html += '</div>';
+
+  // --- Кнопка действия ---
+  if (reviewTopics.length > 0) {
+    var firstReviewTopic = reviewTopics[0];
+    var reviewIdx = getReviewLessonIndex(firstReviewTopic);
+    var reviewData = userProgress.reviewData && userProgress.reviewData[firstReviewTopic];
+    var mastery = reviewData ? reviewData.mastery || 50 : 50;
+    html += '<div class="continue-card" onclick="startReviewLesson(' + reviewIdx + ',' + mastery + ')">';
+    html += '<div class="continue-icon">🔄</div>';
+    html += '<div><div class="continue-label">Повторить сегодня</div><div class="continue-title">' + firstReviewTopic + '</div></div>';
+    html += '<div class="continue-arrow">→</div></div>';
+  } else {
+    if (!allDone) {
+      var nextIdx = 0;
+      for (var i = 0; i < allLessons.length; i++) {
+        if (!userProgress.completedLessons[allLessons[i].title]) { nextIdx = i; break; }
+      }
+      var nextLesson = allLessons[nextIdx];
+      html += '<div class="continue-card" onclick="goQuizFromLoaded(' + nextIdx + ')">';
+      html += '<div class="continue-icon">' + (nextLesson.title.match(/^\S+/) ? nextLesson.title.match(/^\S+/)[0] : '▶') + '</div>';
+      html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextLesson.title.replace(/^\S+\s*/, '') + '</div></div>';
+      html += '<div class="continue-arrow">→</div></div>';
+    } else {
+      html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+      html += '<div class="continue-icon">👑</div>';
+      html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс</div></div>';
+      html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+    }
+  }
+
+  // --- Вертикальный список тем ---
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
 
   for (var i = 0; i < allLessons.length; i++) {
     var lesson = allLessons[i];
-    // Все темы кликабельны, вызываем openLessonTheory для первой, для остальных просто alert
-    if (i === 0) {
-      html += '<div style="padding:12px; margin:6px 0; background: #1c2333; border:1px solid #58a6ff; border-radius:12px; cursor:pointer; color:#fff; font-weight:600;" onclick="openLessonTheory(0)">';
-      html += '▶ ' + lesson.title + ' (открыть теорию)';
-      html += '</div>';
+    var done = userProgress.completedLessons[lesson.title];
+    var perfect = done && done.score === done.total;
+    var isLocked = i > 0 && !userProgress.completedLessons[allLessons[i-1].title];
+    var stateIcon = perfect ? '🏆' : done ? '✅' : isLocked ? '🔒' : '▶';
+    var isReview = reviewTopics.indexOf(lesson.title) !== -1;
+    var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
+
+    html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin:4px 0;background:' + bgColor + ';border-radius:12px;border:1px solid var(--border);' + (isLocked ? 'opacity:0.45;' : 'cursor:pointer;') + '"' + (isLocked ? '' : ' onclick="openLessonTheory(' + i + ')"') + '>';
+    html += '<div style="font-size:24px;width:32px;text-align:center;">' + stateIcon + '</div>';
+    html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + lesson.title + '</div>';
+    if (done) {
+      html += '<div style="font-size:11px;color:var(--primary2);">' + done.score + '/' + done.total + ' верно</div>';
+    } else if (isLocked) {
+      html += '<div style="font-size:11px;color:var(--muted);">Заблокировано</div>';
     } else {
-      html += '<div style="padding:12px; margin:6px 0; background: #1c2333; border:1px solid #58a6ff; border-radius:12px; cursor:pointer; color:#fff; font-weight:600;" onclick="alert(\'Тема: ' + lesson.title + '\')">';
-      html += '▶ ' + lesson.title;
-      html += '</div>';
+      html += '<div style="font-size:11px;color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопросов</div>';
     }
+    if (isReview) {
+      html += '<span style="background:#f5a623;color:#000;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px;">🔄 Повторить</span>';
+    }
+    html += '</div></div>';
   }
 
+  // Финальный босс
+  html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin-top:12px;background:' + (allDone ? 'rgba(210,153,34,0.1)' : 'var(--card2)') + ';border-radius:12px;border:1px solid ' + (allDone ? '#d29922' : 'var(--border)') + ';' + (allDone ? 'cursor:pointer;' : 'opacity:0.45;') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + '>';
+  html += '<div style="font-size:32px;">👑</div>';
+  html += '<div style="flex:1;"><div style="font-weight:700;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
+  html += '<div style="font-size:11px;color:var(--muted);">' + (allDone ? 'Тест по всем темам открыт' : 'Пройди все темы') + '</div></div>';
+  html += '</div>';
+
   container.innerHTML = html;
+
+  document.getElementById('home-streak').textContent = '🔥 ' + streak;
+  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+
+  var carousel = document.getElementById('home-carousel');
+  if (carousel) {
+    function updateCarouselActive() {
+      var cards = carousel.querySelectorAll('.carousel-card');
+      if (!cards.length) return;
+      var scrollLeft = carousel.scrollLeft;
+      var cardWidth = cards[0].offsetWidth + 12;
+      var activeIndex = Math.round(scrollLeft / cardWidth);
+      cards.forEach(function(card, idx) {
+        if (idx === activeIndex) {
+          card.classList.add('active');
+        } else {
+          card.classList.remove('active');
+        }
+      });
+      var dots = document.querySelectorAll('#carousel-dots .carousel-dot');
+      dots.forEach(function(d, idx) { d.classList.toggle('active', idx === activeIndex); });
+    }
+    carousel.removeEventListener('scroll', carousel._scrollHandler);
+    carousel.addEventListener('scroll', updateCarouselActive);
+    carousel._scrollHandler = updateCarouselActive;
+    updateCarouselActive();
+  }
 }
 
 // ==========================================
-// ИТОГИ ЗАНЯТИЯ (Session Summary) — без изменений
+// ИТОГИ ЗАНЯТИЯ (Session Summary)
 // ==========================================
 function renderSessionSummary() {
   var container = document.getElementById('session-summary-content');
@@ -320,7 +454,6 @@ function renderSessionSummary() {
   container.innerHTML = html;
 }
 
-// Выполнить рекомендованное действие (из learning-path)
 window.executeNextAction = function() {
   var action = getNextAction();
   if (action && action.action) {
@@ -331,7 +464,7 @@ window.executeNextAction = function() {
 };
 
 // ==========================================
-// ЦЕНТР ПОВТОРЕНИЯ (Review Screen) — без изменений
+// ЦЕНТР ПОВТОРЕНИЯ (Review Screen)
 // ==========================================
 function renderReviewScreen() {
   var container = document.getElementById('review-content');
