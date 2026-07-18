@@ -34,20 +34,19 @@ document.addEventListener('DOMContentLoaded', function () {
   document.addEventListener('keydown', resetIdleTimer);
   document.addEventListener('click', resetIdleTimer);
   resetIdleTimer();
-
-  // onStreak: предполагаем, что checkStreak() внутри себя вызывает professor.onStreak,
-  // но если нет — добавь в streak.js
 });
 
-// Привязка глобальных функций (inviteFriend заменён на заглушку)
-window.goScreen = goScreen;
-window.goQuizFromLoaded = goQuizFromLoaded;
-window.replayLesson = replayLesson;
-window.openChest = openChest;
-window.inviteFriend = function() {
+// Безопасная привязка глобальных функций
+window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
+window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
+window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
+window.openChest = typeof openChest === 'function' ? openChest : function() {};
+window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
   alert('Приглашение друзей появится позже');
 };
-window.nextQ = nextQ;
-window.shareBossResult = shareBossResult;
-window.closeRewardModal = closeRewardModal;
-window.closeProfessorModal = closeProfessorModal;
+window.nextQ = typeof nextQ === 'function' ? nextQ : function() {};
+window.shareBossResult = typeof shareBossResult === 'function' ? shareBossResult : function() {
+  alert('Результат сохранён');
+};
+window.closeRewardModal = typeof closeRewardModal === 'function' ? closeRewardModal : function() {};
+window.closeProfessorModal = typeof closeProfessorModal === 'function' ? closeProfessorModal : function() {};
