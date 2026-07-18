@@ -47,4 +47,4 @@ const REWARD_POOL = [
   { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
   { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
   { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
-];
+]; 
