@@ -8,12 +8,6 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <script>
-  window.onerror = function(msg, url, line) {
-    alert('Ошибка в скриптах:\n' + msg + '\nФайл: ' + url + '\nСтрока: ' + line);
-    return true; // предотвращает стандартный вывод в консоль
-  };
-</script>
 
   <div id="modal-container"></div>
 
@@ -137,6 +131,7 @@
 
   <!-- Подключение скриптов (порядок важен!) -->
   <script src="js/config.js"></script>
+  <script src="js/utils/common.js"></script>   <!-- общие утилиты -->
   <script src="data/professor-messages.js"></script>
   <script src="data/questions.js"></script>
   <script src="js/storage.js"></script>
