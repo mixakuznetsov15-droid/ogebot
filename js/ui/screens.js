@@ -21,26 +21,33 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (без изменений)
+// ТЕОРИЯ — ОТЛАДОЧНАЯ ВЕРСИЯ
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
+
+// Временная упрощённая fetchJSON
+async function fetchJSON(file) {
+  var response = await fetch('data/' + file);
+  if (!response.ok) throw new Error('Файл не найден: ' + file);
+  return await response.json();
+}
 
 async function openLessonTheory(index) {
     currentLessonIndex = index;
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
     if (!theoryInfo) {
-        goQuizFromLoaded(index);
+        alert('❌ Не найдена теория для темы: ' + lesson.title);
         return;
     }
     try {
         var theory = await fetchJSON(theoryInfo.file);
-        theoryLoaded = theory;
+        alert('✅ Теория загружена, шагов: ' + theory.length);
+        // Если всё ок, запускаем микроуроки
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
-        console.error(e);
-        goQuizFromLoaded(index);
+        alert('❌ Ошибка при загрузке теории ' + theoryInfo.file + ': ' + e.message);
     }
 }
 
@@ -199,13 +206,12 @@ function getDayWord(n) {
 }
 
 // --------------------------------------------------
-//  ГЛАВНЫЙ ЭКРАН — ОТЛАДОЧНАЯ ВЕРСИЯ
+//  ГЛАВНЫЙ ЭКРАН — ОТЛАДОЧНАЯ ВЕРСИЯ (кликабельные темы с alert)
 // --------------------------------------------------
 function renderHomePath() {
   var container = document.getElementById('home-content');
   if (!container) return;
 
-  // Загружаем уроки, если ещё не загружены
   if (typeof lessonsLoaded === 'undefined' || lessonsLoaded.length === 0) {
     container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
     if (typeof loadAllLessons === 'function') {
@@ -220,15 +226,20 @@ function renderHomePath() {
     return;
   }
 
-  // Простой список с алертами для проверки кликабельности
   var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы (отладка)</div>';
 
   for (var i = 0; i < allLessons.length; i++) {
     var lesson = allLessons[i];
-    // Все темы активны, чтобы проверить клик
-    html += '<div style="padding:12px; margin:6px 0; background: #1c2333; border:1px solid #58a6ff; border-radius:12px; cursor:pointer; color:#fff; font-weight:600;" onclick="alert(\'Клик по теме: ' + lesson.title + '\')">';
-    html += '▶ ' + lesson.title;
-    html += '</div>';
+    // Все темы кликабельны, вызываем openLessonTheory для первой, для остальных просто alert
+    if (i === 0) {
+      html += '<div style="padding:12px; margin:6px 0; background: #1c2333; border:1px solid #58a6ff; border-radius:12px; cursor:pointer; color:#fff; font-weight:600;" onclick="openLessonTheory(0)">';
+      html += '▶ ' + lesson.title + ' (открыть теорию)';
+      html += '</div>';
+    } else {
+      html += '<div style="padding:12px; margin:6px 0; background: #1c2333; border:1px solid #58a6ff; border-radius:12px; cursor:pointer; color:#fff; font-weight:600;" onclick="alert(\'Тема: ' + lesson.title + '\')">';
+      html += '▶ ' + lesson.title;
+      html += '</div>';
+    }
   }
 
   container.innerHTML = html;
