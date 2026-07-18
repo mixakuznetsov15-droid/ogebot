@@ -8,6 +8,12 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+  <script>
+  window.onerror = function(msg, url, line) {
+    alert('Ошибка в скриптах:\n' + msg + '\nФайл: ' + url + '\nСтрока: ' + line);
+    return true; // предотвращает стандартный вывод в консоль
+  };
+</script>
 
   <div id="modal-container"></div>
 
