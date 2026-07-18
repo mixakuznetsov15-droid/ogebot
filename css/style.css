@@ -511,6 +511,10 @@ body::before {
   border-color: var(--primary2);
   box-shadow: 0 0 0 3px rgba(63,185,80,0.3);
 }
+/* Временно убираем профессора с экрана */
+.prof-character-container {
+  display: none !important;
+}
 .image-option.wrong-img {
   border-color: var(--danger);
   box-shadow: 0 0 0 3px rgba(248,81,73,0.3);
