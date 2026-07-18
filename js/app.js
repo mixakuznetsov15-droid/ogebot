@@ -39,11 +39,14 @@ document.addEventListener('DOMContentLoaded', function () {
   // но если нет — добавь в streak.js
 });
 
+// Привязка глобальных функций (inviteFriend заменён на заглушку)
 window.goScreen = goScreen;
 window.goQuizFromLoaded = goQuizFromLoaded;
 window.replayLesson = replayLesson;
 window.openChest = openChest;
-window.inviteFriend = inviteFriend;
+window.inviteFriend = function() {
+  alert('Приглашение друзей появится позже');
+};
 window.nextQ = nextQ;
 window.shareBossResult = shareBossResult;
 window.closeRewardModal = closeRewardModal;
