@@ -47,7 +47,7 @@ function showTheoryScreen(theoryInfo) {}
 function startLessonPractice(){ goQuizFromLoaded(currentLessonIndex); }
 
 // ==========================================
-// ПРОФИЛЬ
+// ПРОФИЛЬ (исправлен)
 // ==========================================
 function renderProfile() {
   var container = document.getElementById('profile-content');
@@ -79,28 +79,28 @@ function renderProfile() {
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
   html += '<div style="font-size:32px">🎯</div>';
   html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
-  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + getPredictedScore(predictedGrade) + '</span></div>';
+  html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + getPredictedScore(predictedGrade) + '</span></div></div>';
   html += '</div>';
 
   html += '<div class="profile-stats-grid">';
-  html += '<div class="profile-stat"><div class="profile-stat-num" style="cursor:pointer" onclick="goScreen(\'s-review\')">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Изучено</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num" style="cursor:pointer" onclick="goScreen(\'s-review\')">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">' + acc + '%</div><div class="profile-stat-label">Точность</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">🔥 ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center">';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
   if (chestCount > 0) {
-    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' сундук' + (chestCount === 1 ? '' : 'ов') + '</div>';
+    html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
   } else {
     html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
   }
   html += '</div>';
-  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;">Открыть</button>';
+  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
   html += '</div>';
 
   var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
-  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение';
+  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
   html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
   html += '<div style="font-size:13px;color:' + (isTelegram ? 'var(--primary2)' : 'var(--danger)') + ';margin-top:6px">' + notifText + '</div>';
@@ -109,8 +109,8 @@ function renderProfile() {
 
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей</div></div>';
-  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer;">Пригласить</button>';
+  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
   html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
 
@@ -137,7 +137,7 @@ function renderProfile() {
   html += '</div>';
 
   html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
-  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted)">Полный доступ ко всем урокам</div></div></div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
 
   container.innerHTML = html;
 }
@@ -192,8 +192,31 @@ function getDayWord(n) {
   return 'дней';
 }
 
+// Недостающие функции для профиля (заглушки, если их нет в xp-system.js)
+function getRank(xp) {
+  if (typeof xp !== 'number') return 'Новичок';
+  if (xp >= 10000) return 'Легенда';
+  if (xp >= 5000) return 'Мастер';
+  if (xp >= 3000) return 'Эксперт';
+  if (xp >= 500) return 'Ученик';
+  return 'Новичок';
+}
+
+function getNextRank(xp) {
+  var ranks = [
+    { name: 'Ученик', min: 500 },
+    { name: 'Эксперт', min: 3000 },
+    { name: 'Мастер', min: 5000 },
+    { name: 'Легенда', min: 10000 }
+  ];
+  for (var i = 0; i < ranks.length; i++) {
+    if (xp < ranks[i].min) return ranks[i];
+  }
+  return null;
+}
+
 // --------------------------------------------------
-//  Главный экран (путь обучения)
+//  Главный экран (путь обучения) — все темы разблокированы
 // --------------------------------------------------
 function renderHomePath() {
   var container = document.getElementById('home-content');
@@ -251,8 +274,6 @@ function renderHomePath() {
 
   // Карточка 2: Ежедневные задания
   var tasks = userProgress.dailyTasks || {};
-  var dailyQ = userProgress.dailyQuestions || 0;
-  var dailyXP = userProgress.dailyXP || 0;
   html += '<div class="carousel-card">';
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
   html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
@@ -267,12 +288,12 @@ function renderHomePath() {
   html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">🔥 Серия</div>';
   html += '<div style="font-size:42px;font-weight:800;color:#f85149;line-height:1">' + streak + '</div>';
   html += '<div style="font-size:13px;color:var(--muted)">' + getDayWord(streak) + ' подряд</div>';
-  html += '<div style="margin-top:8px;font-size:13px;">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день - залог успеха!') + '</div>';
+  html += '<div style="margin-top:8px;font-size:13px;">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
   html += '</div>';
 
   html += '</div>'; // .carousel
 
-  // Динамические точки-индикаторы
+  // Точки карусели
   var carouselCardsCount = 3;
   html += '<div class="carousel-dots" id="carousel-dots">';
   for (var dotIdx = 0; dotIdx < carouselCardsCount; dotIdx++) {
@@ -316,7 +337,6 @@ function renderHomePath() {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
-    // ✅ ИСПРАВЛЕНИЕ: Убираем блокировку последовательности - ВСЕ ТЕМЫ РАЗБЛОКИРОВАНЫ
     var stateIcon = perfect ? '🏆' : done ? '✅' : '▶';
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
