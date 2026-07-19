@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (исправленная последовательность)
+// ТЕОРИЯ (исправленная последовательность + обход кэша)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -44,7 +44,8 @@ async function openLessonTheory(index) {
     }
 
     try {
-        var theory = await fetchJSON(theoryInfo.file);
+        // 🔥 Принудительно обходим кэш, добавляя ?t= со случайным числом
+        var theory = await fetchJSON(theoryInfo.file + '?t=' + Date.now());
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
         console.error(e);
