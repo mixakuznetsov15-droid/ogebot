@@ -4,7 +4,7 @@
 
 // Список файлов теории
 const THEORY_FILES = [
-  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo.json', tasks:'Задания 1-4' },
+  { key:'topo', title:'🗺 Топографические карты', file:'lesson_topo.json', tasks:'Задания 1-4' },
   { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_synoptic.json', tasks:'Задания 5-6' },
   { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
   { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
@@ -47,4 +47,4 @@ const REWARD_POOL = [
   { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
   { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
   { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
-]; 
+];
