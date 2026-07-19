@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (исправленная последовательность + обход кэша)
+// ТЕОРИЯ (отладочная версия)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -31,20 +31,29 @@ async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
 
-    // Если тема уже пройдена — пропускаем микроурок, сразу практика
+    // ОТЛАДКА: показываем, почему выбрано то или иное действие
+    var reason = '';
     if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
-        goQuizFromLoaded(index);
-        return;
+        reason = 'Тема уже пройдена, но проверка отключена — запускаем микроурок.';
+    } else if (!theoryInfo) {
+        reason = 'Файл теории не найден — запускаем практику.';
+    } else {
+        reason = 'Загружаем микроурок из ' + theoryInfo.file;
     }
+    alert('Открытие темы «' + lesson.title + '»:\n' + reason);
 
-    // Если теории нет — тоже сразу практика
+    // Временно отключаем проверку пройденных тем (для теста микроурока)
+    // if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
+    //     goQuizFromLoaded(index);
+    //     return;
+    // }
+
     if (!theoryInfo) {
         goQuizFromLoaded(index);
         return;
     }
 
     try {
-        // 🔥 Принудительно обходим кэш, добавляя ?t= со случайным числом
         var theory = await fetchJSON(theoryInfo.file + '?t=' + Date.now());
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
