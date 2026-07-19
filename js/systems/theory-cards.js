@@ -1,5 +1,5 @@
 // ==========================================
-//  МИКРОУРОКИ (полная поддержка всех форматов)
+//  МИКРОУРОКИ (финальная версия без alert)
 // ==========================================
 
 var microSteps = [];
@@ -7,18 +7,9 @@ var microStepIndex = 0;
 var microTopicKey = '';
 
 function startTheoryCards(theoryInfo, data, topicKey) {
-  // ОТЛАДКА: показываем, что пришло
-  alert('Тип данных: ' + typeof data + '\n' +
-        'Массив? ' + Array.isArray(data) + '\n' +
-        'Есть cards? ' + (data && data.cards ? 'Да (' + data.cards.length + ' шт.)' : 'Нет') + '\n' +
-        'Первый шаг: ' + (Array.isArray(data) ? JSON.stringify(data[0]).substring(0, 80) : (data && data.cards ? JSON.stringify(data.cards[0]).substring(0, 80) : '—')));
-
   let steps = [];
 
-  if (Array.isArray(data)) {
-    // Старый формат: массив шагов
-    steps = data;
-  } else if (data && Array.isArray(data.cards)) {
+  if (data && Array.isArray(data.cards)) {
     // Новый формат: объект с полем cards
     steps = data.cards.map(card => {
       if (card.type === 'explain') {
@@ -44,11 +35,13 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           text: card.message || 'Ты прошёл весь материал!'
         };
       }
-      // fallback
       return card;
     });
+  } else if (Array.isArray(data)) {
+    // Старый формат {section,topic,content} НЕ поддерживается — сразу в практику
+    goQuizFromLoaded(currentLessonIndex);
+    return;
   } else {
-    alert('❌ Неизвестный формат теории. Ожидается массив или объект с полем cards.');
     document.getElementById('topic-content').innerHTML =
       '<div style="padding:20px;text-align:center;color:var(--danger)">Формат урока не поддерживается</div>';
     return;
@@ -93,14 +86,10 @@ function renderMicroStep() {
     else dotClass += ' lesson';
     if (i === microStepIndex) dotClass += ' active';
     else if (i < microStepIndex) dotClass += ' done';
-    html += '<div class="' + dotClass + '"><span class="dot-icon">' +
-      (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' ? '🎯' :
-       s.type === 'final' ? '🏁' : '📖') +
-      '</span></div>';
+    html += '<div class="' + dotClass + '"><span class="dot-icon">' + (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' ? '🎯' : s.type === 'final' ? '🏁' : '📖') + '</span></div>';
   }
   html += '</div>';
 
-  // Содержимое шага
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
