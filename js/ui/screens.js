@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (диагностическая версия)
+// ТЕОРИЯ (диагностическая версия без ?t=)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -41,7 +41,7 @@ async function openLessonTheory(index) {
 
     try {
         alert('2️⃣ Начинаем загрузку ' + theoryInfo.file);
-        var theory = await fetchJSON(theoryInfo.file + '?t=' + Date.now());
+        var theory = await fetchJSON(theoryInfo.file);  // без ?t=
         alert('3️⃣ Загрузка завершена. Тип данных: ' + typeof theory + '\nСодержит cards? ' + (theory && theory.cards ? 'Да (' + theory.cards.length + ' шт.)' : 'Нет'));
 
         alert('4️⃣ Тип startTheoryCards: ' + typeof startTheoryCards);
