@@ -1,5 +1,5 @@
 // ==========================================
-//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ФИНАЛ)
+//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ДИАГНОСТИКА)
 // ==========================================
 
 function goScreen(id) {
@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (отладочная версия)
+// ТЕОРИЯ (диагностическая версия)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -31,33 +31,23 @@ async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
 
-    // ОТЛАДКА: показываем, почему выбрано то или иное действие
-    var reason = '';
-    if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
-        reason = 'Тема уже пройдена, но проверка отключена — запускаем микроурок.';
-    } else if (!theoryInfo) {
-        reason = 'Файл теории не найден — запускаем практику.';
-    } else {
-        reason = 'Загружаем микроурок из ' + theoryInfo.file;
-    }
-    alert('Открытие темы «' + lesson.title + '»:\n' + reason);
-
-    // Временно отключаем проверку пройденных тем (для теста микроурока)
-    // if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
-    //     goQuizFromLoaded(index);
-    //     return;
-    // }
+    alert('1️⃣ Открытие темы «' + lesson.title + '»\nФайл теории: ' + (theoryInfo ? theoryInfo.file : 'не найден'));
 
     if (!theoryInfo) {
+        alert('❌ Файл теории не найден — запускаем практику.');
         goQuizFromLoaded(index);
         return;
     }
 
     try {
+        alert('2️⃣ Начинаем загрузку ' + theoryInfo.file);
         var theory = await fetchJSON(theoryInfo.file + '?t=' + Date.now());
+        alert('3️⃣ Загрузка завершена. Тип данных: ' + typeof theory + '\nСодержит cards? ' + (theory && theory.cards ? 'Да (' + theory.cards.length + ' шт.)' : 'Нет'));
+
+        alert('4️⃣ Тип startTheoryCards: ' + typeof startTheoryCards);
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
-        console.error(e);
+        alert('❌ Ошибка в openLessonTheory: ' + e.message);
         goQuizFromLoaded(index);
     }
 }
