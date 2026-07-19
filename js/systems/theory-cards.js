@@ -38,7 +38,7 @@ function startTheoryCards(theoryInfo, data, topicKey) {
       return card;
     });
   } else if (Array.isArray(data)) {
-    // Старый формат {section,topic,content} НЕ поддерживается — сразу в практику
+    // Старый формат (без type) — сразу в практику
     goQuizFromLoaded(currentLessonIndex);
     return;
   } else {
@@ -86,10 +86,14 @@ function renderMicroStep() {
     else dotClass += ' lesson';
     if (i === microStepIndex) dotClass += ' active';
     else if (i < microStepIndex) dotClass += ' done';
-    html += '<div class="' + dotClass + '"><span class="dot-icon">' + (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' ? '🎯' : s.type === 'final' ? '🏁' : '📖') + '</span></div>';
+    html += '<div class="' + dotClass + '"><span class="dot-icon">' +
+      (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' ? '🎯' :
+       s.type === 'final' ? '🏁' : '📖') +
+      '</span></div>';
   }
   html += '</div>';
 
+  // Содержимое шага
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
