@@ -1,5 +1,5 @@
 // ==========================================
-//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ДИАГНОСТИКА)
+//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ФИНАЛ)
 // ==========================================
 
 function goScreen(id) {
@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (диагностическая версия без ?t=)
+// ТЕОРИЯ (с прямым fetch)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -31,23 +31,21 @@ async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
 
-    alert('1️⃣ Открытие темы «' + lesson.title + '»\nФайл теории: ' + (theoryInfo ? theoryInfo.file : 'не найден'));
-
     if (!theoryInfo) {
-        alert('❌ Файл теории не найден — запускаем практику.');
         goQuizFromLoaded(index);
         return;
     }
 
     try {
-        alert('2️⃣ Начинаем загрузку ' + theoryInfo.file);
-        var theory = await fetchJSON(theoryInfo.file);  // без ?t=
-        alert('3️⃣ Загрузка завершена. Тип данных: ' + typeof theory + '\nСодержит cards? ' + (theory && theory.cards ? 'Да (' + theory.cards.length + ' шт.)' : 'Нет'));
+        // Прямой fetch к файлу (гарантированно обходит проблемы с fetchJSON)
+        var url = 'data/' + theoryInfo.file;
+        var response = await fetch(url);
+        if (!response.ok) throw new Error('HTTP ' + response.status + ' при загрузке ' + url);
+        var theory = await response.json();
 
-        alert('4️⃣ Тип startTheoryCards: ' + typeof startTheoryCards);
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
-        alert('❌ Ошибка в openLessonTheory: ' + e.message);
+        console.error('Ошибка загрузки теории:', e);
         goQuizFromLoaded(index);
     }
 }
