@@ -7,7 +7,6 @@ var microStepIndex = 0;
 var microTopicKey = '';
 
 function startTheoryCards(theoryInfo, data, topicKey) {
-  // ОТЛАДКА: подробный анализ загруженных данных
   alert('📦 startTheoryCards вызвана.\n\n' +
         'Тип данных: ' + typeof data + '\n' +
         'Содержит поле "cards"? ' + (data && data.cards ? 'Да (' + data.cards.length + ' шт.)' : 'Нет') + '\n' +
@@ -17,7 +16,6 @@ function startTheoryCards(theoryInfo, data, topicKey) {
   let steps = [];
 
   if (data && Array.isArray(data.cards)) {
-    // Новый формат: объект с полем cards
     steps = data.cards.map(card => {
       if (card.type === 'explain') {
         let text = card.text || '';
@@ -37,7 +35,7 @@ function startTheoryCards(theoryInfo, data, topicKey) {
       return card;
     });
   } else if (Array.isArray(data)) {
-    alert('⚠️ Старый формат (массив без "cards"). Микроурок пропущен, запускается практика.');
+    alert('⚠️ Старый формат (массив без "cards"). Микроурок пропущен.');
     goQuizFromLoaded(currentLessonIndex);
     return;
   } else {
