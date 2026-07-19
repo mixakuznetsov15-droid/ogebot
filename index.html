@@ -144,7 +144,6 @@
   <script src="js/systems/daily-quest.js"></script>
   <script src="js/systems/achievements.js"></script>
   <script src="js/systems/theory.js"></script>
-  <!-- theory-cards.js встроен ниже -->
   <script src="js/utils/skill-tagger.js"></script>
   <script src="js/systems/adaptive-selector.js"></script>
   <script src="js/systems/quiz-system.js"></script>
@@ -156,7 +155,7 @@
   <script src="js/ui/screens.js"></script>
   <script src="js/app.js"></script>
 
-  <!-- ВСТРОЕННЫЙ theory-cards.js (отладка) -->
+  <!-- ВСТРОЕННЫЙ theory-cards.js (полная отладочная версия) -->
   <script>
     // ==========================================
     //  МИКРОУРОКИ (отладка структуры JSON)
@@ -295,12 +294,92 @@
       container.innerHTML = html;
     }
 
-    function nextMicroStep() { /* ... */ }
-    function processMicroAnswer(isCorrect, explanation) { /* ... */ }
-    function answerMicroQuestion(chosen) { /* ... */ }
-    function answerTrueFalse(value) { /* ... */ }
-    function answerChooseImage(chosen) { /* ... */ }
-    // (Остальные функции скопируйте из предыдущей полной версии, они там есть)
+    function nextMicroStep() {
+      microStepIndex++;
+      if (microStepIndex < microSteps.length) {
+        renderMicroStep();
+      } else {
+        startLessonPractice();
+      }
+    }
+
+    function processMicroAnswer(isCorrect, explanation) {
+      var feedbackDiv = document.getElementById('micro-feedback');
+      if (isCorrect) {
+        addXP(5);
+        feedbackDiv.innerHTML = '<div style="color:var(--primary2);margin-bottom:8px;">✅ Верно! ' + (explanation || '') + '</div>';
+        if (typeof professor !== 'undefined') {
+          professor.showMessage('Отлично! Идём дальше.', 'happy', 2000);
+        }
+        setTimeout(function() {
+          microStepIndex++;
+          if (microStepIndex < microSteps.length) {
+            renderMicroStep();
+          } else {
+            startLessonPractice();
+          }
+        }, 1200);
+      } else {
+        feedbackDiv.innerHTML = '<div style="color:var(--danger);margin-bottom:8px;">❌ Неверно. ' + (explanation || 'Попробуй ещё раз.') + '</div>';
+        if (typeof professor !== 'undefined') {
+          professor.showMessage('Не переживай, это сложный момент. Попробуй ещё раз.', 'sad', 2500);
+        }
+        setTimeout(function() {
+          renderMicroStep();
+        }, 2000);
+      }
+    }
+
+    function answerMicroQuestion(chosen) {
+      var step = microSteps[microStepIndex];
+      var correctIdx = step.correct;
+      var isCorrect = (chosen === correctIdx);
+      var btns = document.querySelectorAll('#micro-answers .ans-btn');
+      btns.forEach(function(b) { b.disabled = true; });
+      if (isCorrect) {
+        btns[correctIdx].classList.add('correct');
+      } else {
+        btns[chosen].classList.add('wrong');
+        btns[correctIdx].classList.add('correct');
+      }
+      processMicroAnswer(isCorrect, step.explanation);
+    }
+
+    function answerTrueFalse(value) {
+      var step = microSteps[microStepIndex];
+      var isCorrect = (value === step.correct);
+      var buttons = document.querySelectorAll('.true-false-btn');
+      buttons.forEach(function(b) { b.disabled = true; });
+      if (isCorrect) {
+        if (value === true) {
+          document.querySelector('.true-btn').classList.add('correct-tf');
+        } else {
+          document.querySelector('.false-btn').classList.add('correct-tf');
+        }
+      } else {
+        if (value === true) {
+          document.querySelector('.true-btn').classList.add('wrong-tf');
+          document.querySelector('.false-btn').classList.add('correct-tf');
+        } else {
+          document.querySelector('.false-btn').classList.add('wrong-tf');
+          document.querySelector('.true-btn').classList.add('correct-tf');
+        }
+      }
+      processMicroAnswer(isCorrect, step.explanation);
+    }
+
+    function answerChooseImage(chosen) {
+      var step = microSteps[microStepIndex];
+      var correctIdx = step.images.findIndex(function(img) { return img.correct === true; });
+      var isCorrect = (chosen === correctIdx);
+      var images = document.querySelectorAll('.image-option');
+      images.forEach(function(img, idx) {
+        img.style.pointerEvents = 'none';
+        if (idx === correctIdx) img.classList.add('correct-img');
+        if (idx === chosen && !isCorrect) img.classList.add('wrong-img');
+      });
+      processMicroAnswer(isCorrect, step.explanation);
+    }
   </script>
 </body>
 </html>
