@@ -1,5 +1,5 @@
 // ==========================================
-//  МИКРОУРОКИ (финальная версия без alert)
+//  МИКРОУРОКИ (отладка структуры JSON)
 // ==========================================
 
 var microSteps = [];
@@ -7,6 +7,13 @@ var microStepIndex = 0;
 var microTopicKey = '';
 
 function startTheoryCards(theoryInfo, data, topicKey) {
+  // ОТЛАДКА: подробный анализ загруженных данных
+  alert('📦 startTheoryCards вызвана.\n\n' +
+        'Тип данных: ' + typeof data + '\n' +
+        'Содержит поле "cards"? ' + (data && data.cards ? 'Да (' + data.cards.length + ' шт.)' : 'Нет') + '\n' +
+        'Является массивом? ' + Array.isArray(data) + '\n' +
+        'Первый элемент: ' + (Array.isArray(data) ? JSON.stringify(data[0]).substring(0, 100) : (data && data.cards ? JSON.stringify(data.cards[0]).substring(0, 100) : '—')));
+
   let steps = [];
 
   if (data && Array.isArray(data.cards)) {
@@ -15,11 +22,7 @@ function startTheoryCards(theoryInfo, data, topicKey) {
       if (card.type === 'explain') {
         let text = card.text || '';
         if (card.example) text += '\n\n📝 Пример: ' + card.example;
-        return {
-          type: 'lesson',
-          title: card.title || '',
-          text: text
-        };
+        return { type: 'lesson', title: card.title || '', text: text };
       } else if (card.type === 'check') {
         return {
           type: 'quiz',
@@ -29,30 +32,27 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           explanation: card.explanation || ''
         };
       } else if (card.type === 'ready') {
-        return {
-          type: 'final',
-          title: '🎉 Готов к практике',
-          text: card.message || 'Ты прошёл весь материал!'
-        };
+        return { type: 'final', title: '🎉 Готов к практике', text: card.message || 'Ты прошёл весь материал!' };
       }
       return card;
     });
   } else if (Array.isArray(data)) {
-    // Старый формат (без type) — сразу в практику
+    alert('⚠️ Старый формат (массив без "cards"). Микроурок пропущен, запускается практика.');
     goQuizFromLoaded(currentLessonIndex);
     return;
   } else {
-    document.getElementById('topic-content').innerHTML =
-      '<div style="padding:20px;text-align:center;color:var(--danger)">Формат урока не поддерживается</div>';
+    alert('❌ Неизвестный формат данных. Запускается практика.');
+    goQuizFromLoaded(currentLessonIndex);
     return;
   }
+
+  alert('✅ Шагов подготовлено: ' + steps.length);
 
   if (steps.length === 0) {
     goQuizFromLoaded(currentLessonIndex);
     return;
   }
 
-  // Сохраняем, что теория открыта
   if (!userProgress.theoryRead) userProgress.theoryRead = {};
   var lesson = QUESTIONS_FILES[currentLessonIndex];
   if (lesson) {
@@ -76,7 +76,6 @@ function renderMicroStep() {
   var total = microSteps.length;
   var html = '';
 
-  // Прогресс-бар с точками-типами
   html += '<div class="theory-progress">';
   for (var i = 0; i < total; i++) {
     var dotClass = 'theory-progress-dot';
@@ -86,14 +85,10 @@ function renderMicroStep() {
     else dotClass += ' lesson';
     if (i === microStepIndex) dotClass += ' active';
     else if (i < microStepIndex) dotClass += ' done';
-    html += '<div class="' + dotClass + '"><span class="dot-icon">' +
-      (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' ? '🎯' :
-       s.type === 'final' ? '🏁' : '📖') +
-      '</span></div>';
+    html += '<div class="' + dotClass + '"><span class="dot-icon">' + (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' ? '🎯' : s.type === 'final' ? '🏁' : '📖') + '</span></div>';
   }
   html += '</div>';
 
-  // Содержимое шага
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
@@ -151,7 +146,6 @@ function nextMicroStep() {
   }
 }
 
-// Универсальная обработка ответа
 function processMicroAnswer(isCorrect, explanation) {
   var feedbackDiv = document.getElementById('micro-feedback');
   if (isCorrect) {
