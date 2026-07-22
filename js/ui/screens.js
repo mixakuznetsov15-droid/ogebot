@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (поддержка подтем + отладка)
+// ТЕОРИЯ (поддержка подтем + прямой fetch)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -64,13 +64,12 @@ function showSubtopicsList(subtopics, parentIndex) {
 
     subtopics.forEach(function(sub, i) {
         html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer; position:relative; z-index:10;" ' +
-                'onclick="alert(\'Клик: ' + sub.title + '\'); openSubtopic(' + parentIndex + ', ' + i + ')">';
+                'onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
         html += '<div style="font-weight:600;">' + sub.title + '</div>';
         html += '</div>';
     });
 
     container.innerHTML = html;
-    // Принудительно поднимаем контейнер над профессором
     container.style.position = 'relative';
     container.style.zIndex = '20';
 }
@@ -89,11 +88,18 @@ async function openSubtopic(parentIndex, subtopicIndex) {
 
     currentLessonIndex = parentIndex;
 
+    // Формируем полный URL
+    var url = window.location.origin + '/data/' + sub.file;
+
     try {
-        var theory = await fetchJSON(sub.file);
+        var response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+        }
+        var theory = await response.json();
         startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
     } catch (e) {
-        alert('Ошибка загрузки теории: ' + e.message + ' (файл ' + sub.file + ')');
+        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nПолный URL: ' + url + '\nОшибка: ' + e.message);
         // fallback – сразу практика
         goQuizFromLoaded(parentIndex);
     }
