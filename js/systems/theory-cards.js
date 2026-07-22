@@ -231,10 +231,18 @@ function renderMicroStep() {
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
   } else if (step.type === 'final') {
-    html += '<div class="theory-card">';
-    html += '<div class="theory-topic">🏁 ' + (step.title || 'Финальный шаг') + '</div>';
-    html += '<div class="theory-text">' + (step.text || 'Ты прошёл весь материал! Готов проверить знания?') + '</div>';
-    html += '<button class="btn-full primary" onclick="startLessonPractice()">🚀 Начать практику</button>';
+    // Экран завершения микроурока с XP и профессором
+    html += '<div style="text-align:center;padding:30px 20px;">';
+    html += '<div style="font-size:64px;margin-bottom:12px;">🎉</div>';
+    html += '<div style="font-family:var(--font-h);font-size:20px;font-weight:800;margin-bottom:8px;">' + (step.title || 'Урок пройден!') + '</div>';
+    html += '<div style="font-size:14px;color:var(--muted);margin-bottom:8px;">' + (step.text || 'Отличная работа!') + '</div>';
+    html += '<div style="font-size:28px;font-weight:800;color:var(--gold);margin:12px 0;">+25 XP</div>';
+    if (typeof professor !== 'undefined') {
+      html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:12px;margin:12px 0;text-align:left;font-size:13px;color:var(--text);">';
+      html += '🧑‍🏫 <b>Профессор Гео:</b> «Отлично! Теперь закрепим знания на практике. Ты справишься!»';
+      html += '</div>';
+    }
+    html += '<button class="btn-full primary" onclick="startSubtopicPractice()" style="margin-top:20px;">🎯 К практике</button>';
     html += '</div>';
   }
 
