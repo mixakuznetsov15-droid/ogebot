@@ -79,3 +79,13 @@ function refreshFreeze() {
     saveProgress();
   }
 }
+
+// ==========================================
+//  ПОЛУЧИТЬ СПИСОК ВСЕХ УРОКОВ
+// ==========================================
+function getAllLessons() {
+  // Включаем темы, у которых есть файл вопросов ИЛИ подтемы
+  return QUESTIONS_FILES.filter(function(q) {
+    return q.file || (q.subtopics && q.subtopics.length > 0);
+  });
+}
