@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (поддержка подтем)
+// ТЕОРИЯ (поддержка подтем + отладка)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -31,13 +31,11 @@ async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES[index];
 
-    // Если у темы есть подтемы — показываем их список
     if (theoryInfo && theoryInfo.subtopics) {
         showSubtopicsList(theoryInfo.subtopics, index);
         return;
     }
 
-    // Обычная тема без подтем
     if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
         goQuizFromLoaded(index);
         return;
@@ -57,7 +55,6 @@ async function openLessonTheory(index) {
     }
 }
 
-// Показывает список подтем
 function showSubtopicsList(subtopics, parentIndex) {
     goScreen('s-topic');
     document.getElementById('topic-title').textContent = 'Топографические карты';
@@ -66,26 +63,37 @@ function showSubtopicsList(subtopics, parentIndex) {
     var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">📚 Выбери урок</div>';
 
     subtopics.forEach(function(sub, i) {
-        html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer;" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
+        html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer; position:relative; z-index:10;" ' +
+                'onclick="alert(\'Клик: ' + sub.title + '\'); openSubtopic(' + parentIndex + ', ' + i + ')">';
         html += '<div style="font-weight:600;">' + sub.title + '</div>';
         html += '</div>';
     });
 
     container.innerHTML = html;
+    // Принудительно поднимаем контейнер над профессором
+    container.style.position = 'relative';
+    container.style.zIndex = '20';
 }
 
-// Открывает конкретную подтему
 async function openSubtopic(parentIndex, subtopicIndex) {
     var theoryInfo = THEORY_FILES[parentIndex];
+    if (!theoryInfo || !theoryInfo.subtopics) {
+        alert('Ошибка: нет подтем у темы');
+        return;
+    }
     var sub = theoryInfo.subtopics[subtopicIndex];
+    if (!sub) {
+        alert('Ошибка: подтема не найдена');
+        return;
+    }
 
-    currentLessonIndex = parentIndex; // сохраняем индекс родительской темы для практики
+    currentLessonIndex = parentIndex;
 
     try {
         var theory = await fetchJSON(sub.file);
         startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
     } catch (e) {
-        console.error(e);
+        alert('Ошибка загрузки теории: ' + e.message + ' (файл ' + sub.file + ')');
         // fallback – сразу практика
         goQuizFromLoaded(parentIndex);
     }
@@ -209,7 +217,6 @@ function renderHomePath() {
     return;
   }
 
-  // Принудительно добавляем тему topo, если её нет (временный фикс)
   var hasTopo = allLessons.some(function(l) { return l.key === 'topo'; });
   if (!hasTopo) {
     var topoEntry = QUESTIONS_FILES.find(function(q) { return q.key === 'topo'; });
