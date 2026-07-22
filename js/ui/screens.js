@@ -1,5 +1,5 @@
 // ==========================================
-//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ (ФИНАЛ)
+//  ПЕРЕКЛЮЧЕНИЕ ЭКРАНОВ И РЕНДЕРИНГ
 // ==========================================
 
 function goScreen(id) {
@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (с прямым fetch)
+// ТЕОРИЯ (поддержка подтем)
 // ==========================================
 var currentLessonIndex = 0;
 var theoryLoaded = [];
@@ -29,24 +29,65 @@ var theoryLoaded = [];
 async function openLessonTheory(index) {
     currentLessonIndex = index;
     var lesson = QUESTIONS_FILES[index];
-    var theoryInfo = THEORY_FILES.find(t => t.key === lesson.key);
+    var theoryInfo = THEORY_FILES[index];
 
-    if (!theoryInfo) {
+    // Если у темы есть подтемы — показываем их список
+    if (theoryInfo && theoryInfo.subtopics) {
+        showSubtopicsList(theoryInfo.subtopics, index);
+        return;
+    }
+
+    // Обычная тема без подтем
+    if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
+        goQuizFromLoaded(index);
+        return;
+    }
+
+    if (!theoryInfo || !theoryInfo.file) {
         goQuizFromLoaded(index);
         return;
     }
 
     try {
-        // Прямой fetch к файлу (гарантированно обходит проблемы с fetchJSON)
-        var url = 'data/' + theoryInfo.file;
-        var response = await fetch(url);
-        if (!response.ok) throw new Error('HTTP ' + response.status + ' при загрузке ' + url);
-        var theory = await response.json();
-
+        var theory = await fetchJSON(theoryInfo.file);
         startTheoryCards(theoryInfo, theory, theoryInfo.key);
     } catch (e) {
-        console.error('Ошибка загрузки теории:', e);
+        console.error(e);
         goQuizFromLoaded(index);
+    }
+}
+
+// Показывает список подтем
+function showSubtopicsList(subtopics, parentIndex) {
+    goScreen('s-topic');
+    document.getElementById('topic-title').textContent = 'Топографические карты';
+
+    var container = document.getElementById('topic-content');
+    var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">📚 Выбери урок</div>';
+
+    subtopics.forEach(function(sub, i) {
+        html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer;" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
+        html += '<div style="font-weight:600;">' + sub.title + '</div>';
+        html += '</div>';
+    });
+
+    container.innerHTML = html;
+}
+
+// Открывает конкретную подтему
+async function openSubtopic(parentIndex, subtopicIndex) {
+    var theoryInfo = THEORY_FILES[parentIndex];
+    var sub = theoryInfo.subtopics[subtopicIndex];
+
+    currentLessonIndex = parentIndex; // сохраняем индекс родительской темы для практики
+
+    try {
+        var theory = await fetchJSON(sub.file);
+        startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
+    } catch (e) {
+        console.error(e);
+        // fallback – сразу практика
+        goQuizFromLoaded(parentIndex);
     }
 }
 
@@ -54,7 +95,7 @@ function showTheoryScreen(theoryInfo) {}
 function startLessonPractice(){ goQuizFromLoaded(currentLessonIndex); }
 
 // ==========================================
-// ПРОФИЛЬ (исправлен)
+// ПРОФИЛЬ
 // ==========================================
 function renderProfile() {
   var container = document.getElementById('profile-content');
