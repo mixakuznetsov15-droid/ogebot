@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (поддержка подтем + практика подтемы)
+// ТЕОРИЯ (поддержка подтем + прямой fetch в openSubtopic)
 // ==========================================
 var currentLessonIndex = 0;
 var currentSubtopicQuestionsFile = null;
@@ -32,13 +32,11 @@ async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES[index];
 
-    // Если у темы есть подтемы — показываем их список
     if (theoryInfo && theoryInfo.subtopics) {
         showSubtopicsList(theoryInfo.subtopics, index);
         return;
     }
 
-    // Обычная тема без подтем
     if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
         goQuizFromLoaded(index);
         return;
@@ -58,7 +56,6 @@ async function openLessonTheory(index) {
     }
 }
 
-// Показывает список подтем
 function showSubtopicsList(subtopics, parentIndex) {
     goScreen('s-topic');
     document.getElementById('topic-title').textContent = 'Топографические карты';
@@ -77,7 +74,6 @@ function showSubtopicsList(subtopics, parentIndex) {
     container.style.zIndex = '20';
 }
 
-// Открывает конкретную подтему
 async function openSubtopic(parentIndex, subtopicIndex) {
     var theoryInfo = THEORY_FILES[parentIndex];
     if (!theoryInfo || !theoryInfo.subtopics) {
@@ -91,18 +87,23 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     }
 
     currentLessonIndex = parentIndex;
-    currentSubtopicQuestionsFile = sub.questions;   // сохраняем файл вопросов
+    currentSubtopicQuestionsFile = sub.questions;
+
+    var url = window.location.origin + '/data/' + sub.file;
 
     try {
-        var theory = await fetchJSON(sub.file);
+        var response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+        }
+        var theory = await response.json();
         startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
     } catch (e) {
-        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nОшибка: ' + e.message);
+        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nПолный URL: ' + url + '\nОшибка: ' + e.message);
         goQuizFromLoaded(parentIndex);
     }
 }
 
-// Запуск практики для подтемы (вызывается из финального экрана микроурока)
 function startSubtopicPractice() {
   if (currentSubtopicQuestionsFile) {
     var questionsEntry = QUESTIONS_FILES.find(function(q) {
