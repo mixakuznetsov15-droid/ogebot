@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (поддержка подтем + прямой fetch в openSubtopic)
+// ТЕОРИЯ (исправленная практика для подтем)
 // ==========================================
 var currentLessonIndex = 0;
 var currentSubtopicQuestionsFile = null;
@@ -89,33 +89,45 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
-    var url = window.location.origin + '/data/' + sub.file;
-
     try {
-        var response = await fetch(url);
-        if (!response.ok) {
-            throw new Error('HTTP ' + response.status + ' ' + response.statusText);
-        }
-        var theory = await response.json();
+        var theory = await fetchJSON(sub.file);
         startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
     } catch (e) {
-        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nПолный URL: ' + url + '\nОшибка: ' + e.message);
+        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nОшибка: ' + e.message);
         goQuizFromLoaded(parentIndex);
     }
 }
 
 function startSubtopicPractice() {
-  if (currentSubtopicQuestionsFile) {
-    var questionsEntry = QUESTIONS_FILES.find(function(q) {
-      return q.file === currentSubtopicQuestionsFile;
-    });
-    if (questionsEntry) {
-      var idx = QUESTIONS_FILES.indexOf(questionsEntry);
-      goQuizFromLoaded(idx);
-      return;
+    if (!currentSubtopicQuestionsFile) {
+        goQuizFromLoaded(currentLessonIndex);
+        return;
     }
-  }
-  goQuizFromLoaded(currentLessonIndex);
+
+    var url = 'data/' + currentSubtopicQuestionsFile;
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
+        .then(function(questions) {
+            shuffled = questions;
+            curQ = 0;
+            score = 0;
+            answered = false;
+            lives = 3;
+            hintUsed = false;
+            correctStreak = 0;
+            lastAnswerWasWrong = false;
+            isBossMode = false;
+            currentLessonIndex = 0;
+            goScreen('s-quiz');
+            renderQ();
+        })
+        .catch(function(e) {
+            alert('Ошибка загрузки практики: ' + e.message);
+            goQuizFromLoaded(currentLessonIndex);
+        });
 }
 
 function showTheoryScreen(theoryInfo) {}
