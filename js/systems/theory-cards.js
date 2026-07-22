@@ -1,5 +1,5 @@
 // ==========================================
-//  МИКРОУРОКИ (исправленная сортировка)
+//  МИКРОУРОКИ (исправленная сортировка + все обработчики)
 // ==========================================
 
 var microSteps = [];
@@ -127,7 +127,7 @@ function renderMicroStep() {
   }
   html += '</div>';
 
-  // Рендеринг
+  // Рендеринг шагов
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
@@ -241,7 +241,7 @@ function renderMicroStep() {
   container.innerHTML = html;
 }
 
-// ---------- Функции для сортировки ----------
+// ---------- Функции сортировки ----------
 function moveSortItem(btn, direction) {
   var item = btn.closest('.sort-item');
   var list = document.getElementById('sort-list');
@@ -307,12 +307,82 @@ function processMicroAnswer(isCorrect, explanation) {
   }
 }
 
-function answerMicroQuestion(chosen) { /* без изменений */ }
-function answerTrueFalse(value) { /* без изменений */ }
-function answerChooseImage(chosen) { /* без изменений */ }
-function answerHotspot(chosen) { /* без изменений */ }
-function submitNumberAnswer() { /* без изменений */ }
-function submitMultiSelectAnswer() { /* без изменений */ }
+function answerMicroQuestion(chosen) {
+  var step = microSteps[microStepIndex];
+  var correctIdx = step.correct;
+  var isCorrect = (chosen === correctIdx);
+  var btns = document.querySelectorAll('#micro-answers .ans-btn');
+  btns.forEach(function(b) { b.disabled = true; });
+  if (isCorrect) {
+    btns[correctIdx].classList.add('correct');
+  } else {
+    btns[chosen].classList.add('wrong');
+    btns[correctIdx].classList.add('correct');
+  }
+  processMicroAnswer(isCorrect, step.explanation);
+}
+
+function answerTrueFalse(value) {
+  var step = microSteps[microStepIndex];
+  var isCorrect = (value === step.correct);
+  var buttons = document.querySelectorAll('.true-false-btn');
+  buttons.forEach(function(b) { b.disabled = true; });
+  if (isCorrect) {
+    if (value === true) {
+      document.querySelector('.true-btn').classList.add('correct-tf');
+    } else {
+      document.querySelector('.false-btn').classList.add('correct-tf');
+    }
+  } else {
+    if (value === true) {
+      document.querySelector('.true-btn').classList.add('wrong-tf');
+      document.querySelector('.false-btn').classList.add('correct-tf');
+    } else {
+      document.querySelector('.false-btn').classList.add('wrong-tf');
+      document.querySelector('.true-btn').classList.add('correct-tf');
+    }
+  }
+  processMicroAnswer(isCorrect, step.explanation);
+}
+
+function answerChooseImage(chosen) {
+  var step = microSteps[microStepIndex];
+  var correctIdx = step.images.findIndex(function(img) { return img.correct === true; });
+  var isCorrect = (chosen === correctIdx);
+  var images = document.querySelectorAll('.image-option');
+  images.forEach(function(img, idx) {
+    img.style.pointerEvents = 'none';
+    if (idx === correctIdx) img.classList.add('correct-img');
+    if (idx === chosen && !isCorrect) img.classList.add('wrong-img');
+  });
+  processMicroAnswer(isCorrect, step.explanation);
+}
+
+function answerHotspot(chosen) {
+  var step = microSteps[microStepIndex];
+  var isCorrect = step.hotspots[chosen].correct;
+  processMicroAnswer(isCorrect, step.explanation);
+}
+
+function submitNumberAnswer() {
+  var step = microSteps[microStepIndex];
+  var input = document.getElementById('number-answer');
+  var userAnswer = parseFloat(input.value);
+  var correct = step.correctAnswer;
+  var tol = step.tolerance || 0;
+  var isCorrect = Math.abs(userAnswer - correct) <= tol;
+  processMicroAnswer(isCorrect, step.explanation);
+}
+
+function submitMultiSelectAnswer() {
+  var step = microSteps[microStepIndex];
+  var selected = [];
+  document.querySelectorAll('#multi-options input:checked').forEach(function(cb) {
+    selected.push(parseInt(cb.value));
+  });
+  var isCorrect = JSON.stringify(selected.sort()) === JSON.stringify(step.correctIndices.sort());
+  processMicroAnswer(isCorrect, step.explanation);
+}
 
 function shuffle(arr) {
   var a = [...arr];
