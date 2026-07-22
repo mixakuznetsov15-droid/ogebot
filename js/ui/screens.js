@@ -209,6 +209,13 @@ function renderHomePath() {
     return;
   }
 
+  // Принудительно добавляем тему topo, если её нет (временный фикс)
+  var hasTopo = allLessons.some(function(l) { return l.key === 'topo'; });
+  if (!hasTopo) {
+    var topoEntry = QUESTIONS_FILES.find(function(q) { return q.key === 'topo'; });
+    if (topoEntry) allLessons.unshift(topoEntry);
+  }
+
   updateDailyTasks();
 
   var completedCount = Object.keys(userProgress.completedLessons).length;
