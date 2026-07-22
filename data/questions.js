@@ -4,7 +4,17 @@
 
 // Список файлов теории
 const THEORY_FILES = [
-  { key:'topo', title:'🗺 Топографические карты', file:'theory_topo_v2.json', tasks:'Задания 1-4' },
+  // topo теперь разбита на 8 подтем
+  { key:'topo_intro',     title:'📌 Топографическая карта',    file:'theory_topo_01.json', tasks:'Что это и где применяется' },
+  { key:'topo_scale',     title:'📏 Масштаб',                  file:'theory_topo_02.json', tasks:'Виды, перевод, расчёт' },
+  { key:'topo_signs',     title:'🏘 Условные знаки',           file:'theory_topo_03.json', tasks:'Распознавание объектов' },
+  { key:'topo_relief',    title:'⛰ Рельеф',                   file:'theory_topo_04.json', tasks:'Горизонтали, высоты, склоны' },
+  { key:'topo_azimuth',   title:'🧭 Азимут',                   file:'theory_topo_05.json', tasks:'Стороны горизонта, направление' },
+  { key:'topo_coords',    title:'📍 Координаты и объекты',     file:'theory_topo_06.json', tasks:'Поиск по квадратам' },
+  { key:'topo_route',     title:'🚶 Маршрут',                  file:'theory_topo_07.json', tasks:'Построение и чтение маршрута' },
+  { key:'topo_final',     title:'📝 Комплексные задания',      file:'theory_topo_08.json', tasks:'Задания 1–4 ОГЭ' },
+
+  // остальные темы (без изменений)
   { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_synoptic.json', tasks:'Задания 5-6' },
   { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
   { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
@@ -17,12 +27,21 @@ const THEORY_FILES = [
   { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
   { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
   { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
-  { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' }
+  { key:'geopos', title:'📍 Геогр. положение России', file:'theory_geopos.json', tasks:'Задание 26' }
 ];
 
-// Список файлов с вопросами для викторины
+// Список файлов с вопросами
 const QUESTIONS_FILES = [
-  { key:'topo', title:'🗺 Топографические карты', file:'questions_topo.json', tasks:'Задания 1-4' },
+  { key:'topo_intro',     title:'📌 Топографическая карта',    file:'questions_topo_01.json', tasks:'Что это и где применяется' },
+  { key:'topo_scale',     title:'📏 Масштаб',                  file:'questions_topo_02.json', tasks:'Виды, перевод, расчёт' },
+  { key:'topo_signs',     title:'🏘 Условные знаки',           file:'questions_topo_03.json', tasks:'Распознавание объектов' },
+  { key:'topo_relief',    title:'⛰ Рельеф',                   file:'questions_topo_04.json', tasks:'Горизонтали, высоты, склоны' },
+  { key:'topo_azimuth',   title:'🧭 Азимут',                   file:'questions_topo_05.json', tasks:'Стороны горизонта, направление' },
+  { key:'topo_coords',    title:'📍 Координаты и объекты',     file:'questions_topo_06.json', tasks:'Поиск по квадратам' },
+  { key:'topo_route',     title:'🚶 Маршрут',                  file:'questions_topo_07.json', tasks:'Построение и чтение маршрута' },
+  { key:'topo_final',     title:'📝 Комплексные задания',      file:'questions_topo_08.json', tasks:'Задания 1–4 ОГЭ' },
+
+  // остальные темы (без изменений)
   { key:'synoptic', title:'🌀 Синоптические карты', file:'questions_synoptic.json', tasks:'Задания 5-6' },
   { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
   { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json', tasks:'Задания 13-16'},
