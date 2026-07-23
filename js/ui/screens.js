@@ -64,8 +64,10 @@ function showSubtopicsList(subtopics, parentIndex) {
     var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">📚 Выбери урок</div>';
 
     subtopics.forEach(function(sub, i) {
+        var done = userProgress.completedLessons && userProgress.completedLessons[sub.title];
+        var icon = done ? '✅' : '▶';
         html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer; position:relative; z-index:10;" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
-        html += '<div style="font-weight:600;">' + sub.title + '</div>';
+        html += '<span style="margin-right:8px;">' + icon + '</span>' + sub.title;
         html += '</div>';
     });
 
@@ -139,7 +141,7 @@ function showTheoryScreen(theoryInfo) {}
 function startLessonPractice(){ goQuizFromLoaded(currentLessonIndex); }
 
 // ==========================================
-// ПРОФИЛЬ
+// ПРОФИЛЬ (без блока «Напоминания»)
 // ==========================================
 function renderProfile() {
   var container = document.getElementById('profile-content');
@@ -191,13 +193,7 @@ function renderProfile() {
   html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
   html += '</div>';
 
-  var notifText = isTelegram ? '✅ Подключены' : '❌ Не подключены';
-  var notifDesc = isTelegram ? 'Напоминания о заданиях будут приходить в Telegram.' : 'Для получения уведомлений открой приложение через Telegram.';
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0">';
-  html += '<div style="font-weight:700;font-size:15px">🔔 Напоминания</div>';
-  html += '<div style="font-size:13px;color:' + (isTelegram ? 'var(--primary2)' : 'var(--danger)') + ';margin-top:6px">' + notifText + '</div>';
-  html += '<div style="font-size:11px;color:var(--muted);margin-top:4px">' + notifDesc + '</div>';
-  html += '</div>';
+  // Блок «Напоминания» полностью удалён
 
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
