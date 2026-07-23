@@ -8,7 +8,7 @@
   --muted: #8b949e;
   --danger: #f85149;
   --gold: #d29922;
-  --border: #ffffff0c;
+  --border: #2a3a4a;   /* ← улучшенная видимость */
   --radius: 18px;
   --font-h: 'Unbounded', sans-serif;
   --font-b: 'Onest', sans-serif;
@@ -40,6 +40,14 @@ body::before {
 .scroll::-webkit-scrollbar { width:3px; }
 .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
+/* ── КАРТОЧКИ (улучшенные границы) ── */
+.path-progress-card,
+.continue-card,
+.theory-card,
+.carousel-card {
+  border-color: var(--border) !important;   /* теперь #2a3a4a */
+}
+
 .xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
 .xp-icon { font-size:26px; }
 .xp-bar { height:6px; background:#2d3a55; border-radius:8px; margin:6px 0; overflow:hidden; }
@@ -70,7 +78,7 @@ body::before {
 .nav-item.active { color:var(--primary); }
 .nav-icon { font-size:20px; }
 
-/* ── AI PANEL (Профессор Гео) ── */
+/* ── AI PANEL ── */
 .ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
 .ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
 .ai-header-left { display:flex; align-items:center; gap:10px; }
@@ -150,7 +158,7 @@ body::before {
 .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
 .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
 
-/* ── PATH (главный экран) ── */
+/* ── PATH ── */
 .path-progress-card {
   background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
   padding:16px; margin-bottom:6px;
@@ -171,7 +179,7 @@ body::before {
 .continue-title { font-size:15px; font-weight:700; margin-top:2px; }
 .continue-arrow { font-size:20px; color:var(--primary); margin-left:auto; }
 
-/* --- НОВЫЕ СТИЛИ: КАРУСЕЛЬ И ПУТЬ-ЗМЕЙКА --- */
+/* ── КАРУСЕЛЬ ── */
 .carousel {
   display: flex;
   overflow-x: auto;
@@ -217,24 +225,21 @@ body::before {
 }
 .carousel-dot.active { background: var(--primary); }
 
-/* Зигзаг с защитой от выхода за экран */
+/* ── ПУТЬ-ЗМЕЙКА (оставлено на случай возврата) ── */
 .path-zigzag {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 0 20px 20px;      /* ← боковые отступы */
-  overflow-x: hidden;        /* ← обрезаем случайный выход */
+  padding: 0 0 20px;
 }
 .zigzag-node {
   position: relative;
   display: flex;
   align-items: center;
   width: 100%;
-  max-width: calc(100% - 40px);  /* ← учитываем отступы */
-  box-sizing: border-box;
+  max-width: 360px;
   margin-bottom: 8px;
 }
-
 .review-badge {
   position: absolute;
   top: -6px;
@@ -251,7 +256,6 @@ body::before {
   box-shadow: 0 2px 4px rgba(0,0,0,0.3);
   z-index: 2;
 }
-
 .zigzag-connector {
   width: 2px;
   height: 24px;
@@ -307,6 +311,9 @@ body::before {
 .theory-progress-dot.lesson { border-color: var(--primary); }
 .theory-progress-dot.quiz { border-color: #f5a623; }
 .theory-progress-dot.final { border-color: var(--primary2); }
+.theory-progress-dot.remember { border-color: #f5a623; }
+.theory-progress-dot.exam-tip { border-color: var(--primary2); }
+.theory-progress-dot.common-mistake { border-color: var(--danger); }
 .theory-progress-dot.active {
   transform: scale(1.25);
   box-shadow: 0 0 10px currentColor;
@@ -339,7 +346,7 @@ body::before {
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
 
-/* ── СУНДУКИ (анимации) ── */
+/* ── СУНДУКИ ── */
 @keyframes chestGlow {
   0% { box-shadow: 0 0 5px #d29922; }
   50% { box-shadow: 0 0 20px #d29922; }
@@ -386,6 +393,11 @@ body::before {
 @keyframes particleFly {
   0% { transform: translate(0,0) scale(1); opacity:1; }
   100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; }
+}
+
+/* ── ПРОФЕССОР ГЕО (временно скрыт) ── */
+.prof-character-container {
+  display: none !important;
 }
 
 /* ── ПРОФЕССОР ГЕО: модальное окно подсказок ── */
@@ -452,70 +464,4 @@ body::before {
     line-height:1.7;
     color:var(--text);
     font-size:15px;
-}
-/* ── НОВЫЕ ТИПЫ БЛОКОВ МИКРОУРОКОВ ── */
-
-/* Кнопки Правда / Ложь */
-.true-false-buttons {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
-.true-false-btn {
-  flex: 1;
-  padding: 16px 12px;
-  border-radius: var(--radius);
-  font-family: var(--font-b);
-  font-size: 16px;
-  font-weight: 700;
-  border: 2px solid var(--border);
-  background: var(--card2);
-  color: var(--text);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-.true-false-btn:active { transform: scale(0.97); }
-.true-false-btn.correct-tf {
-  background: rgba(63,185,80,0.15);
-  border-color: var(--primary2);
-  color: var(--primary2);
-}
-.true-false-btn.wrong-tf {
-  background: rgba(248,81,73,0.15);
-  border-color: var(--danger);
-  color: var(--danger);
-}
-
-/* Сетка изображений */
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  margin-top: 16px;
-}
-.image-option {
-  aspect-ratio: 1 / 1;
-  background-size: cover;
-  background-position: center;
-  border-radius: var(--radius);
-  border: 2px solid var(--border);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.image-option:active { transform: scale(0.96); }
-.image-option.correct-img {
-  border-color: var(--primary2);
-  box-shadow: 0 0 0 3px rgba(63,185,80,0.3);
-}
-/* Временно убираем профессора с экрана */
-.prof-character-container {
-  display: none !important;
-}
-.image-option.wrong-img {
-  border-color: var(--danger);
-  box-shadow: 0 0 0 3px rgba(248,81,73,0.3);
 }
