@@ -89,7 +89,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
-    // Прямой fetch с полным URL (обходит проблемы с fetchJSON)
     var url = window.location.origin + '/data/' + sub.file;
 
     try {
@@ -472,16 +471,12 @@ function renderSessionSummary() {
   html += '<div style="font-size:14px;line-height:1.5;color:var(--text)">' + professorComment + '</div>';
   html += '</div>';
 
+  // Рекомендация – ведёт к списку подтем или на главный экран
   html += '<div style="margin-top:20px;font-size:15px;font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
   html += '<div class="continue-card" style="margin-top:8px" onclick="executeNextAction()">';
-  if (nextAction && nextAction.action) {
-    html += '<div class="continue-icon">▶</div>';
-    html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + nextAction.text + '</div></div>';
-    html += '<div class="continue-arrow">→</div>';
-  } else {
-    html += '<div class="continue-icon">🌟</div>';
-    html += '<div><div class="continue-title">Отдохнуть. Сегодня план выполнен.</div></div>';
-  }
+  html += '<div class="continue-icon">▶</div>';
+  html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') + '</div></div>';
+  html += '<div class="continue-arrow">→</div>';
   html += '</div>';
 
   html += '<div class="res-btns" style="margin-top:20px">';
@@ -493,12 +488,19 @@ function renderSessionSummary() {
 }
 
 window.executeNextAction = function() {
-  var action = getNextAction();
-  if (action && action.action) {
-    action.action();
-  } else {
+    // Если мы пришли из подтемы – возвращаемся к списку подтем
+    if (currentSubtopicQuestionsFile) {
+        var parentLesson = THEORY_FILES.find(function(t) {
+            return t.subtopics && t.subtopics.some(function(s) { return s.questions === currentSubtopicQuestionsFile; });
+        });
+        if (parentLesson) {
+            var parentIndex = THEORY_FILES.indexOf(parentLesson);
+            showSubtopicsList(parentLesson.subtopics, parentIndex);
+            return;
+        }
+    }
+    // Иначе – на главный экран
     goScreen('s-home');
-  }
 };
 
 // ==========================================
