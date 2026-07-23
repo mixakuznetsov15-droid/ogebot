@@ -225,106 +225,20 @@ body::before {
 }
 .carousel-dot.active { background: var(--primary); }
 
-/* ── ПУТЬ-ЗМЕЙКА (оставлено для совместимости) ── */
-.path-zigzag {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 0 0 20px;
-}
-.zigzag-node {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  max-width: 360px;
-  margin-bottom: 8px;
-}
-.review-badge {
-  position: absolute;
-  top: -6px;
-  right: -6px;
-  width: 20px;
-  height: 20px;
-  background: #f5a623;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: #000;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-  z-index: 2;
-}
-.zigzag-connector {
-  width: 2px;
-  height: 24px;
-  background: var(--border);
-  margin: 0 auto;
-  transform: rotate(15deg);
-  position: relative;
-  left: 20px;
-}
-
-.node-circle {
-  width:56px; height:56px; border-radius:50%; flex-shrink:0;
-  display:flex; align-items:center; justify-content:center; font-size:22px;
-}
-.node-circle.done { background:var(--primary2); border:2px solid var(--primary2); }
-.node-circle.perfect { background:var(--gold); border:2px solid var(--gold); }
-.node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
-.node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
-@keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-
-.boss-node {
-  width:72px; height:72px; border-radius:20px; flex-shrink:0;
-  background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
-  display:flex; align-items:center; justify-content:center; font-size:30px;
-}
-.boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
-
-/* ── ПРОГРЕСС МИКРОУРОКА ── */
-.theory-progress {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-.theory-progress-dot {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
+/* ── ПРОГРЕСС МИКРОУРОКА (прогресс-бар) ── */
+.theory-progress-bar {
+  height: 6px;
   background: var(--card2);
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  position: relative;
-  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
 }
-.theory-progress-dot .dot-icon {
-  font-size: 16px;
+.theory-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary2));
+  border-radius: 8px;
+  transition: width 0.4s ease;
 }
-.theory-progress-dot.lesson { border-color: var(--primary); }
-.theory-progress-dot.quiz { border-color: #f5a623; }
-.theory-progress-dot.final { border-color: var(--primary2); }
-.theory-progress-dot.remember { border-color: #f5a623; }
-.theory-progress-dot.exam-tip { border-color: var(--primary2); }
-.theory-progress-dot.common-mistake { border-color: var(--danger); }
-.theory-progress-dot.active {
-  transform: scale(1.25);
-  box-shadow: 0 0 10px currentColor;
-}
-.theory-progress-dot.done {
-  background: var(--primary2);
-  border-color: var(--primary2);
-  color: #000;
-}
-.theory-progress-dot.done.quiz { background: #f5a623; border-color: #f5a623; }
-.theory-progress-dot.done.final { background: var(--gold); border-color: var(--gold); }
 
 /* ── НОВЫЕ ТИПЫ БЛОКОВ МИКРОУРОКОВ ── */
 
