@@ -45,7 +45,7 @@ body::before {
 .continue-card,
 .theory-card,
 .carousel-card {
-  border-color: var(--border) !important;   /* теперь #2a3a4a */
+  border-color: var(--border) !important;
 }
 
 .xp-panel { background:var(--card2); border-radius:var(--radius); padding:14px 16px; display:flex; align-items:center; gap:12px; border:1px solid var(--border); }
@@ -225,7 +225,7 @@ body::before {
 }
 .carousel-dot.active { background: var(--primary); }
 
-/* ── ПУТЬ-ЗМЕЙКА (оставлено на случай возврата) ── */
+/* ── ПУТЬ-ЗМЕЙКА (оставлено для совместимости) ── */
 .path-zigzag {
   display: flex;
   flex-direction: column;
@@ -325,6 +325,103 @@ body::before {
 }
 .theory-progress-dot.done.quiz { background: #f5a623; border-color: #f5a623; }
 .theory-progress-dot.done.final { background: var(--gold); border-color: var(--gold); }
+
+/* ── НОВЫЕ ТИПЫ БЛОКОВ МИКРОУРОКОВ ── */
+
+/* Кнопки Правда / Ложь */
+.true-false-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.true-false-btn {
+  flex: 1;
+  padding: 16px 12px;
+  border-radius: var(--radius);
+  font-family: var(--font-b);
+  font-size: 16px;
+  font-weight: 700;
+  border: 2px solid var(--border);
+  background: var(--card2);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.true-false-btn:active { transform: scale(0.97); }
+.true-false-btn.correct-tf {
+  background: rgba(63,185,80,0.15);
+  border-color: var(--primary2);
+  color: var(--primary2);
+}
+.true-false-btn.wrong-tf {
+  background: rgba(248,81,73,0.15);
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* Сетка изображений */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.image-option {
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.image-option:active { transform: scale(0.96); }
+.image-option.correct-img {
+  border-color: var(--primary2);
+  box-shadow: 0 0 0 3px rgba(63,185,80,0.3);
+}
+.image-option.wrong-img {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 3px rgba(248,81,73,0.3);
+}
+
+/* Hotspot */
+.hotspot-marker {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.3);
+  border: 2px solid var(--primary);
+  cursor: pointer;
+  transform: translate(-50%, -50%);
+}
+
+/* Drag & Drop */
+.drag-item {
+  cursor: grab;
+  user-select: none;
+}
+.drag-item:active {
+  cursor: grabbing;
+}
+.drag-target {
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card2);
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  transition: background 0.2s;
+}
+
+/* Compass */
+#compass-container {
+  touch-action: none;
+}
 
 /* ── PROFILE ── */
 .profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
