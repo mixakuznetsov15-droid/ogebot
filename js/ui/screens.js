@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (исправленная практика для подтем)
+// ТЕОРИЯ (исправленная практика для подтем + прямой fetch)
 // ==========================================
 var currentLessonIndex = 0;
 var currentSubtopicQuestionsFile = null;
@@ -89,11 +89,16 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
+    // Прямой fetch с полным URL (обходит проблемы с fetchJSON)
+    var url = window.location.origin + '/data/' + sub.file;
+
     try {
-        var theory = await fetchJSON(sub.file);
+        var response = await fetch(url);
+        if (!response.ok) throw new Error('HTTP ' + response.status + ' ' + response.statusText);
+        var theory = await response.json();
         startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
     } catch (e) {
-        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nОшибка: ' + e.message);
+        alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nURL: ' + url + '\nОшибка: ' + e.message);
         goQuizFromLoaded(parentIndex);
     }
 }
