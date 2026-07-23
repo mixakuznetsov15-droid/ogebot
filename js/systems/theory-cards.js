@@ -1,5 +1,5 @@
 // ==========================================
-//  МИКРОУРОКИ (расширенная версия)
+//  МИКРОУРОКИ (расширенная версия с прогресс-баром)
 // ==========================================
 
 var microSteps = [];
@@ -152,31 +152,15 @@ function renderMicroStep() {
 
   var step = microSteps[microStepIndex];
   var total = microSteps.length;
+  var percent = Math.round((microStepIndex / total) * 100);
   var html = '';
 
   // Прогресс-бар
-  html += '<div class="theory-progress">';
-  for (var i = 0; i < total; i++) {
-    var dotClass = 'theory-progress-dot';
-    var s = microSteps[i];
-    if (s.type === 'quiz' || s.type === 'true_false' || s.type === 'choose_image' || s.type === 'image_hotspot' || s.type === 'number_input' || s.type === 'sorting' || s.type === 'multi_select' || s.type === 'image_quiz' || s.type === 'image_compare' || s.type === 'drag_match' || s.type === 'compass' || s.type === 'map_route') dotClass += ' quiz';
-    else if (s.type === 'final') dotClass += ' final';
-    else if (s.type === 'remember') dotClass += ' remember';
-    else if (s.type === 'exam_tip') dotClass += ' exam-tip';
-    else if (s.type === 'common_mistake') dotClass += ' common-mistake';
-    else dotClass += ' lesson';
-    if (i === microStepIndex) dotClass += ' active';
-    else if (i < microStepIndex) dotClass += ' done';
-    html += '<div class="' + dotClass + '"><span class="dot-icon">' +
-      (dotClass.indexOf('quiz') !== -1 ? '🎯' :
-       dotClass.indexOf('final') !== -1 ? '🏁' :
-       dotClass.indexOf('remember') !== -1 ? '🧠' :
-       dotClass.indexOf('exam-tip') !== -1 ? '💡' :
-       dotClass.indexOf('common-mistake') !== -1 ? '⚠️' : '📖') + '</span></div>';
-  }
+  html += '<div class="theory-progress-bar">';
+  html += '<div class="theory-progress-fill" style="width:' + percent + '%;"></div>';
   html += '</div>';
 
-  // Рендеринг шагов
+  // Рендеринг шагов (без изменений, как в последней версии)
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
