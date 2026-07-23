@@ -21,7 +21,7 @@ function goScreen(id) {
 }
 
 // ==========================================
-// ТЕОРИЯ (исправленная практика для подтем + прямой fetch)
+// ТЕОРИЯ (поддержка подтем + практика подтемы + обход кэша)
 // ==========================================
 var currentLessonIndex = 0;
 var currentSubtopicQuestionsFile = null;
@@ -89,7 +89,8 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
-    var url = window.location.origin + '/data/' + sub.file;
+    // ✅ Добавлен ?v=... для обхода кэша
+    var url = window.location.origin + '/data/' + sub.file + '?v=' + Date.now();
 
     try {
         var response = await fetch(url);
