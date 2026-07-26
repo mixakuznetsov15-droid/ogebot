@@ -297,7 +297,28 @@ body::before {
 .ring-wrap { position:relative; width:130px; height:130px; }
 .ring-wrap svg { transform:rotate(-90deg); }
 .ring-bg { fill:none; stroke:var(--card2); stroke-width:10; }
-.ring-fill { fill:none; stroke:url(#rg); stroke-width:10; stroke-linecap:round; transition:stroke-dashoffset 1s ease; }
+
+/* Обновлённая анимация кольца прогресса */
+.ring-fill {
+  fill: none;
+  stroke: url(#rg);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.ring-fill.glow {
+  filter: drop-shadow(0 0 8px rgba(63,185,80,0.5));
+}
+
+/* Кольцо для финального босса */
+#boss-ring-fill {
+  stroke: #d29922;
+  transition: stroke-dashoffset 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+#boss-ring-fill.glow {
+  filter: drop-shadow(0 0 8px rgba(63,185,80,0.5));
+}
+
 .ring-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
 .ring-num { font-family:var(--font-h); font-size:var(--text-2xl); font-weight:800; }
 .ring-denom { font-size:var(--text-xs); color:var(--muted); }
@@ -396,7 +417,7 @@ body::before {
 
 /* ── SVG-ИКОНКИ (наследование цвета и размер) ── */
 .node-circle svg, .boss-node svg, .continue-card svg, .carousel-card svg,
-.true-false-btn svg, .continue-icon svg, .continue-arrow svg, .btn-full svg {
+.true-false-btn svg, .continue-icon svg, .continue-arrow svg {
   color: inherit; width: 24px; height: 24px; vertical-align: middle;
 }
 
