@@ -174,7 +174,7 @@ function renderMicroStep() {
     if (example) {
       html += '<div class="example-block">📝 Пример: ' + example.replace(/\n/g, '<br>') + '</div>';
     }
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
+    html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'image_lesson') {
     var partsImg = (step.text || '').split('📝 Пример:');
@@ -188,7 +188,7 @@ function renderMicroStep() {
     if (exampleImg) {
       html += '<div class="example-block">📝 Пример: ' + exampleImg.replace(/\n/g, '<br>') + '</div>';
     }
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
+    html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'quiz') {
     html += renderQuiz(step, 'quiz');
@@ -227,7 +227,7 @@ function renderMicroStep() {
     html += '<div class="q-card"><div class="q-text">' + step.question + '</div></div>';
     html += '<div style="display:flex;gap:8px;align-items:center;">';
     html += '<input type="number" id="number-answer" style="flex:1;padding:12px;border-radius:12px;border:1px solid var(--border);background:var(--card);color:var(--text);" placeholder="Введи ответ">';
-    html += '<button class="btn-full primary" style="width:auto;padding:12px 20px;" onclick="submitNumberAnswer()">Проверить</button>';
+    html += '<button class="btn-primary" style="width:auto;padding:12px 20px;" onclick="submitNumberAnswer()">Проверить</button>';
     html += '</div>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
@@ -246,7 +246,7 @@ function renderMicroStep() {
       html += '</div>';
     });
     html += '</div>';
-    html += '<button class="btn-full primary" style="margin-top:12px;" onclick="submitSortingAnswer()">Проверить порядок</button>';
+    html += '<button class="btn-primary" style="margin-top:12px;" onclick="submitSortingAnswer()">Проверить порядок</button>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
   } else if (step.type === 'multi_select') {
@@ -259,7 +259,7 @@ function renderMicroStep() {
       html += '</label>';
     });
     html += '</div>';
-    html += '<button class="btn-full primary" style="margin-top:12px;" onclick="submitMultiSelectAnswer()">Проверить</button>';
+    html += '<button class="btn-primary" style="margin-top:12px;" onclick="submitMultiSelectAnswer()">Проверить</button>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
   } else if (step.type === 'image_quiz') {
@@ -289,7 +289,7 @@ function renderMicroStep() {
       html += '<div class="drag-target" data-expected="' + opt + '" style="padding:10px;min-height:40px;background:var(--card2);border:1px dashed var(--border);border-radius:12px;text-align:center;">' + opt + '</div>';
     });
     html += '</div></div>';
-    html += '<button class="btn-full primary" style="margin-top:12px;" onclick="submitDragMatchAnswer()">Проверить</button>';
+    html += '<button class="btn-primary" style="margin-top:12px;" onclick="submitDragMatchAnswer()">Проверить</button>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
   } else if (step.type === 'compass') {
@@ -301,7 +301,7 @@ function renderMicroStep() {
     html += '</div>';
     html += '<div style="margin-top:10px;font-weight:600;">Угол: <span id="compass-angle">0°</span></div>';
     html += '</div>';
-    html += '<button class="btn-full primary" style="margin-top:12px;" onclick="submitCompassAnswer()">Проверить</button>';
+    html += '<button class="btn-primary" style="margin-top:12px;" onclick="submitCompassAnswer()">Проверить</button>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
   } else if (step.type === 'map_route') {
@@ -314,25 +314,25 @@ function renderMicroStep() {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#1a3a5c,#0f2438);border-color:var(--primary);">';
     html += '<div class="theory-topic" style="font-size:28px;margin-bottom:8px;">' + ICONS.book + ' ' + (step.title || 'Запомни') + '</div>';
     html += '<div class="theory-text" style="font-size:18px;font-weight:600;">' + (step.text || '') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
+    html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'exam_tip') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#2a3a0c,#1f2a08);border-color:var(--primary2);">';
     html += '<div class="theory-topic">' + ICONS.star + ' ' + (step.title || 'Лайфхак ОГЭ') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
+    html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'common_mistake') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#3a2020,#2a1010);border-color:var(--danger);">';
     html += '<div class="theory-topic" style="color:var(--danger);">' + ICONS.alertTriangle + ' ' + (step.title || 'Типичная ошибка') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
+    html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'final') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + ICONS.flag + ' ' + (step.title || 'Финальный шаг') + '</div>';
     html += '<div class="theory-text">' + (step.text || 'Ты прошёл весь материал! Готов проверить знания?') + '</div>';
-    html += '<button class="btn-full primary" onclick="startSubtopicPractice()">' + ICONS.arrowRight + ' К практике</button>';
+    html += '<button class="btn-primary" onclick="startSubtopicPractice()">' + ICONS.arrowRight + ' К практике</button>';
     html += '</div>';
   }
 
