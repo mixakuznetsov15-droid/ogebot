@@ -66,8 +66,10 @@ function showSubtopicsList(subtopics, parentIndex) {
     subtopics.forEach(function(sub, i) {
         var done = userProgress.completedLessons && userProgress.completedLessons[sub.title];
         var icon = done ? ICONS.check : ICONS.play;
+        // убираем начальные эмодзи из названия, если они есть
+        var cleanTitle = sub.title.replace(/^[^\wа-яё]+/i, '');
         html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer; position:relative; z-index:10;" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
-        html += '<span style="margin-right:8px;">' + icon + '</span>' + sub.title;
+        html += '<span style="margin-right:8px;">' + icon + '</span>' + cleanTitle;
         html += '</div>';
     });
 
@@ -354,7 +356,6 @@ function renderHomePath() {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
-    // убираем начальные эмодзи из названия, если они есть
     var cleanTitle = lesson.title.replace(/^[^\wа-яё]+/i, '');
     var stateIcon = perfect ? ICONS.trophy : done ? ICONS.check : ICONS.play;
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
