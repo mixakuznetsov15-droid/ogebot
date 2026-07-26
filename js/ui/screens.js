@@ -355,11 +355,10 @@ function renderHomePath() {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
-    var isLocked = false; // сейчас все разблокированы, но логика готова
+    var isLocked = false; // сейчас все разблокированы
     var cleanTitle = lesson.title.replace(/^[^\wа-яё]+/i, '');
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
 
-    // определяем класс состояния
     var stateClass = 'list-row--current';
     var badgeClass = 'status-badge--current';
     var stateIcon = ICONS.play;
@@ -401,6 +400,20 @@ function renderHomePath() {
   html += '</div>';
 
   container.innerHTML = html;
+
+  // Анимация чисел после рендера
+  setTimeout(function() {
+    // Прогноз оценки (ищем внутри первой карусель-карточки крупную цифру)
+    var gradeEl = container.querySelector('.carousel-card:first-child div[style*="font-size:42px"]');
+    if (gradeEl && predictedGrade !== '—') {
+      animateNumber(gradeEl, parseInt(predictedGrade), 700);
+    }
+    // Серия дней (в карточке "Серия")
+    var streakEl = container.querySelector('.carousel-card:nth-child(3) div[style*="font-size:42px"]');
+    if (streakEl) {
+      animateNumber(streakEl, streak, 700);
+    }
+  }, 100);
 
   document.getElementById('home-streak').innerHTML = ICONS.fire + ' ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
