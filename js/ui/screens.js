@@ -68,7 +68,7 @@ function showSubtopicsList(subtopics, parentIndex) {
         var icon = done ? ICONS.check : ICONS.play;
         var cleanTitle = sub.title.replace(/^[^\wа-яё]+/i, '');
         html += '<div class="list-row" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
-        html += '<span style="margin-right:8px;">' + icon + '</span>' + cleanTitle;
+        html += '<span style="margin-right:var(--space-2);">' + icon + '</span>' + cleanTitle;
         html += '</div>';
     });
 
@@ -158,22 +158,22 @@ function renderProfile() {
 
   html += '<div class="profile-header-card">';
   html += '<div class="profile-avatar-big">' + ICONS.user + '</div>';
-  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:var(--text-sm);background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">' + rank + '</span></div>';
+  html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:var(--text-sm);background:var(--primary);color:#fff;padding:var(--space-1) var(--space-2);border-radius:10px;margin-left:var(--space-2)">' + rank + '</span></div>';
   html += '<div class="profile-level-big">⚡ Уровень ' + userProgress.level + ' · ' + userProgress.xp + ' XP</div>';
   var nextRank = getNextRank(userProgress.xp);
   if (nextRank) {
     var xpNeeded = nextRank.min;
     var currentXP = userProgress.xp;
     var progressPct = Math.min(100, Math.round((currentXP / xpNeeded) * 100));
-    html += '<div style="margin-top:8px;font-size:var(--text-xs);color:var(--muted)">До ранга "' + nextRank.name + '" осталось ' + (xpNeeded - currentXP) + ' XP</div>';
-    html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:' + progressPct + '%"></div></div>';
+    html += '<div style="margin-top:var(--space-2);font-size:var(--text-xs);color:var(--muted)">До ранга "' + nextRank.name + '" осталось ' + (xpNeeded - currentXP) + ' XP</div>';
+    html += '<div class="path-progress-bar" style="height:6px;margin-top:var(--space-1)"><div class="path-progress-fill" style="width:' + progressPct + '%"></div></div>';
   }
   html += '</div></div>';
 
-  html += '<div class="info-card" style="display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div class="info-card" style="display:flex;align-items:center;gap:var(--space-3);margin-bottom:var(--space-3)">';
   html += '<div style="font-size:var(--text-2xl)">' + ICONS.target + '</div>';
   html += '<div><div style="font-weight:700;font-size:var(--text-base)">Прогноз на ОГЭ</div>';
-  html += '<div style="font-size:var(--text-sm);color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + getPredictedScore(predictedGrade) + '</span></div></div>';
+  html += '<div style="font-size:var(--text-sm);color:var(--muted);margin-top:var(--space-1)">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + getPredictedScore(predictedGrade) + '</span></div></div>';
   html += '</div>';
 
   html += '<div class="profile-stats-grid">';
@@ -182,28 +182,28 @@ function renderProfile() {
   html += '<div class="profile-stat"><div class="profile-stat-num">' + ICONS.fire + ' ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  html += '<div class="info-card" style="margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
+  html += '<div class="info-card" style="margin:var(--space-3) 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + ICONS.gift + ' Сундуки</div>';
   if (chestCount > 0) {
-    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
+    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
   } else {
-    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:3px">Сегодня все награды уже получены. Возвращайся завтра.</div>';
+    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Сегодня все награды уже получены. Возвращайся завтра.</div>';
   }
   html += '</div>';
-  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:var(--text-sm);font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
+  html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:var(--space-2) var(--space-4);font-family:var(--font-b);font-size:var(--text-sm);font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
   html += '</div>';
 
-  html += '<div class="info-card" style="margin:8px 0">';
+  html += '<div class="info-card" style="margin:var(--space-2) 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + ICONS.user + ' Мой класс</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
-  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:var(--text-xs);font-weight:600;cursor:pointer">➕ Пригласить</button>';
-  html += '</div><div style="margin-top:10px;font-size:var(--text-xs);color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
+  html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + ICONS.user + ' Мой класс</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:var(--space-2) var(--space-3);font-family:var(--font-b);font-size:var(--text-xs);font-weight:600;cursor:pointer">➕ Пригласить</button>';
+  html += '</div><div style="margin-top:var(--space-3);font-size:var(--text-xs);color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
 
   checkAchievements();
   var achievements = userProgress.achievements || {};
-  html += '<div class="section-title" style="margin:6px 0 4px">Достижения</div>';
-  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
+  html += '<div class="section-title" style="margin:var(--space-2) 0 var(--space-1)">Достижения</div>';
+  html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-2)">';
   ACHIEVEMENTS_LIST.forEach(function(a) {
     var ach = achievements[a.id] || { progress: 0, unlocked: false };
     var isUnlocked = ach.unlocked;
@@ -213,17 +213,17 @@ function renderProfile() {
     html += '<div class="badge-icon-p">' + (a.icon && a.icon.startsWith('<svg') ? a.icon : ICONS.star) + '</div>';
     html += '<div class="badge-name-p">' + a.title + '</div>';
     if (a.max) {
-      html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:2px">' + progress + '/' + a.max + '</div>';
+      html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + progress + '/' + a.max + '</div>';
     }
     if (isUnlocked && dateStr) {
-      html += '<div style="font-size:var(--text-xs);color:var(--primary2);margin-top:2px">' + dateStr + '</div>';
+      html += '<div style="font-size:var(--text-xs);color:var(--primary2);margin-top:var(--space-1)">' + dateStr + '</div>';
     }
     html += '</div>';
   });
   html += '</div>';
 
-  html += '<div class="section-title" style="margin:14px 0 4px">Подписка</div>';
-  html += '<div class="sub-status-card active"><div style="font-size:var(--text-xl)">' + ICONS.check + '</div><div><div style="font-weight:700;font-size:var(--text-base)">Активна</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+  html += '<div class="section-title" style="margin:var(--space-3) 0 var(--space-1)">Подписка</div>';
+  html += '<div class="sub-status-card active"><div style="font-size:var(--text-xl)">' + ICONS.check + '</div><div><div style="font-weight:700;font-size:var(--text-base)">Активна</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Полный доступ ко всем темам</div></div></div>';
 
   container.innerHTML = html;
 }
@@ -271,7 +271,7 @@ function renderHomePath() {
 
   // Карточка 1: Прогноз ОГЭ
   html += '<div class="carousel-card">';
-  html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:4px">Твой прогноз ОГЭ</div>';
+  html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-1)">Твой прогноз ОГЭ</div>';
   if (predictedGrade !== '—') {
     html += '<div style="font-size:var(--text-3xl);font-weight:800;color:var(--gold);line-height:1">' + predictedGrade + '</div>';
     html += '<div style="font-size:var(--text-sm);color:var(--muted)">Прогноз: ' + predictedScore + ' баллов</div>';
@@ -281,10 +281,10 @@ function renderHomePath() {
       var needed = getCorrectAnswersNeededForGrade(nextGrade);
       var progressPercent = userProgress.totalCorrect / (userProgress.totalCorrect + needed) * 100;
       progressPercent = Math.min(100, Math.round(progressPercent));
-      html += '<div style="margin-top:8px;font-size:var(--text-xs);color:var(--muted)">До ' + nextGrade + ' ещё ' + needed + ' ' + getDayWord(needed) + '</div>';
-      html += '<div class="path-progress-bar" style="height:6px;margin-top:4px"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
+      html += '<div style="margin-top:var(--space-2);font-size:var(--text-xs);color:var(--muted)">До ' + nextGrade + ' ещё ' + needed + ' ' + getDayWord(needed) + '</div>';
+      html += '<div class="path-progress-bar" style="height:6px;margin-top:var(--space-1)"><div class="path-progress-fill" style="width:' + progressPercent + '%"></div></div>';
     } else {
-      html += '<div style="margin-top:8px;font-size:var(--text-sm);color:var(--primary2)">Ты на высшем уровне!</div>';
+      html += '<div style="margin-top:var(--space-2);font-size:var(--text-sm);color:var(--primary2)">Ты на высшем уровне!</div>';
     }
   } else {
     html += '<div style="font-size:var(--text-base);color:var(--muted)">Недостаточно данных</div>';
@@ -294,20 +294,20 @@ function renderHomePath() {
   // Карточка 2: Ежедневные задания
   var tasks = userProgress.dailyTasks || {};
   html += '<div class="carousel-card">';
-  html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">' + ICONS.target + ' Ежедневные задания</div>';
-  html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:var(--text-sm)">';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.solve10 ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.solve10 ? '✅' : '⬜') + '</span> 10 вопросов решено</div>';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.earn50XP ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.earn50XP ? '✅' : '⬜') + '</span> 50 XP получено</div>';
-  html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.loginToday ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.loginToday ? '✅' : '⬜') + '</span> Заходил сегодня</div>';
+  html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-2);">' + ICONS.target + ' Ежедневные задания</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:var(--space-2);font-size:var(--text-sm)">';
+  html += '<div style="display:flex;align-items:center;gap:var(--space-2)"><span style="color:' + (tasks.solve10 ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.solve10 ? '✅' : '⬜') + '</span> 10 вопросов решено</div>';
+  html += '<div style="display:flex;align-items:center;gap:var(--space-2)"><span style="color:' + (tasks.earn50XP ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.earn50XP ? '✅' : '⬜') + '</span> 50 XP получено</div>';
+  html += '<div style="display:flex;align-items:center;gap:var(--space-2)"><span style="color:' + (tasks.loginToday ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.loginToday ? '✅' : '⬜') + '</span> Заходил сегодня</div>';
   html += '</div>';
   html += '</div>';
 
   // Карточка 3: Стрик
   html += '<div class="carousel-card">';
-  html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;">' + ICONS.fire + ' Серия</div>';
+  html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-1);display:flex;align-items:center;gap:var(--space-2);">' + ICONS.fire + ' Серия</div>';
   html += '<div style="font-size:var(--text-3xl);font-weight:800;color:#f85149;line-height:1">' + streak + '</div>';
   html += '<div style="font-size:var(--text-sm);color:var(--muted)">' + getDayWord(streak) + ' подряд</div>';
-  html += '<div style="margin-top:8px;font-size:var(--text-sm);">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
+  html += '<div style="margin-top:var(--space-2);font-size:var(--text-sm);">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
   html += '</div>';
 
   html += '</div>'; // .carousel
@@ -349,7 +349,7 @@ function renderHomePath() {
   }
 
   // --- Вертикальный список тем (ВСЕ РАЗБЛОКИРОВАНЫ) ---
-  html += '<div class="section-title" style="margin:20px 0 10px 16px;">' + ICONS.list + ' Темы</div>';
+  html += '<div class="section-title" style="margin:var(--space-5) 0 var(--space-3) var(--space-4);">' + ICONS.list + ' Темы</div>';
 
   for (var i = 0; i < allLessons.length; i++) {
     var lesson = allLessons[i];
@@ -382,18 +382,18 @@ function renderHomePath() {
     if (done) {
       var pctDone = Math.round((done.score / done.total) * 100);
       html += '<div class="mini-progress"><div class="mini-progress-fill" style="width:' + pctDone + '%;"></div></div>';
-      html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:2px;">' + done.score + '/' + done.total + ' верно</div>';
+      html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1);">' + done.score + '/' + done.total + ' верно</div>';
     } else {
       html += '<div style="font-size:var(--text-xs);color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопросов</div>';
     }
     if (isReview) {
-      html += '<span style="background:#f5a623;color:#000;padding:2px 8px;border-radius:10px;font-size:var(--text-xs);margin-left:8px;">' + ICONS.arrowRight + ' Повторить</span>';
+      html += '<span style="background:#f5a623;color:#000;padding:var(--space-1) var(--space-2);border-radius:10px;font-size:var(--text-xs);margin-left:var(--space-2);">' + ICONS.arrowRight + ' Повторить</span>';
     }
     html += '</div></div>';
   }
 
   // Финальный босс
-  html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin-top:12px;background:' + (allDone ? 'rgba(210,153,34,0.1)' : 'var(--card2)') + ';border-radius:12px;border:1px solid var(--border);' + (allDone ? 'cursor:pointer;' : 'cursor:default;opacity:0.5;') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + '>';
+  html += '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);margin-top:var(--space-3);background:' + (allDone ? 'rgba(210,153,34,0.1)' : 'var(--card2)') + ';border-radius:12px;border:1px solid var(--border);' + (allDone ? 'cursor:pointer;' : 'cursor:default;opacity:0.5;') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + '>';
   html += '<div style="font-size:var(--text-2xl);">' + (allDone ? ICONS.crown : ICONS.lock) + '</div>';
   html += '<div style="flex:1;"><div style="font-weight:700;font-size:var(--text-base);color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
   html += '<div style="font-size:var(--text-xs);color:var(--muted);">' + (allDone ? 'Тест по всем темам открыт' : 'Пройди все темы') + '</div></div>';
@@ -403,12 +403,10 @@ function renderHomePath() {
 
   // Анимация чисел после рендера
   setTimeout(function() {
-    // Прогноз оценки (ищем внутри первой карусель-карточки крупную цифру)
     var gradeEl = container.querySelector('.carousel-card:first-child div[style*="font-size:var(--text-3xl)"]');
     if (gradeEl && predictedGrade !== '—') {
       animateNumber(gradeEl, parseInt(predictedGrade), 700);
     }
-    // Серия дней (в карточке "Серия")
     var streakEl = container.querySelector('.carousel-card:nth-child(3) div[style*="font-size:var(--text-3xl)"]');
     if (streakEl) {
       animateNumber(streakEl, streak, 700);
@@ -476,36 +474,36 @@ function renderSessionSummary() {
   html += '<div class="result-emoji">🎉</div>';
   html += '<div class="result-title">Отличная работа!</div>';
 
-  html += '<div class="res-stats" style="margin-top:12px">';
+  html += '<div class="res-stats" style="margin-top:var(--space-3)">';
   html += '<div class="res-stat"><div class="res-num g">' + totalQuestions + '</div><div class="res-label">Решено вопросов</div></div>';
   html += '<div class="res-stat"><div class="res-num y">+' + xpGain + '</div><div class="res-label">XP</div></div>';
   html += '<div class="res-stat"><div class="res-num" style="color:#f85149">' + ICONS.fire + ' ' + streak + '</div><div class="res-label">Серия дней</div></div>';
   html += '</div>';
 
   if (levelUp) {
-    html += '<div class="res-stat" style="background:rgba(63,185,80,0.15);border-color:var(--primary2);margin-top:8px">';
+    html += '<div class="res-stat" style="background:rgba(63,185,80,0.15);border-color:var(--primary2);margin-top:var(--space-2)">';
     html += '<div class="res-num g">' + ICONS.trophy + '</div><div class="res-label">Новый уровень!</div>';
     html += '</div>';
   }
   if (chestReceived) {
-    html += '<div class="res-stat" style="background:rgba(210,153,34,0.2);border-color:var(--gold);margin-top:8px">';
+    html += '<div class="res-stat" style="background:rgba(210,153,34,0.2);border-color:var(--gold);margin-top:var(--space-2)">';
     html += '<div class="res-num y">' + ICONS.gift + '</div><div class="res-label">Получен сундук!</div>';
     html += '</div>';
   }
 
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:16px;text-align:left">';
-  html += '<div style="font-weight:700;margin-bottom:4px">🧑‍🏫 Профессор Гео:</div>';
+  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:var(--space-3);margin-top:var(--space-4);text-align:left">';
+  html += '<div style="font-weight:700;margin-bottom:var(--space-1)">🧑‍🏫 Профессор Гео:</div>';
   html += '<div style="font-size:var(--text-base);line-height:1.5;color:var(--text)">' + professorComment + '</div>';
   html += '</div>';
 
-  html += '<div style="margin-top:20px;font-size:var(--text-base);font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
-  html += '<div class="continue-card" style="margin-top:8px" onclick="executeNextAction()">';
+  html += '<div style="margin-top:var(--space-5);font-size:var(--text-base);font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
+  html += '<div class="continue-card" style="margin-top:var(--space-2)" onclick="executeNextAction()">';
   html += '<div class="continue-icon">' + ICONS.play + '</div>';
   html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') + '</div></div>';
   html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div>';
   html += '</div>';
 
-  html += '<div class="res-btns" style="margin-top:20px">';
+  html += '<div class="res-btns" style="margin-top:var(--space-5)">';
   html += '<button class="btn-full primary" onclick="executeNextAction()">Продолжить обучение</button>';
   html += '<button class="btn-full sec" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
   html += '</div>';
@@ -564,10 +562,10 @@ function renderReviewScreen() {
     var label = status === 'red' ? 'Требует повторения' : status === 'yellow' ? 'Пора повторить' : 'Изучено';
 
     list.forEach(function(item) {
-      html += '<div class="path-progress-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">';
+      html += '<div class="path-progress-card" style="margin-bottom:var(--space-3); display:flex; justify-content:space-between; align-items:center;">';
       html += '<div><div style="font-weight:600;">' + item.title + '</div>';
       html += '<div style="font-size:var(--text-xs); color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
-      html += '<button class="btn-full primary" style="padding:8px 16px; width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
+      html += '<button class="btn-full primary" style="padding:var(--space-2) var(--space-4); width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
       html += '</div>';
     });
   });
