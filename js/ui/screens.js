@@ -92,6 +92,16 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
+    // Показываем скелетоны на время загрузки
+    goScreen('s-topic');
+    var container = document.getElementById('topic-content');
+    container.innerHTML = '' +
+      '<div class="skeleton skeleton-card" style="height:180px"></div>' +
+      '<div class="skeleton skeleton-text" style="width:60%"></div>' +
+      '<div class="skeleton skeleton-text" style="width:80%"></div>' +
+      '<div class="skeleton skeleton-text" style="width:40%"></div>';
+    document.getElementById('topic-title').textContent = sub.title || 'Загрузка...';
+
     var url = window.location.origin + '/data/' + sub.file + '?v=' + Date.now();
 
     try {
@@ -236,8 +246,12 @@ function renderHomePath() {
   if (!container) return;
 
   if (lessonsLoaded.length === 0) {
-    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--muted)">⏳ Загружаю путь...</div>';
-    loadAllLessons().then(function() { renderHomePath(); });
+    container.innerHTML = '' +
+      '<div class="skeleton skeleton-card"></div>' +
+      '<div class="skeleton skeleton-list-item"></div>' +
+      '<div class="skeleton skeleton-list-item"></div>' +
+      '<div class="skeleton skeleton-list-item"></div>' +
+      '<div class="skeleton skeleton-list-item"></div>';
     return;
   }
 
