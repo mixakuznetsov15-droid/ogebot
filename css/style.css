@@ -47,6 +47,7 @@ body::before {
   border-radius: var(--radius);
   padding: 14px 16px;
 }
+
 .list-row {
   display: flex;
   align-items: center;
@@ -56,14 +57,74 @@ body::before {
   background: var(--card2);
   border-radius: 12px;
   border: 1px solid var(--border);
+  border-left-width: 3px;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: transform 0.15s ease, border-color 0.2s;
+  position: relative;
+}
+.list-row:hover {
+  transform: translateX(2px);
+}
+.list-row:active {
+  transform: scale(0.99);
 }
 .list-row--done {
-  background: rgba(63,185,80,0.05);
+  border-left-color: var(--primary2);
 }
 .list-row--perfect {
-  background: rgba(63,185,80,0.1);
+  border-left-color: var(--gold);
 }
+.list-row--current {
+  border-left-color: var(--primary);
+}
+.list-row--locked {
+  border-left-color: var(--muted);
+  opacity: 0.45;
+  cursor: default;
+}
+
+.status-badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.status-badge svg {
+  width: 16px;
+  height: 16px;
+  color: #fff;
+}
+.status-badge--done {
+  background: var(--primary2);
+}
+.status-badge--perfect {
+  background: var(--gold);
+}
+.status-badge--current {
+  background: var(--primary);
+}
+.status-badge--locked {
+  background: var(--muted);
+}
+
+.mini-progress {
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.mini-progress-fill {
+  height: 100%;
+  background: var(--primary2);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
 .section-title {
   font-family: var(--font-h);
   font-size: 14px;
