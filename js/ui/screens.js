@@ -65,7 +65,7 @@ function showSubtopicsList(subtopics, parentIndex) {
 
     subtopics.forEach(function(sub, i) {
         var done = userProgress.completedLessons && userProgress.completedLessons[sub.title];
-        var icon = done ? '✅' : '▶';
+        var icon = done ? ICONS.check : ICONS.play;
         html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer; position:relative; z-index:10;" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
         html += '<span style="margin-right:8px;">' + icon + '</span>' + sub.title;
         html += '</div>';
@@ -296,7 +296,7 @@ function renderHomePath() {
   // Карточка 2: Ежедневные задания
   var tasks = userProgress.dailyTasks || {};
   html += '<div class="carousel-card">';
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px">🎯 Ежедневные задания</div>';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:6px;">' + ICONS.target + ' Ежедневные задания</div>';
   html += '<div style="display:flex;flex-direction:column;gap:6px;font-size:13px">';
   html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.solve10 ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.solve10 ? '✅' : '⬜') + '</span> 10 вопросов решено</div>';
   html += '<div style="display:flex;align-items:center;gap:8px"><span style="color:' + (tasks.earn50XP ? 'var(--primary2)' : 'var(--muted)') + '">' + (tasks.earn50XP ? '✅' : '⬜') + '</span> 50 XP получено</div>';
@@ -306,7 +306,7 @@ function renderHomePath() {
 
   // Карточка 3: Стрик
   html += '<div class="carousel-card">';
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px">🔥 Серия</div>';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:6px;">' + ICONS.fire + ' Серия</div>';
   html += '<div style="font-size:42px;font-weight:800;color:#f85149;line-height:1">' + streak + '</div>';
   html += '<div style="font-size:13px;color:var(--muted)">' + getDayWord(streak) + ' подряд</div>';
   html += '<div style="margin-top:8px;font-size:13px;">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
@@ -329,9 +329,9 @@ function renderHomePath() {
     var reviewData = userProgress.reviewData && userProgress.reviewData[firstReviewTopic];
     var mastery = reviewData ? reviewData.mastery || 50 : 50;
     html += '<div class="continue-card" onclick="startReviewLesson(' + reviewIdx + ',' + mastery + ')">';
-    html += '<div class="continue-icon">🔄</div>';
+    html += '<div class="continue-icon">' + ICONS.arrowRight + '</div>';
     html += '<div><div class="continue-label">Повторить сегодня</div><div class="continue-title">' + firstReviewTopic + '</div></div>';
-    html += '<div class="continue-arrow">→</div></div>';
+    html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
   } else {
     if (!allDone) {
       var nextIdx = 0;
@@ -340,14 +340,14 @@ function renderHomePath() {
       }
       var nextLesson = allLessons[nextIdx];
       html += '<div class="continue-card" onclick="openLessonTheory(' + nextIdx + ')">';
-      html += '<div class="continue-icon">' + (nextLesson.title.match(/^\S+/) ? nextLesson.title.match(/^\S+/)[0] : '▶') + '</div>';
+      html += '<div class="continue-icon">' + ICONS.play + '</div>';
       html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextLesson.title.replace(/^\S+\s*/, '') + '</div></div>';
-      html += '<div class="continue-arrow">→</div></div>';
+      html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
     } else {
       html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
-      html += '<div class="continue-icon">👑</div>';
+      html += '<div class="continue-icon">' + ICONS.crown + '</div>';
       html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс</div></div>';
-      html += '<div class="continue-arrow" style="color:#d29922">→</div></div>';
+      html += '<div class="continue-arrow" style="color:#d29922">' + ICONS.arrowRight + '</div></div>';
     }
   }
 
@@ -358,7 +358,7 @@ function renderHomePath() {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
-    var stateIcon = perfect ? '🏆' : done ? '✅' : '▶';
+    var stateIcon = perfect ? ICONS.trophy : done ? ICONS.check : ICONS.play;
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
 
@@ -371,14 +371,14 @@ function renderHomePath() {
       html += '<div style="font-size:11px;color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопросов</div>';
     }
     if (isReview) {
-      html += '<span style="background:#f5a623;color:#000;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px;">🔄 Повторить</span>';
+      html += '<span style="background:#f5a623;color:#000;padding:2px 8px;border-radius:10px;font-size:11px;margin-left:8px;">' + ICONS.arrowRight + ' Повторить</span>';
     }
     html += '</div></div>';
   }
 
   // Финальный босс
   html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin-top:12px;background:' + (allDone ? 'rgba(210,153,34,0.1)' : 'var(--card2)') + ';border-radius:12px;border:1px solid var(--border);' + (allDone ? 'cursor:pointer;' : 'cursor:default;opacity:0.5;') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + '>';
-  html += '<div style="font-size:32px;">👑</div>';
+  html += '<div style="font-size:32px;">' + (allDone ? ICONS.crown : ICONS.lock) + '</div>';
   html += '<div style="flex:1;"><div style="font-weight:700;font-size:15px;color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
   html += '<div style="font-size:11px;color:var(--muted);">' + (allDone ? 'Тест по всем темам открыт' : 'Пройди все темы') + '</div></div>';
   html += '</div>';
@@ -449,17 +449,17 @@ function renderSessionSummary() {
   html += '<div class="res-stats" style="margin-top:12px">';
   html += '<div class="res-stat"><div class="res-num g">' + totalQuestions + '</div><div class="res-label">Решено вопросов</div></div>';
   html += '<div class="res-stat"><div class="res-num y">+' + xpGain + '</div><div class="res-label">XP</div></div>';
-  html += '<div class="res-stat"><div class="res-num" style="color:#f85149">🔥 ' + streak + '</div><div class="res-label">Серия дней</div></div>';
+  html += '<div class="res-stat"><div class="res-num" style="color:#f85149">' + ICONS.fire + ' ' + streak + '</div><div class="res-label">Серия дней</div></div>';
   html += '</div>';
 
   if (levelUp) {
     html += '<div class="res-stat" style="background:rgba(63,185,80,0.15);border-color:var(--primary2);margin-top:8px">';
-    html += '<div class="res-num g">🏆</div><div class="res-label">Новый уровень!</div>';
+    html += '<div class="res-num g">' + ICONS.trophy + '</div><div class="res-label">Новый уровень!</div>';
     html += '</div>';
   }
   if (chestReceived) {
     html += '<div class="res-stat" style="background:rgba(210,153,34,0.2);border-color:var(--gold);margin-top:8px">';
-    html += '<div class="res-num y">🎁</div><div class="res-label">Получен сундук!</div>';
+    html += '<div class="res-num y">' + ICONS.gift + '</div><div class="res-label">Получен сундук!</div>';
     html += '</div>';
   }
 
@@ -471,9 +471,9 @@ function renderSessionSummary() {
   // Рекомендация – ведёт к списку подтем или на главный экран
   html += '<div style="margin-top:20px;font-size:15px;font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
   html += '<div class="continue-card" style="margin-top:8px" onclick="executeNextAction()">';
-  html += '<div class="continue-icon">▶</div>';
+  html += '<div class="continue-icon">' + ICONS.play + '</div>';
   html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') + '</div></div>';
-  html += '<div class="continue-arrow">→</div>';
+  html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div>';
   html += '</div>';
 
   html += '<div class="res-btns" style="margin-top:20px">';
@@ -540,7 +540,7 @@ function renderReviewScreen() {
       html += '<div class="path-progress-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">';
       html += '<div><div style="font-weight:600;">' + item.title + '</div>';
       html += '<div style="font-size:12px; color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
-      html += '<button class="btn-full primary" style="padding:8px 16px; width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">Повторить</button>';
+      html += '<button class="btn-full primary" style="padding:8px 16px; width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
       html += '</div>';
     });
   });
