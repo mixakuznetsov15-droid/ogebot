@@ -61,7 +61,7 @@ function showSubtopicsList(subtopics, parentIndex) {
     document.getElementById('topic-title').textContent = 'Топографические карты';
 
     var container = document.getElementById('topic-content');
-    var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">📚 Выбери урок</div>';
+    var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">' + ICONS.list + ' Выбери урок</div>';
 
     subtopics.forEach(function(sub, i) {
         var done = userProgress.completedLessons && userProgress.completedLessons[sub.title];
@@ -91,7 +91,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
-    // ✅ Добавлен ?v=... для обхода кэша
     var url = window.location.origin + '/data/' + sub.file + '?v=' + Date.now();
 
     try {
@@ -157,7 +156,7 @@ function renderProfile() {
   var html = '';
 
   html += '<div class="profile-header-card">';
-  html += '<div class="profile-avatar-big">🧑‍🎓</div>';
+  html += '<div class="profile-avatar-big">' + ICONS.user + '</div>';
   html += '<div><div class="profile-name-big">Ученик ГеоПро <span style="font-size:12px;background:var(--primary);color:#fff;padding:2px 8px;border-radius:10px;margin-left:6px">' + rank + '</span></div>';
   html += '<div class="profile-level-big">⚡ Уровень ' + userProgress.level + ' · ' + userProgress.xp + ' XP</div>';
   var nextRank = getNextRank(userProgress.xp);
@@ -171,7 +170,7 @@ function renderProfile() {
   html += '</div></div>';
 
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
-  html += '<div style="font-size:32px">🎯</div>';
+  html += '<div style="font-size:32px">' + ICONS.target + '</div>';
   html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
   html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + getPredictedScore(predictedGrade) + '</span></div></div>';
   html += '</div>';
@@ -179,11 +178,11 @@ function renderProfile() {
   html += '<div class="profile-stats-grid">';
   html += '<div class="profile-stat"><div class="profile-stat-num" style="cursor:pointer" onclick="goScreen(\'s-review\')">' + completedCount + '/' + allLessons.length + '</div><div class="profile-stat-label">Тем пройдено</div></div>';
   html += '<div class="profile-stat"><div class="profile-stat-num">' + acc + '%</div><div class="profile-stat-label">Точность</div></div>';
-  html += '<div class="profile-stat"><div class="profile-stat-num">🔥 ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
+  html += '<div class="profile-stat"><div class="profile-stat-num">' + ICONS.fire + ' ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
-  html += '<div><div style="font-weight:700;font-size:15px">🎁 Сундуки</div>';
+  html += '<div><div style="font-weight:700;font-size:15px">' + ICONS.gift + ' Сундуки</div>';
   if (chestCount > 0) {
     html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
   } else {
@@ -193,11 +192,9 @@ function renderProfile() {
   html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
   html += '</div>';
 
-  // Блок «Напоминания» полностью удалён
-
   html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-  html += '<div><div style="font-weight:700;font-size:14px">👥 Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
+  html += '<div><div style="font-weight:700;font-size:14px">' + ICONS.user + ' Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
   html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
   html += '</div><div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
@@ -212,7 +209,7 @@ function renderProfile() {
     var progress = a.max ? ach.progress : (isUnlocked ? (a.max || 1) : 0);
     var dateStr = ach.date ? new Date(ach.date).toLocaleDateString() : '';
     html += '<div class="badge-item-p' + (isUnlocked ? '' : ' locked') + '" style="position:relative">';
-    html += '<div class="badge-icon-p">' + a.icon + '</div>';
+    html += '<div class="badge-icon-p">' + (a.icon && a.icon.startsWith('<svg') ? a.icon : ICONS.star) + '</div>';
     html += '<div class="badge-name-p">' + a.title + '</div>';
     if (a.max) {
       html += '<div style="font-size:8px;color:var(--muted);margin-top:2px">' + progress + '/' + a.max + '</div>';
@@ -225,7 +222,7 @@ function renderProfile() {
   html += '</div>';
 
   html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
-  html += '<div class="sub-status-card active"><div style="font-size:28px">✅</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
+  html += '<div class="sub-status-card active"><div style="font-size:28px">' + ICONS.check + '</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
 
   container.innerHTML = html;
 }
@@ -314,7 +311,6 @@ function renderHomePath() {
 
   html += '</div>'; // .carousel
 
-  // Точки карусели
   var carouselCardsCount = 3;
   html += '<div class="carousel-dots" id="carousel-dots">';
   for (var dotIdx = 0; dotIdx < carouselCardsCount; dotIdx++) {
@@ -352,19 +348,21 @@ function renderHomePath() {
   }
 
   // --- Вертикальный список тем (ВСЕ РАЗБЛОКИРОВАНЫ) ---
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">📚 Темы</div>';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">' + ICONS.list + ' Темы</div>';
 
   for (var i = 0; i < allLessons.length; i++) {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
+    // убираем начальные эмодзи из названия, если они есть
+    var cleanTitle = lesson.title.replace(/^[^\wа-яё]+/i, '');
     var stateIcon = perfect ? ICONS.trophy : done ? ICONS.check : ICONS.play;
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
     var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
 
     html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin:4px 0;background:' + bgColor + ';border-radius:12px;border:1px solid var(--border);cursor:pointer;" onclick="openLessonTheory(' + i + ')">';
     html += '<div style="font-size:24px;width:32px;text-align:center;">' + stateIcon + '</div>';
-    html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + lesson.title + '</div>';
+    html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + cleanTitle + '</div>';
     if (done) {
       html += '<div style="font-size:11px;color:var(--primary2);">' + done.score + '/' + done.total + ' верно</div>';
     } else {
@@ -385,7 +383,7 @@ function renderHomePath() {
 
   container.innerHTML = html;
 
-  document.getElementById('home-streak').textContent = '🔥 ' + streak;
+  document.getElementById('home-streak').innerHTML = ICONS.fire + ' ' + streak;
   document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
 
   var carousel = document.getElementById('home-carousel');
@@ -468,7 +466,6 @@ function renderSessionSummary() {
   html += '<div style="font-size:14px;line-height:1.5;color:var(--text)">' + professorComment + '</div>';
   html += '</div>';
 
-  // Рекомендация – ведёт к списку подтем или на главный экран
   html += '<div style="margin-top:20px;font-size:15px;font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
   html += '<div class="continue-card" style="margin-top:8px" onclick="executeNextAction()">';
   html += '<div class="continue-icon">' + ICONS.play + '</div>';
@@ -485,7 +482,6 @@ function renderSessionSummary() {
 }
 
 window.executeNextAction = function() {
-    // Если мы пришли из подтемы – возвращаемся к списку подтем
     if (currentSubtopicQuestionsFile) {
         var parentLesson = THEORY_FILES.find(function(t) {
             return t.subtopics && t.subtopics.some(function(s) { return s.questions === currentSubtopicQuestionsFile; });
@@ -496,7 +492,6 @@ window.executeNextAction = function() {
             return;
         }
     }
-    // Иначе – на главный экран
     goScreen('s-home');
 };
 
@@ -528,7 +523,7 @@ function renderReviewScreen() {
     }
   });
 
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">📊 Статус тем</div>';
+  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">' + ICONS.chart + ' Статус тем</div>';
 
   ['red', 'yellow', 'green'].forEach(function(status) {
     var list = statuses[status];
