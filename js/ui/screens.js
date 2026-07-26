@@ -196,7 +196,7 @@ function renderProfile() {
   html += '<div class="info-card" style="margin:var(--space-2) 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + ICONS.user + ' Мой класс</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
-  html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:var(--space-2) var(--space-3);font-family:var(--font-b);font-size:var(--text-xs);font-weight:600;cursor:pointer">➕ Пригласить</button>';
+  html += '<button onclick="inviteFriend()" class="btn-ghost" style="padding:var(--space-2) var(--space-3);font-size:var(--text-xs);">➕ Пригласить</button>';
   html += '</div><div style="margin-top:var(--space-3);font-size:var(--text-xs);color:var(--muted);text-align:center">Рейтинг класса появится позже</div>';
   html += '</div>';
 
@@ -504,8 +504,8 @@ function renderSessionSummary() {
   html += '</div>';
 
   html += '<div class="res-btns" style="margin-top:var(--space-5)">';
-  html += '<button class="btn-full primary" onclick="executeNextAction()">Продолжить обучение</button>';
-  html += '<button class="btn-full sec" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
+  html += '<button class="btn-primary" onclick="executeNextAction()">Продолжить обучение</button>';
+  html += '<button class="btn-secondary" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
   html += '</div>';
 
   container.innerHTML = html;
@@ -565,7 +565,7 @@ function renderReviewScreen() {
       html += '<div class="path-progress-card" style="margin-bottom:var(--space-3); display:flex; justify-content:space-between; align-items:center;">';
       html += '<div><div style="font-weight:600;">' + item.title + '</div>';
       html += '<div style="font-size:var(--text-xs); color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
-      html += '<button class="btn-full primary" style="padding:var(--space-2) var(--space-4); width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
+      html += '<button class="btn-primary" style="padding:var(--space-2) var(--space-4); width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
       html += '</div>';
     });
   });
