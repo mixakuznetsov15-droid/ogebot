@@ -155,6 +155,9 @@ function renderMicroStep() {
   var percent = Math.round((microStepIndex / total) * 100);
   var html = '';
 
+  // Номер шага
+  html += '<div style="text-align:right;font-size:11px;color:var(--muted);margin-bottom:4px;">' + (microStepIndex + 1) + ' / ' + total + '</div>';
+
   // Прогресс-бар
   html += '<div class="theory-progress-bar">';
   html += '<div class="theory-progress-fill" style="width:' + percent + '%;"></div>';
@@ -162,17 +165,29 @@ function renderMicroStep() {
 
   // Рендеринг шагов
   if (step.type === 'lesson') {
+    var parts = (step.text || '').split('📝 Пример:');
+    var mainText = parts[0] || '';
+    var example = parts.length > 1 ? parts[1].trim() : '';
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
-    html += '<div class="theory-text">' + (step.text || '').replace(/\n/g, '<br>') + '</div>';
+    html += '<div class="theory-text">' + mainText.replace(/\n/g, '<br>') + '</div>';
+    if (example) {
+      html += '<div class="example-block">📝 Пример: ' + example.replace(/\n/g, '<br>') + '</div>';
+    }
     html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'image_lesson') {
+    var partsImg = (step.text || '').split('📝 Пример:');
+    var mainTextImg = partsImg[0] || '';
+    var exampleImg = partsImg.length > 1 ? partsImg[1].trim() : '';
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + step.title + '</div>';
     html += '<img src="' + step.image + '" style="width:100%;border-radius:12px;margin-bottom:12px;" />';
     if (step.caption) html += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">' + step.caption + '</div>';
-    html += '<div class="theory-text">' + step.text.replace(/\n/g, '<br>') + '</div>';
+    html += '<div class="theory-text">' + mainTextImg.replace(/\n/g, '<br>') + '</div>';
+    if (exampleImg) {
+      html += '<div class="example-block">📝 Пример: ' + exampleImg.replace(/\n/g, '<br>') + '</div>';
+    }
     html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'quiz') {
