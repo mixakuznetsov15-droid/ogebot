@@ -219,17 +219,43 @@ function showResult() {
     userProgress.bossCompleted = true;
     saveProgress();
     document.getElementById('boss-sub').textContent = score + '/' + total + ' правильных ответов (' + pct + '%)';
-    document.getElementById('boss-num').textContent = score;
+    // Сбрасываем число для анимации
+    document.getElementById('boss-num').textContent = '0';
     document.getElementById('boss-denom').textContent = 'из ' + total;
     goScreen('s-boss-result');
-    setTimeout(function() {
-      document.getElementById('boss-ring-fill').style.strokeDashoffset = 339 * (1 - score / total);
-    }, 100);
+
+    // Анимация кольца
+    var bossRing = document.getElementById('boss-ring-fill');
+    var circumference = 339;
+    var offset = circumference * (1 - score / total);
+    // Начальное состояние (пустое)
+    bossRing.style.strokeDashoffset = circumference;
+    // Запуск анимации после отрисовки
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        bossRing.style.strokeDashoffset = offset;
+        if (pct >= 80) {
+          bossRing.classList.add('glow');
+        } else {
+          bossRing.classList.remove('glow');
+        }
+      });
+    });
+
+    // Анимация числа
+    var bossNumEl = document.getElementById('boss-num');
+    if (typeof animateNumber === 'function') {
+      animateNumber(bossNumEl, score, 1000);
+    } else {
+      bossNumEl.textContent = score;
+    }
+
     isBossMode = false;
     updateDailyTasks();
     return;
   }
 
+  // ---- Обычный результат ----
   var e = '😔', t = 'Нужно повторить';
   if (pct >= 80) { e = '🏆'; t = 'Отлично!'; }
   else if (pct >= 60) { e = '👍'; t = 'Хороший результат!'; }
@@ -238,7 +264,7 @@ function showResult() {
   document.getElementById('res-emoji').textContent = e;
   document.getElementById('res-title').textContent = t;
   document.getElementById('res-sub').textContent = pct + '% правильных ответов';
-  document.getElementById('ring-num').textContent = score;
+  document.getElementById('ring-num').textContent = '0';  // сброс перед анимацией
   document.getElementById('ring-denom').textContent = 'из ' + total;
   document.getElementById('res-c').textContent = score;
   document.getElementById('res-w').textContent = total - score;
@@ -262,11 +288,39 @@ function showResult() {
   };
   window.sessionLevelUp = false;
   window._chestGivenThisSession = false;
-
-  // Сбрасываем счётчики ошибок сессии
   sessionMistakes = {};
 
-  goScreen('s-session-summary');
+  // Показываем экран с кольцом
+  goScreen('s-result');
+
+  // Анимация кольца
+  var ring = document.getElementById('ring-fill');
+  var circumference = 339;
+  var offset = circumference * (1 - score / total);
+  ring.style.strokeDashoffset = circumference; // начальное состояние (пустое)
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      ring.style.strokeDashoffset = offset;
+      if (pct >= 80) {
+        ring.classList.add('glow');
+      } else {
+        ring.classList.remove('glow');
+      }
+    });
+  });
+
+  // Анимация числа
+  var numEl = document.getElementById('ring-num');
+  if (typeof animateNumber === 'function') {
+    animateNumber(numEl, score, 1000);
+  } else {
+    numEl.textContent = score;
+  }
+
+  // Через 1.5 секунды переходим на итоговый экран с профессором
+  setTimeout(function() {
+    goScreen('s-session-summary');
+  }, 1500);
 }
 
 function saveLesson(lessonIdx, sc, total) {
