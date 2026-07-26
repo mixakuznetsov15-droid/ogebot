@@ -246,12 +246,17 @@ function renderHomePath() {
   if (!container) return;
 
   if (lessonsLoaded.length === 0) {
+    // Показываем скелетоны
     container.innerHTML = '' +
       '<div class="skeleton skeleton-card"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>';
+    // Запускаем загрузку, после чего перерисовываем экран
+    loadAllLessons().then(function() {
+      renderHomePath();
+    });
     return;
   }
 
