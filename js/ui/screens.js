@@ -355,16 +355,35 @@ function renderHomePath() {
     var lesson = allLessons[i];
     var done = userProgress.completedLessons[lesson.title];
     var perfect = done && done.score === done.total;
+    var isLocked = false; // сейчас все разблокированы, но логика готова
     var cleanTitle = lesson.title.replace(/^[^\wа-яё]+/i, '');
-    var stateIcon = perfect ? ICONS.trophy : done ? ICONS.check : ICONS.play;
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
-    var rowClass = 'list-row' + (perfect ? ' list-row--perfect' : done ? ' list-row--done' : '');
 
-    html += '<div class="' + rowClass + '" onclick="openLessonTheory(' + i + ')">';
-    html += '<div style="font-size:24px;width:32px;text-align:center;">' + stateIcon + '</div>';
+    // определяем класс состояния
+    var stateClass = 'list-row--current';
+    var badgeClass = 'status-badge--current';
+    var stateIcon = ICONS.play;
+    if (perfect) {
+      stateClass = 'list-row--perfect';
+      badgeClass = 'status-badge--perfect';
+      stateIcon = ICONS.trophy;
+    } else if (done) {
+      stateClass = 'list-row--done';
+      badgeClass = 'status-badge--done';
+      stateIcon = ICONS.check;
+    } else if (isLocked) {
+      stateClass = 'list-row--locked';
+      badgeClass = 'status-badge--locked';
+      stateIcon = ICONS.lock;
+    }
+
+    html += '<div class="list-row ' + stateClass + '" onclick="openLessonTheory(' + i + ')">';
+    html += '<div class="status-badge ' + badgeClass + '">' + stateIcon + '</div>';
     html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + cleanTitle + '</div>';
     if (done) {
-      html += '<div style="font-size:11px;color:var(--primary2);">' + done.score + '/' + done.total + ' верно</div>';
+      var pctDone = Math.round((done.score / done.total) * 100);
+      html += '<div class="mini-progress"><div class="mini-progress-fill" style="width:' + pctDone + '%;"></div></div>';
+      html += '<div style="font-size:10px;color:var(--muted);margin-top:2px;">' + done.score + '/' + done.total + ' верно</div>';
     } else {
       html += '<div style="font-size:11px;color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопросов</div>';
     }
