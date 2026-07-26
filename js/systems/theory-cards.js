@@ -1,5 +1,5 @@
 // ==========================================
-//  МИКРОУРОКИ (расширенная версия с прогресс-баром)
+//  МИКРОУРОКИ (расширенная версия с прогресс-баром и SVG-иконками)
 // ==========================================
 
 var microSteps = [];
@@ -160,12 +160,12 @@ function renderMicroStep() {
   html += '<div class="theory-progress-fill" style="width:' + percent + '%;"></div>';
   html += '</div>';
 
-  // Рендеринг шагов (без изменений, как в последней версии)
+  // Рендеринг шагов
   if (step.type === 'lesson') {
     html += '<div class="theory-card">';
     html += '<div class="theory-topic">' + (step.title || '') + '</div>';
     html += '<div class="theory-text">' + (step.text || '').replace(/\n/g, '<br>') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
+    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'image_lesson') {
     html += '<div class="theory-card">';
@@ -173,7 +173,7 @@ function renderMicroStep() {
     html += '<img src="' + step.image + '" style="width:100%;border-radius:12px;margin-bottom:12px;" />';
     if (step.caption) html += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">' + step.caption + '</div>';
     html += '<div class="theory-text">' + step.text.replace(/\n/g, '<br>') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
+    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'quiz') {
     html += renderQuiz(step, 'quiz');
@@ -181,8 +181,8 @@ function renderMicroStep() {
     html += '<div class="quiz-wrap" style="padding:0">';
     html += '<div class="q-card"><div class="q-text">' + (step.question || '') + '</div></div>';
     html += '<div class="true-false-buttons">';
-    html += '<button class="true-false-btn true-btn" onclick="answerTrueFalse(true)">✅ Правда</button>';
-    html += '<button class="true-false-btn false-btn" onclick="answerTrueFalse(false)">❌ Ложь</button>';
+    html += '<button class="true-false-btn true-btn" onclick="answerTrueFalse(true)">' + ICONS.check + ' Правда</button>';
+    html += '<button class="true-false-btn false-btn" onclick="answerTrueFalse(false)">' + ICONS.x + ' Ложь</button>';
     html += '</div>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
@@ -259,18 +259,15 @@ function renderMicroStep() {
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
   } else if (step.type === 'drag_match') {
-    // Перетаскивание элементов
     html += '<div class="quiz-wrap" style="padding:0">';
     html += '<div class="q-card"><div class="q-text">' + step.question + '</div></div>';
     html += '<div style="display:flex;gap:20px;">';
-    // левая колонка – перетаскиваемые элементы
     html += '<div style="flex:1;display:flex;flex-direction:column;gap:8px;" id="drag-left">';
     var leftItems = shuffle([...step.pairs]);
     leftItems.forEach(function(pair, idx) {
       html += '<div class="drag-item" draggable="true" data-value="' + pair.right + '" style="padding:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;cursor:grab;">' + pair.left + '</div>';
     });
     html += '</div>';
-    // правая колонка – цели
     html += '<div style="flex:1;display:flex;flex-direction:column;gap:8px;" id="drag-right">';
     var rightOptions = step.pairs.map(function(p) { return p.right; });
     rightOptions.forEach(function(opt) {
@@ -300,38 +297,36 @@ function renderMicroStep() {
     html += '</div>';
   } else if (step.type === 'remember') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#1a3a5c,#0f2438);border-color:var(--primary);">';
-    html += '<div class="theory-topic" style="font-size:28px;margin-bottom:8px;">🧠 ' + (step.title || 'Запомни') + '</div>';
+    html += '<div class="theory-topic" style="font-size:28px;margin-bottom:8px;">' + ICONS.book + ' ' + (step.title || 'Запомни') + '</div>';
     html += '<div class="theory-text" style="font-size:18px;font-weight:600;">' + (step.text || '') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
+    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'exam_tip') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#2a3a0c,#1f2a08);border-color:var(--primary2);">';
-    html += '<div class="theory-topic">💡 ' + (step.title || 'Лайфхак ОГЭ') + '</div>';
+    html += '<div class="theory-topic">' + ICONS.star + ' ' + (step.title || 'Лайфхак ОГЭ') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
+    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'common_mistake') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#3a2020,#2a1010);border-color:var(--danger);">';
-    html += '<div class="theory-topic" style="color:var(--danger);">⚠️ ' + (step.title || 'Типичная ошибка') + '</div>';
+    html += '<div class="theory-topic" style="color:var(--danger);">' + ICONS.alertTriangle + ' ' + (step.title || 'Типичная ошибка') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
-    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить →</button>';
+    html += '<button class="btn-full primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'final') {
     html += '<div class="theory-card">';
-    html += '<div class="theory-topic">🏁 ' + (step.title || 'Финальный шаг') + '</div>';
+    html += '<div class="theory-topic">' + ICONS.flag + ' ' + (step.title || 'Финальный шаг') + '</div>';
     html += '<div class="theory-text">' + (step.text || 'Ты прошёл весь материал! Готов проверить знания?') + '</div>';
-    html += '<button class="btn-full primary" onclick="startSubtopicPractice()">🚀 К практике</button>';
+    html += '<button class="btn-full primary" onclick="startSubtopicPractice()">' + ICONS.arrowRight + ' К практике</button>';
     html += '</div>';
   }
 
   container.innerHTML = html;
 
-  // Инициализация интерактивных элементов
   if (step.type === 'drag_match') initDragMatch();
   if (step.type === 'compass') initCompass();
 }
 
-// Универсальная функция для quiz / image_quiz / map_route
 function renderQuiz(step, subtype) {
   var answers = step.answers || [];
   var letters = answers.length === 3 ? ['А', 'Б', 'В'] : ['А', 'Б', 'В', 'Г'];
@@ -462,7 +457,7 @@ function initCompass() {
     var dx = clientX - centerX;
     var dy = clientY - centerY;
     var angle = Math.atan2(dy, dx) * (180/Math.PI);
-    angle = (angle + 90 + 360) % 360; // корректировка, чтобы 0 был вверху
+    angle = (angle + 90 + 360) % 360;
     setAngle(Math.round(angle));
   }
 
@@ -515,14 +510,14 @@ function processMicroAnswer(isCorrect, explanation, professorComment) {
 
   if (isCorrect) {
     addXP(5);
-    feedbackText = '<div style="color:var(--primary2);margin-bottom:8px;">✅ Верно! ' + (explanation || '') + '</div>';
+    feedbackText = '<div style="color:var(--primary2);margin-bottom:8px;">' + ICONS.check + ' Верно! ' + (explanation || '') + '</div>';
     if (professorComment && typeof professor !== 'undefined') {
       professor.showMessage(professorComment, 'happy', 2000);
     } else if (typeof professor !== 'undefined') {
       professor.showMessage('Отлично! Идём дальше.', 'happy', 2000);
     }
   } else {
-    feedbackText = '<div style="color:var(--danger);margin-bottom:8px;">❌ Неверно. ' + (explanation || 'Попробуй ещё раз.') + '</div>';
+    feedbackText = '<div style="color:var(--danger);margin-bottom:8px;">' + ICONS.x + ' Неверно. ' + (explanation || 'Попробуй ещё раз.') + '</div>';
     if (step.feedback && step.feedback.length > 0) {
       feedbackText += '<div style="font-size:13px;color:var(--muted);margin-top:8px;">';
       step.feedback.forEach(function(fb, idx) {
