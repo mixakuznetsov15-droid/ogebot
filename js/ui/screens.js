@@ -61,14 +61,13 @@ function showSubtopicsList(subtopics, parentIndex) {
     document.getElementById('topic-title').textContent = 'Топографические карты';
 
     var container = document.getElementById('topic-content');
-    var html = '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">' + ICONS.list + ' Выбери урок</div>';
+    var html = '<div class="section-title">' + ICONS.list + ' Выбери урок</div>';
 
     subtopics.forEach(function(sub, i) {
         var done = userProgress.completedLessons && userProgress.completedLessons[sub.title];
         var icon = done ? ICONS.check : ICONS.play;
-        // убираем начальные эмодзи из названия, если они есть
         var cleanTitle = sub.title.replace(/^[^\wа-яё]+/i, '');
-        html += '<div style="padding:12px; margin:6px 0; background:var(--card2); border:1px solid var(--border); border-radius:12px; cursor:pointer; position:relative; z-index:10;" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
+        html += '<div class="list-row" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
         html += '<span style="margin-right:8px;">' + icon + '</span>' + cleanTitle;
         html += '</div>';
     });
@@ -171,7 +170,7 @@ function renderProfile() {
   }
   html += '</div></div>';
 
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+  html += '<div class="info-card" style="display:flex;align-items:center;gap:12px;margin-bottom:12px">';
   html += '<div style="font-size:32px">' + ICONS.target + '</div>';
   html += '<div><div style="font-weight:700;font-size:15px">Прогноз на ОГЭ</div>';
   html += '<div style="font-size:13px;color:var(--muted);margin-top:4px">При текущей точности ты можешь получить <span style="color:var(--gold);font-weight:800">' + getPredictedScore(predictedGrade) + '</span></div></div>';
@@ -183,7 +182,7 @@ function renderProfile() {
   html += '<div class="profile-stat"><div class="profile-stat-num">' + ICONS.fire + ' ' + (userProgress.streak || 0) + '</div><div class="profile-stat-label">Дней подряд</div></div>';
   html += '</div>';
 
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
+  html += '<div class="info-card" style="margin:12px 0;display:flex;justify-content:space-between;align-items:center;' + (chestCount > 0 ? 'animation: chestGlow 2s infinite, chestPulse 1.5s infinite;' : '') + '">';
   html += '<div><div style="font-weight:700;font-size:15px">' + ICONS.gift + ' Сундуки</div>';
   if (chestCount > 0) {
     html += '<div style="font-size:12px;color:var(--muted);margin-top:3px">Доступно: ' + chestCount + ' ' + (chestCount === 1 ? 'сундук' : (chestCount >= 2 && chestCount <= 4 ? 'сундука' : 'сундуков')) + '</div>';
@@ -194,7 +193,7 @@ function renderProfile() {
   html += '<button onclick="openChest()" style="background:var(--gold);color:#000;border:none;border-radius:12px;padding:8px 16px;font-family:var(--font-b);font-size:13px;font-weight:700;cursor:pointer;' + (chestCount > 0 ? 'animation: chestPulse 1.2s infinite;' : 'opacity:0.5;background:gray !important;color:#fff;') + '"' + (chestCount === 0 ? ' disabled' : '') + '>' + (chestCount > 0 ? 'Открыть сундук' : 'Нет сундуков') + '</button>';
   html += '</div>';
 
-  html += '<div style="background:var(--card2);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin:8px 0">';
+  html += '<div class="info-card" style="margin:8px 0">';
   html += '<div style="display:flex;justify-content:space-between;align-items:center">';
   html += '<div><div style="font-weight:700;font-size:14px">' + ICONS.user + ' Мой класс</div><div style="font-size:11px;color:var(--muted);margin-top:3px">Пригласи друзей, чтобы сравнивать прогресс</div></div>';
   html += '<button onclick="inviteFriend()" style="background:var(--primary);color:#fff;border:none;border-radius:12px;padding:8px 14px;font-family:var(--font-b);font-size:12px;font-weight:600;cursor:pointer">➕ Пригласить</button>';
@@ -203,7 +202,7 @@ function renderProfile() {
 
   checkAchievements();
   var achievements = userProgress.achievements || {};
-  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:6px 0 4px">Достижения</div>';
+  html += '<div class="section-title" style="margin:6px 0 4px">Достижения</div>';
   html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   ACHIEVEMENTS_LIST.forEach(function(a) {
     var ach = achievements[a.id] || { progress: 0, unlocked: false };
@@ -223,7 +222,7 @@ function renderProfile() {
   });
   html += '</div>';
 
-  html += '<div class="section-label" style="font-family:var(--font-h);font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:14px 0 4px">Подписка</div>';
+  html += '<div class="section-title" style="margin:14px 0 4px">Подписка</div>';
   html += '<div class="sub-status-card active"><div style="font-size:28px">' + ICONS.check + '</div><div><div style="font-weight:700;font-size:14px">Активна</div><div style="font-size:11px;color:var(--muted);margin-top:2px">Полный доступ ко всем темам</div></div></div>';
 
   container.innerHTML = html;
@@ -350,7 +349,7 @@ function renderHomePath() {
   }
 
   // --- Вертикальный список тем (ВСЕ РАЗБЛОКИРОВАНЫ) ---
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin: 20px 0 10px 16px;">' + ICONS.list + ' Темы</div>';
+  html += '<div class="section-title" style="margin:20px 0 10px 16px;">' + ICONS.list + ' Темы</div>';
 
   for (var i = 0; i < allLessons.length; i++) {
     var lesson = allLessons[i];
@@ -359,9 +358,9 @@ function renderHomePath() {
     var cleanTitle = lesson.title.replace(/^[^\wа-яё]+/i, '');
     var stateIcon = perfect ? ICONS.trophy : done ? ICONS.check : ICONS.play;
     var isReview = reviewTopics.indexOf(lesson.title) !== -1;
-    var bgColor = perfect ? 'rgba(63,185,80,0.1)' : done ? 'rgba(63,185,80,0.05)' : 'var(--card2)';
+    var rowClass = 'list-row' + (perfect ? ' list-row--perfect' : done ? ' list-row--done' : '');
 
-    html += '<div style="display:flex;align-items:center;gap:12px;padding:12px;margin:4px 0;background:' + bgColor + ';border-radius:12px;border:1px solid var(--border);cursor:pointer;" onclick="openLessonTheory(' + i + ')">';
+    html += '<div class="' + rowClass + '" onclick="openLessonTheory(' + i + ')">';
     html += '<div style="font-size:24px;width:32px;text-align:center;">' + stateIcon + '</div>';
     html += '<div style="flex:1;"><div style="font-weight:600;font-size:14px;">' + cleanTitle + '</div>';
     if (done) {
@@ -524,7 +523,7 @@ function renderReviewScreen() {
     }
   });
 
-  html += '<div style="font-family:var(--font-h);font-size:14px;font-weight:700;margin-bottom:12px;">' + ICONS.chart + ' Статус тем</div>';
+  html += '<div class="section-title">' + ICONS.chart + ' Статус тем</div>';
 
   ['red', 'yellow', 'green'].forEach(function(status) {
     var list = statuses[status];
