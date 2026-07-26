@@ -562,16 +562,42 @@ body::before {
     padding:20px;
     margin-bottom:18px;
     animation:fadeIn .35s;
+    position:relative;
+    overflow:hidden;
+}
+/* акцентная полоса сверху */
+.theory-card::before {
+    content:'';
+    position:absolute;
+    top:0;
+    left:0;
+    right:0;
+    height:3px;
+    background:linear-gradient(90deg, var(--primary), var(--primary2));
 }
 .theory-topic{
-    font-size:20px;
+    font-size:22px;
     font-weight:700;
     margin-bottom:14px;
     color:var(--primary);
+    letter-spacing:-0.02em;
 }
 .theory-text{
     white-space:pre-line;
     line-height:1.7;
     color:var(--text);
     font-size:15px;
+}
+
+/* блок с примером */
+.example-block {
+    margin-top:12px;
+    padding:10px 14px;
+    background:rgba(88,166,255,0.06);
+    border-left:3px solid var(--primary);
+    border-radius:0 10px 10px 0;
+    font-family:'Courier New', monospace;
+    font-size:14px;
+    color:var(--primary);
+    white-space:pre-line;
 }
