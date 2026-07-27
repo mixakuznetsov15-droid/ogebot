@@ -100,7 +100,10 @@ async function openSubtopic(parentIndex, subtopicIndex) {
       '<div class="skeleton skeleton-text" style="width:60%"></div>' +
       '<div class="skeleton skeleton-text" style="width:80%"></div>' +
       '<div class="skeleton skeleton-text" style="width:40%"></div>';
-    document.getElementById('topic-title').textContent = sub.title || 'Загрузка...';
+    
+    // Устанавливаем заголовок с иконкой, если есть
+    var topicIcon = sub.icon && ICONS[sub.icon] ? ICONS[sub.icon] + ' ' : '';
+    document.getElementById('topic-title').innerHTML = topicIcon + (sub.title || 'Загрузка...');
 
     var url = window.location.origin + '/data/' + sub.file + '?v=' + Date.now();
 
