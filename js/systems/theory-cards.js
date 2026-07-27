@@ -21,7 +21,8 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           correct: card.correct,
           explanation: card.explanation || '',
           feedback: card.feedback || [],
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'image_compare') {
         return {
@@ -29,9 +30,10 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           question: card.question,
           leftImage: card.leftImage || '',
           rightImage: card.rightImage || '',
-          correct: card.correct, // 'left' или 'right'
+          correct: card.correct,
           explanation: card.explanation || '',
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'drag_match') {
         return {
@@ -39,7 +41,8 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           question: card.question,
           pairs: card.pairs || [],
           explanation: card.explanation || '',
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'compass') {
         return {
@@ -48,7 +51,8 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           correctAngle: card.correctAngle,
           tolerance: card.tolerance || 5,
           explanation: card.explanation || '',
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'map_route') {
         return {
@@ -59,25 +63,29 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           correct: card.correct,
           explanation: card.explanation || '',
           feedback: card.feedback || [],
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'remember') {
         return {
           type: 'remember',
           title: card.title || 'Запомни',
-          text: card.text || ''
+          text: card.text || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'exam_tip') {
         return {
           type: 'exam_tip',
           title: card.title || 'Лайфхак ОГЭ',
-          text: card.text || ''
+          text: card.text || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'common_mistake') {
         return {
           type: 'common_mistake',
           title: card.title || 'Типичная ошибка',
-          text: card.text || ''
+          text: card.text || '',
+          icon: card.icon || null
         };
       }
       // Старые типы
@@ -87,7 +95,8 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           title: card.title || '',
           text: card.text || '',
           image: card.image || '',
-          caption: card.caption || ''
+          caption: card.caption || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'image_hotspot') {
         return {
@@ -96,12 +105,13 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           image: card.image,
           hotspots: card.hotspots || [],
           explanation: card.explanation || '',
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'explain') {
         let text = card.text || '';
         if (card.example) text += '\n\n📝 Пример: ' + card.example;
-        return { type: 'lesson', title: card.title || '', text: text };
+        return { type: 'lesson', title: card.title || '', text: text, icon: card.icon || null };
       } else if (card.type === 'check') {
         return {
           type: 'quiz',
@@ -110,10 +120,11 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           correct: card.correct,
           explanation: card.explanation || '',
           feedback: card.feedback || [],
-          professorComment: card.professorComment || ''
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
         };
       } else if (card.type === 'ready') {
-        return { type: 'final', title: '🎉 Готов к практике', text: card.message || 'Ты прошёл весь материал!' };
+        return { type: 'final', title: '🎉 Готов к практике', text: card.message || 'Ты прошёл весь материал!', icon: card.icon || null };
       }
       return card;
     });
@@ -163,13 +174,16 @@ function renderMicroStep() {
   html += '<div class="theory-progress-fill" style="width:' + percent + '%;"></div>';
   html += '</div>';
 
+  // Подготовка иконки, если есть
+  var iconHtml = step.icon && ICONS[step.icon] ? '<span class="theory-card-icon">' + ICONS[step.icon] + '</span>' : '';
+
   // Рендеринг шагов
   if (step.type === 'lesson') {
     var parts = (step.text || '').split('📝 Пример:');
     var mainText = parts[0] || '';
     var example = parts.length > 1 ? parts[1].trim() : '';
     html += '<div class="theory-card">';
-    html += '<div class="theory-topic">' + (step.title || '') + '</div>';
+    html += '<div class="theory-topic">' + iconHtml + (step.title || '') + '</div>';
     html += '<div class="theory-text">' + mainText.replace(/\n/g, '<br>') + '</div>';
     if (example) {
       html += '<div class="example-block">📝 Пример: ' + example.replace(/\n/g, '<br>') + '</div>';
@@ -181,7 +195,7 @@ function renderMicroStep() {
     var mainTextImg = partsImg[0] || '';
     var exampleImg = partsImg.length > 1 ? partsImg[1].trim() : '';
     html += '<div class="theory-card">';
-    html += '<div class="theory-topic">' + step.title + '</div>';
+    html += '<div class="theory-topic">' + iconHtml + step.title + '</div>';
     html += '<img src="' + step.image + '" style="width:100%;border-radius:12px;margin-bottom:12px;" />';
     if (step.caption) html += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">' + step.caption + '</div>';
     html += '<div class="theory-text">' + mainTextImg.replace(/\n/g, '<br>') + '</div>';
@@ -316,25 +330,25 @@ function renderMicroStep() {
     html += '</div>';
   } else if (step.type === 'remember') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#1a3a5c,#0f2438);border-color:var(--primary);">';
-    html += '<div class="theory-topic">' + (step.title || 'Запомни') + '</div>';
+    html += '<div class="theory-topic">' + iconHtml + (step.title || 'Запомни') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'exam_tip') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#2a3a0c,#1f2a08);border-color:var(--primary2);">';
-    html += '<div class="theory-topic">' + (step.title || 'Лайфхак ОГЭ') + '</div>';
+    html += '<div class="theory-topic">' + iconHtml + (step.title || 'Лайфхак ОГЭ') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'common_mistake') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#3a2020,#2a1010);border-color:var(--danger);">';
-    html += '<div class="theory-topic" style="color:var(--danger);">' + (step.title || 'Типичная ошибка') + '</div>';
+    html += '<div class="theory-topic" style="color:var(--danger);">' + iconHtml + (step.title || 'Типичная ошибка') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'final') {
     html += '<div class="theory-card">';
-    html += '<div class="theory-topic">' + ICONS.flag + ' ' + (step.title || 'Финальный шаг') + '</div>';
+    html += '<div class="theory-topic">' + iconHtml + (step.title || 'Финальный шаг') + '</div>';
     html += '<div class="theory-text">' + (step.text || 'Ты прошёл весь материал! Готов проверить знания?') + '</div>';
     html += '<button class="btn-primary" onclick="startSubtopicPractice()">' + ICONS.arrowRight + ' К практике</button>';
     html += '</div>';
