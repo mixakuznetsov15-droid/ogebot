@@ -63,10 +63,13 @@ function renderQ() {
 
   var ans = document.getElementById('answers');
   ans.innerHTML = '';
-  ['А', 'Б', 'В', 'Г'].forEach(function(l, i) {
+  var letters = q.answers.length === 2 ? ['А', 'Б'] :
+                q.answers.length === 3 ? ['А', 'Б', 'В'] : ['А', 'Б', 'В', 'Г'];
+
+  q.answers.forEach(function(ansText, i) {
     var b = document.createElement('button');
     b.className = 'ans-btn';
-    b.innerHTML = '<div class="ans-letter">' + l + '</div><span>' + q.answers[i] + '</span>';
+    b.innerHTML = '<div class="ans-letter">' + letters[i] + '</div><span>' + ansText + '</span>';
     b.onclick = function() { selectAns(i, q.correct, q.text, topicTitle, q.hint); };
     ans.appendChild(b);
   });
@@ -82,13 +85,18 @@ function selectAns(idx, correct, qText, topic, hint) {
   }
 
   var btns = document.querySelectorAll('.ans-btn');
-  btns[idx].classList.add(idx === correct ? 'correct' : 'wrong');
-  if (idx !== correct) {
-    btns[correct].classList.add('correct');
-    lives--;
-    correctStreak = 0;
-    lastAnswerWasWrong = true;
-  } else {
+  btns.forEach(function(btn, i) {
+    btn.disabled = true;
+    if (i === correct) {
+      btn.classList.add('correct');
+      btn.querySelector('.ans-letter').innerHTML = ICONS.check;
+    } else if (i === idx && i !== correct) {
+      btn.classList.add('wrong');
+      btn.querySelector('.ans-letter').innerHTML = ICONS.x;
+    }
+  });
+
+  if (idx === correct) {
     score++;
     correctStreak++;
     if (lastAnswerWasWrong) {
@@ -97,6 +105,10 @@ function selectAns(idx, correct, qText, topic, hint) {
       }
       lastAnswerWasWrong = false;
     }
+  } else {
+    lives--;
+    correctStreak = 0;
+    lastAnswerWasWrong = true;
   }
 
   // Персонализация: отслеживаем ответы и получаем особые флаги
