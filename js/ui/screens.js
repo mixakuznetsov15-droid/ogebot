@@ -256,6 +256,10 @@ function renderHomePath() {
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>';
+    // Загружаем данные и сразу перерисовываем экран
+    loadAllLessons().then(function() {
+        renderHomePath();
+    });
     return;
   }
 
