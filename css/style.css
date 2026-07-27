@@ -191,6 +191,16 @@ body::before {
   color: var(--danger);
 }
 
+/* Цвета по умолчанию */
+.true-false-btn.true-btn {
+  border-color: var(--primary2);
+  color: var(--primary2);
+}
+.true-false-btn.false-btn {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
 /* Иконки в кнопках */
 .btn-primary svg,
 .btn-secondary svg,
