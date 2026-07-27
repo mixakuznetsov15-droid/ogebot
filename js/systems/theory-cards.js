@@ -276,19 +276,23 @@ function renderMicroStep() {
   } else if (step.type === 'drag_match') {
     html += '<div class="quiz-wrap" style="padding:0">';
     html += '<div class="q-card"><div class="q-text">' + step.question + '</div></div>';
+    html += '<div style="font-weight:700;margin-bottom:4px;">📥 Перетащите термин к его определению</div>';
     html += '<div style="display:flex;gap:20px;">';
-    html += '<div style="flex:1;display:flex;flex-direction:column;gap:8px;" id="drag-left">';
+    html += '<div style="flex:1;"><div style="font-size:var(--text-xs);color:var(--muted);margin-bottom:4px;">Термины</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px;" id="drag-left">';
     var leftItems = shuffle([...step.pairs]);
     leftItems.forEach(function(pair, idx) {
       html += '<div class="drag-item" draggable="true" data-value="' + pair.right + '" style="padding:10px;background:var(--card);border:1px solid var(--border);border-radius:12px;cursor:grab;">' + pair.left + '</div>';
     });
-    html += '</div>';
-    html += '<div style="flex:1;display:flex;flex-direction:column;gap:8px;" id="drag-right">';
+    html += '</div></div>';
+    html += '<div style="flex:1;"><div style="font-size:var(--text-xs);color:var(--muted);margin-bottom:4px;">Определения</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px;" id="drag-right">';
     var rightOptions = step.pairs.map(function(p) { return p.right; });
     rightOptions.forEach(function(opt) {
       html += '<div class="drag-target" data-expected="' + opt + '" style="padding:10px;min-height:40px;background:var(--card2);border:1px dashed var(--border);border-radius:12px;text-align:center;">' + opt + '</div>';
     });
     html += '</div></div>';
+    html += '</div>';
     html += '<button class="btn-primary" style="margin-top:12px;" onclick="submitDragMatchAnswer()">Проверить</button>';
     html += '<div id="micro-feedback" style="margin-top:12px;"></div>';
     html += '</div>';
@@ -312,19 +316,19 @@ function renderMicroStep() {
     html += '</div>';
   } else if (step.type === 'remember') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#1a3a5c,#0f2438);border-color:var(--primary);">';
-    html += '<div class="theory-topic" style="font-size:28px;margin-bottom:8px;">' + ICONS.book + ' ' + (step.title || 'Запомни') + '</div>';
-    html += '<div class="theory-text" style="font-size:18px;font-weight:600;">' + (step.text || '') + '</div>';
+    html += '<div class="theory-topic">' + (step.title || 'Запомни') + '</div>';
+    html += '<div class="theory-text">' + (step.text || '') + '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'exam_tip') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#2a3a0c,#1f2a08);border-color:var(--primary2);">';
-    html += '<div class="theory-topic">' + ICONS.star + ' ' + (step.title || 'Лайфхак ОГЭ') + '</div>';
+    html += '<div class="theory-topic">' + (step.title || 'Лайфхак ОГЭ') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'common_mistake') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#3a2020,#2a1010);border-color:var(--danger);">';
-    html += '<div class="theory-topic" style="color:var(--danger);">' + ICONS.alertTriangle + ' ' + (step.title || 'Типичная ошибка') + '</div>';
+    html += '<div class="theory-topic" style="color:var(--danger);">' + (step.title || 'Типичная ошибка') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
@@ -344,7 +348,7 @@ function renderMicroStep() {
 
 function renderQuiz(step, subtype) {
   var answers = step.answers || [];
-  var letters = answers.length === 3 ? ['А', 'Б', 'В'] : ['А', 'Б', 'В', 'Г'];
+  var letters = answers.length === 2 ? ['А', 'Б'] : answers.length === 3 ? ['А', 'Б', 'В'] : ['А', 'Б', 'В', 'Г'];
   var html = '<div class="quiz-wrap" style="padding:0">';
   html += '<div class="q-card"><div class="q-text">' + (step.question || '') + '</div></div>';
   if (subtype === 'image_quiz' || subtype === 'map_route') {
@@ -526,10 +530,8 @@ function processMicroAnswer(isCorrect, explanation, professorComment) {
   if (isCorrect) {
     addXP(5);
     feedbackText = '<div style="color:var(--primary2);margin-bottom:8px;">' + ICONS.check + ' Верно! ' + (explanation || '') + '</div>';
-    if (professorComment && typeof professor !== 'undefined') {
-      professor.showMessage(professorComment, 'happy', 2000);
-    } else if (typeof professor !== 'undefined') {
-      professor.showMessage('Отлично! Идём дальше.', 'happy', 2000);
+    if (professorComment) {
+      feedbackText += '<div style="font-size:13px;color:var(--muted);margin-top:4px;">🧑‍🏫 ' + professorComment + '</div>';
     }
   } else {
     feedbackText = '<div style="color:var(--danger);margin-bottom:8px;">' + ICONS.x + ' Неверно. ' + (explanation || 'Попробуй ещё раз.') + '</div>';
@@ -540,10 +542,8 @@ function processMicroAnswer(isCorrect, explanation, professorComment) {
       });
       feedbackText += '</div>';
     }
-    if (professorComment && typeof professor !== 'undefined') {
-      professor.showMessage(professorComment, 'sad', 2500);
-    } else if (typeof professor !== 'undefined') {
-      professor.showMessage('Не переживай, это сложный момент. Попробуй ещё раз.', 'sad', 2500);
+    if (professorComment) {
+      feedbackText += '<div style="font-size:13px;color:var(--muted);margin-top:4px;">🧑‍🏫 ' + professorComment + '</div>';
     }
   }
 
@@ -568,7 +568,14 @@ function answerMicroQuestion(chosen) {
   var correctIdx = step.correct;
   var isCorrect = (chosen === correctIdx);
   var btns = document.querySelectorAll('#micro-answers .ans-btn');
-  btns.forEach(function(b) { b.disabled = true; });
+  btns.forEach(function(b, i) {
+    b.disabled = true;
+    if (i === correctIdx) {
+      b.querySelector('.ans-letter').innerHTML = ICONS.check;
+    } else if (i === chosen && i !== correctIdx) {
+      b.querySelector('.ans-letter').innerHTML = ICONS.x;
+    }
+  });
   if (isCorrect) {
     btns[correctIdx].classList.add('correct');
   } else {
