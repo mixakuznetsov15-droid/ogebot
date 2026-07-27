@@ -101,9 +101,10 @@ async function openSubtopic(parentIndex, subtopicIndex) {
       '<div class="skeleton skeleton-text" style="width:80%"></div>' +
       '<div class="skeleton skeleton-text" style="width:40%"></div>';
     
-    // Устанавливаем заголовок с иконкой, если есть
+    // Устанавливаем заголовок БЕЗ эмодзи, но с иконкой, если есть
+    var cleanTitle = (sub.title || 'Загрузка...').replace(/[^\p{L}\p{N}\p{P}\p{Z}]/gu, '').trim();
     var topicIcon = sub.icon && ICONS[sub.icon] ? ICONS[sub.icon] + ' ' : '';
-    document.getElementById('topic-title').innerHTML = topicIcon + (sub.title || 'Загрузка...');
+    document.getElementById('topic-title').innerHTML = topicIcon + cleanTitle;
 
     var url = window.location.origin + '/data/' + sub.file + '?v=' + Date.now();
 
@@ -111,7 +112,7 @@ async function openSubtopic(parentIndex, subtopicIndex) {
         var response = await fetch(url);
         if (!response.ok) throw new Error('HTTP ' + response.status + ' ' + response.statusText);
         var theory = await response.json();
-        startTheoryCards({ title: sub.title, key: sub.key }, theory, sub.key);
+        startTheoryCards({ title: cleanTitle, key: sub.key }, theory, sub.key);
     } catch (e) {
         alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nURL: ' + url + '\nОшибка: ' + e.message);
         goQuizFromLoaded(parentIndex);
