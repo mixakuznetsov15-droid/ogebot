@@ -109,9 +109,14 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           icon: card.icon || null
         };
       } else if (card.type === 'explain') {
-        let text = card.text || '';
-        if (card.example) text += '\n\n📝 Пример: ' + card.example;
-        return { type: 'lesson', title: card.title || '', text: text, icon: card.icon || null };
+        // Поддержка iconList
+        return {
+          type: 'lesson',
+          title: card.title || '',
+          text: card.text || '',
+          iconList: card.iconList || null,
+          icon: card.icon || null
+        };
       } else if (card.type === 'check') {
         return {
           type: 'quiz',
@@ -163,15 +168,19 @@ function renderMicroStep() {
 
   var step = microSteps[microStepIndex];
   var total = microSteps.length;
-  var percent = Math.round((microStepIndex / total) * 100);
   var html = '';
 
   // Номер шага
   html += '<div style="text-align:right;font-size:11px;color:var(--muted);margin-bottom:4px;">' + (microStepIndex + 1) + ' / ' + total + '</div>';
 
-  // Прогресс-бар
-  html += '<div class="theory-progress-bar">';
-  html += '<div class="theory-progress-fill" style="width:' + percent + '%;"></div>';
+  // Сегментированный прогресс-бар
+  html += '<div class="theory-progress-bar" id="micro-progress-bar">';
+  for (var i = 0; i < total; i++) {
+    var segClass = 'progress-segment';
+    if (i < microStepIndex) segClass += ' completed';
+    else if (i === microStepIndex) segClass += ' current';
+    html += '<div class="' + segClass + '"></div>';
+  }
   html += '</div>';
 
   // Подготовка иконки, если есть
@@ -179,15 +188,31 @@ function renderMicroStep() {
 
   // Рендеринг шагов
   if (step.type === 'lesson') {
-    var parts = (step.text || '').split('📝 Пример:');
-    var mainText = parts[0] || '';
-    var example = parts.length > 1 ? parts[1].trim() : '';
     html += '<div class="theory-card">';
+    html += '<div>';
     html += '<div class="theory-topic">' + iconHtml + (step.title || '') + '</div>';
-    html += '<div class="theory-text">' + mainText.replace(/\n/g, '<br>') + '</div>';
-    if (example) {
-      html += '<div class="example-block">📝 Пример: ' + example.replace(/\n/g, '<br>') + '</div>';
+
+    if (step.iconList) {
+      // Сетка иконок вместо текста
+      html += '<div class="theory-text">' + (step.text || '').replace(/\n/g, '<br>') + '</div>';
+      html += '<div class="icon-list-grid">';
+      step.iconList.forEach(function(item) {
+        html += '<div class="icon-list-item">';
+        html += '<div class="icon-list-icon">' + (ICONS[item.icon] || '') + '</div>';
+        html += '<div class="icon-list-label">' + item.label + '</div>';
+        html += '</div>';
+      });
+      html += '</div>';
+    } else {
+      var parts = (step.text || '').split('📝 Пример:');
+      var mainText = parts[0] || '';
+      var example = parts.length > 1 ? parts[1].trim() : '';
+      html += '<div class="theory-text">' + mainText.replace(/\n/g, '<br>') + '</div>';
+      if (example) {
+        html += '<div class="example-block">📝 Пример: ' + example.replace(/\n/g, '<br>') + '</div>';
+      }
     }
+    html += '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'image_lesson') {
@@ -195,6 +220,7 @@ function renderMicroStep() {
     var mainTextImg = partsImg[0] || '';
     var exampleImg = partsImg.length > 1 ? partsImg[1].trim() : '';
     html += '<div class="theory-card">';
+    html += '<div>';
     html += '<div class="theory-topic">' + iconHtml + step.title + '</div>';
     html += '<img src="' + step.image + '" style="width:100%;border-radius:12px;margin-bottom:12px;" />';
     if (step.caption) html += '<div style="font-size:12px;color:var(--muted);margin-bottom:8px;">' + step.caption + '</div>';
@@ -202,6 +228,7 @@ function renderMicroStep() {
     if (exampleImg) {
       html += '<div class="example-block">📝 Пример: ' + exampleImg.replace(/\n/g, '<br>') + '</div>';
     }
+    html += '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'quiz') {
@@ -330,26 +357,34 @@ function renderMicroStep() {
     html += '</div>';
   } else if (step.type === 'remember') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#1a3a5c,#0f2438);border-color:var(--primary);">';
+    html += '<div>';
     html += '<div class="theory-topic">' + iconHtml + (step.title || 'Запомни') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
+    html += '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'exam_tip') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#2a3a0c,#1f2a08);border-color:var(--primary2);">';
+    html += '<div>';
     html += '<div class="theory-topic">' + iconHtml + (step.title || 'Лайфхак ОГЭ') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
+    html += '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'common_mistake') {
     html += '<div class="theory-card" style="background:linear-gradient(135deg,#3a2020,#2a1010);border-color:var(--danger);">';
+    html += '<div>';
     html += '<div class="theory-topic" style="color:var(--danger);">' + iconHtml + (step.title || 'Типичная ошибка') + '</div>';
     html += '<div class="theory-text">' + (step.text || '') + '</div>';
+    html += '</div>';
     html += '<button class="btn-primary" onclick="nextMicroStep()">Продолжить ' + ICONS.arrowRight + '</button>';
     html += '</div>';
   } else if (step.type === 'final') {
     html += '<div class="theory-card">';
+    html += '<div>';
     html += '<div class="theory-topic">' + iconHtml + (step.title || 'Финальный шаг') + '</div>';
     html += '<div class="theory-text">' + (step.text || 'Ты прошёл весь материал! Готов проверить знания?') + '</div>';
+    html += '</div>';
     html += '<button class="btn-primary" onclick="startSubtopicPractice()">' + ICONS.arrowRight + ' К практике</button>';
     html += '</div>';
   }
