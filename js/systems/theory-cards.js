@@ -109,7 +109,6 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           icon: card.icon || null
         };
       } else if (card.type === 'explain') {
-        // Поддержка iconList
         return {
           type: 'lesson',
           title: card.title || '',
@@ -117,10 +116,22 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           iconList: card.iconList || null,
           icon: card.icon || null
         };
+      } else if (card.type === 'quiz') {
+        // Прямой тип quiz
+        return {
+          type: 'quiz',
+          question: card.quizQuestion || card.question || '',
+          answers: card.answers || [],
+          correct: card.correct,
+          explanation: card.explanation || '',
+          feedback: card.feedback || [],
+          professorComment: card.professorComment || '',
+          icon: card.icon || null
+        };
       } else if (card.type === 'check') {
         return {
           type: 'quiz',
-          quizQuestion: card.question,
+          question: card.question,
           answers: card.options || [],
           correct: card.correct,
           explanation: card.explanation || '',
@@ -129,7 +140,7 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           icon: card.icon || null
         };
       } else if (card.type === 'ready') {
-        return { type: 'final', title: '🎉 Готов к практике', text: card.message || 'Ты прошёл весь материал!', icon: card.icon || null };
+        return { type: 'final', title: 'Готов к практике', text: card.message || 'Ты прошёл весь материал!', icon: card.icon || null };
       }
       return card;
     });
@@ -193,7 +204,6 @@ function renderMicroStep() {
     html += '<div class="theory-topic">' + iconHtml + (step.title || '') + '</div>';
 
     if (step.iconList) {
-      // Сетка иконок вместо текста
       html += '<div class="theory-text">' + (step.text || '').replace(/\n/g, '<br>') + '</div>';
       html += '<div class="icon-list-grid">';
       step.iconList.forEach(function(item) {
