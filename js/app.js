@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         },
         onComplete: () => {
-          // Можно оставить пустым — закрытие происходит по кнопке "Забрать"
+          // Сброс _isOpening теперь происходит в hideChestModal
         }
       }
     });
