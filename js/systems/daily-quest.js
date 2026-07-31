@@ -10,6 +10,9 @@ function updateDailyTasks() {
     userProgress.dailyTasks = { solve10: false, earn50XP: false, loginToday: true };
     userProgress.dailyTasksCollected = { solve10: false, earn50XP: false, loginToday: false };
     userProgress.allDailyTasksDone = false;
+    // Сбрасываем счётчики вопросов и XP за день
+    userProgress.dailyQuestions = 0;
+    userProgress.dailyXP = 0;
     saveProgress();
   }
   var tasks = userProgress.dailyTasks || {};
