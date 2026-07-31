@@ -7,6 +7,41 @@ document.addEventListener('DOMContentLoaded', function () {
     checkStreak();
     updateDailyTasks();
     checkAchievements();
+
+    // Инициализация менеджера сундуков
+    ChestManager.init({
+      getProgress: () => userProgress,
+      saveProgress: () => saveProgress(),
+      ui: {
+        onOpenStart: () => {
+          // Показать модальное окно с анимацией открытия
+          if (typeof showChestModal === 'function') {
+            showChestModal();
+          }
+        },
+        onReward: (reward) => {
+          // Показать полученную награду
+          if (typeof showToast === 'function') {
+            showToast(`Получено: ${reward.amount} XP`);
+          }
+        },
+        onError: (msg) => {
+          if (typeof showToast === 'function') {
+            showToast(msg);
+          }
+        },
+        onComplete: () => {
+          // Закрыть модальное окно и обновить интерфейс
+          if (typeof closeChestModal === 'function') {
+            closeChestModal();
+          }
+          if (typeof renderProfile === 'function') {
+            renderProfile();
+          }
+        }
+      }
+    });
+
     renderHomePath();
   });
 
@@ -40,7 +75,21 @@ document.addEventListener('DOMContentLoaded', function () {
 window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
 window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
 window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
-window.openChest = typeof openChest === 'function' ? openChest : function() {};
+
+// Обёртки для совместимости со старыми вызовами
+window.openChest = async function() {
+  await ChestManager.open();
+};
+window.giveChest = function(type) {
+  ChestManager.giveChest(type);
+};
+window.closeRewardModal = function() {
+  // Оставлено для обратной совместимости, реальное закрытие происходит в onComplete
+  if (typeof closeChestModal === 'function') {
+    closeChestModal();
+  }
+};
+
 window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
   alert('Приглашение друзей появится позже');
 };
@@ -48,5 +97,4 @@ window.nextQ = typeof nextQ === 'function' ? nextQ : function() {};
 window.shareBossResult = typeof shareBossResult === 'function' ? shareBossResult : function() {
   alert('Результат сохранён');
 };
-window.closeRewardModal = typeof closeRewardModal === 'function' ? closeRewardModal : function() {};
 window.closeProfessorModal = typeof closeProfessorModal === 'function' ? closeProfessorModal : function() {};
