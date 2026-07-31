@@ -626,9 +626,11 @@ body::before {
   align-items: center;
   justify-content: center;
   transition: background .28s ease;
+  pointer-events: none;          /* клики проходят сквозь неактивный оверлей */
 }
 .chest-modal-overlay.show {
   background: rgba(0,0,0,.62);
+  pointer-events: auto;          /* в активном состоянии клики работают */
 }
 .chest-modal-card {
   width: 90%;
