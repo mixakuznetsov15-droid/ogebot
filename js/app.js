@@ -20,7 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         },
         onReward: (reward) => {
-          // Показать полученную награду
+          // Показать полученную награду (после анимации)
+          if (typeof showRewardModal === 'function') {
+            setTimeout(() => showRewardModal(reward), 1200);
+          }
+          // Дополнительно — текстовое уведомление
           if (typeof showToast === 'function') {
             showToast(`Получено: ${reward.amount} XP`);
           }
@@ -31,13 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         },
         onComplete: () => {
-          // Закрыть модальное окно и обновить интерфейс
-          if (typeof closeChestModal === 'function') {
-            closeChestModal();
-          }
-          if (typeof renderProfile === 'function') {
-            renderProfile();
-          }
+          // Можно оставить пустым — закрытие происходит по кнопке "Забрать"
         }
       }
     });
@@ -76,7 +74,7 @@ window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
 window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
 window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
 
-// Обёртки для совместимости со старыми вызовами
+// Обёртки для совместимости со старыми вызовами сундуков
 window.openChest = async function() {
   await ChestManager.open();
 };
@@ -84,9 +82,9 @@ window.giveChest = function(type) {
   ChestManager.giveChest(type);
 };
 window.closeRewardModal = function() {
-  // Оставлено для обратной совместимости, реальное закрытие происходит в onComplete
-  if (typeof closeChestModal === 'function') {
-    closeChestModal();
+  // Закрытие модального окна теперь происходит в hideChestModal
+  if (typeof hideChestModal === 'function') {
+    hideChestModal();
   }
 };
 
