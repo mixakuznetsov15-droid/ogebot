@@ -60,7 +60,7 @@
     </div>
   </div>
 
-  <!-- Экран результата (старый) -->
+  <!-- Экран результата -->
   <div class="screen" id="s-result">
     <div class="result-wrap">
       <div class="result-emoji" id="res-emoji">🎉</div>
@@ -129,6 +129,25 @@
     <div class="scroll" id="profile-content"></div>
   </div>
 
+  <!-- Шаблон модального окна сундука -->
+  <template id="chest-modal-template">
+    <div class="chest-modal-overlay">
+      <div class="chest-modal-card">
+        <div class="chest-open-anim" id="chest-anim">
+          <div class="chest-body">🎁</div>
+          <div class="chest-lid"></div>
+          <div class="chest-particles"></div>
+        </div>
+        <div class="chest-reward hidden" id="chest-reward">
+          <div class="chest-reward-icon"></div>
+          <div class="chest-reward-title"></div>
+          <div class="chest-reward-amount"></div>
+          <button class="chest-reward-btn btn-primary">Забрать</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
   <!-- Подключение скриптов (порядок важен!) -->
   <script src="js/config.js"></script>
   <script src="js/utils/common.js"></script>
@@ -144,7 +163,8 @@
   <script src="js/systems/daily-quest.js"></script>
   <script src="js/systems/achievements.js"></script>
   <script src="js/systems/theory.js"></script>
-  <script src="js/ui/icons.js"></script>                <!-- SVG-иконки -->
+  <script src="js/ui/icons.js"></script>
+  <script src="js/systems/chest-manager.js"></script>
   <script src="js/systems/theory-cards.js"></script>
   <script src="js/utils/skill-tagger.js"></script>
   <script src="js/systems/adaptive-selector.js"></script>
