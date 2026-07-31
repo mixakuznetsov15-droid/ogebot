@@ -50,7 +50,7 @@ body::before {
   display:flex; align-items:center; justify-content:space-between;
   background:#0f1620; border-bottom:1px solid var(--border); flex-shrink:0;
 }
-/* Баг 1: безопасная область для Telegram Mini App + запас */
+/* Безопасная область для Telegram Mini App */
 #s-topic .topbar {
   padding-top: max(24px, calc(env(safe-area-inset-top) + 8px));
   padding-bottom: var(--space-3);
@@ -499,6 +499,7 @@ body::before {
   margin-top: auto;
 }
 
+/* остальные блоки */
 .example-block {
   margin-top: var(--space-3); padding: var(--space-3) var(--space-3);
   background:rgba(88,166,255,0.06); border-left:3px solid var(--primary);
@@ -538,6 +539,28 @@ body::before {
   0% { background-position: -200px 0; }
   100% { background-position: 200px 0; }
 }
+
+/* ── ВЫБОР КАРТИНКИ ── */
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+.image-option {
+  aspect-ratio: 1 / 1;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  min-height: 100px;
+  background-color: var(--card2);
+}
+.image-option:active { transform: scale(0.96); }
+.image-option.correct-img { border-color: var(--primary2); box-shadow: 0 0 0 3px rgba(63,185,80,0.3); }
+.image-option.wrong-img { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(248,81,73,0.3); }
 
 /* ── ПРОФЕССОР ГЕО (временно скрыт) ── */
 .prof-character-container { display: none !important; }
@@ -593,48 +616,109 @@ body::before {
 .chest-card-available { animation: chestGlow 2s infinite, chestPulse 1.5s infinite; border-color: #d29922 !important; }
 .chest-btn-available { background: linear-gradient(135deg, #f5a623, #d29922) !important; animation: chestPulse 1.2s infinite; }
 
-/* ── МОДАЛЬНОЕ ОКНО СУНДУКА ── */
-.chest-open-anim { width: 90px; height: 90px; margin: 0 auto; position: relative; }
+/* ── МОДАЛЬНОЕ ОКНО СУНДУКА (новый template) ── */
+.chest-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  transition: background .28s ease;
+}
+.chest-modal-overlay.show {
+  background: rgba(0,0,0,.62);
+}
+.chest-modal-card {
+  width: 100%;
+  max-width: 480px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 22px 22px 0 0;
+  padding: var(--space-5) var(--space-4) var(--space-6);
+  transform: translateY(100%);
+  transition: transform .28s cubic-bezier(.34,1.3,.64,1);
+  box-shadow: 0 -12px 40px rgba(0,0,0,.45);
+}
+.chest-modal-overlay.show .chest-modal-card {
+  transform: translateY(0);
+}
+
+/* Анимация сундука */
+.chest-open-anim {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto;
+  position: relative;
+}
 .chest-body {
-  width: 80px; height: 60px; background: linear-gradient(135deg, #b8860b, #d29922);
-  border-radius: 10px; position: absolute; bottom: 0; left: 5px;
-  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  width: 80px; height: 60px;
+  background: linear-gradient(135deg, #b8860b, #d29922);
+  border-radius: 10px;
+  position: absolute; bottom: 0; left: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 36px;
   box-shadow: 0 0 15px rgba(210,153,34,0.5);
 }
 .chest-lid {
-  width: 86px; height: 20px; background: linear-gradient(135deg, #d29922, #f5a623);
-  border-radius: 8px 8px 0 0; position: absolute; top: 0; left: 2px;
-  transform-origin: left bottom; transition: transform 0.4s ease;
+  width: 86px; height: 20px;
+  background: linear-gradient(135deg, #d29922, #f5a623);
+  border-radius: 8px 8px 0 0;
+  position: absolute; top: 0; left: 2px;
+  transform-origin: left bottom;
+  transition: transform 0.4s ease;
   box-shadow: 0 0 10px rgba(210,153,34,0.5);
 }
-.chest-lid.open { transform: rotate(-35deg) translateY(-5px); }
-.particle {
-  position: absolute; width: 6px; height: 6px; background: #f5a623; border-radius: 50%;
-  animation: particleFly 0.8s ease-out forwards; opacity: 0;
+.chest-lid.open {
+  transform: rotate(-35deg) translateY(-5px);
 }
-@keyframes particleFly { 0% { transform: translate(0,0) scale(1); opacity:1; } 100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; } }
+.chest-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
 
-/* ── ВЫБОР КАРТИНКИ ── */
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
+.particle {
+  position: absolute;
+  width: 6px; height: 6px;
+  background: #f5a623;
+  border-radius: 50%;
+  animation: particleFly 0.8s ease-out forwards;
+  opacity: 0;
+}
+@keyframes particleFly {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  100% { transform: translate(var(--x), var(--y)) scale(0); opacity:0; }
+}
+
+/* Блок награды */
+.chest-reward {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
+}
+.chest-reward.hidden {
+  display: none;
+}
+.chest-reward-icon {
+  font-size: 48px;
+}
+.chest-reward-title {
+  font-family: var(--font-h);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--text);
+}
+.chest-reward-amount {
+  font-size: var(--text-lg);
+  color: var(--primary2);
+}
+.chest-reward-btn {
   margin-top: var(--space-4);
 }
-.image-option {
-  aspect-ratio: 1 / 1;
-  background-size: cover;
-  background-position: center;
-  border-radius: var(--radius);
-  border: 2px solid var(--border);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  min-height: 100px;          /* чтобы картинка не схлопывалась */
-  background-color: var(--card2); /* если картинка не загрузилась */
-}
-.image-option:active { transform: scale(0.96); }
-.image-option.correct-img { border-color: var(--primary2); box-shadow: 0 0 0 3px rgba(63,185,80,0.3); }
-.image-option.wrong-img { border-color: var(--danger); box-shadow: 0 0 0 3px rgba(248,81,73,0.3); }
 
 /* ── SVG-ИКОНКИ (наследование цвета и размер) ── */
 .node-circle svg, .boss-node svg, .continue-card svg, .carousel-card svg,
