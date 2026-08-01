@@ -155,7 +155,7 @@ function showTheoryScreen(theoryInfo) {}
 function startLessonPractice(){ goQuizFromLoaded(currentLessonIndex); }
 
 // ==========================================
-// ПРОФИЛЬ (без блока «Напоминания»)
+// ПРОФИЛЬ (с подпиской)
 // ==========================================
 function renderProfile() {
   var container = document.getElementById('profile-content');
@@ -236,8 +236,28 @@ function renderProfile() {
   });
   html += '</div>';
 
+  // Блок подписки
+  var subStatus = Subscription.getStatus();
   html += '<div class="section-title" style="margin:var(--space-3) 0 var(--space-1)">Подписка</div>';
-  html += '<div class="sub-status-card active"><div style="font-size:var(--text-xl)">' + ICONS.check + '</div><div><div style="font-weight:700;font-size:var(--text-base)">Активна</div><div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Полный доступ ко всем темам</div></div></div>';
+
+  if (subStatus.active) {
+    var subTypeText = subStatus.type === 'trial' ? 'Пробный период' : 'Подписка активна';
+    var subDetails = subStatus.type === 'trial'
+      ? 'Осталось ' + subStatus.daysLeft + ' ' + getDayWord(subStatus.daysLeft)
+      : 'Действует до ' + userProgress.subscriptionEndDate;
+    html += '<div class="sub-status-card active">';
+    html += '<div style="font-size:var(--text-xl)">' + ICONS.check + '</div>';
+    html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
+    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + subDetails + '</div></div>';
+    html += '</div>';
+  } else {
+    html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
+    html += '<div style="font-size:var(--text-xl)">' + ICONS.alertTriangle + '</div>';
+    html += '<div><div style="font-weight:700;font-size:var(--text-base)">Пробный период истёк</div>';
+    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Оформите подписку за ' + Subscription.PRICE + ' ₽/мес</div></div>';
+    html += '</div>';
+    html += '<button class="btn-primary" style="margin-top:var(--space-2)" onclick="handleSubscribe()">Оформить подписку</button>';
+  }
 
   container.innerHTML = html;
 }
@@ -259,7 +279,7 @@ function renderHomePath() {
       '<div class="skeleton skeleton-list-item"></div>';
     // Загружаем данные и сразу перерисовываем экран
     loadAllLessons().then(function() {
-        renderHomePath();
+      renderHomePath();
     });
     return;
   }
