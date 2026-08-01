@@ -1,77 +1,65 @@
 // ==========================================
-//  ДАННЫЕ: темы, вопросы, награды сундуков
+//  ФАЙЛ ТЕМ И ПОДТЕМ (ОГЭ ГЕОГРАФИЯ)
 // ==========================================
 
-const THEORY_FILES = [
-  {
-    key: 'topo',
-    title: '🗺 Топографические карты',
-    file: null,   // будет выбираться при входе в подтему
-    subtopics: [
-      { key: 'topo_intro',   title: '📌 Что такое топографическая карта', file: 'theory_topo_01.json', questions: 'questions_topo_01.json' },
-      { key: 'topo_scale',   title: '📏 Масштаб', file: 'theory_topo_02.json', questions: 'questions_topo_02.json' },
-      { key: 'topo_signs',   title: '🏘 Условные знаки', file: 'theory_topo_03.json', questions: 'questions_topo_03.json' },
-      { key: 'topo_relief',  title: '⛰ Рельеф', file: 'theory_topo_04.json', questions: 'questions_topo_04.json' },
-      { key: 'topo_azimuth', title: '🧭 Азимут и стороны горизонта', file: 'theory_topo_05.json', questions: 'questions_topo_05.json' },
-      { key: 'topo_coords',  title: '📍 Определение координат и объектов', file: 'theory_topo_06.json', questions: 'questions_topo_06.json' },
-      { key: 'topo_route',   title: '🚶 Построение маршрута', file: 'theory_topo_07.json', questions: 'questions_topo_07.json' },
-      { key: 'topo_final',   title: '📝 Комплексные задания ОГЭ', file: 'theory_topo_08.json', questions: 'questions_topo_08.json' }
-    ]
-  },
-  // остальные темы без изменений
-  { key:'synoptic', title:'🌀 Синоптические карты', file:'theory_synoptic.json', tasks:'Задания 5-6' },
-  { key:'climat', title:'📊 Климат и климатограммы', file:'theory_climat.json', tasks:'Задания 7-8' },
-  { key:'nature_russia', title:'🌋 Природа России', file:'theory_nature_russia.json', tasks:'Задания 13-16'},
-  { key:'timezone', title:'🕐 Часовые пояса', file:'theory_timezone.json', tasks:'Задание 17' },
-  { key:'zones', title:'🌲 Природные зоны', file:'theory_zones.json', tasks:'Задание 28' },
-  { key:'population', title:'👥 Население России', file:'theory_population.json', tasks:'Задания 23-25'},
-  { key:'economy', title:'🏭 Хозяйство России', file:'theory_economy.json', tasks:'Задание 27' },
-  { key:'regions', title:'📍 Регионы России', file:'theory_regions.json', tasks:'Задания 20-21'},
-  { key:'world', title:'🌍 Страны и материки', file:'theory_world.json', tasks:'Задания 20-21'},
-  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'theory_litosphere.json', tasks:'Задание 22' },
-  { key:'hydro', title:'💧 Гидросфера', file:'theory_hydro.json', tasks:'Задание 22' },
-  { key:'ecology', title:'🌱 Экология', file:'theory_ecology.json', tasks:'Задание 15' },
-  { key:'geopos', title:'📍 Географическое положение России', file:'theory_geopos.json', tasks:'Задание 26' }
+// Основные вопросы (практика) для каждой подтемы
+var QUESTIONS_FILES = [
+  // Раздел 1: Топографические карты
+  { title: "1. Что такое топографические карты", key: "topo_01", questions: "data/questions_topo_01.json" },
+  { title: "2. Масштаб", key: "topo_02", questions: "data/questions_topo_02.json" },
+  { title: "3. Условные знаки", key: "topo_03", questions: "data/questions_topo_03.json" },
+  { title: "4. Рельеф", key: "topo_04", questions: "data/questions_topo_04.json" },
+  { title: "5. Азимут и стороны горизонта", key: "topo_05", questions: "data/questions_topo_05.json" },
+  { title: "6. Географические координаты", key: "topo_06", questions: "data/questions_topo_06.json" },
+  { title: "7. Построение маршрута", key: "topo_07", questions: "data/questions_topo_07.json" },
+  { title: "8. Комплексные задания (топо)", key: "topo_08", questions: "data/questions_topo_08.json" },
+
+  // Раздел 2: Градусная сеть и географические координаты
+  { title: "1. Параллели и меридианы", key: "grid_01", questions: "data/questions_grid_01.json" },
+  { title: "2. Экватор и нулевой меридиан", key: "grid_02", questions: "data/questions_grid_02.json" },
+  { title: "3. Градусная сеть", key: "grid_03", questions: "data/questions_grid_03.json" },
+  { title: "4. Географическая широта", key: "grid_04", questions: "data/questions_grid_04.json" },
+  { title: "5. Географическая долгота", key: "grid_05", questions: "data/questions_grid_05.json" },
+  { title: "6. Определение координат точки", key: "grid_06", questions: "data/questions_grid_06.json" },
+  { title: "7. Поиск объекта по координатам", key: "grid_07", questions: "data/questions_grid_07.json" },
+  { title: "8. Комплексные задания (координаты)", key: "grid_08", questions: "data/questions_grid_08.json" },
+
+  // Будущие разделы можно добавлять сюда
 ];
 
-const QUESTIONS_FILES = [
+// Теоретические карточки (микроуроки)
+var THEORY_FILES = [
+  // Раздел 1
   {
-    key: 'topo',
-    title: '🗺 Топографические карты',
-    file: null,
+    title: "Топографические карты",
+    icon: "mapPin",
     subtopics: [
-      { key: 'topo_intro',   title: '📌 Что такое топографическая карта', file: 'questions_topo_01.json' },
-      { key: 'topo_scale',   title: '📏 Масштаб', file: 'questions_topo_02.json' },
-      { key: 'topo_signs',   title: '🏘 Условные знаки', file: 'questions_topo_03.json' },
-      { key: 'topo_relief',  title: '⛰ Рельеф', file: 'questions_topo_04.json' },
-      { key: 'topo_azimuth', title: '🧭 Азимут и стороны горизонта', file: 'questions_topo_05.json' },
-      { key: 'topo_coords',  title: '📍 Определение координат и объектов', file: 'questions_topo_06.json' },
-      { key: 'topo_route',   title: '🚶 Построение маршрута', file: 'questions_topo_07.json' },
-      { key: 'topo_final',   title: '📝 Комплексные задания ОГЭ', file: 'questions_topo_08.json' }
+      { title: "Что такое топографические карты", icon: "mapPin", file: "topo_what_is.json", key: "topo_01", questions: "data/questions_topo_01.json" },
+      { title: "Масштаб", icon: "ruler", file: "topo_scale.json", key: "topo_02", questions: "data/questions_topo_02.json" },
+      { title: "Условные знаки", icon: "book", file: "topo_symbols.json", key: "topo_03", questions: "data/questions_topo_03.json" },
+      { title: "Рельеф", icon: "mountain", file: "topo_relief.json", key: "topo_04", questions: "data/questions_topo_04.json" },
+      { title: "Азимут и стороны горизонта", icon: "compass", file: "topo_azimuth.json", key: "topo_05", questions: "data/questions_topo_05.json" },
+      { title: "Географические координаты", icon: "globe", file: "topo_coordinates.json", key: "topo_06", questions: "data/questions_topo_06.json" },
+      { title: "Построение маршрута", icon: "mapPin", file: "topo_route.json", key: "topo_07", questions: "data/questions_topo_07.json" },
+      { title: "Комплексные задания", icon: "star", file: "topo_complex.json", key: "topo_08", questions: "data/questions_topo_08.json" },
     ]
   },
-  // остальные темы без изменений
-  { key:'synoptic', title:'🌀 Синоптические карты', file:'questions_synoptic.json', tasks:'Задания 5-6' },
-  { key:'climat', title:'📊 Климат и климатограммы', file:'questions_climat.json', tasks:'Задания 7-8' },
-  { key:'nature_russia', title:'🌋 Природа России', file:'questions_nature_russia.json', tasks:'Задания 13-16'},
-  { key:'timezone', title:'🕐 Часовые пояса', file:'questions_timezone.json', tasks:'Задание 17' },
-  { key:'zones', title:'🌲 Природные зоны', file:'questions_zones.json', tasks:'Задание 28' },
-  { key:'population', title:'👥 Население России', file:'questions_population.json', tasks:'Задания 23-25'},
-  { key:'economy', title:'🏭 Хозяйство России', file:'questions_economy.json', tasks:'Задание 27' },
-  { key:'regions', title:'📍 Регионы России', file:'questions_regions.json', tasks:'Задания 20-21'},
-  { key:'world', title:'🌍 Страны и материки', file:'questions_world.json', tasks:'Задания 20-21'},
-  { key:'litosphere', title:'⛰ Литосфера и рельеф', file:'questions_litosphere.json', tasks:'Задание 22' },
-  { key:'hydro', title:'💧 Гидросфера', file:'questions_hydro.json', tasks:'Задание 22' },
-  { key:'ecology', title:'🌱 Экология', file:'questions_ecology.json', tasks:'Задание 15' },
-  { key:'geopos', title:'📍 Геогр. положение России', file:'questions_geopos.json', tasks:'Задание 26' }
-];
 
-const REWARD_POOL = [
-  { type: 'xp', value: 20, label: '+20 XP' },
-  { type: 'xp', value: 50, label: '+50 XP' },
-  { type: 'xp', value: 100, label: '+100 XP' },
-  { type: 'streak_day', value: 1, label: '+1 день серии' },
-  { type: 'boost_x2', duration: 15, label: 'Бустер x2 XP на 15 мин' },
-  { type: 'free_hint', value: 1, label: 'Бесплатная AI-подсказка' },
-  { type: 'badge', id: 'rare_chest', label: 'Редкий бейдж' }
+  // Раздел 2
+  {
+    title: "Градусная сеть и географические координаты",
+    icon: "globe",
+    subtopics: [
+      { title: "Параллели и меридианы", icon: "globe", file: "theory_grid_01.json", key: "grid_01", questions: "data/questions_grid_01.json" },
+      { title: "Экватор и нулевой меридиан", icon: "globe", file: "theory_grid_02.json", key: "grid_02", questions: "data/questions_grid_02.json" },
+      { title: "Градусная сеть", icon: "globe", file: "theory_grid_03.json", key: "grid_03", questions: "data/questions_grid_03.json" },
+      { title: "Географическая широта", icon: "ruler", file: "theory_grid_04.json", key: "grid_04", questions: "data/questions_grid_04.json" },
+      { title: "Географическая долгота", icon: "compass", file: "theory_grid_05.json", key: "grid_05", questions: "data/questions_grid_05.json" },
+      { title: "Определение координат точки", icon: "mapPin", file: "theory_grid_06.json", key: "grid_06", questions: "data/questions_grid_06.json" },
+      { title: "Поиск объекта по координатам", icon: "search", file: "theory_grid_07.json", key: "grid_07", questions: "data/questions_grid_07.json" },
+      { title: "Комплексные задания", icon: "star", file: "theory_grid_08.json", key: "grid_08", questions: "data/questions_grid_08.json" },
+    ]
+  },
+
+  // Будущие разделы
 ];
