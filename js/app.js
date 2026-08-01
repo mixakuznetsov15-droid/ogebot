@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     checkStreak();
     updateDailyTasks();
     checkAchievements();
+    Subscription.initTrial();   // инициализация триала
 
     // Инициализация менеджера сундуков
     ChestManager.init({
@@ -86,6 +87,14 @@ window.closeRewardModal = function() {
   if (typeof hideChestModal === 'function') {
     hideChestModal();
   }
+};
+
+// Заглушка оплаты (для будущей интеграции с Telegram Stars или ЮKassa)
+window.handleSubscribe = function() {
+  if (typeof showToast === 'function') {
+    showToast('Оплата появится позже');
+  }
+  // В будущем: Subscription.activateSubscription().then(...)
 };
 
 window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
