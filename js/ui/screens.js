@@ -27,33 +27,32 @@ var currentLessonIndex = 0;
 var currentSubtopicQuestionsFile = null;
 var theoryLoaded = [];
 
+// Открывает родительскую тему по индексу в THEORY_FILES
+function openTopic(index) {
+  var theoryInfo = THEORY_FILES[index];
+  if (theoryInfo && theoryInfo.subtopics) {
+    showSubtopicsList(theoryInfo.subtopics, index);
+  } else {
+    alert('Тема не найдена');
+  }
+}
+
+// Старая функция для совместимости (не используется на главном экране, но может вызываться из других мест)
 async function openLessonTheory(index) {
-    currentLessonIndex = index;
+    // index теперь — индекс в QUESTIONS_FILES (если вызов старый)
     var lesson = QUESTIONS_FILES[index];
-    var theoryInfo = THEORY_FILES[index];
-
-    if (theoryInfo && theoryInfo.subtopics) {
-        showSubtopicsList(theoryInfo.subtopics, index);
-        return;
+    var theoryInfo = THEORY_FILES.find(t => t.subtopics && t.subtopics.some(s => s.key === lesson.key));
+    if (theoryInfo) {
+        // это подтема, показываем её
+        var sub = theoryInfo.subtopics.find(s => s.key === lesson.key);
+        if (sub) {
+            openSubtopic(THEORY_FILES.indexOf(theoryInfo), theoryInfo.subtopics.indexOf(sub));
+            return;
+        }
     }
 
-    if (userProgress.completedLessons && userProgress.completedLessons[lesson.title]) {
-        goQuizFromLoaded(index);
-        return;
-    }
-
-    if (!theoryInfo || !theoryInfo.file) {
-        goQuizFromLoaded(index);
-        return;
-    }
-
-    try {
-        var theory = await fetchJSON(theoryInfo.file);
-        startTheoryCards(theoryInfo, theory, theoryInfo.key);
-    } catch (e) {
-        console.error(e);
-        goQuizFromLoaded(index);
-    }
+    // Если нет теории — сразу квиз
+    goQuizFromLoaded(index);
 }
 
 function showSubtopicsList(subtopics, parentIndex) {
@@ -101,7 +100,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
       '<div class="skeleton skeleton-text" style="width:80%"></div>' +
       '<div class="skeleton skeleton-text" style="width:40%"></div>';
     
-    // Устанавливаем заголовок БЕЗ эмодзи, но с иконкой, если есть
     var cleanTitle = (sub.title || 'Загрузка...').replace(/[^\p{L}\p{N}\p{P}\p{Z}]/gu, '').trim();
     var topicIcon = sub.icon && ICONS[sub.icon] ? ICONS[sub.icon] + ' ' : '';
     document.getElementById('topic-title').innerHTML = topicIcon + cleanTitle;
@@ -263,45 +261,39 @@ function renderProfile() {
 }
 
 // --------------------------------------------------
-//  Главный экран (путь обучения) — все темы разблокированы
+//  Главный экран (путь обучения) — родительские темы
 // --------------------------------------------------
 function renderHomePath() {
   var container = document.getElementById('home-content');
   if (!container) return;
 
+  // Если данные ещё не загружены, показываем скелетоны и запускаем загрузку
   if (lessonsLoaded.length === 0) {
-    // Показываем скелетоны
     container.innerHTML = '' +
       '<div class="skeleton skeleton-card"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>' +
       '<div class="skeleton skeleton-list-item"></div>';
-    // Загружаем данные и сразу перерисовываем экран
     loadAllLessons().then(function() {
       renderHomePath();
     });
     return;
   }
 
-  var allLessons = getAllLessons();
-  if (allLessons.length === 0) {
-    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить задания</div>';
+  // Если уроки загружены, но THEORY_FILES пуст (ошибка)
+  if (!THEORY_FILES || THEORY_FILES.length === 0) {
+    container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить темы</div>';
     return;
-  }
-
-  var hasTopo = allLessons.some(function(l) { return l.key === 'topo'; });
-  if (!hasTopo) {
-    var topoEntry = QUESTIONS_FILES.find(function(q) { return q.key === 'topo'; });
-    if (topoEntry) allLessons.unshift(topoEntry);
   }
 
   updateDailyTasks();
 
   var completedCount = Object.keys(userProgress.completedLessons).length;
-  var totalCount = allLessons.length;
-  var pct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-  var allDone = completedCount >= totalCount;
+  var totalLessons = 0;
+  THEORY_FILES.forEach(t => totalLessons += t.subtopics ? t.subtopics.length : 1);
+  var pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+  var allDone = completedCount >= totalLessons;
   var streak = userProgress.streak || 0;
   var predictedGrade = getPredictedGrade();
   var predictedScore = getPredictedScore(predictedGrade);
@@ -374,15 +366,25 @@ function renderHomePath() {
     html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
   } else {
     if (!allDone) {
-      var nextIdx = 0;
-      for (var i = 0; i < allLessons.length; i++) {
-        if (!userProgress.completedLessons[allLessons[i].title]) { nextIdx = i; break; }
+      // Находим первую не пройденную подтему и предлагаем перейти к родительской теме
+      var nextTopicIndex = -1;
+      for (var i = 0; i < THEORY_FILES.length; i++) {
+        var topic = THEORY_FILES[i];
+        if (topic.subtopics) {
+          var allSubtopicDone = topic.subtopics.every(sub => userProgress.completedLessons && userProgress.completedLessons[sub.title]);
+          if (!allSubtopicDone) {
+            nextTopicIndex = i;
+            break;
+          }
+        }
       }
-      var nextLesson = allLessons[nextIdx];
-      html += '<div class="continue-card" onclick="openLessonTheory(' + nextIdx + ')">';
-      html += '<div class="continue-icon">' + ICONS.play + '</div>';
-      html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextLesson.title.replace(/^\S+\s*/, '') + '</div></div>';
-      html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
+      if (nextTopicIndex >= 0) {
+        var nextTopic = THEORY_FILES[nextTopicIndex];
+        html += '<div class="continue-card" onclick="openTopic(' + nextTopicIndex + ')">';
+        html += '<div class="continue-icon">' + ICONS.play + '</div>';
+        html += '<div><div class="continue-label">Продолжить</div><div class="continue-title">' + nextTopic.title + '</div></div>';
+        html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
+      }
     } else {
       html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
       html += '<div class="continue-icon">' + ICONS.crown + '</div>';
@@ -391,56 +393,30 @@ function renderHomePath() {
     }
   }
 
-  // --- Вертикальный список тем (ВСЕ РАЗБЛОКИРОВАНЫ) ---
-  html += '<div class="section-title" style="margin:var(--space-5) 0 var(--space-3) var(--space-4);">' + ICONS.list + ' Темы</div>';
+  // --- Список родительских тем (вместо подтем) ---
+  html += '<div class="section-title" style="margin:var(--space-5) 0 var(--space-3) var(--space-4);">' + ICONS.list + ' Разделы</div>';
 
-  for (var i = 0; i < allLessons.length; i++) {
-    var lesson = allLessons[i];
-    var done = userProgress.completedLessons[lesson.title];
-    var perfect = done && done.score === done.total;
-    var isLocked = false;
-    var cleanTitle = lesson.title.replace(/^[^\wа-яё]+/i, '');
-    var isReview = reviewTopics.indexOf(lesson.title) !== -1;
-
-    var stateClass = 'list-row--current';
-    var badgeClass = 'status-badge--current';
-    var stateIcon = ICONS.play;
-    if (perfect) {
-      stateClass = 'list-row--perfect';
-      badgeClass = 'status-badge--perfect';
-      stateIcon = ICONS.trophy;
-    } else if (done) {
-      stateClass = 'list-row--done';
-      badgeClass = 'status-badge--done';
-      stateIcon = ICONS.check;
-    } else if (isLocked) {
-      stateClass = 'list-row--locked';
-      badgeClass = 'status-badge--locked';
-      stateIcon = ICONS.lock;
+  for (var i = 0; i < THEORY_FILES.length; i++) {
+    var topic = THEORY_FILES[i];
+    var totalSub = topic.subtopics ? topic.subtopics.length : 1;
+    var doneSub = 0;
+    if (topic.subtopics) {
+      topic.subtopics.forEach(function(sub) {
+        if (userProgress.completedLessons && userProgress.completedLessons[sub.title]) doneSub++;
+      });
     }
+    var topicDone = doneSub >= totalSub;
+    var stateClass = topicDone ? 'list-row--done' : 'list-row--current';
+    var stateIcon = topicDone ? ICONS.check : ICONS.play;
+    var badgeClass = topicDone ? 'status-badge--done' : 'status-badge--current';
 
-    html += '<div class="list-row ' + stateClass + '" onclick="openLessonTheory(' + i + ')">';
+    html += '<div class="list-row ' + stateClass + '" onclick="openTopic(' + i + ')">';
     html += '<div class="status-badge ' + badgeClass + '">' + stateIcon + '</div>';
-    html += '<div style="flex:1;"><div style="font-weight:600;font-size:var(--text-base);">' + cleanTitle + '</div>';
-    if (done) {
-      var pctDone = Math.round((done.score / done.total) * 100);
-      html += '<div class="mini-progress"><div class="mini-progress-fill" style="width:' + pctDone + '%;"></div></div>';
-      html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1);">' + done.score + '/' + done.total + ' верно</div>';
-    } else {
-      html += '<div style="font-size:var(--text-xs);color:var(--muted);">' + (lesson.questions ? lesson.questions.length : '?') + ' вопросов</div>';
-    }
-    if (isReview) {
-      html += '<span style="background:#f5a623;color:#000;padding:var(--space-1) var(--space-2);border-radius:10px;font-size:var(--text-xs);margin-left:var(--space-2);">' + ICONS.arrowRight + ' Повторить</span>';
-    }
+    html += '<div style="flex:1;"><div style="font-weight:600;font-size:var(--text-base);">' + topic.title + '</div>';
+    html += '<div class="mini-progress"><div class="mini-progress-fill" style="width:' + (doneSub/totalSub*100) + '%;"></div></div>';
+    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1);">' + doneSub + '/' + totalSub + ' уроков</div>';
     html += '</div></div>';
   }
-
-  // Финальный босс
-  html += '<div style="display:flex;align-items:center;gap:var(--space-3);padding:var(--space-3);margin-top:var(--space-3);background:' + (allDone ? 'rgba(210,153,34,0.1)' : 'var(--card2)') + ';border-radius:12px;border:1px solid var(--border);' + (allDone ? 'cursor:pointer;' : 'cursor:default;opacity:0.5;') + '"' + (allDone ? ' onclick="goBossLevel()"' : '') + '>';
-  html += '<div style="font-size:var(--text-2xl);">' + (allDone ? ICONS.crown : ICONS.lock) + '</div>';
-  html += '<div style="flex:1;"><div style="font-weight:700;font-size:var(--text-base);color:' + (allDone ? '#d29922' : 'var(--muted)') + '">Финальный босс</div>';
-  html += '<div style="font-size:var(--text-xs);color:var(--muted);">' + (allDone ? 'Тест по всем темам открыт' : 'Пройди все темы') + '</div></div>';
-  html += '</div>';
 
   container.innerHTML = html;
 
@@ -457,7 +433,7 @@ function renderHomePath() {
   }, 100);
 
   document.getElementById('home-streak').innerHTML = ICONS.fire + ' ' + streak;
-  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalCount + ' тем пройдено';
+  document.getElementById('home-sublabel').textContent = completedCount + '/' + totalLessons + ' уроков пройдено';
 
   var carousel = document.getElementById('home-carousel');
   if (carousel) {
