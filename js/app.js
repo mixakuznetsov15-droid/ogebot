@@ -15,17 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
       saveProgress: () => saveProgress(),
       ui: {
         onOpenStart: () => {
-          // Показать модальное окно с анимацией открытия
           if (typeof showChestModal === 'function') {
             showChestModal();
           }
         },
         onReward: (reward) => {
-          // Показать полученную награду (после анимации)
           if (typeof showRewardModal === 'function') {
             setTimeout(() => showRewardModal(reward), 1200);
           }
-          // Дополнительно — текстовое уведомление
           if (typeof showToast === 'function') {
             showToast(`Получено: ${reward.amount} XP`);
           }
@@ -36,10 +33,13 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         },
         onComplete: () => {
-          // Сброс _isOpening теперь происходит в hideChestModal
+          // сброс в hideChestModal
         }
       }
     });
+
+    // Онбординг (показывается перед главным экраном, если не пройден)
+    startOnboarding();
 
     renderHomePath();
   });
@@ -75,7 +75,6 @@ window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
 window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
 window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
 
-// Обёртки для совместимости со старыми вызовами сундуков
 window.openChest = async function() {
   await ChestManager.open();
 };
@@ -83,18 +82,15 @@ window.giveChest = function(type) {
   ChestManager.giveChest(type);
 };
 window.closeRewardModal = function() {
-  // Закрытие модального окна теперь происходит в hideChestModal
   if (typeof hideChestModal === 'function') {
     hideChestModal();
   }
 };
 
-// Заглушка оплаты (для будущей интеграции с Telegram Stars или ЮKassa)
 window.handleSubscribe = function() {
   if (typeof showToast === 'function') {
     showToast('Оплата появится позже');
   }
-  // В будущем: Subscription.activateSubscription().then(...)
 };
 
 window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
