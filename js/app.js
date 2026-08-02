@@ -4,12 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   loadProgress(function () {
-    checkStreak();
-    updateDailyTasks();
-    checkAchievements();
-    Subscription.initTrial();   // инициализация триала
-
-    // Инициализация менеджера сундуков
+    // Инициализация менеджера сундуков должна быть ПЕРВОЙ
     ChestManager.init({
       getProgress: () => userProgress,
       saveProgress: () => saveProgress(),
@@ -37,6 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
       }
     });
+
+    checkStreak();
+    updateDailyTasks();
+    checkAchievements();
+    Subscription.initTrial();   // инициализация триала
 
     // Онбординг (показывается перед главным экраном, если не пройден)
     startOnboarding();
