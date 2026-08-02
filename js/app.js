@@ -36,10 +36,12 @@ document.addEventListener('DOMContentLoaded', function () {
     checkStreak();
     updateDailyTasks();
     checkAchievements();
-    Subscription.initTrial();   // инициализация триала
+    Subscription.initTrial();
 
-    // Онбординг (показывается перед главным экраном, если не пройден)
-    startOnboarding();
+    // Онбординг (показывается, если функция определена)
+    if (typeof startOnboarding === 'function') {
+      startOnboarding();
+    }
 
     renderHomePath();
   });
@@ -54,7 +56,6 @@ document.addEventListener('DOMContentLoaded', function () {
   professor.showGreeting();
   window.professor = professor;
 
-  // idle timer (20 сек)
   var idleTimer;
   function resetIdleTimer() {
     clearTimeout(idleTimer);
@@ -70,34 +71,21 @@ document.addEventListener('DOMContentLoaded', function () {
   resetIdleTimer();
 });
 
-// Безопасная привязка глобальных функций
 window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
 window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
 window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
 
-window.openChest = async function() {
-  await ChestManager.open();
-};
-window.giveChest = function(type) {
-  ChestManager.giveChest(type);
-};
+window.openChest = async function() { await ChestManager.open(); };
+window.giveChest = function(type) { ChestManager.giveChest(type); };
 window.closeRewardModal = function() {
-  if (typeof hideChestModal === 'function') {
-    hideChestModal();
-  }
+  if (typeof hideChestModal === 'function') hideChestModal();
 };
 
 window.handleSubscribe = function() {
-  if (typeof showToast === 'function') {
-    showToast('Оплата появится позже');
-  }
+  if (typeof showToast === 'function') showToast('Оплата появится позже');
 };
 
-window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
-  alert('Приглашение друзей появится позже');
-};
+window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() { alert('Приглашение друзей появится позже'); };
 window.nextQ = typeof nextQ === 'function' ? nextQ : function() {};
-window.shareBossResult = typeof shareBossResult === 'function' ? shareBossResult : function() {
-  alert('Результат сохранён');
-};
+window.shareBossResult = typeof shareBossResult === 'function' ? shareBossResult : function() { alert('Результат сохранён'); };
 window.closeProfessorModal = typeof closeProfessorModal === 'function' ? closeProfessorModal : function() {};
