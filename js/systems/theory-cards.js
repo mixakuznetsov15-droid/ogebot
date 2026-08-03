@@ -117,7 +117,6 @@ function startTheoryCards(theoryInfo, data, topicKey) {
           icon: card.icon || null
         };
       } else if (card.type === 'quiz') {
-        // Прямой тип quiz
         return {
           type: 'quiz',
           question: card.quizQuestion || card.question || '',
@@ -577,7 +576,7 @@ function nextMicroStep() {
   if (microStepIndex < microSteps.length) {
     renderMicroStep();
   } else {
-    startLessonPractice();
+    startSubtopicPractice();  // <-- ИЗМЕНЕНО: теперь запускает практику подтемы
   }
 }
 
@@ -614,7 +613,7 @@ function processMicroAnswer(isCorrect, explanation, professorComment) {
       if (microStepIndex < microSteps.length) {
         renderMicroStep();
       } else {
-        startLessonPractice();
+        startSubtopicPractice();  // <-- ИЗМЕНЕНО: теперь запускает практику подтемы
       }
     } else {
       renderMicroStep();
