@@ -73,6 +73,13 @@ function renderQ() {
     b.onclick = function() { selectAns(i, q.correct, q.text, topicTitle, q.hint); };
     ans.appendChild(b);
   });
+
+  // Контекстная подсказка: «Застрял? Профессор подскажет»
+  if (userProgress.onboardingCompleted) {
+    setTimeout(function() {
+      showContextualHint('firstQuizHint');
+    }, 1000);
+  }
 }
 
 function selectAns(idx, correct, qText, topic, hint) {
@@ -109,6 +116,13 @@ function selectAns(idx, correct, qText, topic, hint) {
     lives--;
     correctStreak = 0;
     lastAnswerWasWrong = true;
+
+    // Контекстная подсказка: первая ошибка
+    if (lives === 2 && userProgress.onboardingCompleted) {
+      setTimeout(function() {
+        showContextualHint('firstWrongAnswer');
+      }, 1500);
+    }
   }
 
   // Персонализация: отслеживаем ответы и получаем особые флаги
@@ -231,18 +245,14 @@ function showResult() {
     userProgress.bossCompleted = true;
     saveProgress();
     document.getElementById('boss-sub').textContent = score + '/' + total + ' правильных ответов (' + pct + '%)';
-    // Сбрасываем число для анимации
     document.getElementById('boss-num').textContent = '0';
     document.getElementById('boss-denom').textContent = 'из ' + total;
     goScreen('s-boss-result');
 
-    // Анимация кольца
     var bossRing = document.getElementById('boss-ring-fill');
     var circumference = 339;
     var offset = circumference * (1 - score / total);
-    // Начальное состояние (пустое)
     bossRing.style.strokeDashoffset = circumference;
-    // Запуск анимации после отрисовки
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
         bossRing.style.strokeDashoffset = offset;
@@ -254,7 +264,6 @@ function showResult() {
       });
     });
 
-    // Анимация числа
     var bossNumEl = document.getElementById('boss-num');
     if (typeof animateNumber === 'function') {
       animateNumber(bossNumEl, score, 1000);
@@ -267,7 +276,6 @@ function showResult() {
     return;
   }
 
-  // ---- Обычный результат ----
   var e = '😔', t = 'Нужно повторить';
   if (pct >= 80) { e = '🏆'; t = 'Отлично!'; }
   else if (pct >= 60) { e = '👍'; t = 'Хороший результат!'; }
@@ -276,19 +284,17 @@ function showResult() {
   document.getElementById('res-emoji').textContent = e;
   document.getElementById('res-title').textContent = t;
   document.getElementById('res-sub').textContent = pct + '% правильных ответов';
-  document.getElementById('ring-num').textContent = '0';  // сброс перед анимацией
+  document.getElementById('ring-num').textContent = '0';
   document.getElementById('ring-denom').textContent = 'из ' + total;
   document.getElementById('res-c').textContent = score;
   document.getElementById('res-w').textContent = total - score;
   var xpGain = score * 20 + (score === total ? 50 : 0);
   document.getElementById('res-xp').textContent = '+' + xpGain;
 
-  // Реакция на завершение темы
   if (typeof professor !== 'undefined') {
     professor.onTopicComplete(getCurrentTopicTitle());
   }
 
-  // Сохраняем данные сессии для итогового экрана
   window._sessionData = {
     total: total,
     score: score,
@@ -302,14 +308,12 @@ function showResult() {
   window._chestGivenThisSession = false;
   sessionMistakes = {};
 
-  // Показываем экран с кольцом
   goScreen('s-result');
 
-  // Анимация кольца
   var ring = document.getElementById('ring-fill');
   var circumference = 339;
   var offset = circumference * (1 - score / total);
-  ring.style.strokeDashoffset = circumference; // начальное состояние (пустое)
+  ring.style.strokeDashoffset = circumference;
   requestAnimationFrame(function() {
     requestAnimationFrame(function() {
       ring.style.strokeDashoffset = offset;
@@ -321,7 +325,6 @@ function showResult() {
     });
   });
 
-  // Анимация числа
   var numEl = document.getElementById('ring-num');
   if (typeof animateNumber === 'function') {
     animateNumber(numEl, score, 1000);
@@ -329,7 +332,6 @@ function showResult() {
     numEl.textContent = score;
   }
 
-  // Через 1.5 секунды переходим на итоговый экран с профессором
   setTimeout(function() {
     goScreen('s-session-summary');
   }, 1500);
@@ -348,7 +350,6 @@ function saveLesson(lessonIdx, sc, total) {
   checkStreak();
   saveProgress();
 
-  // Обновление данных для умного повторения
   updateReviewData(lessonKey, sc, total);
 
   if (!userProgress.chests) userProgress.chests = [];
@@ -365,7 +366,6 @@ function goQuizFromLoaded(idx) {
   var allLessons = getAllLessons();
   curLesson = idx;
   currentLessonIndex = idx;
-  // ---- АДАПТИВНЫЙ СЕЛЕКТОР: выбор вопросов ----
   var rawQuestions = allLessons[idx].questions;
   var questions = typeof migrateQuestionsAddSkills === 'function'
     ? migrateQuestionsAddSkills(rawQuestions, allLessons[idx].key)
@@ -376,7 +376,6 @@ function goQuizFromLoaded(idx) {
     sessionMistakes: sessionMistakes
   });
   currentReviewMastery = null;
-  // -------------------------------------------
   curQ = 0;
   score = 0;
   answered = false;
@@ -386,7 +385,6 @@ function goQuizFromLoaded(idx) {
   lastAnswerWasWrong = false;
   goScreen('s-quiz');
 
-  // Первое открытие темы
   var lesson = allLessons[idx];
   if (lesson && !userProgress.completedLessons[lesson.title]) {
     if (typeof professor !== 'undefined') {
@@ -403,7 +401,6 @@ function replayLesson() {
     return;
   }
   var allLessons = getAllLessons();
-  // ---- АДАПТИВНЫЙ СЕЛЕКТОР: повторный выбор вопросов ----
   var rawQuestions = allLessons[curLesson].questions;
   var questions = typeof migrateQuestionsAddSkills === 'function'
     ? migrateQuestionsAddSkills(rawQuestions, allLessons[curLesson].key)
@@ -414,7 +411,6 @@ function replayLesson() {
     sessionMistakes: sessionMistakes
   });
   currentReviewMastery = null;
-  // -------------------------------------------------------
   curQ = 0;
   score = 0;
   answered = false;
@@ -432,7 +428,6 @@ function goBossLevel() {
   allLessons.forEach(function(l) {
     if (l.questions) allQuestions = allQuestions.concat(l.questions);
   });
-  // Для финального босса пока не применяем адаптивный отбор (все темы вперемешку)
   allQuestions = allQuestions.sort(function() { return Math.random() - 0.5; }).slice(0, 30);
   isBossMode = true;
   shuffled = allQuestions;
@@ -448,7 +443,6 @@ function goBossLevel() {
   renderQ();
 }
 
-// Запуск повторения с указанным mastery
 function startReviewLesson(idx, mastery) {
   currentReviewMastery = mastery;
   goQuizFromLoaded(idx);
