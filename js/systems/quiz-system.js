@@ -447,14 +447,15 @@ function startReviewLesson(idx, mastery) {
   goQuizFromLoaded(idx);
 }
 
-// Обновлённая startSubtopicPractice с сохранением индекса урока
+// ★ ИСПРАВЛЕННАЯ startSubtopicPractice — больше не добавляем лишний 'data/'
 function startSubtopicPractice() {
     if (!currentSubtopicQuestionsFile) {
         goQuizFromLoaded(currentLessonIndex);
         return;
     }
 
-    var url = 'data/' + currentSubtopicQuestionsFile;
+    var url = currentSubtopicQuestionsFile; // путь уже содержит 'data/questions_...json'
+
     fetch(url)
         .then(function(response) {
             if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -462,7 +463,7 @@ function startSubtopicPractice() {
         })
         .then(function(questions) {
             // Определяем правильный индекс подтемы в QUESTIONS_FILES
-            var targetFile = currentSubtopicQuestionsFile; // например, 'data/questions_earth_01.json'
+            var targetFile = currentSubtopicQuestionsFile;
             for (var i = 0; i < QUESTIONS_FILES.length; i++) {
                 if (QUESTIONS_FILES[i].questions === targetFile) {
                     currentLessonIndex = i;
