@@ -37,6 +37,13 @@ function openTopic(index) {
   }
 }
 
+// Проверка разблокировки подтемы
+function isSubtopicUnlocked(topicIndex, subtopicIndex) {
+  if (subtopicIndex === 0) return true; // первая подтема всегда открыта
+  var prevSubtopic = THEORY_FILES[topicIndex].subtopics[subtopicIndex - 1];
+  return userProgress.completedLessons && userProgress.completedLessons[prevSubtopic.title];
+}
+
 async function openLessonTheory(index) {
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.subtopics && t.subtopics.some(s => s.key === lesson.key));
@@ -52,17 +59,21 @@ async function openLessonTheory(index) {
 
 function showSubtopicsList(subtopics, parentIndex) {
     goScreen('s-topic');
-    document.getElementById('topic-title').textContent = 'Топографические карты';
+    var theoryInfo = THEORY_FILES[parentIndex];
+    document.getElementById('topic-title').textContent = theoryInfo.title;
 
     var container = document.getElementById('topic-content');
     var html = '<div class="section-title">' + ICONS.list + ' Выбери урок</div>';
 
     subtopics.forEach(function(sub, i) {
         var done = userProgress.completedLessons && userProgress.completedLessons[sub.title];
-        var icon = done ? ICONS.check : ICONS.play;
+        var locked = !isSubtopicUnlocked(parentIndex, i);
+        var icon = done ? ICONS.check : (locked ? ICONS.lock : ICONS.play);
         var cleanTitle = sub.title.replace(/^[^\wа-яё]+/i, '');
-        html += '<div class="list-row" onclick="openSubtopic(' + parentIndex + ', ' + i + ')">';
+        var stateClass = locked ? 'list-row--locked' : '';
+        html += '<div class="list-row ' + stateClass + '" onclick="' + (locked ? '' : 'openSubtopic(' + parentIndex + ', ' + i + ')') + '">';
         html += '<span style="margin-right:var(--space-2);">' + icon + '</span>' + cleanTitle;
+        if (locked) html += '<span style="margin-left:auto;font-size:var(--text-xs);color:var(--muted)">Завершите предыдущий урок</span>';
         html += '</div>';
     });
 
@@ -72,6 +83,11 @@ function showSubtopicsList(subtopics, parentIndex) {
 }
 
 async function openSubtopic(parentIndex, subtopicIndex) {
+    if (!isSubtopicUnlocked(parentIndex, subtopicIndex)) {
+        alert('Этот урок ещё не открыт. Завершите предыдущий урок.');
+        return;
+    }
+
     var theoryInfo = THEORY_FILES[parentIndex];
     if (!theoryInfo || !theoryInfo.subtopics) {
         alert('Ошибка: нет подтем у темы');
@@ -384,27 +400,42 @@ function renderHomePath() {
     }
   }
 
+  // --- Список родительских тем с учётом блокировок ---
   html += '<div class="section-title" style="margin:var(--space-5) 0 var(--space-3) var(--space-4);">' + ICONS.list + ' Разделы</div>';
 
   for (var i = 0; i < THEORY_FILES.length; i++) {
     var topic = THEORY_FILES[i];
-    var totalSub = topic.subtopics ? topic.subtopics.length : 1;
+    if (topic.comingSoon) {
+      // Заглушка для будущих тем
+      html += '<div class="list-row list-row--locked">';
+      html += '<div class="status-badge status-badge--locked">' + ICONS.lock + '</div>';
+      html += '<div style="flex:1;"><div style="font-weight:600;font-size:var(--text-base);">' + topic.title + '</div>';
+      html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1);">Появится позже</div>';
+      html += '</div></div>';
+      continue;
+    }
+
+    var totalSub = topic.subtopics ? topic.subtopics.length : 0;
     var doneSub = 0;
+    var firstUnlocked = isSubtopicUnlocked(i, 0); // первая подтема определяет доступность всей темы
+    var topicLocked = !firstUnlocked;
+
     if (topic.subtopics) {
       topic.subtopics.forEach(function(sub) {
         if (userProgress.completedLessons && userProgress.completedLessons[sub.title]) doneSub++;
       });
     }
-    var topicDone = doneSub >= totalSub;
-    var stateClass = topicDone ? 'list-row--done' : 'list-row--current';
-    var stateIcon = topicDone ? ICONS.check : ICONS.play;
-    var badgeClass = topicDone ? 'status-badge--done' : 'status-badge--current';
 
-    html += '<div class="list-row ' + stateClass + '" onclick="openTopic(' + i + ')">';
+    var stateClass = topicLocked ? 'list-row--locked' : (doneSub >= totalSub ? 'list-row--done' : 'list-row--current');
+    var stateIcon = topicLocked ? ICONS.lock : (doneSub >= totalSub ? ICONS.check : ICONS.play);
+    var badgeClass = topicLocked ? 'status-badge--locked' : (doneSub >= totalSub ? 'status-badge--done' : 'status-badge--current');
+
+    html += '<div class="list-row ' + stateClass + '" onclick="' + (topicLocked ? '' : 'openTopic(' + i + ')') + '">';
     html += '<div class="status-badge ' + badgeClass + '">' + stateIcon + '</div>';
     html += '<div style="flex:1;"><div style="font-weight:600;font-size:var(--text-base);">' + topic.title + '</div>';
     html += '<div class="mini-progress"><div class="mini-progress-fill" style="width:' + (doneSub/totalSub*100) + '%;"></div></div>';
     html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1);">' + doneSub + '/' + totalSub + ' уроков</div>';
+    if (topicLocked) html += '<span style="font-size:var(--text-xs);color:var(--muted)">Пройдите предыдущий раздел</span>';
     html += '</div></div>';
   }
 
