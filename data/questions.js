@@ -2,7 +2,6 @@
 //  ФАЙЛ ТЕМ И ПОДТЕМ (ОГЭ ГЕОГРАФИЯ)
 // ==========================================
 
-// Основные вопросы (практика) для каждой подтемы
 var QUESTIONS_FILES = [
   // Раздел 1: Топографические карты
   { title: "1. Что такое топографические карты", key: "topo_01", questions: "data/questions_topo_01.json" },
@@ -33,7 +32,7 @@ var QUESTIONS_FILES = [
   { title: "6. Часовые пояса", key: "earth_06", questions: "data/questions_earth_06.json" },
   { title: "7. Комплексные задания ОГЭ", key: "earth_07", questions: "data/questions_earth_07.json" },
 
-  // Будущие разделы (заглушки)
+  // Будущие разделы
   { title: "Литосфера и рельеф", key: "lithosphere", comingSoon: true },
   { title: "Атмосфера и климат", key: "atmosphere", comingSoon: true },
   { title: "Гидросфера", key: "hydrosphere", comingSoon: true },
@@ -43,25 +42,24 @@ var QUESTIONS_FILES = [
   { title: "География России", key: "russia", comingSoon: true },
 ];
 
-// Теоретические карточки (микроуроки) – родительские темы
 var THEORY_FILES = [
-  // Раздел 1
+  // Раздел 1: Топографические карты
   {
     title: "Топографические карты",
     icon: "mapPin",
     subtopics: [
-      { title: "Что такое топографические карты", icon: "mapPin", file: "topo_what_is.json", key: "topo_01", questions: "data/questions_topo_01.json" },
-      { title: "Масштаб", icon: "ruler", file: "topo_scale.json", key: "topo_02", questions: "data/questions_topo_02.json" },
-      { title: "Условные знаки", icon: "book", file: "topo_symbols.json", key: "topo_03", questions: "data/questions_topo_03.json" },
-      { title: "Рельеф", icon: "mountain", file: "topo_relief.json", key: "topo_04", questions: "data/questions_topo_04.json" },
-      { title: "Азимут и стороны горизонта", icon: "compass", file: "topo_azimuth.json", key: "topo_05", questions: "data/questions_topo_05.json" },
-      { title: "Географические координаты", icon: "globe", file: "topo_coordinates.json", key: "topo_06", questions: "data/questions_topo_06.json" },
-      { title: "Построение маршрута", icon: "mapPin", file: "topo_route.json", key: "topo_07", questions: "data/questions_topo_07.json" },
-      { title: "Комплексные задания", icon: "star", file: "topo_complex.json", key: "topo_08", questions: "data/questions_topo_08.json" },
+      { title: "Что такое топографические карты", icon: "mapPin", file: "theory_topo_01.json", key: "topo_01", questions: "data/questions_topo_01.json" },
+      { title: "Масштаб", icon: "ruler", file: "theory_topo_02.json", key: "topo_02", questions: "data/questions_topo_02.json" },
+      { title: "Условные знаки", icon: "book", file: "theory_topo_03.json", key: "topo_03", questions: "data/questions_topo_03.json" },
+      { title: "Рельеф", icon: "mountain", file: "theory_topo_04.json", key: "topo_04", questions: "data/questions_topo_04.json" },
+      { title: "Азимут и стороны горизонта", icon: "compass", file: "theory_topo_05.json", key: "topo_05", questions: "data/questions_topo_05.json" },
+      { title: "Географические координаты", icon: "globe", file: "theory_topo_06.json", key: "topo_06", questions: "data/questions_topo_06.json" },
+      { title: "Построение маршрута", icon: "mapPin", file: "theory_topo_07.json", key: "topo_07", questions: "data/questions_topo_07.json" },
+      { title: "Комплексные задания", icon: "star", file: "theory_topo_08.json", key: "topo_08", questions: "data/questions_topo_08.json" },
     ]
   },
 
-  // Раздел 2
+  // Раздел 2: Градусная сеть и географические координаты
   {
     title: "Градусная сеть и географические координаты",
     icon: "globe",
@@ -77,14 +75,14 @@ var THEORY_FILES = [
     ]
   },
 
-  // Раздел 3
+  // Раздел 3: Земля как планета Солнечной системы
   {
     title: "Земля как планета Солнечной системы",
     icon: "globe",
     subtopics: [
-      { title: "Форма и размеры Земли", icon: "globe", file: "earth_form.json", key: "earth_01", questions: "data/questions_earth_01.json" },
-      { title: "Движение Земли вокруг оси", icon: "refresh", file: "earth_rotation.json", key: "earth_02", questions: "data/questions_earth_02.json" },
-      { title: "Движение Земли вокруг Солнца", icon: "globe", file: "earth_orbit.json", key: "earth_03", questions: "data/questions_earth_03.json" },
+      { title: "Форма и размеры Земли", icon: "globe", file: "theory_earth_01.json", key: "earth_01", questions: "data/questions_earth_01.json" },
+      { title: "Движение Земли вокруг оси", icon: "refresh", file: "theory_earth_02.json", key: "earth_02", questions: "data/questions_earth_02.json" },
+      { title: "Движение Земли вокруг Солнца", icon: "globe", file: "theory_earth_03.json", key: "earth_03", questions: "data/questions_earth_03.json" },
       { title: "Смена дня и ночи", icon: "globe", file: "theory_earth_04.json", key: "earth_04", questions: "data/questions_earth_04.json" },
       { title: "Смена времён года", icon: "globe", file: "theory_earth_05.json", key: "earth_05", questions: "data/questions_earth_05.json" },
       { title: "Часовые пояса", icon: "clock", file: "theory_earth_06.json", key: "earth_06", questions: "data/questions_earth_06.json" },
@@ -92,47 +90,12 @@ var THEORY_FILES = [
     ]
   },
 
-  // Будущие разделы (заглушки)
-  {
-    title: "Литосфера и рельеф",
-    icon: "mountain",
-    comingSoon: true,
-    subtopics: [] // заглушка
-  },
-  {
-    title: "Атмосфера и климат",
-    icon: "globe",
-    comingSoon: true,
-    subtopics: []
-  },
-  {
-    title: "Гидросфера",
-    icon: "droplet",
-    comingSoon: true,
-    subtopics: []
-  },
-  {
-    title: "Биосфера и почвы",
-    icon: "tree",
-    comingSoon: true,
-    subtopics: []
-  },
-  {
-    title: "Человечество на Земле",
-    icon: "user",
-    comingSoon: true,
-    subtopics: []
-  },
-  {
-    title: "Взаимодействие природы и общества",
-    icon: "refresh",
-    comingSoon: true,
-    subtopics: []
-  },
-  {
-    title: "География России",
-    icon: "mapPin",
-    comingSoon: true,
-    subtopics: []
-  }
+  // Будущие разделы
+  { title: "Литосфера и рельеф", icon: "mountain", comingSoon: true, subtopics: [] },
+  { title: "Атмосфера и климат", icon: "globe", comingSoon: true, subtopics: [] },
+  { title: "Гидросфера", icon: "droplet", comingSoon: true, subtopics: [] },
+  { title: "Биосфера и почвы", icon: "tree", comingSoon: true, subtopics: [] },
+  { title: "Человечество на Земле", icon: "user", comingSoon: true, subtopics: [] },
+  { title: "Взаимодействие природы и общества", icon: "refresh", comingSoon: true, subtopics: [] },
+  { title: "География России", icon: "mapPin", comingSoon: true, subtopics: [] }
 ];
