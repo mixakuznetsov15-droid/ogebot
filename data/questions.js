@@ -24,10 +24,26 @@ var QUESTIONS_FILES = [
   { title: "7. Поиск объекта по координатам", key: "grid_07", questions: "data/questions_grid_07.json" },
   { title: "8. Комплексные задания (координаты)", key: "grid_08", questions: "data/questions_grid_08.json" },
 
-  // Будущие разделы можно добавлять сюда
+  // Раздел 3: Земля как планета Солнечной системы
+  { title: "1. Форма и размеры Земли", key: "earth_01", questions: "data/questions_earth_01.json" },
+  { title: "2. Движение Земли вокруг оси", key: "earth_02", questions: "data/questions_earth_02.json" },
+  { title: "3. Движение Земли вокруг Солнца", key: "earth_03", questions: "data/questions_earth_03.json" },
+  { title: "4. Смена дня и ночи", key: "earth_04", questions: "data/questions_earth_04.json" },
+  { title: "5. Смена времён года", key: "earth_05", questions: "data/questions_earth_05.json" },
+  { title: "6. Часовые пояса", key: "earth_06", questions: "data/questions_earth_06.json" },
+  { title: "7. Комплексные задания ОГЭ", key: "earth_07", questions: "data/questions_earth_07.json" },
+
+  // Будущие разделы (заглушки)
+  { title: "Литосфера и рельеф", key: "lithosphere", comingSoon: true },
+  { title: "Атмосфера и климат", key: "atmosphere", comingSoon: true },
+  { title: "Гидросфера", key: "hydrosphere", comingSoon: true },
+  { title: "Биосфера и почвы", key: "biosphere", comingSoon: true },
+  { title: "Человечество на Земле", key: "mankind", comingSoon: true },
+  { title: "Взаимодействие природы и общества", key: "nature_society", comingSoon: true },
+  { title: "География России", key: "russia", comingSoon: true },
 ];
 
-// Теоретические карточки (микроуроки)
+// Теоретические карточки (микроуроки) – родительские темы
 var THEORY_FILES = [
   // Раздел 1
   {
@@ -61,5 +77,62 @@ var THEORY_FILES = [
     ]
   },
 
-  // Будущие разделы
+  // Раздел 3
+  {
+    title: "Земля как планета Солнечной системы",
+    icon: "globe",
+    subtopics: [
+      { title: "Форма и размеры Земли", icon: "globe", file: "earth_form.json", key: "earth_01", questions: "data/questions_earth_01.json" },
+      { title: "Движение Земли вокруг оси", icon: "refresh", file: "earth_rotation.json", key: "earth_02", questions: "data/questions_earth_02.json" },
+      { title: "Движение Земли вокруг Солнца", icon: "globe", file: "earth_orbit.json", key: "earth_03", questions: "data/questions_earth_03.json" },
+      { title: "Смена дня и ночи", icon: "globe", file: "theory_earth_04.json", key: "earth_04", questions: "data/questions_earth_04.json" },
+      { title: "Смена времён года", icon: "globe", file: "theory_earth_05.json", key: "earth_05", questions: "data/questions_earth_05.json" },
+      { title: "Часовые пояса", icon: "clock", file: "theory_earth_06.json", key: "earth_06", questions: "data/questions_earth_06.json" },
+      { title: "Комплексные задания ОГЭ", icon: "target", file: "theory_earth_07.json", key: "earth_07", questions: "data/questions_earth_07.json" },
+    ]
+  },
+
+  // Будущие разделы (заглушки)
+  {
+    title: "Литосфера и рельеф",
+    icon: "mountain",
+    comingSoon: true,
+    subtopics: [] // заглушка
+  },
+  {
+    title: "Атмосфера и климат",
+    icon: "globe",
+    comingSoon: true,
+    subtopics: []
+  },
+  {
+    title: "Гидросфера",
+    icon: "droplet",
+    comingSoon: true,
+    subtopics: []
+  },
+  {
+    title: "Биосфера и почвы",
+    icon: "tree",
+    comingSoon: true,
+    subtopics: []
+  },
+  {
+    title: "Человечество на Земле",
+    icon: "user",
+    comingSoon: true,
+    subtopics: []
+  },
+  {
+    title: "Взаимодействие природы и общества",
+    icon: "refresh",
+    comingSoon: true,
+    subtopics: []
+  },
+  {
+    title: "География России",
+    icon: "mapPin",
+    comingSoon: true,
+    subtopics: []
+  }
 ];
