@@ -37,21 +37,16 @@ function openTopic(index) {
   }
 }
 
-// Старая функция для совместимости (не используется на главном экране, но может вызываться из других мест)
 async function openLessonTheory(index) {
-    // index теперь — индекс в QUESTIONS_FILES (если вызов старый)
     var lesson = QUESTIONS_FILES[index];
     var theoryInfo = THEORY_FILES.find(t => t.subtopics && t.subtopics.some(s => s.key === lesson.key));
     if (theoryInfo) {
-        // это подтема, показываем её
         var sub = theoryInfo.subtopics.find(s => s.key === lesson.key);
         if (sub) {
             openSubtopic(THEORY_FILES.indexOf(theoryInfo), theoryInfo.subtopics.indexOf(sub));
             return;
         }
     }
-
-    // Если нет теории — сразу квиз
     goQuizFromLoaded(index);
 }
 
@@ -91,7 +86,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     currentLessonIndex = parentIndex;
     currentSubtopicQuestionsFile = sub.questions;
 
-    // Показываем скелетоны на время загрузки
     goScreen('s-topic');
     var container = document.getElementById('topic-content');
     container.innerHTML = '' +
@@ -258,6 +252,13 @@ function renderProfile() {
   }
 
   container.innerHTML = html;
+
+  // Контекстная подсказка для первого сундука (после рендера, если онбординг завершён)
+  if (userProgress.onboardingCompleted) {
+    setTimeout(function() {
+      showContextualHint('firstChest');
+    }, 300);
+  }
 }
 
 // --------------------------------------------------
@@ -267,7 +268,6 @@ function renderHomePath() {
   var container = document.getElementById('home-content');
   if (!container) return;
 
-  // Если данные ещё не загружены, показываем скелетоны и запускаем загрузку
   if (lessonsLoaded.length === 0) {
     container.innerHTML = '' +
       '<div class="skeleton skeleton-card"></div>' +
@@ -281,7 +281,6 @@ function renderHomePath() {
     return;
   }
 
-  // Если уроки загружены, но THEORY_FILES пуст (ошибка)
   if (!THEORY_FILES || THEORY_FILES.length === 0) {
     container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--danger)">⚠️ Не удалось загрузить темы</div>';
     return;
@@ -301,10 +300,7 @@ function renderHomePath() {
 
   var html = '';
 
-  // --- Карусель ---
   html += '<div class="carousel" id="home-carousel">';
-
-  // Карточка 1: Прогноз ОГЭ
   html += '<div class="carousel-card">';
   html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-1)">Твой прогноз ОГЭ</div>';
   if (predictedGrade !== '—') {
@@ -326,7 +322,6 @@ function renderHomePath() {
   }
   html += '</div>';
 
-  // Карточка 2: Ежедневные задания
   var tasks = userProgress.dailyTasks || {};
   html += '<div class="carousel-card">';
   html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-2);display:flex;align-items:center;gap:var(--space-2);">' + ICONS.target + ' Ежедневные задания</div>';
@@ -337,15 +332,13 @@ function renderHomePath() {
   html += '</div>';
   html += '</div>';
 
-  // Карточка 3: Стрик
   html += '<div class="carousel-card">';
   html += '<div style="font-family:var(--font-h);font-size:var(--text-base);font-weight:700;margin-bottom:var(--space-1);display:flex;align-items:center;gap:var(--space-2);">' + ICONS.fire + ' Серия</div>';
   html += '<div style="font-size:var(--text-3xl);font-weight:800;color:#f85149;line-height:1">' + streak + '</div>';
   html += '<div style="font-size:var(--text-sm);color:var(--muted)">' + getDayWord(streak) + ' подряд</div>';
   html += '<div style="margin-top:var(--space-2);font-size:var(--text-sm);">' + (streak >= 7 ? 'Ты в ударе! Так держать!' : streak >= 3 ? 'Хорошая серия, продолжай!' : 'Каждый день — шаг к успеху!') + '</div>';
   html += '</div>';
-
-  html += '</div>'; // .carousel
+  html += '</div>';
 
   var carouselCardsCount = 3;
   html += '<div class="carousel-dots" id="carousel-dots">';
@@ -354,7 +347,6 @@ function renderHomePath() {
   }
   html += '</div>';
 
-  // --- Кнопка действия ---
   if (reviewTopics.length > 0) {
     var firstReviewTopic = reviewTopics[0];
     var reviewIdx = getReviewLessonIndex(firstReviewTopic);
@@ -366,7 +358,6 @@ function renderHomePath() {
     html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
   } else {
     if (!allDone) {
-      // Находим первую не пройденную подтему и предлагаем перейти к родительской теме
       var nextTopicIndex = -1;
       for (var i = 0; i < THEORY_FILES.length; i++) {
         var topic = THEORY_FILES[i];
@@ -393,7 +384,6 @@ function renderHomePath() {
     }
   }
 
-  // --- Список родительских тем (вместо подтем) ---
   html += '<div class="section-title" style="margin:var(--space-5) 0 var(--space-3) var(--space-4);">' + ICONS.list + ' Разделы</div>';
 
   for (var i = 0; i < THEORY_FILES.length; i++) {
@@ -420,7 +410,6 @@ function renderHomePath() {
 
   container.innerHTML = html;
 
-  // Анимация чисел после рендера
   setTimeout(function() {
     var gradeEl = container.querySelector('.carousel-card:first-child div[style*="font-size:var(--text-3xl)"]');
     if (gradeEl && predictedGrade !== '—') {
