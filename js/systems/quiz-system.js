@@ -163,7 +163,6 @@ function selectAns(idx, correct, qText, topic, hint) {
     sessionMistakes[currentSkill] = 0;
   } else {
     sessionMistakes[currentSkill] = (sessionMistakes[currentSkill] || 0) + 1;
-    // Если ошибок >=2, заменяем следующий вопрос на более лёгкий (если он ещё не показан и не последний)
     if (sessionMistakes[currentSkill] >= 2 && curQ + 1 < shuffled.length) {
       var nextQues = shuffled[curQ + 1];
       if (nextQues.skill === currentSkill && nextQues.difficulty !== 'easy') {
@@ -446,6 +445,48 @@ function goBossLevel() {
 function startReviewLesson(idx, mastery) {
   currentReviewMastery = mastery;
   goQuizFromLoaded(idx);
+}
+
+// Обновлённая startSubtopicPractice с сохранением индекса урока
+function startSubtopicPractice() {
+    if (!currentSubtopicQuestionsFile) {
+        goQuizFromLoaded(currentLessonIndex);
+        return;
+    }
+
+    var url = 'data/' + currentSubtopicQuestionsFile;
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
+        .then(function(questions) {
+            // Определяем правильный индекс подтемы в QUESTIONS_FILES
+            var targetFile = currentSubtopicQuestionsFile; // например, 'data/questions_earth_01.json'
+            for (var i = 0; i < QUESTIONS_FILES.length; i++) {
+                if (QUESTIONS_FILES[i].questions === targetFile) {
+                    currentLessonIndex = i;
+                    curLesson = i;
+                    break;
+                }
+            }
+
+            shuffled = questions;
+            curQ = 0;
+            score = 0;
+            answered = false;
+            lives = 3;
+            hintUsed = false;
+            correctStreak = 0;
+            lastAnswerWasWrong = false;
+            isBossMode = false;
+            goScreen('s-quiz');
+            renderQ();
+        })
+        .catch(function(e) {
+            alert('Ошибка загрузки практики: ' + e.message);
+            goQuizFromLoaded(currentLessonIndex);
+        });
 }
 
 window.askProfessor = function() {
