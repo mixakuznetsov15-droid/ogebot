@@ -127,38 +127,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
     }
 }
 
-function startSubtopicPractice() {
-    if (!currentSubtopicQuestionsFile) {
-        goQuizFromLoaded(currentLessonIndex);
-        return;
-    }
-
-    var url = 'data/' + currentSubtopicQuestionsFile;
-    fetch(url)
-        .then(function(response) {
-            if (!response.ok) throw new Error('HTTP ' + response.status);
-            return response.json();
-        })
-        .then(function(questions) {
-            shuffled = questions;
-            curQ = 0;
-            score = 0;
-            answered = false;
-            lives = 3;
-            hintUsed = false;
-            correctStreak = 0;
-            lastAnswerWasWrong = false;
-            isBossMode = false;
-            currentLessonIndex = 0;
-            goScreen('s-quiz');
-            renderQ();
-        })
-        .catch(function(e) {
-            alert('Ошибка загрузки практики: ' + e.message);
-            goQuizFromLoaded(currentLessonIndex);
-        });
-}
-
 function showTheoryScreen(theoryInfo) {}
 function startLessonPractice(){ goQuizFromLoaded(currentLessonIndex); }
 
