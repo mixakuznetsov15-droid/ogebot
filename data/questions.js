@@ -2,37 +2,38 @@
 //  ФАЙЛ ТЕМ И ПОДТЕМ (ОГЭ ГЕОГРАФИЯ)
 // ==========================================
 
+// Основные вопросы (практика) для каждой подтемы
 var QUESTIONS_FILES = [
   // Раздел 1: Топографические карты
-  { title: "1. Что такое топографические карты", key: "topo_01", questions: "data/questions_topo_01.json" },
-  { title: "2. Масштаб", key: "topo_02", questions: "data/questions_topo_02.json" },
-  { title: "3. Условные знаки", key: "topo_03", questions: "data/questions_topo_03.json" },
-  { title: "4. Рельеф", key: "topo_04", questions: "data/questions_topo_04.json" },
-  { title: "5. Азимут и стороны горизонта", key: "topo_05", questions: "data/questions_topo_05.json" },
-  { title: "6. Географические координаты", key: "topo_06", questions: "data/questions_topo_06.json" },
-  { title: "7. Построение маршрута", key: "topo_07", questions: "data/questions_topo_07.json" },
-  { title: "8. Комплексные задания (топо)", key: "topo_08", questions: "data/questions_topo_08.json" },
+  { title: "Что такое топографические карты", key: "topo_01", questions: "data/questions_topo_01.json" },
+  { title: "Масштаб", key: "topo_02", questions: "data/questions_topo_02.json" },
+  { title: "Условные знаки", key: "topo_03", questions: "data/questions_topo_03.json" },
+  { title: "Рельеф", key: "topo_04", questions: "data/questions_topo_04.json" },
+  { title: "Азимут и стороны горизонта", key: "topo_05", questions: "data/questions_topo_05.json" },
+  { title: "Географические координаты", key: "topo_06", questions: "data/questions_topo_06.json" },
+  { title: "Построение маршрута", key: "topo_07", questions: "data/questions_topo_07.json" },
+  { title: "Комплексные задания (топо)", key: "topo_08", questions: "data/questions_topo_08.json" },
 
   // Раздел 2: Градусная сеть и географические координаты
-  { title: "1. Параллели и меридианы", key: "grid_01", questions: "data/questions_grid_01.json" },
-  { title: "2. Экватор и нулевой меридиан", key: "grid_02", questions: "data/questions_grid_02.json" },
-  { title: "3. Градусная сеть", key: "grid_03", questions: "data/questions_grid_03.json" },
-  { title: "4. Географическая широта", key: "grid_04", questions: "data/questions_grid_04.json" },
-  { title: "5. Географическая долгота", key: "grid_05", questions: "data/questions_grid_05.json" },
-  { title: "6. Определение координат точки", key: "grid_06", questions: "data/questions_grid_06.json" },
-  { title: "7. Поиск объекта по координатам", key: "grid_07", questions: "data/questions_grid_07.json" },
-  { title: "8. Комплексные задания (координаты)", key: "grid_08", questions: "data/questions_grid_08.json" },
+  { title: "Параллели и меридианы", key: "grid_01", questions: "data/questions_grid_01.json" },
+  { title: "Экватор и нулевой меридиан", key: "grid_02", questions: "data/questions_grid_02.json" },
+  { title: "Градусная сеть", key: "grid_03", questions: "data/questions_grid_03.json" },
+  { title: "Географическая широта", key: "grid_04", questions: "data/questions_grid_04.json" },
+  { title: "Географическая долгота", key: "grid_05", questions: "data/questions_grid_05.json" },
+  { title: "Определение координат точки", key: "grid_06", questions: "data/questions_grid_06.json" },
+  { title: "Поиск объекта по координатам", key: "grid_07", questions: "data/questions_grid_07.json" },
+  { title: "Комплексные задания (координаты)", key: "grid_08", questions: "data/questions_grid_08.json" },
 
   // Раздел 3: Земля как планета Солнечной системы
-  { title: "1. Форма и размеры Земли", key: "earth_01", questions: "data/questions_earth_01.json" },
-  { title: "2. Движение Земли вокруг оси", key: "earth_02", questions: "data/questions_earth_02.json" },
-  { title: "3. Движение Земли вокруг Солнца", key: "earth_03", questions: "data/questions_earth_03.json" },
-  { title: "4. Смена дня и ночи", key: "earth_04", questions: "data/questions_earth_04.json" },
-  { title: "5. Смена времён года", key: "earth_05", questions: "data/questions_earth_05.json" },
-  { title: "6. Часовые пояса", key: "earth_06", questions: "data/questions_earth_06.json" },
-  { title: "7. Комплексные задания ОГЭ", key: "earth_07", questions: "data/questions_earth_07.json" },
+  { title: "Форма и размеры Земли", key: "earth_01", questions: "data/questions_earth_01.json" },
+  { title: "Движение Земли вокруг оси", key: "earth_02", questions: "data/questions_earth_02.json" },
+  { title: "Движение Земли вокруг Солнца", key: "earth_03", questions: "data/questions_earth_03.json" },
+  { title: "Смена дня и ночи", key: "earth_04", questions: "data/questions_earth_04.json" },
+  { title: "Смена времён года", key: "earth_05", questions: "data/questions_earth_05.json" },
+  { title: "Часовые пояса", key: "earth_06", questions: "data/questions_earth_06.json" },
+  { title: "Комплексные задания ОГЭ", key: "earth_07", questions: "data/questions_earth_07.json" },
 
-  // Будущие разделы
+  // Будущие разделы (заглушки)
   { title: "Литосфера и рельеф", key: "lithosphere", comingSoon: true },
   { title: "Атмосфера и климат", key: "atmosphere", comingSoon: true },
   { title: "Гидросфера", key: "hydrosphere", comingSoon: true },
@@ -42,6 +43,7 @@ var QUESTIONS_FILES = [
   { title: "География России", key: "russia", comingSoon: true },
 ];
 
+// Теоретические карточки (микроуроки) – родительские темы
 var THEORY_FILES = [
   // Раздел 1: Топографические карты
   {
@@ -90,7 +92,7 @@ var THEORY_FILES = [
     ]
   },
 
-  // Будущие разделы
+  // Будущие разделы (заглушки)
   { title: "Литосфера и рельеф", icon: "mountain", comingSoon: true, subtopics: [] },
   { title: "Атмосфера и климат", icon: "globe", comingSoon: true, subtopics: [] },
   { title: "Гидросфера", icon: "droplet", comingSoon: true, subtopics: [] },
