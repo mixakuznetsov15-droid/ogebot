@@ -447,14 +447,45 @@ function startReviewLesson(idx, mastery) {
   goQuizFromLoaded(idx);
 }
 
-// ★ ИСПРАВЛЕННАЯ startSubtopicPractice — больше не добавляем лишний 'data/'
+// ★★★ ИСПРАВЛЕННАЯ startSubtopicPractice ★★★
 function startSubtopicPractice() {
     if (!currentSubtopicQuestionsFile) {
         goQuizFromLoaded(currentLessonIndex);
         return;
     }
 
-    var url = currentSubtopicQuestionsFile; // путь уже содержит 'data/questions_...json'
+    // Ищем индекс урока по ключу подтемы (key), а не по пути к файлу
+    var subKey = null;
+    // Найдём ключ подтемы в THEORY_FILES
+    for (var i = 0; i < THEORY_FILES.length; i++) {
+        var subs = THEORY_FILES[i].subtopics;
+        if (subs) {
+            for (var j = 0; j < subs.length; j++) {
+                if (subs[j].questions === currentSubtopicQuestionsFile) {
+                    subKey = subs[j].key;
+                    break;
+                }
+            }
+        }
+        if (subKey) break;
+    }
+
+    // Теперь по ключу найдём индекс в QUESTIONS_FILES
+    var foundIndex = -1;
+    for (var k = 0; k < QUESTIONS_FILES.length; k++) {
+        if (QUESTIONS_FILES[k].key === subKey) {
+            foundIndex = k;
+            break;
+        }
+    }
+
+    // Если не нашли, оставляем текущий currentLessonIndex (хотя такого быть не должно)
+    if (foundIndex >= 0) {
+        currentLessonIndex = foundIndex;
+        curLesson = foundIndex;
+    }
+
+    var url = currentSubtopicQuestionsFile; // уже полный путь, например "data/questions_earth_01.json"
 
     fetch(url)
         .then(function(response) {
@@ -462,16 +493,6 @@ function startSubtopicPractice() {
             return response.json();
         })
         .then(function(questions) {
-            // Определяем правильный индекс подтемы в QUESTIONS_FILES
-            var targetFile = currentSubtopicQuestionsFile;
-            for (var i = 0; i < QUESTIONS_FILES.length; i++) {
-                if (QUESTIONS_FILES[i].questions === targetFile) {
-                    currentLessonIndex = i;
-                    curLesson = i;
-                    break;
-                }
-            }
-
             shuffled = questions;
             curQ = 0;
             score = 0;
