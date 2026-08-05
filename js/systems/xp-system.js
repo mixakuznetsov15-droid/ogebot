@@ -1,14 +1,14 @@
 // ==========================================
-//  СИСТЕМА ОПЫТА (XP)
+//  СИСТЕМА ОПЫТА (XP) – с поддержкой бустеров
 // ==========================================
 
 function addXP(amount) {
   // Проверяем активный бустер на множитель XP
   var multiplier = 1;
   var now = Date.now();
-  if (userProgress.boosters && userProgress.boosters.type === 'xp2' && userProgress.boosters.expires > now) {
-    multiplier = 2;
-  } else if (userProgress.boosters && userProgress.boosters.expires <= now) {
+  if (userProgress.boosters && userProgress.boosters.type === 'xp' && userProgress.boosters.expires > now) {
+    multiplier = userProgress.boosters.multiplier || 2;
+  } else if (userProgress.boosters && userProgress.boosters.expires <= now && userProgress.boosters.type) {
     // Бустер истёк — сбрасываем
     userProgress.boosters = { type: null, expires: 0 };
   }
