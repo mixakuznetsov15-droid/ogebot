@@ -11,25 +11,42 @@ const ChestManager = {
   // Таблица наград: для каждого типа сундука — массив с вероятностями
   REWARD_TABLE: {
     daily: [
-      { type: 'xp', amount: 20, weight: 50 },
-      { type: 'xp', amount: 50, weight: 30 },
-      { type: 'gems', amount: 5, weight: 10 },
-      { type: 'streakFreeze', weight: 5 },
-      { type: 'cosmetic', itemId: 'avatar_frame_silver', weight: 5 }
+      // XP
+      { type: 'xp', amount: 100, weight: 45 },
+      { type: 'xp', amount: 300, weight: 15 },
+      { type: 'xp', amount: 800, weight: 5 },
+      // Gems
+      { type: 'gems', amount: 10, weight: 10 },
+      { type: 'gems', amount: 50, weight: 3 },
+      // Streak
+      { type: 'streakFreeze', amount: 1, weight: 5 },
+      // Tools
+      { type: 'tool_hint', weight: 10 },
+      { type: 'tool_fiftyFifty', weight: 5 },
+      // Cosmetic
+      { type: 'cosmetic', itemId: 'avatar_frame_bronze', weight: 2 }
     ],
     streak: [
-      { type: 'xp', amount: 200, weight: 30 },
-      { type: 'xp', amount: 500, weight: 20 },
-      { type: 'gems', amount: 20, weight: 20 },
-      { type: 'booster', duration: 1800000, weight: 10 }, // 30 минут
-      { type: 'cosmetic', itemId: 'nickname_color_gold', weight: 20 }
+      { type: 'xp', amount: 300, weight: 30 },
+      { type: 'xp', amount: 800, weight: 15 },
+      { type: 'gems', amount: 50, weight: 15 },
+      { type: 'gems', amount: 200, weight: 5 },
+      { type: 'streakFreeze', amount: 3, weight: 10 },
+      { type: 'booster', duration: 900000, multiplier: 1.5, weight: 10 },
+      { type: 'booster', duration: 1800000, multiplier: 2, weight: 5 },
+      { type: 'tool_hint', weight: 5 },
+      { type: 'tool_fiftyFifty', weight: 3 },
+      { type: 'cosmetic', itemId: 'avatar_frame_silver', weight: 2 }
     ],
     achievement: [
-      { type: 'xp', amount: 300, weight: 30 },
-      { type: 'xp', amount: 1000, weight: 10 },
-      { type: 'gems', amount: 50, weight: 30 },
-      { type: 'booster', duration: 3600000, weight: 20 }, // 1 час
-      { type: 'cosmetic', itemId: 'avatar_frame_gold', weight: 10 }
+      { type: 'xp', amount: 800, weight: 25 },
+      { type: 'gems', amount: 200, weight: 25 },
+      { type: 'gems', amount: 50, weight: 10 },
+      { type: 'streakFreeze', amount: 3, weight: 10 },
+      { type: 'booster', duration: 3600000, multiplier: 2, weight: 15 },
+      { type: 'tool_hint', weight: 5 },
+      { type: 'tool_fiftyFifty', weight: 3 },
+      { type: 'cosmetic', itemId: 'badge_master_oge', weight: 7 }
     ]
   },
 
@@ -80,8 +97,8 @@ const ChestManager = {
   },
 
   /**
-   * Применить награду к прогрессу (можно вызывать отдельно, например, для бустера из магазина)
-   * @param {Object} reward - объект награды: { type, amount, duration, itemId, ... }
+   * Применить награду к прогрессу.
+   * @param {Object} reward - объект награды: { type, amount, duration, multiplier, itemId, ... }
    */
   applyReward(reward) {
     this._validateReward(reward);
@@ -98,14 +115,22 @@ const ChestManager = {
         p.gems = (p.gems || 0) + reward.amount;
         break;
       case 'booster':
-        // Если уже есть активный бустер, перезаписываем (можно изменить на продление)
         p.boosters = {
-          type: 'xp2',
+          type: 'xp',
+          multiplier: reward.multiplier || 2,
           expires: Date.now() + reward.duration
         };
         break;
       case 'streakFreeze':
-        p.freezes = (p.freezes || 0) + 1;
+        p.freezes = (p.freezes || 0) + (reward.amount || 1);
+        break;
+      case 'tool_hint':
+        if (!p.tools) p.tools = { hints: 0, fiftyFifty: 0 };
+        p.tools.hints += 1;
+        break;
+      case 'tool_fiftyFifty':
+        if (!p.tools) p.tools = { hints: 0, fiftyFifty: 0 };
+        p.tools.fiftyFifty += 1;
         break;
       case 'cosmetic':
         if (!p.inventory) p.inventory = [];
@@ -116,7 +141,7 @@ const ChestManager = {
     }
   },
 
-  // Приватный метод: выбор награды по весам
+  // Приватный метод: выбор награды по весам (weighted random)
   _getRandomReward(chestType) {
     const rewards = this.REWARD_TABLE[chestType];
     if (!rewards || rewards.length === 0) {
@@ -138,7 +163,7 @@ const ChestManager = {
     if (!reward || typeof reward.type !== 'string') {
       throw new Error('Некорректная награда');
     }
-    const allowedTypes = ['xp', 'gems', 'booster', 'streakFreeze', 'cosmetic'];
+    const allowedTypes = ['xp', 'gems', 'booster', 'streakFreeze', 'tool_hint', 'tool_fiftyFifty', 'cosmetic'];
     if (!allowedTypes.includes(reward.type)) {
       throw new Error(`Неизвестный тип награды: ${reward.type}`);
     }
