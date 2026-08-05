@@ -33,6 +33,12 @@ document.addEventListener('DOMContentLoaded', function () {
             case 'streakFreeze':
               toastMsg = 'Получена заморозка серии!';
               break;
+            case 'tool_hint':
+              toastMsg = 'Получена бесплатная подсказка!';
+              break;
+            case 'tool_fiftyFifty':
+              toastMsg = 'Получен шанс 50/50!';
+              break;
             case 'cosmetic':
               toastMsg = 'Новый предмет в коллекции!';
               break;
