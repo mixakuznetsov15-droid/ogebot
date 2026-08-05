@@ -29,7 +29,11 @@ var defaultProgress = {
   // Новые поля для системы наград
   gems: 0,
   inventory: [],
-  boosters: { type: null, expires: 0 }
+  boosters: { type: null, expires: 0 },
+  tools: {
+    hints: 0,       // бесплатные подсказки
+    fiftyFifty: 0   // убрать два неверных ответа
+  }
 };
 
 var userProgress = JSON.parse(JSON.stringify(defaultProgress));
@@ -54,6 +58,7 @@ function loadProgress(callback) {
       userProgress.reviewData = Object.assign({}, defaultProgress.reviewData, parsed.reviewData || {});
       userProgress.hintsShown = Object.assign({}, defaultProgress.hintsShown, parsed.hintsShown || {});
       userProgress.boosters = Object.assign({}, defaultProgress.boosters, parsed.boosters || {});
+      userProgress.tools = Object.assign({}, defaultProgress.tools, parsed.tools || {});
       // inventory — массив, если нет, берём default
       userProgress.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : [];
     } catch(e) {
