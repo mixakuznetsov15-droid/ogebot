@@ -523,4 +523,80 @@ function renderSessionSummary() {
   html += '<div style="margin-top:var(--space-5);font-size:var(--text-base);font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
   html += '<div class="continue-card" style="margin-top:var(--space-2)" onclick="executeNextAction()">';
   html += '<div class="continue-icon">' + ICONS.play + '</div>';
-  html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') +
+  html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') + '</div></div>';
+  html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div>';
+  html += '</div>';
+
+  html += '<div class="res-btns" style="margin-top:var(--space-5)">';
+  html += '<button class="btn-primary" onclick="executeNextAction()">Продолжить обучение</button>';
+  html += '<button class="btn-secondary" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
+  html += '</div>';
+
+  container.innerHTML = html;
+}
+
+window.executeNextAction = function() {
+    if (currentSubtopicQuestionsFile) {
+        var parentLesson = THEORY_FILES.find(function(t) {
+            return t.subtopics && t.subtopics.some(function(s) { return s.questions === currentSubtopicQuestionsFile; });
+        });
+        if (parentLesson) {
+            var parentIndex = THEORY_FILES.indexOf(parentLesson);
+            showSubtopicsList(parentLesson.subtopics, parentIndex);
+            return;
+        }
+    }
+    goScreen('s-home');
+};
+
+// ==========================================
+// ЦЕНТР ПОВТОРЕНИЯ (Review Screen)
+// ==========================================
+function renderReviewScreen() {
+  var container = document.getElementById('review-content');
+  if (!container) return;
+
+  var allLessons = getAllLessons();
+  var reviewData = userProgress.reviewData || {};
+  var html = '';
+
+  var statuses = { red: [], yellow: [], green: [] };
+  var today = new Date().toISOString().slice(0,10);
+
+  allLessons.forEach(function(lesson) {
+    var rd = reviewData[lesson.title];
+    if (!rd) return;
+    var mastery = rd.mastery || 0;
+    var nextDate = rd.nextReviewDate || '';
+    if (nextDate && nextDate < today) {
+      statuses.red.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
+    } else if (nextDate && nextDate === today) {
+      statuses.yellow.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
+    } else {
+      statuses.green.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
+    }
+  });
+
+  html += '<div class="section-title">' + ICONS.chart + ' Статус тем</div>';
+
+  ['red', 'yellow', 'green'].forEach(function(status) {
+    var list = statuses[status];
+    if (list.length === 0) return;
+    var emoji = status === 'red' ? '🔴' : status === 'yellow' ? '🟡' : '🟢';
+    var label = status === 'red' ? 'Требует повторения' : status === 'yellow' ? 'Пора повторить' : 'Изучено';
+
+    list.forEach(function(item) {
+      html += '<div class="path-progress-card" style="margin-bottom:var(--space-3); display:flex; justify-content:space-between; align-items:center;">';
+      html += '<div><div style="font-weight:600;">' + item.title + '</div>';
+      html += '<div style="font-size:var(--text-xs); color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
+      html += '<button class="btn-primary" style="padding:var(--space-2) var(--space-4); width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
+      html += '</div>';
+    });
+  });
+
+  if (html.indexOf('path-progress-card') === -1) {
+    html += '<div style="text-align:center; color:var(--muted); padding:40px;">Нет данных для повторения. Пройдите несколько тем!</div>';
+  }
+
+  container.innerHTML = html;
+}
