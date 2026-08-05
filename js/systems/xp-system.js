@@ -1,51 +1,31 @@
 // ==========================================
-//  СИСТЕМА ОПЫТА И УРОВНЕЙ
+//  СИСТЕМА ОПЫТА (XP)
 // ==========================================
 
-// Начисление опыта
 function addXP(amount) {
-  if (amount <= 0) return;
-
-  // Бустер x2 XP, если активен
-  if (userProgress.doubleXPUntil && new Date(userProgress.doubleXPUntil) > new Date()) {
-    amount *= 2;
+  // Проверяем активный бустер на множитель XP
+  var multiplier = 1;
+  var now = Date.now();
+  if (userProgress.boosters && userProgress.boosters.type === 'xp2' && userProgress.boosters.expires > now) {
+    multiplier = 2;
+  } else if (userProgress.boosters && userProgress.boosters.expires <= now) {
+    // Бустер истёк — сбрасываем
+    userProgress.boosters = { type: null, expires: 0 };
   }
 
-  var oldLevel = userProgress.level;                // запоминаем старый уровень
-
-  userProgress.xp += amount;
-  userProgress.level = Math.floor(userProgress.xp / 200) + 1;
-
-  // Если уровень повысился — вызываем профессора
-  if (userProgress.level > oldLevel && typeof professor !== 'undefined') {
-    professor.onLevelUp(userProgress.level);
+  var gained = Math.floor(amount * multiplier);
+  userProgress.xp = (userProgress.xp || 0) + gained;
+  
+  // Проверка повышения уровня (каждые 100 XP = новый уровень)
+  var newLevel = Math.floor(userProgress.xp / 100) + 1;
+  if (newLevel > userProgress.level) {
+    userProgress.level = newLevel;
+    window.sessionLevelUp = true; // флаг для отображения в результатах
+    if (typeof showToast === 'function') {
+      showToast('🎉 Новый уровень!');
+    }
   }
 
   saveProgress();
-  showXPToast(amount);
-  checkAchievements();
-  incrementDailyCounters(0, amount);
-}
-
-// Звание (ранг) по количеству опыта
-function getRank(xp) {
-  if (xp >= 10000) return 'Легенда';
-  if (xp >= 5000) return 'Мастер';
-  if (xp >= 3000) return 'Эксперт';
-  if (xp >= 500) return 'Ученик';
-  return 'Новичок';
-}
-
-// Следующий ранг и сколько до него осталось
-function getNextRank(xp) {
-  var ranks = [
-    { name: 'Ученик', min: 500 },
-    { name: 'Эксперт', min: 3000 },
-    { name: 'Мастер', min: 5000 },
-    { name: 'Легенда', min: 10000 }
-  ];
-  for (var i = 0; i < ranks.length; i++) {
-    if (xp < ranks[i].min) return ranks[i];
-  }
-  return null;
+  return gained;
 }
