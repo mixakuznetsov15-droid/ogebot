@@ -4,7 +4,7 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   loadProgress(function () {
-    // Инициализация менеджера сундуков должна быть ПЕРВОЙ
+    // Инициализация менеджера сундуков (ChestManager 2.0)
     ChestManager.init({
       getProgress: () => userProgress,
       saveProgress: () => saveProgress(),
@@ -18,8 +18,29 @@ document.addEventListener('DOMContentLoaded', function () {
           if (typeof showRewardModal === 'function') {
             setTimeout(() => showRewardModal(reward), 1200);
           }
+          // Умное уведомление в зависимости от типа награды
+          let toastMsg = '';
+          switch (reward.type) {
+            case 'xp':
+              toastMsg = `Получено: ${reward.amount} XP`;
+              break;
+            case 'gems':
+              toastMsg = `Получено: ${reward.amount} кристаллов`;
+              break;
+            case 'booster':
+              toastMsg = `Бустер XP на ${Math.round(reward.duration / 60000)} мин.`;
+              break;
+            case 'streakFreeze':
+              toastMsg = 'Получена заморозка серии!';
+              break;
+            case 'cosmetic':
+              toastMsg = 'Новый предмет в коллекции!';
+              break;
+            default:
+              toastMsg = 'Награда получена!';
+          }
           if (typeof showToast === 'function') {
-            showToast(`Получено: ${reward.amount} XP`);
+            showToast(toastMsg);
           }
         },
         onError: (msg) => {
@@ -28,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         },
         onComplete: () => {
-          // сброс в hideChestModal
+          // Профиль обновится в hideChestModal
         }
       }
     });
@@ -56,6 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
   professor.showGreeting();
   window.professor = professor;
 
+  // idle timer (20 сек)
   var idleTimer;
   function resetIdleTimer() {
     clearTimeout(idleTimer);
@@ -71,21 +93,34 @@ document.addEventListener('DOMContentLoaded', function () {
   resetIdleTimer();
 });
 
+// Безопасная привязка глобальных функций
 window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
 window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
 window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
 
-window.openChest = async function() { await ChestManager.open(); };
-window.giveChest = function(type) { ChestManager.giveChest(type); };
+window.openChest = async function() {
+  await ChestManager.open();
+};
+window.giveChest = function(type) {
+  ChestManager.giveChest(type);
+};
 window.closeRewardModal = function() {
-  if (typeof hideChestModal === 'function') hideChestModal();
+  if (typeof hideChestModal === 'function') {
+    hideChestModal();
+  }
 };
 
 window.handleSubscribe = function() {
-  if (typeof showToast === 'function') showToast('Оплата появится позже');
+  if (typeof showToast === 'function') {
+    showToast('Оплата появится позже');
+  }
 };
 
-window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() { alert('Приглашение друзей появится позже'); };
+window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
+  alert('Приглашение друзей появится позже');
+};
 window.nextQ = typeof nextQ === 'function' ? nextQ : function() {};
-window.shareBossResult = typeof shareBossResult === 'function' ? shareBossResult : function() { alert('Результат сохранён'); };
+window.shareBossResult = typeof shareBossResult === 'function' ? shareBossResult : function() {
+  alert('Результат сохранён');
+};
 window.closeProfessorModal = typeof closeProfessorModal === 'function' ? closeProfessorModal : function() {};
