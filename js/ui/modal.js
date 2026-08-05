@@ -81,6 +81,8 @@ function showRewardModal(reward) {
     gems: '💎',
     booster: '⏱️',
     streakFreeze: '❄️',
+    tool_hint: '💡',
+    tool_fiftyFifty: '🎲',
     cosmetic: '🎨'
   };
   chestRewardEl.querySelector('.chest-reward-icon').textContent = iconMap[reward.type] || '🎁';
@@ -91,6 +93,8 @@ function showRewardModal(reward) {
     gems: 'Кристаллы',
     booster: 'Бустер XP',
     streakFreeze: 'Заморозка серии',
+    tool_hint: 'Подсказка',
+    tool_fiftyFifty: 'Шанс 50/50',
     cosmetic: 'Предмет'
   };
   chestRewardEl.querySelector('.chest-reward-title').textContent = titleMap[reward.type] || 'Награда!';
