@@ -18,36 +18,41 @@ function createChestModal() {
   chestAnimEl = document.getElementById('chest-anim');
   chestRewardEl = document.getElementById('chest-reward');
 
-  // Обработчик кнопки "Забрать"
   const btn = chestRewardEl.querySelector('.chest-reward-btn');
   btn.addEventListener('click', hideChestModal);
 }
 
 function showChestModal() {
   if (!chestModalRoot) createChestModal();
-  // Сброс состояний
   chestAnimEl.style.display = 'block';
   chestRewardEl.classList.add('hidden');
   chestModalRoot.classList.add('show');
-  // Запуск анимации открытия
   startChestOpeningAnimation();
 }
 
 function hideChestModal() {
   if (!chestModalRoot) return;
   chestModalRoot.classList.remove('show');
+  setTimeout(() => {
+    chestAnimEl.style.display = 'none';
+    chestRewardEl.classList.add('hidden');
+    if (typeof ChestManager !== 'undefined') {
+      ChestManager._isOpening = false;
+    }
+    // Обновляем счётчик сундуков в профиле
+    if (typeof renderProfile === 'function') {
+      renderProfile();
+    }
+  }, 300);
 }
 
 function startChestOpeningAnimation() {
   const lid = chestAnimEl.querySelector('.chest-lid');
   const particlesContainer = chestAnimEl.querySelector('.chest-particles');
-  // Очищаем старые частицы
   particlesContainer.innerHTML = '';
 
-  // Анимация крышки
   lid.classList.add('open');
 
-  // Генерация частиц
   for (let i = 0; i < 12; i++) {
     const p = document.createElement('div');
     p.className = 'particle';
@@ -60,7 +65,6 @@ function startChestOpeningAnimation() {
     particlesContainer.appendChild(p);
   }
 
-  // Через время скрываем анимацию и показываем награду
   setTimeout(() => {
     lid.classList.remove('open');
     chestAnimEl.style.display = 'none';
@@ -69,16 +73,32 @@ function startChestOpeningAnimation() {
 
 function showRewardModal(reward) {
   if (!chestModalRoot) createChestModal();
-  // Скрываем анимацию
   chestAnimEl.style.display = 'none';
-  // Заполняем награду
+
+  // Иконки для разных типов наград
   const iconMap = {
     xp: '⚡',
-    freeze: '❄️',
+    gems: '💎',
+    booster: '⏱️',
+    streakFreeze: '❄️',
     cosmetic: '🎨'
   };
   chestRewardEl.querySelector('.chest-reward-icon').textContent = iconMap[reward.type] || '🎁';
-  chestRewardEl.querySelector('.chest-reward-title').textContent = 'Награда!';
-  chestRewardEl.querySelector('.chest-reward-amount').textContent = `+${reward.amount} XP`;
+
+  // Заголовок и сумма
+  const titleMap = {
+    xp: 'Опыт',
+    gems: 'Кристаллы',
+    booster: 'Бустер XP',
+    streakFreeze: 'Заморозка серии',
+    cosmetic: 'Предмет'
+  };
+  chestRewardEl.querySelector('.chest-reward-title').textContent = titleMap[reward.type] || 'Награда!';
+
+  const amountText = reward.type === 'booster' 
+    ? (Math.round(reward.duration / 60000) + ' мин.')
+    : (reward.amount ? '+' + reward.amount : '');
+  chestRewardEl.querySelector('.chest-reward-amount').textContent = amountText;
+
   chestRewardEl.classList.remove('hidden');
 }
