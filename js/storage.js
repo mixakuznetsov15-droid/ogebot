@@ -1,91 +1,76 @@
 // ==========================================
-//  ХРАНИЛИЩЕ ПРОГРЕССА ПОЛЬЗОВАТЕЛЯ
+//  ХРАНИЛИЩЕ ПРОГРЕССА
 // ==========================================
 
-// Глобальный объект прогресса
-var userProgress = {
+var defaultProgress = {
   xp: 0,
   level: 1,
   streak: 0,
   lastDate: '',
+  freezes: 0,
+  lastFreezeMonday: '',
   completedLessons: {},
+  theoryRead: {},
   totalAnswered: 0,
   totalCorrect: 0,
-  bossCompleted: false,
-  freezes: 1,
-  lastFreezeMonday: '',
   chests: [],
-  invitedFriend: false,
-  dailyTasksDate: '',
-  dailyTasks: { solve10: false, earn50XP: false, loginToday: false },
-  dailyTasksCollected: { solve10: false, earn50XP: false, loginToday: false },
-  allDailyTasksDone: false,
-  dailyQuestions: 0,
-  dailyXP: 0,
   achievements: {},
-  lastDailyChestDate: '',
-  streakChestsGiven: {},
-  friends: [],
-  freeHints: 0,
-  rareBadges: [],
-  doubleXPUntil: null
+  dailyTasks: {},
+  dailyTasksDate: '',
+  dailyTasksCollected: {},
+  dailyXP: 0,
+  dailyQuestions: 0,
+  reviewData: {},
+  onboardingCompleted: false,
+  hintsShown: {},
+  trialStartDate: '',
+  subscriptionEndDate: '',
+
+  // Новые поля для системы наград
+  gems: 0,
+  inventory: [],
+  boosters: { type: null, expires: 0 }
 };
 
-// Сохранить прогресс
+var userProgress = JSON.parse(JSON.stringify(defaultProgress));
+
 function saveProgress() {
-  var data = JSON.stringify(userProgress);
-  if (isTelegram && tgApp.CloudStorage) {
-    tgApp.CloudStorage.setItem('progress', data, function(){});
-  } else {
-    try { localStorage.setItem('geo_progress', data); } catch(e) {}
-  }
+  localStorage.setItem('geoProProgress', JSON.stringify(userProgress));
 }
 
-// Загрузить прогресс
 function loadProgress(callback) {
-  if (isTelegram && tgApp.CloudStorage) {
-    tgApp.CloudStorage.getItem('progress', function(err, val) {
-      if (!err && val) {
-        try { userProgress = JSON.parse(val); } catch(e) {}
-      }
-      refreshFreeze();
-      callback();
-    });
-  } else {
+  var saved = localStorage.getItem('geoProProgress');
+  if (saved) {
     try {
-      var saved = localStorage.getItem('geo_progress');
-      if (saved) userProgress = JSON.parse(saved);
-    } catch(e) {}
-    refreshFreeze();
-    callback();
+      var parsed = JSON.parse(saved);
+      // Слияние с defaultProgress, чтобы добавить отсутствующие поля
+      userProgress = Object.assign({}, defaultProgress, parsed);
+      // Для вложенных объектов делаем глубокое слияние
+      userProgress.completedLessons = Object.assign({}, defaultProgress.completedLessons, parsed.completedLessons || {});
+      userProgress.theoryRead = Object.assign({}, defaultProgress.theoryRead, parsed.theoryRead || {});
+      userProgress.achievements = Object.assign({}, defaultProgress.achievements, parsed.achievements || {});
+      userProgress.dailyTasks = Object.assign({}, defaultProgress.dailyTasks, parsed.dailyTasks || {});
+      userProgress.dailyTasksCollected = Object.assign({}, defaultProgress.dailyTasksCollected, parsed.dailyTasksCollected || {});
+      userProgress.reviewData = Object.assign({}, defaultProgress.reviewData, parsed.reviewData || {});
+      userProgress.hintsShown = Object.assign({}, defaultProgress.hintsShown, parsed.hintsShown || {});
+      userProgress.boosters = Object.assign({}, defaultProgress.boosters, parsed.boosters || {});
+      // inventory — массив, если нет, берём default
+      userProgress.inventory = Array.isArray(parsed.inventory) ? parsed.inventory : [];
+    } catch(e) {
+      userProgress = JSON.parse(JSON.stringify(defaultProgress));
+    }
+  } else {
+    userProgress = JSON.parse(JSON.stringify(defaultProgress));
   }
+  if (callback) callback();
 }
 
-// Получить понедельник недели, к которой принадлежит дата
-function getMonday(date) {
-  var d = new Date(date);
-  d.setHours(0,0,0,0);
-  var day = d.getDay();
-  var diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  return new Date(d.setDate(diff)).toISOString().slice(0,10);
-}
-
-// Обновление заморозки серии (раз в неделю)
-function refreshFreeze() {
-  var todayMonday = getMonday(new Date());
-  if (!userProgress.lastFreezeMonday || userProgress.lastFreezeMonday < todayMonday) {
-    userProgress.freezes = 1;
-    userProgress.lastFreezeMonday = todayMonday;
+// Безопасное обновление любого поля userProgress с автосохранением
+function updateProgress(key, value) {
+  if (userProgress.hasOwnProperty(key)) {
+    userProgress[key] = value;
     saveProgress();
+  } else {
+    console.warn('Попытка обновить несуществующее поле userProgress:', key);
   }
-}
-
-// ==========================================
-//  ПОЛУЧИТЬ СПИСОК ВСЕХ УРОКОВ
-// ==========================================
-function getAllLessons() {
-  // Включаем темы, у которых есть файл вопросов ИЛИ подтемы
-  return QUESTIONS_FILES.filter(function(q) {
-    return q.file || (q.subtopics && q.subtopics.length > 0);
-  });
 }
