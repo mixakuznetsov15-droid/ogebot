@@ -37,6 +37,18 @@ function openTopic(index) {
   }
 }
 
+// Проверка, разблокирована ли родительская тема
+function isTopicUnlocked(topicIndex) {
+  if (topicIndex === 0) return true; // первая тема всегда открыта
+  // Тема открыта, если предыдущая тема полностью завершена (все её подтемы пройдены)
+  var prevTopic = THEORY_FILES[topicIndex - 1];
+  if (!prevTopic || prevTopic.comingSoon) return false;
+  if (!prevTopic.subtopics || prevTopic.subtopics.length === 0) return true;
+  return prevTopic.subtopics.every(function(sub) {
+    return userProgress.completedLessons && userProgress.completedLessons[sub.title];
+  });
+}
+
 // Проверка разблокировки подтемы
 function isSubtopicUnlocked(topicIndex, subtopicIndex) {
   if (subtopicIndex === 0) return true; // первая подтема всегда открыта
@@ -274,7 +286,9 @@ function renderHomePath() {
 
   var completedCount = Object.keys(userProgress.completedLessons).length;
   var totalLessons = 0;
-  THEORY_FILES.forEach(t => totalLessons += t.subtopics ? t.subtopics.length : 1);
+  THEORY_FILES.forEach(function(t) {
+    if (!t.comingSoon && t.subtopics) totalLessons += t.subtopics.length;
+  });
   var pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
   var allDone = completedCount >= totalLessons;
   var streak = userProgress.streak || 0;
@@ -345,8 +359,12 @@ function renderHomePath() {
       var nextTopicIndex = -1;
       for (var i = 0; i < THEORY_FILES.length; i++) {
         var topic = THEORY_FILES[i];
+        if (topic.comingSoon) continue;
+        if (!isTopicUnlocked(i)) break; // тема ещё не открыта
         if (topic.subtopics) {
-          var allSubtopicDone = topic.subtopics.every(sub => userProgress.completedLessons && userProgress.completedLessons[sub.title]);
+          var allSubtopicDone = topic.subtopics.every(function(sub) {
+            return userProgress.completedLessons && userProgress.completedLessons[sub.title];
+          });
           if (!allSubtopicDone) {
             nextTopicIndex = i;
             break;
@@ -368,7 +386,7 @@ function renderHomePath() {
     }
   }
 
-  // --- Список родительских тем с учётом блокировок ---
+  // --- Список родительских тем с учётом блокировок разделов ---
   html += '<div class="section-title" style="margin:var(--space-5) 0 var(--space-3) var(--space-4);">' + ICONS.list + ' Разделы</div>';
 
   for (var i = 0; i < THEORY_FILES.length; i++) {
@@ -385,8 +403,7 @@ function renderHomePath() {
 
     var totalSub = topic.subtopics ? topic.subtopics.length : 0;
     var doneSub = 0;
-    var firstUnlocked = isSubtopicUnlocked(i, 0); // первая подтема определяет доступность всей темы
-    var topicLocked = !firstUnlocked;
+    var topicLocked = !isTopicUnlocked(i);
 
     if (topic.subtopics) {
       topic.subtopics.forEach(function(sub) {
@@ -506,80 +523,4 @@ function renderSessionSummary() {
   html += '<div style="margin-top:var(--space-5);font-size:var(--text-base);font-weight:600;color:var(--muted)">📌 Рекомендация</div>';
   html += '<div class="continue-card" style="margin-top:var(--space-2)" onclick="executeNextAction()">';
   html += '<div class="continue-icon">' + ICONS.play + '</div>';
-  html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') + '</div></div>';
-  html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div>';
-  html += '</div>';
-
-  html += '<div class="res-btns" style="margin-top:var(--space-5)">';
-  html += '<button class="btn-primary" onclick="executeNextAction()">Продолжить обучение</button>';
-  html += '<button class="btn-secondary" onclick="goScreen(\'s-home\')">🏠 На главный экран</button>';
-  html += '</div>';
-
-  container.innerHTML = html;
-}
-
-window.executeNextAction = function() {
-    if (currentSubtopicQuestionsFile) {
-        var parentLesson = THEORY_FILES.find(function(t) {
-            return t.subtopics && t.subtopics.some(function(s) { return s.questions === currentSubtopicQuestionsFile; });
-        });
-        if (parentLesson) {
-            var parentIndex = THEORY_FILES.indexOf(parentLesson);
-            showSubtopicsList(parentLesson.subtopics, parentIndex);
-            return;
-        }
-    }
-    goScreen('s-home');
-};
-
-// ==========================================
-// ЦЕНТР ПОВТОРЕНИЯ (Review Screen)
-// ==========================================
-function renderReviewScreen() {
-  var container = document.getElementById('review-content');
-  if (!container) return;
-
-  var allLessons = getAllLessons();
-  var reviewData = userProgress.reviewData || {};
-  var html = '';
-
-  var statuses = { red: [], yellow: [], green: [] };
-  var today = new Date().toISOString().slice(0,10);
-
-  allLessons.forEach(function(lesson) {
-    var rd = reviewData[lesson.title];
-    if (!rd) return;
-    var mastery = rd.mastery || 0;
-    var nextDate = rd.nextReviewDate || '';
-    if (nextDate && nextDate < today) {
-      statuses.red.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
-    } else if (nextDate && nextDate === today) {
-      statuses.yellow.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
-    } else {
-      statuses.green.push({ title: lesson.title, mastery: mastery, nextDate: nextDate });
-    }
-  });
-
-  html += '<div class="section-title">' + ICONS.chart + ' Статус тем</div>';
-
-  ['red', 'yellow', 'green'].forEach(function(status) {
-    var list = statuses[status];
-    if (list.length === 0) return;
-    var emoji = status === 'red' ? '🔴' : status === 'yellow' ? '🟡' : '🟢';
-    var label = status === 'red' ? 'Требует повторения' : status === 'yellow' ? 'Пора повторить' : 'Изучено';
-
-    list.forEach(function(item) {
-      html += '<div class="path-progress-card" style="margin-bottom:var(--space-3); display:flex; justify-content:space-between; align-items:center;">';
-      html += '<div><div style="font-weight:600;">' + item.title + '</div>';
-      html += '<div style="font-size:var(--text-xs); color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
-      html += '<button class="btn-primary" style="padding:var(--space-2) var(--space-4); width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
-      html += '</div>';
-    });
-  });
-
-  if (html.indexOf('path-progress-card') === -1) {
-    html += '<div style="text-align:center; color:var(--muted); padding:40px;">Нет данных для повторения. Пройдите несколько тем!</div>';
-  }
-
-  container.innerHTML = html;
-}
+  html += '<div><div class="continue-label">Следующий шаг</div><div class="continue-title">' + (nextAction && nextAction.text ? nextAction.text : 'Продолжить обучение') +
