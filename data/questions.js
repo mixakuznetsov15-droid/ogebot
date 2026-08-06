@@ -2,7 +2,6 @@
 //  ФАЙЛ ТЕМ И ПОДТЕМ (ОГЭ ГЕОГРАФИЯ)
 // ==========================================
 
-// Основные вопросы (практика) для каждой подтемы
 var QUESTIONS_FILES = [
   // Раздел 1: Топографические карты
   { title: "Что такое топографические карты", key: "topo_01", questions: "data/questions_topo_01.json" },
@@ -33,8 +32,15 @@ var QUESTIONS_FILES = [
   { title: "Часовые пояса", key: "earth_06", questions: "data/questions_earth_06.json" },
   { title: "Комплексные задания ОГЭ", key: "earth_07", questions: "data/questions_earth_07.json" },
 
+  // Раздел 4: Литосфера и рельеф
+  { title: "Внутреннее строение Земли", key: "lith_01", questions: "data/questions_lith_01.json" },
+  { title: "Горные породы и полезные ископаемые", key: "lith_02", questions: "data/questions_lith_02.json" },
+  { title: "Рельеф суши и дна океана", key: "lith_03", questions: "data/questions_lith_03.json" },
+  { title: "Вулканы и землетрясения", key: "lith_04", questions: "data/questions_lith_04.json" },
+  { title: "Равнины и горы", key: "lith_05", questions: "data/questions_lith_05.json" },
+  { title: "Профили рельефа", key: "lith_06", questions: "data/questions_lith_06.json" },
+
   // Будущие разделы (заглушки)
-  { title: "Литосфера и рельеф", key: "lithosphere", comingSoon: true },
   { title: "Атмосфера и климат", key: "atmosphere", comingSoon: true },
   { title: "Гидросфера", key: "hydrosphere", comingSoon: true },
   { title: "Биосфера и почвы", key: "biosphere", comingSoon: true },
@@ -43,7 +49,6 @@ var QUESTIONS_FILES = [
   { title: "География России", key: "russia", comingSoon: true },
 ];
 
-// Теоретические карточки (микроуроки) – родительские темы
 var THEORY_FILES = [
   // Раздел 1: Топографические карты
   {
@@ -92,8 +97,21 @@ var THEORY_FILES = [
     ]
   },
 
+  // Раздел 4: Литосфера и рельеф
+  {
+    title: "Литосфера и рельеф",
+    icon: "mountain",
+    subtopics: [
+      { title: "Внутреннее строение Земли", icon: "globe", file: "theory_lith_01.json", key: "lith_01", questions: "data/questions_lith_01.json" },
+      { title: "Горные породы и полезные ископаемые", icon: "mountain", file: "theory_lith_02.json", key: "lith_02", questions: "data/questions_lith_02.json" },
+      { title: "Рельеф суши и дна океана", icon: "globe", file: "theory_lith_03.json", key: "lith_03", questions: "data/questions_lith_03.json" },
+      { title: "Вулканы и землетрясения", icon: "globe", file: "theory_lith_04.json", key: "lith_04", questions: "data/questions_lith_04.json" },
+      { title: "Равнины и горы", icon: "mountain", file: "theory_lith_05.json", key: "lith_05", questions: "data/questions_lith_05.json" },
+      { title: "Профили рельефа", icon: "chart", file: "theory_lith_06.json", key: "lith_06", questions: "data/questions_lith_06.json" },
+    ]
+  },
+
   // Будущие разделы (заглушки)
-  { title: "Литосфера и рельеф", icon: "mountain", comingSoon: true, subtopics: [] },
   { title: "Атмосфера и климат", icon: "globe", comingSoon: true, subtopics: [] },
   { title: "Гидросфера", icon: "droplet", comingSoon: true, subtopics: [] },
   { title: "Биосфера и почвы", icon: "tree", comingSoon: true, subtopics: [] },
