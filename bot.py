@@ -1,4 +1,32 @@
-<!DOCTYPE html>
+import asyncio
+import os
+import json
+from datetime import datetime, timedelta
+from aiogram import Bot, Dispatcher, F
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.filters import CommandStart, Command
+from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.storage.memory import MemoryStorage
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+# ── Веб-сервер для Mini App ──
+from aiohttp import web
+import aiohttp.web
+
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+ADMIN_ID = int(os.getenv("ADMIN_ID", "0"))
+WEBAPP_URL = os.getenv("WEBAPP_URL", "http://localhost:8080")  # url, который видит пользователь
+
+bot = Bot(token=BOT_TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
+scheduler = AsyncIOScheduler()
+
+# ── HTML Mini App (тот самый, что был в отдельном файле) ──
+HTML_CONTENT = """<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -48,7 +76,7 @@ body::before {
 .scroll::-webkit-scrollbar { width:3px; }
 .scroll::-webkit-scrollbar-thumb { background:#ffffff15; border-radius:8px; }
 
-/* ── Анимации появления карточек ── */
+/* Анимации появления карточек */
 .card-animate {
   opacity: 0;
   transform: translateY(20px);
@@ -58,7 +86,7 @@ body::before {
   to { opacity:1; transform:translateY(0); }
 }
 
-/* ── Кнопки ── */
+/* Кнопки */
 .btn, .btn-full, .btn-next, .ans-btn, .continue-card, .modal-btn, button {
   transition: transform 0.12s ease, opacity 0.12s ease;
 }
@@ -66,27 +94,12 @@ body::before {
   transform: scale(0.97) !important;
 }
 
-/* ── Прогресс-бары ── */
+/* Прогресс-бары */
 .path-progress-fill, .q-progress-fill {
   transition: width 0.8s cubic-bezier(0.2, 0.9, 0.3, 1);
 }
 
-/* ── Ежедневные задания: анимация выполнения ── */
-.task-check {
-  display: inline-block;
-  transition: transform 0.25s ease, color 0.25s ease;
-}
-.task-check.done {
-  color: var(--primary2) !important;
-  animation: taskPop 0.35s ease;
-}
-@keyframes taskPop {
-  0% { transform: scale(0.8); }
-  50% { transform: scale(1.3); }
-  100% { transform: scale(1); }
-}
-
-/* ── Toast ── */
+/* Toast */
 .toast-container {
   position: fixed;
   top: 20px;
@@ -127,7 +140,7 @@ body::before {
   to { opacity:0; transform:translateY(-12px); }
 }
 
-/* ── AI PANEL (Профессор Гео) ── */
+/* AI PANEL (Профессор Гео) */
 .ai-panel { background:linear-gradient(135deg,#0f1e35,#0d1f2d); border:1px solid #58a6ff30; border-radius:var(--radius); overflow:hidden; }
 .ai-header { display:flex; align-items:center; justify-content:space-between; padding:12px 14px; background:#58a6ff0a; border-bottom:1px solid #58a6ff20; cursor:pointer; }
 .ai-header-left { display:flex; align-items:center; gap:10px; }
@@ -136,23 +149,18 @@ body::before {
 .ai-tagline { font-size:10px; color:var(--muted); }
 .ai-toggle { font-size:18px; color:var(--muted); transition:transform .3s; }
 .ai-toggle.open { transform:rotate(180deg); }
-
 .ai-body { padding:14px; display:none; flex-direction:column; gap:10px; }
 .ai-body.open { display:flex; animation: fadeUp .25s ease; }
-
 .ai-prompts { display:flex; flex-wrap:wrap; gap:6px; }
 .ai-prompt-btn { background:#58a6ff15; border:1px solid #58a6ff30; border-radius:20px; padding:6px 12px; font-size:11px; color:var(--primary); cursor:pointer; font-family:var(--font-b); transition:.15s; }
 .ai-prompt-btn:active { background:#58a6ff30; }
-
 .ai-messages { display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; padding-right:4px; }
 .ai-messages::-webkit-scrollbar { width:2px; }
 .ai-messages::-webkit-scrollbar-thumb { background:#ffffff15; }
-
 .msg { padding:10px 12px; border-radius:12px; font-size:13px; line-height:1.55; max-width:92%; }
 .msg.user { background:#58a6ff20; border:1px solid #58a6ff30; align-self:flex-end; color:var(--text); }
 .msg.ai { background:var(--card); border:1px solid var(--border); align-self:flex-start; color:#c8d8e8; }
 .msg.loading { color:var(--muted); font-style:italic; }
-
 .ai-input-row { display:flex; gap:8px; align-items:flex-end; }
 .ai-input { flex:1; background:var(--card); border:1px solid #58a6ff30; border-radius:12px; padding:10px 12px; color:var(--text); font-family:var(--font-b); font-size:13px; resize:none; min-height:40px; max-height:80px; outline:none; }
 .ai-input:focus { border-color:#58a6ff60; }
@@ -162,7 +170,7 @@ body::before {
 .ai-send:disabled { opacity:.5; cursor:default; }
 .ai-context { font-size:10px; color:var(--muted); background:var(--card); border:1px solid var(--border); border-radius:8px; padding:4px 8px; }
 
-/* ── QUIZ ── */
+/* QUIZ */
 .quiz-wrap { flex:1; padding:16px; display:flex; flex-direction:column; gap:14px; padding-bottom:24px; overflow-y:auto; }
 .quiz-wrap::-webkit-scrollbar { width:3px; }
 .q-header { display:flex; justify-content:space-between; align-items:center; }
@@ -183,7 +191,7 @@ body::before {
 .btn-next.show { display:block; animation: fadeUp .3s ease; }
 .btn-next:active { transform:scale(.97); }
 
-/* ── RESULT ── */
+/* RESULT */
 .result-wrap { flex:1; padding:40px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; gap:16px; overflow-y:auto; padding-bottom:32px; }
 .result-emoji { font-size:64px; animation: popIn .5s cubic-bezier(.34,1.56,.64,1); }
 @keyframes popIn { from{transform:scale(.3);opacity:0} to{transform:scale(1);opacity:1} }
@@ -207,7 +215,7 @@ body::before {
 .btn-full.primary { background:linear-gradient(135deg,var(--primary),var(--primary2)); color:#fff; border:none; }
 .btn-full.sec { background:transparent; color:var(--muted); border:1px solid var(--border); }
 
-/* ── PATH (главный экран) ── */
+/* PATH (главный экран) */
 .path-progress-card {
   background:var(--card2); border:1px solid var(--border); border-radius:var(--radius);
   padding:16px; margin-bottom:6px;
@@ -217,7 +225,6 @@ body::before {
 .path-progress-pct { font-family:var(--font-h); font-size:16px; font-weight:800; color:var(--primary); }
 .path-progress-bar { height:8px; background:#2d3a55; border-radius:8px; overflow:hidden; }
 .path-progress-fill { height:100%; background:linear-gradient(90deg,var(--primary),var(--primary2)); border-radius:8px; transition:width .5s ease; }
-
 .continue-card {
   background:linear-gradient(135deg,#1a3a5c,#0f2438); border:1px solid #58a6ff40; border-radius:var(--radius);
   padding:16px; display:flex; align-items:center; gap:12px; cursor:pointer; transition:transform .15s;
@@ -230,7 +237,6 @@ body::before {
 
 .path-node-row { display:flex; align-items:center; gap:14px; width:100%; }
 .path-connector { width:3px; height:24px; margin:0 auto; }
-
 .node-circle {
   width:56px; height:56px; border-radius:50%; flex-shrink:0;
   display:flex; align-items:center; justify-content:center; font-size:22px;
@@ -240,7 +246,6 @@ body::before {
 .node-circle.current { background:#f5a623; border:2px solid #f5a623; box-shadow:0 0 0 6px #f5a62320; animation: pulseNode 2s infinite; }
 .node-circle.locked { background:var(--card2); border:2px solid var(--border); opacity:.4; }
 @keyframes pulseNode { 0%,100%{box-shadow:0 0 0 6px #f5a62320} 50%{box-shadow:0 0 0 10px #f5a62308} }
-
 .boss-node {
   width:72px; height:72px; border-radius:20px; flex-shrink:0;
   background:linear-gradient(135deg,#d29922,#b8860b); border:2px solid #d29922;
@@ -248,39 +253,28 @@ body::before {
 }
 .boss-node.locked { background:var(--card2); border-color:var(--border); opacity:.35; }
 
-/* ── PROFILE ── */
+/* PROFILE */
 .profile-header-card { display:flex; align-items:center; gap:16px; padding:8px 0 4px; }
 .profile-avatar-big { width:64px; height:64px; border-radius:20px; background:linear-gradient(135deg,var(--primary),var(--primary2)); display:flex; align-items:center; justify-content:center; font-size:28px; flex-shrink:0; }
 .profile-name-big { font-family:var(--font-h); font-size:17px; font-weight:800; }
 .profile-level-big { font-size:12px; color:var(--primary); margin-top:3px; }
-
 .profile-stats-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
 .profile-stat { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
 .profile-stat-num { font-family:var(--font-h); font-size:17px; font-weight:800; color:var(--primary); }
 .profile-stat-label { font-size:9px; color:var(--muted); margin-top:3px; }
-
 .badges-grid-profile { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
 .badge-item-p { background:var(--card2); border:1px solid var(--border); border-radius:14px; padding:12px 6px; text-align:center; }
 .badge-item-p.locked { opacity:.3; }
 .badge-icon-p { font-size:22px; margin-bottom:4px; }
 .badge-name-p { font-size:8px; color:var(--muted); line-height:1.3; }
-
 .sub-status-card { background:var(--card2); border:1px solid var(--border); border-radius:var(--radius); padding:16px; display:flex; align-items:center; gap:12px; }
 .sub-status-card.active { border-color:#3fb95040; background:linear-gradient(135deg,#0f2318,#0d1f17); }
 
-/* ── СУНДУКИ (анимации) ── */
-@keyframes chestGlow {
-  0% { box-shadow: 0 0 5px #d29922; }
-  50% { box-shadow: 0 0 20px #d29922; }
-  100% { box-shadow: 0 0 5px #d29922; }
-}
-@keyframes chestPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
+/* CHEST ANIMATIONS */
+@keyframes chestGlow { 0% { box-shadow: 0 0 5px #d29922; } 50% { box-shadow: 0 0 20px #d29922; } 100% { box-shadow: 0 0 5px #d29922; } }
+@keyframes chestPulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
 
-/* Модальное окно профессора */
+/* PROFESSOR MODAL */
 .professor-modal-overlay {
   position: fixed;
   inset: 0;
@@ -305,14 +299,8 @@ body::before {
   gap: 16px;
   box-shadow: 0 -10px 30px rgba(0,0,0,0.5);
 }
-@keyframes fadeInOverlay {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-@keyframes slideUp {
-  from { transform: translateY(100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+@keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(100%); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .professor-avatar {
   width: 64px; height: 64px; margin: 0 auto;
   background: linear-gradient(135deg, #4a6fa5, #3b5998);
@@ -334,23 +322,12 @@ body::before {
   border: none;
 }
 .professor-btn:active { transform: scale(0.97); }
-.professor-btn-primary {
-  background: linear-gradient(135deg, var(--primary), var(--primary2));
-  color: #fff;
-}
-.professor-btn-secondary {
-  background: transparent;
-  color: var(--muted);
-  border: 1px solid var(--border);
-}
-.professor-btn:disabled {
-  opacity: 0.4;
-  pointer-events: none;
-}
+.professor-btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary2)); color: #fff; }
+.professor-btn-secondary { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+.professor-btn:disabled { opacity: 0.4; pointer-events: none; }
 </style>
 </head>
 <body>
-
 <div id="modal-container"></div>
 <div id="toast-container" class="toast-container"></div>
 <div id="professor-modal-container"></div>
@@ -897,9 +874,7 @@ var ProfessorModal = {
   },
   nextHint: function() {
     this.currentHintLevel++;
-    if (this.currentHintLevel >= 3) {
-      this.currentHintLevel = 2;
-    }
+    if (this.currentHintLevel >= 3) { this.currentHintLevel = 2; }
     var hint = getProfessorHint(this.topicKey, this.currentHintLevel);
     var buttons = [
       { text: 'Закрыть', cls: 'professor-btn-secondary', onClick: function() { ProfessorModal.close(); } }
@@ -935,15 +910,11 @@ var ProfessorModal = {
           <div class="professor-actions">${btnsHtml}</div>
         </div>
       </div>`;
-    // привязываем события
     var overlay = document.getElementById('professor-overlay');
     var btns = overlay.querySelectorAll('.professor-btn');
     buttons.forEach(function(b, idx) {
-      if (b.onClick) {
-        btns[idx].addEventListener('click', b.onClick);
-      }
+      if (b.onClick) btns[idx].addEventListener('click', b.onClick);
     });
-    // закрытие по клику на оверлей (опционально)
     overlay.addEventListener('click', function(e) {
       if (e.target === overlay) ProfessorModal.close();
     });
@@ -1132,7 +1103,7 @@ var QuestionSystem = {
   }
 };
 
-// ── AISystem (оставлен для чата) ──
+// ── AISystem ──
 var AISystem = {
   openChat: function() {
     const aiPanel = document.getElementById('ai-quiz');
@@ -1569,4 +1540,331 @@ loadProgress(function() {
 });
 </script>
 </body>
-</html>
+</html>"""
+
+# ═══════════════════════════════════════════
+#  ВЕБ-СЕРВЕР ДЛЯ MINI APP
+# ═══════════════════════════════════════════
+async def handle_webapp(request):
+    return web.Response(text=HTML_CONTENT, content_type='text/html')
+
+app_web = web.Application()
+app_web.router.add_get('/', handle_webapp)
+
+async def run_web():
+    runner = web.AppRunner(app_web)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', 8080)
+    await site.start()
+    print("Mini App available on port 8080")
+
+# ═══════════════════════════════════════════
+#  ХРАНИЛИЩЕ ПОЛЬЗОВАТЕЛЕЙ (простой JSON-файл)
+# ═══════════════════════════════════════════
+DB_FILE = "users_db.json"
+
+def load_db():
+    if os.path.exists(DB_FILE):
+        with open(DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return {}
+
+def save_db(db):
+    with open(DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(db, f, ensure_ascii=False, indent=2)
+
+def get_user(user_id: int) -> dict:
+    db = load_db()
+    uid = str(user_id)
+    if uid not in db:
+        db[uid] = {
+            "user_id": user_id,
+            "first_name": "",
+            "oge_date": None,
+            "trial_start": None,
+            "trial_end": None,
+            "subscription_until": None,
+            "last_active": None,
+            "streak_reminder_sent_today": False,
+            "onboarding_step": "start"
+        }
+        save_db(db)
+    return db[uid]
+
+def update_user(user_id: int, **kwargs):
+    db = load_db()
+    uid = str(user_id)
+    if uid not in db:
+        get_user(user_id)
+        db = load_db()
+    db[uid].update(kwargs)
+    save_db(db)
+
+# ═══════════════════════════════════════════
+#  FSM — состояния для онбординга
+# ═══════════════════════════════════════════
+class Onboarding(StatesGroup):
+    waiting_for_oge_year = State()
+
+# ═══════════════════════════════════════════
+#  /start
+# ═══════════════════════════════════════════
+@dp.message(CommandStart())
+async def cmd_start(message: Message, state: FSMContext):
+    user = get_user(message.from_user.id)
+    name = message.from_user.first_name
+
+    if user["onboarding_step"] == "completed":
+        await send_app_menu(message)
+        return
+
+    update_user(message.from_user.id, first_name=name)
+
+    text = (
+        f"👋 Привет, <b>{name}</b>!\n\n"
+        f"🗺 Я — Профессор Гео, твой AI-репетитор по географии.\n\n"
+        f"Помогу подготовиться к ОГЭ так, чтобы было понятно и не скучно.\n\n"
+        f"Для начала — скажи, в каком году у тебя ОГЭ?"
+    )
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="2026", callback_data="oge_year_2026")],
+        [InlineKeyboardButton(text="2027", callback_data="oge_year_2027")],
+        [InlineKeyboardButton(text="2028", callback_data="oge_year_2028")],
+    ])
+    await message.answer(text, reply_markup=kb)
+    update_user(message.from_user.id, onboarding_step="waiting_oge_year")
+
+@dp.callback_query(F.data.startswith("oge_year_"))
+async def cb_oge_year(call: CallbackQuery):
+    year = call.data.replace("oge_year_", "")
+    oge_date = f"{year}-06-19"
+
+    now = datetime.now()
+    trial_end = now + timedelta(days=7)
+
+    update_user(
+        call.from_user.id,
+        oge_date=oge_date,
+        trial_start=now.isoformat(),
+        trial_end=trial_end.isoformat(),
+        onboarding_step="completed",
+        last_active=now.isoformat()
+    )
+
+    text = (
+        f"Отлично! Настроил план подготовки под {year} год.\n\n"
+        f"🎁 Дарю тебе <b>7 дней бесплатного доступа</b> ко всем темам — "
+        f"попробуй, как это работает.\n\n"
+        f"Жми кнопку и начинай первую тему 👇"
+    )
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
+    ])
+    await call.message.edit_text(text, reply_markup=kb)
+
+@dp.message(Command("ping"))
+async def cmd_ping(message: Message):
+    update_user(message.from_user.id, last_active=datetime.now().isoformat())
+    await message.delete()
+
+async def send_app_menu(message: Message):
+    user = get_user(message.from_user.id)
+    status = get_subscription_status(user)
+
+    if status == "trial":
+        trial_end = datetime.fromisoformat(user["trial_end"])
+        days_left = max(0, (trial_end - datetime.now()).days)
+        sub_text = f"🎁 Пробный период: осталось {days_left} дн."
+    elif status == "active":
+        sub_end = datetime.fromisoformat(user["subscription_until"])
+        sub_text = f"✅ Подписка активна до {sub_end.strftime('%d.%m.%Y')}"
+    else:
+        sub_text = "⚠️ Подписка не активна"
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
+    ])
+    await message.answer(f"{sub_text}\n\nПродолжай подготовку 👇", reply_markup=kb)
+
+def get_subscription_status(user: dict) -> str:
+    now = datetime.now()
+    if user.get("subscription_until"):
+        sub_end = datetime.fromisoformat(user["subscription_until"])
+        if sub_end > now:
+            return "active"
+    if user.get("trial_end"):
+        trial_end = datetime.fromisoformat(user["trial_end"])
+        if trial_end > now:
+            return "trial"
+    return "expired"
+
+# ═══════════════════════════════════════════
+#  ПЛАТЁЖНАЯ СИСТЕМА (ЮKassa)
+# ═══════════════════════════════════════════
+from yookassa import Configuration, Payment
+import uuid
+
+Configuration.account_id = os.getenv('YOOKASSA_SHOP_ID')
+Configuration.secret_key = os.getenv('YOOKASSA_SECRET_KEY')
+
+TARIFFS = {
+    "1m": {"label": "1 месяц", "price": 349, "days": 30},
+    "3m": {"label": "3 месяца", "price": 899, "days": 90},
+    "full": {"label": "До ОГЭ (выгодно)", "price": 1490, "days": 240},
+}
+
+@dp.message(Command("subscribe"))
+async def cmd_subscribe(message: Message):
+    await show_tariffs(message)
+
+async def show_tariffs(message: Message):
+    kb_buttons = []
+    for key, t in TARIFFS.items():
+        kb_buttons.append([InlineKeyboardButton(
+            text=f"{t['label']} — {t['price']}₽",
+            callback_data=f"buy_{key}"
+        )])
+    kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
+    await message.answer(
+        "💳 <b>Выбери тариф</b>\n\n"
+        "Полный доступ ко всем темам, финальному боссу и AI-объяснениям.",
+        reply_markup=kb
+    )
+
+@dp.callback_query(F.data.startswith("buy_"))
+async def cb_buy(call: CallbackQuery):
+    tariff_key = call.data.replace("buy_", "")
+    tariff = TARIFFS[tariff_key]
+    user_id = call.from_user.id
+
+    idempotence_key = str(uuid.uuid4())
+    payment = Payment.create({
+        "amount": {"value": f"{tariff['price']}.00", "currency": "RUB"},
+        "confirmation": {
+            "type": "redirect",
+            "return_url": f"https://t.me/{(await bot.get_me()).username}"
+        },
+        "capture": True,
+        "description": f"ГеоПро — {tariff['label']}",
+        "metadata": {"user_id": str(user_id), "tariff": tariff_key, "days": tariff["days"]}
+    }, idempotence_key)
+
+    update_user(user_id, pending_payment_id=payment.id, pending_tariff=tariff_key)
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="💳 Перейти к оплате", url=payment.confirmation.confirmation_url)],
+        [InlineKeyboardButton(text="✅ Я оплатил", callback_data=f"check_{payment.id}")],
+    ])
+    await call.message.edit_text(
+        f"Тариф: <b>{tariff['label']}</b>\nСумма: <b>{tariff['price']}₽</b>\n\n"
+        f"Нажми кнопку ниже для оплаты, потом вернись и нажми «Я оплатил»",
+        reply_markup=kb
+    )
+
+@dp.callback_query(F.data.startswith("check_"))
+async def cb_check_payment(call: CallbackQuery):
+    payment_id = call.data.replace("check_", "")
+    payment = Payment.find_one(payment_id)
+
+    if payment.status == "succeeded":
+        user_id = call.from_user.id
+        user = get_user(user_id)
+        days = int(payment.metadata.get("days", 30))
+
+        base_date = datetime.now()
+        if user.get("subscription_until"):
+            existing_end = datetime.fromisoformat(user["subscription_until"])
+            if existing_end > base_date:
+                base_date = existing_end
+
+        new_end = base_date + timedelta(days=days)
+        update_user(user_id, subscription_until=new_end.isoformat())
+
+        await call.message.edit_text(
+            f"🎉 Оплата прошла!\n\n"
+            f"Доступ открыт до <b>{new_end.strftime('%d.%m.%Y')}</b>\n\n"
+            f"Возвращайся к подготовке 👇"
+        )
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
+        ])
+        await call.message.answer("Погнали дальше!", reply_markup=kb)
+    else:
+        await call.answer("⏳ Оплата ещё не прошла, попробуй через минуту", show_alert=True)
+
+# ═══════════════════════════════════════════
+#  ПЛАНИРОВЩИК НАПОМИНАНИЙ
+# ═══════════════════════════════════════════
+async def check_and_send_reminders():
+    db = load_db()
+    now = datetime.now()
+
+    for uid, user in db.items():
+        if user["onboarding_step"] != "completed":
+            continue
+
+        user_id = user["user_id"]
+        status = get_subscription_status(user)
+        last_active = datetime.fromisoformat(user["last_active"]) if user.get("last_active") else None
+        hours_inactive = (now - last_active).total_seconds() / 3600 if last_active else 999
+
+        last_reminder = user.get("last_reminder_date")
+        today_str = now.strftime("%Y-%m-%d")
+        if last_reminder == today_str:
+            continue
+
+        message_to_send = None
+
+        if status == "trial":
+            trial_end = datetime.fromisoformat(user["trial_end"])
+            days_left = (trial_end - now).days
+
+            if days_left == 1 and hours_inactive > 12:
+                message_to_send = (
+                    "⏰ Завтра последний день пробного периода!\n\n"
+                    "Успей пройти ещё пару тем, пока доступ бесплатный."
+                )
+            elif hours_inactive > 20:
+                message_to_send = (
+                    "📚 Профессор Гео ждёт тебя!\n\n"
+                    "Загляни в приложение — продолжим подготовку к ОГЭ."
+                )
+
+        elif status == "expired":
+            message_to_send = (
+                "🔓 Твой доступ закончился.\n\n"
+                "Не теряй набранный прогресс — оформи подписку и продолжай подготовку.\n\n"
+                "/subscribe — посмотреть тарифы"
+            )
+
+        elif status == "active" and hours_inactive > 20 and hours_inactive < 48:
+            message_to_send = (
+                "🔥 Не теряй серию дней!\n\n"
+                "Зайди сегодня и реши хотя бы один вопрос, чтобы сохранить streak."
+            )
+
+        if message_to_send:
+            try:
+                await bot.send_message(user_id, message_to_send)
+                update_user(user_id, last_reminder_date=today_str)
+            except Exception as e:
+                print(f"Не удалось отправить напоминание {user_id}: {e}")
+
+scheduler.add_job(check_and_send_reminders, "interval", hours=1)
+
+@dp.message(Command("status"))
+async def cmd_status(message: Message):
+    user = get_user(message.from_user.id)
+    status = get_subscription_status(user)
+    status_text = {"trial": "🎁 Пробный период", "active": "✅ Активная подписка", "expired": "⚠️ Доступ истёк"}
+    await message.answer(f"Твой статус: {status_text.get(status, 'неизвестно')}")
+
+# ═══════════════════════════════════════════
+#  ЗАПУСК ВСЕГО ВМЕСТЕ
+# ═══════════════════════════════════════════
+async def main():
+    scheduler.start()
+    await asyncio.gather(run_web(), dp.start_polling(bot))
+
+if __name__ == "__main__":
+    asyncio.run(main())
