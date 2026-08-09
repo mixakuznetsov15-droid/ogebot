@@ -4,21 +4,23 @@
 
 document.addEventListener('DOMContentLoaded', function () {
   loadProgress(function () {
+    // Heartbeat-сигнал активности
+    if (isTelegram && typeof tgApp.sendData === 'function') {
+      tgApp.sendData(JSON.stringify({ action: 'heartbeat' }));
+    }
+
     // Инициализация менеджера сундуков (ChestManager 2.0)
     ChestManager.init({
       getProgress: () => userProgress,
       saveProgress: () => saveProgress(),
       ui: {
         onOpenStart: () => {
-          if (typeof showChestModal === 'function') {
-            showChestModal();
-          }
+          if (typeof showChestModal === 'function') showChestModal();
         },
         onReward: (reward) => {
           if (typeof showRewardModal === 'function') {
             setTimeout(() => showRewardModal(reward), 1200);
           }
-          // Умное уведомление в зависимости от типа награды
           let toastMsg = '';
           switch (reward.type) {
             case 'xp':
@@ -45,18 +47,12 @@ document.addEventListener('DOMContentLoaded', function () {
             default:
               toastMsg = 'Награда получена!';
           }
-          if (typeof showToast === 'function') {
-            showToast(toastMsg);
-          }
+          if (typeof showToast === 'function') showToast(toastMsg);
         },
         onError: (msg) => {
-          if (typeof showToast === 'function') {
-            showToast(msg);
-          }
+          if (typeof showToast === 'function') showToast(msg);
         },
-        onComplete: () => {
-          // Профиль обновится в hideChestModal
-        }
+        onComplete: () => {}
       }
     });
 
@@ -65,11 +61,7 @@ document.addEventListener('DOMContentLoaded', function () {
     checkAchievements();
     Subscription.initTrial();
 
-    // Онбординг (показывается, если функция определена)
-    if (typeof startOnboarding === 'function') {
-      startOnboarding();
-    }
-
+    if (typeof startOnboarding === 'function') startOnboarding();
     renderHomePath();
   });
 
@@ -104,22 +96,14 @@ window.goScreen = typeof goScreen === 'function' ? goScreen : function() {};
 window.goQuizFromLoaded = typeof goQuizFromLoaded === 'function' ? goQuizFromLoaded : function() {};
 window.replayLesson = typeof replayLesson === 'function' ? replayLesson : function() {};
 
-window.openChest = async function() {
-  await ChestManager.open();
-};
-window.giveChest = function(type) {
-  ChestManager.giveChest(type);
-};
+window.openChest = async function() { await ChestManager.open(); };
+window.giveChest = function(type) { ChestManager.giveChest(type); };
 window.closeRewardModal = function() {
-  if (typeof hideChestModal === 'function') {
-    hideChestModal();
-  }
+  if (typeof hideChestModal === 'function') hideChestModal();
 };
 
 window.handleSubscribe = function() {
-  if (typeof showToast === 'function') {
-    showToast('Оплата появится позже');
-  }
+  if (typeof showToast === 'function') showToast('Оплата появится позже');
 };
 
 window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
