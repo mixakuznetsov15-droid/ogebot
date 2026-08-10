@@ -142,6 +142,8 @@ async def handle_web_app_data(message: Message):
         data = json.loads(message.web_app_data.data)
         if data.get('action') == 'heartbeat':
             update_user(message.from_user.id, last_active=datetime.now().isoformat())
+        elif data.get('action') == 'subscribe':
+            await show_tariffs(message)
     except:
         pass
     await message.delete()
