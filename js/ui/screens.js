@@ -647,14 +647,63 @@ function renderReviewScreen() {
 }
 
 // ==========================================
-//  ПЕЙВОЛЛ (Paywall Modal)
+//  МОДАЛЬНОЕ ОКНО ВЫБОРА ТАРИФА (Paywall)
 // ==========================================
 function showPaywallModal() {
-  // Отправляем боту команду /subscribe через sendData, если в Telegram
+  // Если мы в Telegram Mini App, показываем красивое окно с тарифами
   if (isTelegram && typeof tgApp.sendData === 'function') {
-    tgApp.sendData(JSON.stringify({ action: 'subscribe' }));
+    var container = document.getElementById('modal-container');
+    container.innerHTML = `
+      <div class="chest-modal-overlay show" onclick="closePaywallModal(event)">
+        <div class="chest-modal-card" style="max-width: 360px;" onclick="event.stopPropagation()">
+          <div style="text-align:center; margin-bottom: var(--space-4);">
+            <div style="font-family:var(--font-h); font-size:var(--text-xl); font-weight:800; color:var(--text); margin-bottom: var(--space-2);">
+              Выбери тариф
+            </div>
+            <div style="font-size:var(--text-sm); color:var(--muted);">
+              Полный доступ ко всем темам, финальному боссу и AI-объяснениям.
+            </div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap: var(--space-3);">
+            <div class="tariff-card" onclick="selectTariff('1m')">
+              <div class="tariff-name">1 месяц</div>
+              <div class="tariff-price">499 ₽</div>
+              <div class="tariff-desc">Доступ на 30 дней</div>
+            </div>
+            <div class="tariff-card" onclick="selectTariff('3m')" style="border-color: var(--primary2);">
+              <div class="tariff-name">3 месяца</div>
+              <div class="tariff-price">899 ₽</div>
+              <div class="tariff-desc">Экономия 598 ₽</div>
+            </div>
+            <div class="tariff-card" onclick="selectTariff('full')">
+              <div class="tariff-name">До ОГЭ</div>
+              <div class="tariff-price">2990 ₽</div>
+              <div class="tariff-desc">Доступ до экзамена (240 дней)</div>
+            </div>
+          </div>
+          <button class="btn-ghost" style="margin-top: var(--space-4); width: 100%;" onclick="closePaywallModal()">Отмена</button>
+        </div>
+      </div>`;
   } else {
     // Для браузера: показываем сообщение с инструкцией
     alert('Откройте бота @GeoProBot и напишите /subscribe для оформления подписки.');
+  }
+}
+
+function closePaywallModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('modal-container').innerHTML = '';
+}
+
+function selectTariff(tariffKey) {
+  // Отправляем боту выбранный тариф через sendData
+  if (isTelegram && typeof tgApp.sendData === 'function') {
+    tgApp.sendData(JSON.stringify({ action: 'subscribe', tariff: tariffKey }));
+  }
+  // Закрываем модальное окно
+  document.getElementById('modal-container').innerHTML = '';
+  // Показываем toast с инструкцией
+  if (typeof showToast === 'function') {
+    showToast('Проверь чат с ботом для оплаты');
   }
 }
