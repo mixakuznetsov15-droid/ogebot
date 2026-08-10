@@ -282,6 +282,8 @@ function renderProfile() {
     html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
     html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + subDetails + '</div></div>';
     html += '</div>';
+    // Кнопка продления теперь видна всегда
+    html += '<button class="btn-ghost" style="margin-top:var(--space-2); width: auto; padding: var(--space-2) var(--space-4); font-size: var(--text-xs);" onclick="showPaywallModal()">Продлить подписку</button>';
   } else {
     html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
     html += '<div style="font-size:var(--text-xl)">' + ICONS.alertTriangle + '</div>';
