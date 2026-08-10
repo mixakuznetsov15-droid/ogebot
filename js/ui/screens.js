@@ -95,6 +95,12 @@ function showSubtopicsList(subtopics, parentIndex) {
 }
 
 async function openSubtopic(parentIndex, subtopicIndex) {
+    // Проверка подписки
+    if (!Subscription.hasAccess()) {
+        showPaywallModal();
+        return;
+    }
+
     if (!isSubtopicUnlocked(parentIndex, subtopicIndex)) {
         alert('Этот урок ещё не открыт. Завершите предыдущий урок.');
         return;
@@ -137,6 +143,44 @@ async function openSubtopic(parentIndex, subtopicIndex) {
         alert('❌ Ошибка загрузки теории\n\nФайл: ' + sub.file + '\nURL: ' + url + '\nОшибка: ' + e.message);
         goQuizFromLoaded(parentIndex);
     }
+}
+
+function startSubtopicPractice() {
+    // Проверка подписки
+    if (!Subscription.hasAccess()) {
+        showPaywallModal();
+        return;
+    }
+
+    if (!currentSubtopicQuestionsFile) {
+        goQuizFromLoaded(currentLessonIndex);
+        return;
+    }
+
+    var url = 'data/' + currentSubtopicQuestionsFile;
+    fetch(url)
+        .then(function(response) {
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            return response.json();
+        })
+        .then(function(questions) {
+            shuffled = questions;
+            curQ = 0;
+            score = 0;
+            answered = false;
+            lives = 3;
+            hintUsed = false;
+            correctStreak = 0;
+            lastAnswerWasWrong = false;
+            isBossMode = false;
+            currentLessonIndex = 0;
+            goScreen('s-quiz');
+            renderQ();
+        })
+        .catch(function(e) {
+            alert('Ошибка загрузки практики: ' + e.message);
+            goQuizFromLoaded(currentLessonIndex);
+        });
 }
 
 function showTheoryScreen(theoryInfo) {}
@@ -241,10 +285,10 @@ function renderProfile() {
   } else {
     html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
     html += '<div style="font-size:var(--text-xl)">' + ICONS.alertTriangle + '</div>';
-    html += '<div><div style="font-weight:700;font-size:var(--text-base)">Пробный период истёк</div>';
-    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Оформите подписку за ' + Subscription.PRICE + ' ₽/мес</div></div>';
+    html += '<div><div style="font-weight:700;font-size:var(--text-base)">Доступ закрыт</div>';
+    html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">Оформите подписку, чтобы продолжить</div></div>';
     html += '</div>';
-    html += '<button class="btn-primary" style="margin-top:var(--space-2)" onclick="handleSubscribe()">Оформить подписку</button>';
+    html += '<button class="btn-primary" style="margin-top:var(--space-2)" onclick="showPaywallModal()">Оформить подписку</button>';
   }
 
   container.innerHTML = html;
@@ -360,7 +404,7 @@ function renderHomePath() {
       for (var i = 0; i < THEORY_FILES.length; i++) {
         var topic = THEORY_FILES[i];
         if (topic.comingSoon) continue;
-        if (!isTopicUnlocked(i)) break; // тема ещё не открыта
+        if (!isTopicUnlocked(i)) break;
         if (topic.subtopics) {
           var allSubtopicDone = topic.subtopics.every(function(sub) {
             return userProgress.completedLessons && userProgress.completedLessons[sub.title];
@@ -392,7 +436,6 @@ function renderHomePath() {
   for (var i = 0; i < THEORY_FILES.length; i++) {
     var topic = THEORY_FILES[i];
     if (topic.comingSoon) {
-      // Заглушка для будущих тем
       html += '<div class="list-row list-row--locked">';
       html += '<div class="status-badge status-badge--locked">' + ICONS.lock + '</div>';
       html += '<div style="flex:1;"><div style="font-weight:600;font-size:var(--text-base);">' + topic.title + '</div>';
@@ -599,4 +642,17 @@ function renderReviewScreen() {
   }
 
   container.innerHTML = html;
+}
+
+// ==========================================
+//  ПЕЙВОЛЛ (Paywall Modal)
+// ==========================================
+function showPaywallModal() {
+  // Отправляем боту команду /subscribe через sendData, если в Telegram
+  if (isTelegram && typeof tgApp.sendData === 'function') {
+    tgApp.sendData(JSON.stringify({ action: 'subscribe' }));
+  } else {
+    // Для браузера: показываем сообщение с инструкцией
+    alert('Откройте бота @GeoProBot и напишите /subscribe для оформления подписки.');
+  }
 }
