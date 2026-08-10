@@ -134,7 +134,7 @@ async def cb_oge_year(call: CallbackQuery):
     await call.message.edit_text(text, reply_markup=kb)
 
 # ═══════════════════════════════════════════
-#  Heartbeat через WebApp.sendData
+#  Heartbeat и команды из Mini App
 # ═══════════════════════════════════════════
 @dp.message(F.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: Message):
@@ -167,6 +167,7 @@ async def send_app_menu(message: Message):
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
+        [InlineKeyboardButton(text="💳 Подписка", callback_data="show_tariffs")],
     ])
     await message.answer(f"{sub_text}\n\nПродолжай подготовку 👇", reply_markup=kb)
 
@@ -186,14 +187,18 @@ def get_subscription_status(user: dict) -> str:
 #  ПЛАТЕЖИ
 # ═══════════════════════════════════════════
 TARIFFS = {
-    "1m": {"label": "1 месяц", "price": 349, "days": 30},
-    "3m": {"label": "3 месяца", "price": 899, "days": 90},
+    "1m": {"label": "1 месяц", "price": 499, "days": 30},
+    "1y": {"label": "1 год", "price": 2999, "days": 365},
     "full": {"label": "До ОГЭ (выгодно)", "price": 1490, "days": 240},
 }
 
 @dp.message(Command("subscribe"))
 async def cmd_subscribe(message: Message):
     await show_tariffs(message)
+
+@dp.callback_query(F.data == "show_tariffs")
+async def cb_show_tariffs(call: CallbackQuery):
+    await show_tariffs(call.message)
 
 async def show_tariffs(message: Message):
     kb_buttons = []
@@ -205,6 +210,7 @@ async def show_tariffs(message: Message):
     kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
     await message.answer(
         "💳 <b>Выбери тариф</b>\n\n"
+        "Подписка активируется после окончания текущего периода.\n"
         "Полный доступ ко всем темам, финальному боссу и AI-объяснениям.",
         reply_markup=kb
     )
@@ -250,6 +256,15 @@ async def cb_check_payment(call: CallbackQuery):
         days = int(payment.metadata.get("days", 30))
 
         base_date = datetime.now()
+
+        # Если есть активный триал, который ещё не истёк, и нет платной подписки,
+        # начинаем платную подписку после завершения триала.
+        if user.get("trial_end"):
+            trial_end = datetime.fromisoformat(user["trial_end"])
+            if trial_end > base_date:
+                base_date = trial_end
+
+        # Если уже есть платная подписка, продлеваем с даты её окончания
         if user.get("subscription_until"):
             existing_end = datetime.fromisoformat(user["subscription_until"])
             if existing_end > base_date:
