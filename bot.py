@@ -134,7 +134,7 @@ async def cb_oge_year(call: CallbackQuery):
     await call.message.edit_text(text, reply_markup=kb)
 
 # ═══════════════════════════════════════════
-#  Heartbeat и команды из Mini App
+#  Heartbeat через WebApp.sendData
 # ═══════════════════════════════════════════
 @dp.message(F.content_type == ContentType.WEB_APP_DATA)
 async def handle_web_app_data(message: Message):
@@ -143,10 +143,29 @@ async def handle_web_app_data(message: Message):
         if data.get('action') == 'heartbeat':
             update_user(message.from_user.id, last_active=datetime.now().isoformat())
         elif data.get('action') == 'subscribe':
-            await show_tariffs(message)
+            tariff_key = data.get('tariff')
+            if tariff_key and tariff_key in TARIFFS:
+                await start_payment(message, tariff_key)
+            else:
+                await show_tariffs(message)
     except:
         pass
     await message.delete()
+
+# ═══════════════════════════════════════════
+#  КОМАНДА /reset — сброс пользователя
+# ═══════════════════════════════════════════
+@dp.message(Command("reset"))
+async def cmd_reset(message: Message):
+    user_id = message.from_user.id
+    db = load_db()
+    uid = str(user_id)
+    if uid in db:
+        del db[uid]
+        save_db(db)
+        await message.answer("♻️ Данные сброшены. Нажми /start для повторного онбординга.")
+    else:
+        await message.answer("У вас нет сохранённых данных.")
 
 # ═══════════════════════════════════════════
 #  Вспомогательные функции
@@ -184,12 +203,12 @@ def get_subscription_status(user: dict) -> str:
     return "expired"
 
 # ═══════════════════════════════════════════
-#  ПЛАТЕЖИ
+#  ТАРИФЫ
 # ═══════════════════════════════════════════
 TARIFFS = {
     "1m": {"label": "1 месяц", "price": 499, "days": 30},
-    "1y": {"label": "1 год", "price": 2999, "days": 365},
-    "full": {"label": "До ОГЭ (выгодно)", "price": 1490, "days": 240},
+    "3m": {"label": "3 месяца", "price": 899, "days": 90},
+    "full": {"label": "До ОГЭ (выгодно)", "price": 2990, "days": 240},
 }
 
 @dp.message(Command("subscribe"))
@@ -210,7 +229,6 @@ async def show_tariffs(message: Message):
     kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
     await message.answer(
         "💳 <b>Выбери тариф</b>\n\n"
-        "Подписка активируется после окончания текущего периода.\n"
         "Полный доступ ко всем темам, финальному боссу и AI-объяснениям.",
         reply_markup=kb
     )
@@ -218,8 +236,11 @@ async def show_tariffs(message: Message):
 @dp.callback_query(F.data.startswith("buy_"))
 async def cb_buy(call: CallbackQuery):
     tariff_key = call.data.replace("buy_", "")
+    await start_payment(call.message, tariff_key)
+
+async def start_payment(message: Message, tariff_key: str):
     tariff = TARIFFS[tariff_key]
-    user_id = call.from_user.id
+    user_id = message.from_user.id
 
     idempotence_key = str(uuid.uuid4())
     payment = Payment.create({
@@ -239,7 +260,7 @@ async def cb_buy(call: CallbackQuery):
         [InlineKeyboardButton(text="💳 Перейти к оплате", url=payment.confirmation.confirmation_url)],
         [InlineKeyboardButton(text="✅ Я оплатил", callback_data=f"check_{payment.id}")],
     ])
-    await call.message.edit_text(
+    await message.answer(
         f"Тариф: <b>{tariff['label']}</b>\nСумма: <b>{tariff['price']}₽</b>\n\n"
         f"Нажми кнопку ниже для оплаты, потом вернись и нажми «Я оплатил»",
         reply_markup=kb
@@ -255,16 +276,13 @@ async def cb_check_payment(call: CallbackQuery):
         user = get_user(user_id)
         days = int(payment.metadata.get("days", 30))
 
+        # Учёт оставшегося триала
         base_date = datetime.now()
-
-        # Если есть активный триал, который ещё не истёк, и нет платной подписки,
-        # начинаем платную подписку после завершения триала.
-        if user.get("trial_end"):
+        if user.get("trial_end") and not user.get("subscription_until"):
             trial_end = datetime.fromisoformat(user["trial_end"])
             if trial_end > base_date:
                 base_date = trial_end
 
-        # Если уже есть платная подписка, продлеваем с даты её окончания
         if user.get("subscription_until"):
             existing_end = datetime.fromisoformat(user["subscription_until"])
             if existing_end > base_date:
