@@ -46,6 +46,14 @@ const Subscription = {
   },
 
   /**
+   * Проверка, можно ли пользоваться контентом.
+   * @returns {boolean}
+   */
+  hasAccess() {
+    return this.getStatus().active;
+  },
+
+  /**
    * Активировать платную подписку (заглушка).
    * В будущем здесь будет вызов Telegram Payments.
    */
@@ -57,12 +65,5 @@ const Subscription = {
     userProgress.subscriptionEndDate = endDate.toISOString().slice(0, 10);
     saveProgress();
     return true;
-  },
-
-  /**
-   * Проверка, можно ли пользоваться приложением (MVP: всегда можно, но UI показывает статус).
-   */
-  hasAccess() {
-    return true; // в MVP доступ не ограничиваем
   }
 };
