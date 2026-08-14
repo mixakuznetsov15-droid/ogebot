@@ -40,6 +40,7 @@ function openTopic(index) {
 // Проверка, разблокирована ли родительская тема
 function isTopicUnlocked(topicIndex) {
   if (topicIndex === 0) return true; // первая тема всегда открыта
+  // Тема открыта, если предыдущая тема полностью завершена (все её подтемы пройдены)
   var prevTopic = THEORY_FILES[topicIndex - 1];
   if (!prevTopic || prevTopic.comingSoon) return false;
   if (!prevTopic.subtopics || prevTopic.subtopics.length === 0) return true;
@@ -50,7 +51,7 @@ function isTopicUnlocked(topicIndex) {
 
 // Проверка разблокировки подтемы
 function isSubtopicUnlocked(topicIndex, subtopicIndex) {
-  if (subtopicIndex === 0) return true;
+  if (subtopicIndex === 0) return true; // первая подтема всегда открыта
   var prevSubtopic = THEORY_FILES[topicIndex].subtopics[subtopicIndex - 1];
   return userProgress.completedLessons && userProgress.completedLessons[prevSubtopic.title];
 }
@@ -94,6 +95,7 @@ function showSubtopicsList(subtopics, parentIndex) {
 }
 
 async function openSubtopic(parentIndex, subtopicIndex) {
+    // Проверка подписки
     if (!Subscription.hasAccess()) {
         showPaywallModal();
         return;
@@ -144,6 +146,7 @@ async function openSubtopic(parentIndex, subtopicIndex) {
 }
 
 function startSubtopicPractice() {
+    // Проверка подписки
     if (!Subscription.hasAccess()) {
         showPaywallModal();
         return;
@@ -279,6 +282,7 @@ function renderProfile() {
     html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
     html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + subDetails + '</div></div>';
     html += '</div>';
+    // Кнопка продления теперь видна всегда
     html += '<button class="btn-ghost" style="margin-top:var(--space-2); width: auto; padding: var(--space-2) var(--space-4); font-size: var(--text-xs);" onclick="showPaywallModal()">Продлить подписку</button>';
   } else {
     html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
@@ -291,6 +295,7 @@ function renderProfile() {
 
   container.innerHTML = html;
 
+  // Контекстная подсказка для первого сундука (после рендера, если онбординг завершён)
   if (userProgress.onboardingCompleted) {
     setTimeout(function() {
       showContextualHint('firstChest');
@@ -646,7 +651,7 @@ function renderReviewScreen() {
 // ==========================================
 function showPaywallModal() {
   // Если мы в Telegram Mini App, показываем красивое окно с тарифами
-  if (isTelegram && typeof tgApp.sendData === 'function') {
+  if (isTelegram) {
     var container = document.getElementById('modal-container');
     container.innerHTML = `
       <div class="chest-modal-overlay show" onclick="closePaywallModal(event)">
@@ -691,12 +696,13 @@ function closePaywallModal(event) {
 }
 
 function selectTariff(tariffKey) {
-  // Отправляем боту выбранный тариф через sendData
-  if (isTelegram && typeof tgApp.sendData === 'function') {
-    tgApp.sendData(JSON.stringify({ action: 'subscribe', tariff: tariffKey }));
-  }
+  // Закрываем окно
   document.getElementById('modal-container').innerHTML = '';
-  if (typeof showToast === 'function') {
-    showToast('Проверь чат с ботом для оплаты');
+  
+  if (isTelegram) {
+    // Открываем бота с deep-link параметром — bot.py обработает его в /start
+    tgApp.openTelegramLink('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey);
+  } else {
+    window.open('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey, '_blank');
   }
 }
