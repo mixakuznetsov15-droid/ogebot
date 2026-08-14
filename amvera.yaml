@@ -1,6 +1,6 @@
 meta:
   toolchain:
-    language: python
+    name: python
     version: "3.11"
 run:
   command: python bot.py
