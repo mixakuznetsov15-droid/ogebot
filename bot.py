@@ -216,7 +216,7 @@ def get_subscription_status(user: dict) -> str:
 TARIFFS = {
     "1m": {"label": "1 месяц", "price": 499, "days": 30},
     "3m": {"label": "3 месяца", "price": 899, "days": 90},
-    "full": {"label": "До ОГЭ (выгодно)", "price": 2990, "days": 240},
+    "exam": {"label": "До ОГЭ (выгодно)", "price": 2990, "days": 240},
 }
 
 @dp.message(Command("subscribe"))
