@@ -675,7 +675,7 @@ function showPaywallModal() {
               <div class="tariff-price">899 ₽</div>
               <div class="tariff-desc">Экономия 598 ₽</div>
             </div>
-            <div class="tariff-card" onclick="selectTariff('full')">
+            <div class="tariff-card" onclick="selectTariff('exam')">
               <div class="tariff-name">До ОГЭ</div>
               <div class="tariff-price">2990 ₽</div>
               <div class="tariff-desc">Доступ до экзамена (240 дней)</div>
@@ -696,7 +696,6 @@ function closePaywallModal(event) {
 }
 
 function selectTariff(tariffKey) {
-  // Закрываем окно
   document.getElementById('modal-container').innerHTML = '';
   
   if (isTelegram) {
