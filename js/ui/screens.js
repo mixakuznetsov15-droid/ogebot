@@ -282,7 +282,6 @@ function renderProfile() {
     html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
     html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + subDetails + '</div></div>';
     html += '</div>';
-    // Кнопка продления теперь видна всегда
     html += '<button class="btn-ghost" style="margin-top:var(--space-2); width: auto; padding: var(--space-2) var(--space-4); font-size: var(--text-xs);" onclick="showPaywallModal()">Продлить подписку</button>';
   } else {
     html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
@@ -295,7 +294,6 @@ function renderProfile() {
 
   container.innerHTML = html;
 
-  // Контекстная подсказка для первого сундука (после рендера, если онбординг завершён)
   if (userProgress.onboardingCompleted) {
     setTimeout(function() {
       showContextualHint('firstChest');
@@ -650,7 +648,6 @@ function renderReviewScreen() {
 //  МОДАЛЬНОЕ ОКНО ВЫБОРА ТАРИФА (Paywall)
 // ==========================================
 function showPaywallModal() {
-  // Если мы в Telegram Mini App, показываем красивое окно с тарифами
   if (isTelegram) {
     var container = document.getElementById('modal-container');
     container.innerHTML = `
@@ -675,7 +672,7 @@ function showPaywallModal() {
               <div class="tariff-price">899 ₽</div>
               <div class="tariff-desc">Экономия 598 ₽</div>
             </div>
-            <div class="tariff-card" onclick="selectTariff('exam')">
+            <div class="tariff-card" onclick="selectTariff('full')">
               <div class="tariff-name">До ОГЭ</div>
               <div class="tariff-price">2990 ₽</div>
               <div class="tariff-desc">Доступ до экзамена (240 дней)</div>
@@ -685,7 +682,6 @@ function showPaywallModal() {
         </div>
       </div>`;
   } else {
-    // Для браузера: показываем сообщение с инструкцией
     alert('Откройте бота @TestOgeEge_bot и напишите /subscribe для оформления подписки.');
   }
 }
@@ -699,7 +695,6 @@ function selectTariff(tariffKey) {
   document.getElementById('modal-container').innerHTML = '';
   
   if (isTelegram) {
-    // Открываем бота с deep-link параметром — bot.py обработает его в /start
     tgApp.openTelegramLink('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey);
   } else {
     window.open('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey, '_blank');
