@@ -23,29 +23,14 @@ document.addEventListener('DOMContentLoaded', function () {
           }
           let toastMsg = '';
           switch (reward.type) {
-            case 'xp':
-              toastMsg = `Получено: ${reward.amount} XP`;
-              break;
-            case 'gems':
-              toastMsg = `Получено: ${reward.amount} кристаллов`;
-              break;
-            case 'booster':
-              toastMsg = `Бустер XP на ${Math.round(reward.duration / 60000)} мин.`;
-              break;
-            case 'streakFreeze':
-              toastMsg = 'Получена заморозка серии!';
-              break;
-            case 'tool_hint':
-              toastMsg = 'Получена бесплатная подсказка!';
-              break;
-            case 'tool_fiftyFifty':
-              toastMsg = 'Получен шанс 50/50!';
-              break;
-            case 'cosmetic':
-              toastMsg = 'Новый предмет в коллекции!';
-              break;
-            default:
-              toastMsg = 'Награда получена!';
+            case 'xp': toastMsg = `Получено: ${reward.amount} XP`; break;
+            case 'gems': toastMsg = `Получено: ${reward.amount} кристаллов`; break;
+            case 'booster': toastMsg = `Бустер XP на ${Math.round(reward.duration / 60000)} мин.`; break;
+            case 'streakFreeze': toastMsg = 'Получена заморозка серии!'; break;
+            case 'tool_hint': toastMsg = 'Получена бесплатная подсказка!'; break;
+            case 'tool_fiftyFifty': toastMsg = 'Получен шанс 50/50!'; break;
+            case 'cosmetic': toastMsg = 'Новый предмет в коллекции!'; break;
+            default: toastMsg = 'Награда получена!';
           }
           if (typeof showToast === 'function') showToast(toastMsg);
         },
@@ -102,8 +87,13 @@ window.closeRewardModal = function() {
   if (typeof hideChestModal === 'function') hideChestModal();
 };
 
+// ★ ИСПРАВЛЕНО: открываем модальное окно тарифов
 window.handleSubscribe = function() {
-  if (typeof showToast === 'function') showToast('Оплата появится позже');
+  if (typeof showPaywallModal === 'function') {
+    showPaywallModal();
+  } else {
+    if (typeof showToast === 'function') showToast('Функция подписки недоступна');
+  }
 };
 
 window.inviteFriend = typeof inviteFriend === 'function' ? inviteFriend : function() {
