@@ -1,6 +1,4 @@
 meta:
-  version: 1
-  name: ogebot
-  description: Telegram bot for OGE geography
+  toolchain: python
 run:
   command: python bot.py
