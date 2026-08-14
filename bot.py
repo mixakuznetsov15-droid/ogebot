@@ -33,7 +33,7 @@ scheduler = AsyncIOScheduler()
 # ═══════════════════════════════════════════
 #  ХРАНИЛИЩЕ ПОЛЬЗОВАТЕЛЕЙ
 # ═══════════════════════════════════════════
-DB_FILE = "users_db.json"
+DB_FILE = "/data/users_db.json"  # постоянное хранилище Amvera
 
 def load_db():
     if os.path.exists(DB_FILE):
@@ -78,13 +78,21 @@ class Onboarding(StatesGroup):
     waiting_for_oge_year = State()
 
 # ═══════════════════════════════════════════
-#  /start
+#  /start — обрабатывает deep-link и онбординг
 # ═══════════════════════════════════════════
 @dp.message(CommandStart())
 async def cmd_start(message: Message, state: FSMContext):
     user = get_user(message.from_user.id)
-    name = message.from_user.first_name
 
+    # Проверяем deep-link параметр вида /start buy_1m
+    args = message.text.split(maxsplit=1)
+    if len(args) > 1 and args[1].startswith("buy_"):
+        tariff_key = args[1].replace("buy_", "")
+        if tariff_key in TARIFFS:
+            await start_payment(message, tariff_key)
+            return
+
+    name = message.from_user.first_name
     if user["onboarding_step"] == "completed":
         await send_app_menu(message)
         return
@@ -153,7 +161,7 @@ async def handle_web_app_data(message: Message):
     await message.delete()
 
 # ═══════════════════════════════════════════
-#  КОМАНДА /reset — сброс пользователя
+#  /reset — сброс пользователя
 # ═══════════════════════════════════════════
 @dp.message(Command("reset"))
 async def cmd_reset(message: Message):
@@ -203,7 +211,7 @@ def get_subscription_status(user: dict) -> str:
     return "expired"
 
 # ═══════════════════════════════════════════
-#  ТАРИФЫ
+#  ТАРИФЫ И ОПЛАТА
 # ═══════════════════════════════════════════
 TARIFFS = {
     "1m": {"label": "1 месяц", "price": 499, "days": 30},
