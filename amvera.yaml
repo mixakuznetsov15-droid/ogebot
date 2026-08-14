@@ -2,5 +2,6 @@ meta:
   toolchain:
     name: python
     version: "3.11"
+  environment: {}
 run:
   command: python bot.py
