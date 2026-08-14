@@ -40,7 +40,6 @@ function openTopic(index) {
 // Проверка, разблокирована ли родительская тема
 function isTopicUnlocked(topicIndex) {
   if (topicIndex === 0) return true; // первая тема всегда открыта
-  // Тема открыта, если предыдущая тема полностью завершена (все её подтемы пройдены)
   var prevTopic = THEORY_FILES[topicIndex - 1];
   if (!prevTopic || prevTopic.comingSoon) return false;
   if (!prevTopic.subtopics || prevTopic.subtopics.length === 0) return true;
@@ -51,7 +50,7 @@ function isTopicUnlocked(topicIndex) {
 
 // Проверка разблокировки подтемы
 function isSubtopicUnlocked(topicIndex, subtopicIndex) {
-  if (subtopicIndex === 0) return true; // первая подтема всегда открыта
+  if (subtopicIndex === 0) return true;
   var prevSubtopic = THEORY_FILES[topicIndex].subtopics[subtopicIndex - 1];
   return userProgress.completedLessons && userProgress.completedLessons[prevSubtopic.title];
 }
@@ -95,7 +94,6 @@ function showSubtopicsList(subtopics, parentIndex) {
 }
 
 async function openSubtopic(parentIndex, subtopicIndex) {
-    // Проверка подписки
     if (!Subscription.hasAccess()) {
         showPaywallModal();
         return;
@@ -146,7 +144,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
 }
 
 function startSubtopicPractice() {
-    // Проверка подписки
     if (!Subscription.hasAccess()) {
         showPaywallModal();
         return;
@@ -282,7 +279,6 @@ function renderProfile() {
     html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
     html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + subDetails + '</div></div>';
     html += '</div>';
-    // Кнопка продления теперь видна всегда
     html += '<button class="btn-ghost" style="margin-top:var(--space-2); width: auto; padding: var(--space-2) var(--space-4); font-size: var(--text-xs);" onclick="showPaywallModal()">Продлить подписку</button>';
   } else {
     html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
@@ -295,7 +291,6 @@ function renderProfile() {
 
   container.innerHTML = html;
 
-  // Контекстная подсказка для первого сундука (после рендера, если онбординг завершён)
   if (userProgress.onboardingCompleted) {
     setTimeout(function() {
       showContextualHint('firstChest');
@@ -686,7 +681,7 @@ function showPaywallModal() {
       </div>`;
   } else {
     // Для браузера: показываем сообщение с инструкцией
-    alert('Откройте бота @GeoProBot и напишите /subscribe для оформления подписки.');
+    alert('Откройте бота @TestOgeEge_bot и напишите /subscribe для оформления подписки.');
   }
 }
 
@@ -700,9 +695,7 @@ function selectTariff(tariffKey) {
   if (isTelegram && typeof tgApp.sendData === 'function') {
     tgApp.sendData(JSON.stringify({ action: 'subscribe', tariff: tariffKey }));
   }
-  // Закрываем модальное окно
   document.getElementById('modal-container').innerHTML = '';
-  // Показываем toast с инструкцией
   if (typeof showToast === 'function') {
     showToast('Проверь чат с ботом для оплаты');
   }
