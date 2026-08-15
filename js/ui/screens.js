@@ -425,7 +425,7 @@ function renderHomePath() {
         html += '<div class="continue-arrow">' + ICONS.arrowRight + '</div></div>';
       }
     } else {
-      html += '<div class="continue-card" onclick="goBossLevel()" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
+      html += '<div class="continue-card" onclick="' + (Subscription.hasAccess() ? 'goBossLevel()' : 'showPaywallModal()') + '" style="background:linear-gradient(135deg,#3a2a0c,#2a1f08);border-color:#d2992250">';
       html += '<div class="continue-icon">' + ICONS.crown + '</div>';
       html += '<div><div class="continue-label" style="color:#d29922">Готово к финалу</div><div class="continue-title">Финальный босс</div></div>';
       html += '<div class="continue-arrow" style="color:#d29922">' + ICONS.arrowRight + '</div></div>';
@@ -696,11 +696,19 @@ function selectTariff(tariffKey) {
   var container = document.getElementById('modal-container');
   if (container) container.innerHTML = '';
   
-  // Открываем бота с deep-link параметром
-  if (isTelegram && tgApp && tgApp.openTelegramLink) {
+  // Понятный отклик для пользователя
+  if (typeof showToast === 'function') {
+    showToast('Открываем чат с ботом для оплаты...');
+  }
+  
+  // Если внутри Telegram Mini App, используем sendData для надёжной передачи
+  if (isTelegram && typeof tgApp.sendData === 'function') {
+    tgApp.sendData(JSON.stringify({ action: 'subscribe', tariff: tariffKey }));
+  } else if (isTelegram && typeof tgApp.openTelegramLink === 'function') {
+    // Fallback, если sendData почему-то нет
     tgApp.openTelegramLink('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey);
   } else {
-    // Для браузера или если Telegram API не доступен
+    // Для обычного браузера
     window.open('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey, '_blank');
   }
 }
