@@ -10,35 +10,32 @@ const Subscription = {
    * Инициализация триала: если нет даты начала, ставим сегодня.
    */
   initTrial() {
-    if (!userProgress.trialStartDate) {
-      userProgress.trialStartDate = new Date().toISOString().slice(0, 10);
+    if (!userProgress.trial_start) {
+      userProgress.trial_start = new Date().toISOString().slice(0, 10);
       saveProgress();
     }
   },
 
   /**
    * Возвращает статус подписки.
+   * Синхронизирует с полями из bot.py: subscription_until, trial_end
    * @returns {{ active: boolean, type: string, daysLeft: number, expired: boolean }}
    */
   getStatus() {
     const today = new Date();
-    const trialStart = userProgress.trialStartDate ? new Date(userProgress.trialStartDate) : null;
-    const subscriptionEnd = userProgress.subscriptionEndDate ? new Date(userProgress.subscriptionEndDate) : null;
+    const trialEnd = userProgress.trial_end ? new Date(userProgress.trial_end) : null;
+    const subscriptionEnd = userProgress.subscription_until ? new Date(userProgress.subscription_until) : null;
 
-    // Платная подписка
+    // Платная подписка (приоритет выше, чем триал)
     if (subscriptionEnd && subscriptionEnd > today) {
       const daysLeft = Math.ceil((subscriptionEnd - today) / (1000 * 60 * 60 * 24));
       return { active: true, type: 'paid', daysLeft, expired: false };
     }
 
     // Триал
-    if (trialStart) {
-      const trialEnd = new Date(trialStart);
-      trialEnd.setDate(trialEnd.getDate() + this.TRIAL_DAYS);
-      if (today < trialEnd) {
-        const daysLeft = Math.ceil((trialEnd - today) / (1000 * 60 * 60 * 24));
-        return { active: true, type: 'trial', daysLeft, expired: false };
-      }
+    if (trialEnd && trialEnd > today) {
+      const daysLeft = Math.ceil((trialEnd - today) / (1000 * 60 * 60 * 24));
+      return { active: true, type: 'trial', daysLeft, expired: false };
     }
 
     // Нет активной подписки
@@ -54,16 +51,33 @@ const Subscription = {
   },
 
   /**
-   * Активировать платную подписку (заглушка).
-   * В будущем здесь будет вызов Telegram Payments.
+   * Получить количество дней, осталось до конца подписки
+   * @returns {number}
    */
-  async activateSubscription() {
-    // Заглушка: "оплата" на 30 дней
-    const today = new Date();
-    const endDate = new Date(today);
-    endDate.setDate(endDate.getDate() + 30);
-    userProgress.subscriptionEndDate = endDate.toISOString().slice(0, 10);
-    saveProgress();
-    return true;
+  getDaysLeft() {
+    return this.getStatus().daysLeft;
+  },
+
+  /**
+   * Получить тип подписки ('trial', 'paid', 'none')
+   * @returns {string}
+   */
+  getType() {
+    return this.getStatus().type;
+  },
+
+  /**
+   * Получить дату конца подписки (для отображения)
+   * @returns {string}
+   */
+  getEndDate() {
+    const status = this.getStatus();
+    if (status.type === 'paid' && userProgress.subscription_until) {
+      return userProgress.subscription_until;
+    }
+    if (status.type === 'trial' && userProgress.trial_end) {
+      return userProgress.trial_end;
+    }
+    return null;
   }
 };
