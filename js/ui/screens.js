@@ -40,7 +40,6 @@ function openTopic(index) {
 // Проверка, разблокирована ли родительская тема
 function isTopicUnlocked(topicIndex) {
   if (topicIndex === 0) return true; // первая тема всегда открыта
-  // Тема открыта, если предыдущая тема полностью завершена (все её подтемы пройдены)
   var prevTopic = THEORY_FILES[topicIndex - 1];
   if (!prevTopic || prevTopic.comingSoon) return false;
   if (!prevTopic.subtopics || prevTopic.subtopics.length === 0) return true;
@@ -95,7 +94,6 @@ function showSubtopicsList(subtopics, parentIndex) {
 }
 
 async function openSubtopic(parentIndex, subtopicIndex) {
-    // Проверка подписки
     if (!Subscription.hasAccess()) {
         showPaywallModal();
         return;
@@ -146,7 +144,6 @@ async function openSubtopic(parentIndex, subtopicIndex) {
 }
 
 function startSubtopicPractice() {
-    // Проверка подписки
     if (!Subscription.hasAccess()) {
         showPaywallModal();
         return;
@@ -282,7 +279,6 @@ function renderProfile() {
     html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
     html += '<div style="font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-1)">' + subDetails + '</div></div>';
     html += '</div>';
-    // Кнопка продления теперь видна всегда
     html += '<button class="btn-ghost" style="margin-top:var(--space-2); width: auto; padding: var(--space-2) var(--space-4); font-size: var(--text-xs);" onclick="showPaywallModal()">Продлить подписку</button>';
   } else {
     html += '<div class="sub-status-card" style="border-color:var(--danger);background:linear-gradient(135deg,#2a1010,#1f0808)">';
@@ -295,7 +291,6 @@ function renderProfile() {
 
   container.innerHTML = html;
 
-  // Контекстная подсказка для первого сундука (после рендера, если онбординг завершён)
   if (userProgress.onboardingCompleted) {
     setTimeout(function() {
       showContextualHint('firstChest');
@@ -694,21 +689,35 @@ function closePaywallModal(event) {
 
 function selectTariff(tariffKey) {
   var container = document.getElementById('modal-container');
+  if (!container) return;
+
+  // Показываем информационное окно с инструкцией
+  container.innerHTML = `
+    <div class="chest-modal-overlay show" onclick="closePaywallModal(event)">
+      <div class="chest-modal-card" style="max-width: 360px;" onclick="event.stopPropagation()">
+        <div style="text-align:center; margin-bottom: var(--space-4);">
+          <div style="font-family:var(--font-h); font-size:var(--text-xl); font-weight:800; color:var(--text); margin-bottom: var(--space-2);">
+            Перейди в телеграм бота для оплаты
+          </div>
+          <div style="font-size:var(--text-sm); color:var(--muted);">
+            Нажми «ОК», и мы откроем чат с ботом, где ты сможешь завершить оплату выбранного тарифа.
+          </div>
+        </div>
+        <button class="btn-primary" onclick="proceedToPayment('${tariffKey}')">ОК</button>
+        <button class="btn-ghost" style="margin-top: var(--space-2); width: 100%;" onclick="closePaywallModal()">Отмена</button>
+      </div>
+    </div>`;
+}
+
+function proceedToPayment(tariffKey) {
+  // Закрываем модалку
+  var container = document.getElementById('modal-container');
   if (container) container.innerHTML = '';
   
-  // Понятный отклик для пользователя
-  if (typeof showToast === 'function') {
-    showToast('Открываем чат с ботом для оплаты...');
-  }
-  
-  // Если внутри Telegram Mini App, используем sendData для надёжной передачи
-  if (isTelegram && typeof tgApp.sendData === 'function') {
-    tgApp.sendData(JSON.stringify({ action: 'subscribe', tariff: tariffKey }));
-  } else if (isTelegram && typeof tgApp.openTelegramLink === 'function') {
-    // Fallback, если sendData почему-то нет
+  // Открываем бота с deep-link параметром
+  if (isTelegram && typeof tgApp.openTelegramLink === 'function') {
     tgApp.openTelegramLink('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey);
   } else {
-    // Для обычного браузера
     window.open('https://t.me/TestOgeEge_bot?start=buy_' + tariffKey, '_blank');
   }
 }
