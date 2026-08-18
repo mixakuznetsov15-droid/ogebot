@@ -5,7 +5,16 @@ from datetime import datetime, timedelta
 import uuid
 
 from aiogram import Bot, Dispatcher, F
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, ContentType
+from aiogram.types import (
+    Message,
+    CallbackQuery,
+    InlineKeyboardMarkup,
+    InlineKeyboardButton,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
+    ContentType,
+    BotCommand,
+)
 from aiogram.filters import CommandStart, Command
 from aiogram.enums import ParseMode
 from aiogram.client.default import DefaultBotProperties
@@ -152,10 +161,29 @@ async def cb_oge_year(call: CallbackQuery):
         f"попробуй, как это работает.\n\n"
         f"Жми кнопку и начинай первую тему 👇"
     )
+
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
     ])
     await call.message.edit_text(text, reply_markup=kb)
+
+    # Устанавливаем Reply Keyboard после онбординга
+    await set_reply_keyboard(call.message)
+
+# ═══════════════════════════════════════════
+#  ФУНКЦИЯ УСТАНОВКИ КЛАВИАТУРЫ
+# ═══════════════════════════════════════════
+async def set_reply_keyboard(message: Message):
+    kb = ReplyKeyboardMarkup(
+        keyboard=[
+            [KeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
+            [KeyboardButton(text="💳 Подписка"), KeyboardButton(text="📊 Статус")],
+            [KeyboardButton(text="❓ Помощь")]
+        ],
+        resize_keyboard=True,
+        one_time_keyboard=False
+    )
+    await message.answer("Используй кнопки ниже для навигации:", reply_markup=kb)
 
 # ═══════════════════════════════════════════
 #  Heartbeat через WebApp.sendData
@@ -221,6 +249,7 @@ async def send_app_menu(message: Message):
         [InlineKeyboardButton(text="💳 Подписка", callback_data="show_tariffs")],
     ])
     await message.answer(f"{sub_text}\n\nПродолжай подготовку 👇", reply_markup=kb)
+    await set_reply_keyboard(message)
 
 def get_subscription_status(user: dict) -> str:
     now = datetime.now()
@@ -246,6 +275,29 @@ TARIFFS = {
 @dp.message(Command("subscribe"))
 async def cmd_subscribe(message: Message):
     await show_tariffs(message)
+
+@dp.message(F.text == "💳 Подписка")
+async def cmd_subscribe_text(message: Message):
+    await show_tariffs(message)
+
+@dp.message(F.text == "📊 Статус")
+async def cmd_status_text(message: Message):
+    user = get_user(message.from_user.id)
+    status = get_subscription_status(user)
+    status_text = {"trial": "🎁 Пробный период", "active": "✅ Активная подписка", "expired": "⚠️ Доступ истёк"}
+    await message.answer(f"Твой статус: {status_text.get(status, 'неизвестно')}")
+
+@dp.message(F.text == "❓ Помощь")
+async def cmd_help_text(message: Message):
+    help_text = (
+        "Что я умею:\n\n"
+        "• 🚀 Открыть ГеоПро – запустить тренажёр\n"
+        "• 💳 Подписка – выбрать тариф и оплатить\n"
+        "• 📊 Статус – проверить доступ\n"
+        "• /reset – сброс (только администратор)\n\n"
+        "По любым вопросам пиши сюда."
+    )
+    await message.answer(help_text)
 
 @dp.callback_query(F.data == "show_tariffs")
 async def cb_show_tariffs(call: CallbackQuery):
@@ -288,7 +340,6 @@ async def start_payment(message: Message, tariff_key: str):
 
     update_user(user_id, pending_payment_id=payment.id, pending_tariff=tariff_key)
 
-    # Основной сценарий — webhook, кнопка "Я оплатил" как fallback
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="💳 Перейти к оплате", url=payment.confirmation.confirmation_url)],
         [InlineKeyboardButton(text="🔄 Я оплатил (если не открылось)", callback_data=f"check_{payment.id}")],
@@ -461,7 +512,6 @@ async def handle_yookassa_webhook(request):
             new_end = base_date + timedelta(days=days)
             update_user(user_id, subscription_until=new_end.isoformat())
 
-            # Автоматически уведомляем пользователя
             await bot.send_message(
                 user_id,
                 f"🎉 Оплата подтверждена!\n\n"
@@ -490,6 +540,13 @@ async def start_web_server():
 #  ЗАПУСК
 # ═══════════════════════════════════════════
 async def main():
+    await bot.set_my_commands([
+        BotCommand(command="start", description="Главное меню"),
+        BotCommand(command="subscribe", description="Выбрать тариф и оплатить"),
+        BotCommand(command="status", description="Статус подписки"),
+        BotCommand(command="help", description="Помощь"),
+    ])
+
     scheduler.start()
     await asyncio.gather(
         start_web_server(),
