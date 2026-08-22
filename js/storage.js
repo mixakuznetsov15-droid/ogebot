@@ -23,6 +23,13 @@ var defaultProgress = {
   reviewData: {},
   onboardingCompleted: false,
   hintsShown: {},
+
+  // Поля подписки (унифицированы с bot.py)
+  trial_start: '',
+  trial_end: '',
+  subscription_until: '',
+
+  // Дублирующие поля для обратной совместимости
   trialStartDate: '',
   subscriptionEndDate: '',
 
