@@ -3,15 +3,18 @@
 // ==========================================
 
 const Subscription = {
-  TRIAL_DAYS: 7,
-  PRICE: 500, // руб/мес
+  TRIAL_DAYS: 3,  // ← изменено с 7 на 3
+  PRICE: 500, // руб/мес (не используется, оставлено для совместимости)
 
   /**
    * Инициализация триала: если нет даты начала, ставим сегодня.
    */
   initTrial() {
     if (!userProgress.trial_start) {
-      userProgress.trial_start = new Date().toISOString().slice(0, 10);
+      const start = new Date();
+      const end = new Date(start.getTime() + this.TRIAL_DAYS * 24 * 60 * 60 * 1000);
+      userProgress.trial_start = start.toISOString().slice(0, 10);
+      userProgress.trial_end = end.toISOString().slice(0, 10);
       saveProgress();
     }
   },
