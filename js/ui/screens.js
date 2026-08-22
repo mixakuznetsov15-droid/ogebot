@@ -273,7 +273,7 @@ function renderProfile() {
     var subTypeText = subStatus.type === 'trial' ? 'Пробный период' : 'Подписка активна';
     var subDetails = subStatus.type === 'trial'
       ? 'Осталось ' + subStatus.daysLeft + ' ' + getDayWord(subStatus.daysLeft)
-      : 'Действует до ' + userProgress.subscriptionEndDate;
+      : 'Действует до ' + userProgress.subscription_until;
     html += '<div class="sub-status-card active">';
     html += '<div style="font-size:var(--text-xl)">' + ICONS.check + '</div>';
     html += '<div><div style="font-weight:700;font-size:var(--text-base)">' + subTypeText + '</div>';
@@ -626,7 +626,7 @@ function renderReviewScreen() {
     var label = status === 'red' ? 'Требует повторения' : status === 'yellow' ? 'Пора повторить' : 'Изучено';
 
     list.forEach(function(item) {
-      html += '<div class="path-progress-card" style="margin-bottom:var(--space-3); display:flex; justify-content:space-between; align-items:center;">';
+      html += '<div class="path-progress-card" style="margin-bottom:var(--space-3); display: flex; justify-content:space-between; align-items:center;">';
       html += '<div><div style="font-weight:600;">' + item.title + '</div>';
       html += '<div style="font-size:var(--text-xs); color:var(--muted);">' + emoji + ' ' + label + ' · ' + item.mastery + '% усвоения</div></div>';
       html += '<button class="btn-primary" style="padding:var(--space-2) var(--space-4); width:auto;" onclick="startReviewLesson(' + getReviewLessonIndex(item.title) + ',' + item.mastery + ')">' + ICONS.arrowRight + ' Повторить</button>';
@@ -662,18 +662,19 @@ function showPaywallModal() {
         <div style="display:flex; flex-direction:column; gap: var(--space-3);">
           <div class="tariff-card" onclick="selectTariff('1m')">
             <div class="tariff-name">1 месяц</div>
-            <div class="tariff-price">499 ₽</div>
+            <div class="tariff-price">590 ₽</div>
             <div class="tariff-desc">Доступ на 30 дней</div>
           </div>
           <div class="tariff-card" onclick="selectTariff('3m')" style="border-color: var(--primary2);">
             <div class="tariff-name">3 месяца</div>
-            <div class="tariff-price">899 ₽</div>
-            <div class="tariff-desc">Экономия 598 ₽</div>
+            <div class="tariff-price">1 290 ₽</div>
+            <div class="tariff-desc">Экономия 480 ₽ · 430 ₽/мес</div>
           </div>
-          <div class="tariff-card" onclick="selectTariff('full')">
-            <div class="tariff-name">До ОГЭ</div>
-            <div class="tariff-price">2990 ₽</div>
-            <div class="tariff-desc">Доступ до экзамена (240 дней)</div>
+          <div class="tariff-card" onclick="selectTariff('full')" style="border: 2px solid var(--gold); position: relative;">
+            <div style="position:absolute; top:-10px; right:10px; background: var(--gold); color:#000; font-size:12px; font-weight:700; padding:2px 8px; border-radius:6px;">🔥 ХИТ</div>
+            <div class="tariff-name">Навсегда до экзамена</div>
+            <div class="tariff-price" style="color: var(--gold);">1 990 ₽</div>
+            <div class="tariff-desc">Экономия 45% · ≈250 ₽/мес</div>
           </div>
         </div>
         <button class="btn-ghost" style="margin-top: var(--space-4); width: 100%;" onclick="closePaywallModal()">Отмена</button>
