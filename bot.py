@@ -144,7 +144,7 @@ async def cb_oge_year(call: CallbackQuery):
     oge_date = f"{year}-06-19"
 
     now = datetime.now()
-    trial_end = now + timedelta(days=7)
+    trial_end = now + timedelta(days=3)   # ← изменено с 7 на 3
 
     update_user(
         call.from_user.id,
@@ -157,7 +157,7 @@ async def cb_oge_year(call: CallbackQuery):
 
     text = (
         f"Отлично! Настроил план подготовки под {year} год.\n\n"
-        f"🎁 Дарю тебе <b>7 дней бесплатного доступа</b> ко всем темам — "
+        f"🎁 Дарю тебе <b>3 дня бесплатного доступа</b> ко всем темам — "
         f"попробуй, как это работает.\n\n"
         f"Жми кнопку и начинай первую тему 👇"
     )
@@ -267,9 +267,9 @@ def get_subscription_status(user: dict) -> str:
 #  ТАРИФЫ И ОПЛАТА
 # ═══════════════════════════════════════════
 TARIFFS = {
-    "1m": {"label": "1 месяц", "price": 499, "days": 30},
-    "3m": {"label": "3 месяца", "price": 899, "days": 90},
-    "full": {"label": "До ОГЭ (выгодно)", "price": 2990, "days": 240},
+    "1m": {"label": "1 месяц", "price": 590, "days": 30},
+    "3m": {"label": "3 месяца", "price": 1290, "days": 90},
+    "full": {"label": "Навсегда до экзамена", "price": 1990, "days": 240},
 }
 
 @dp.message(Command("subscribe"))
