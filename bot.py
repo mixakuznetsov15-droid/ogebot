@@ -44,12 +44,11 @@ scheduler = AsyncIOScheduler()
 # ═══════════════════════════════════════════
 #  ВРЕМЕННЫЕ КОНСТАНТЫ (Патч 1)
 # ═══════════════════════════════════════════
-MOSCOW_TZ_OFFSET = timedelta(hours=3)  # UTC+3
-QUIET_HOURS_START = 22  # с 22:00 не слать
-QUIET_HOURS_END = 9     # до 9:00 не слать
+MOSCOW_TZ_OFFSET = timedelta(hours=3)
+QUIET_HOURS_START = 22
+QUIET_HOURS_END = 9
 
 def is_quiet_hours() -> bool:
-    """Проверяет, сейчас ли тихие часы по московскому времени"""
     utc_now = datetime.utcnow()
     moscow_now = utc_now + MOSCOW_TZ_OFFSET
     hour = moscow_now.hour
@@ -58,7 +57,7 @@ def is_quiet_hours() -> bool:
 # ═══════════════════════════════════════════
 #  ХРАНИЛИЩЕ ПОЛЬЗОВАТЕЛЕЙ
 # ═══════════════════════════════════════════
-DB_FILE = "/data/users_db.json"  # постоянное хранилище Amvera
+DB_FILE = "/data/users_db.json"
 
 def load_db():
     if os.path.exists(DB_FILE):
@@ -82,7 +81,8 @@ def get_user(user_id: int) -> dict:
             "trial_end": None,
             "subscription_until": None,
             "last_active": None,
-            "onboarding_step": "start"
+            "onboarding_step": "start",
+            "receipt_email": None,   # ← добавлено для чеков
         }
         save_db(db)
     return db[uid]
@@ -102,6 +102,9 @@ def update_user(user_id: int, **kwargs):
 class Onboarding(StatesGroup):
     waiting_for_oge_year = State()
 
+class PaymentFlow(StatesGroup):
+    waiting_for_email = State()
+
 # ═══════════════════════════════════════════
 #  /start — обрабатывает deep-link и онбординг
 # ═══════════════════════════════════════════
@@ -109,12 +112,11 @@ class Onboarding(StatesGroup):
 async def cmd_start(message: Message, state: FSMContext):
     user = get_user(message.from_user.id)
 
-    # Проверяем deep-link параметр вида /start buy_1m
     args = message.text.split(maxsplit=1)
     if len(args) > 1 and args[1].startswith("buy_"):
         tariff_key = args[1].replace("buy_", "")
         if tariff_key in TARIFFS:
-            await start_payment(message, tariff_key)
+            await start_payment_from_key(message, tariff_key)
             return
 
     name = message.from_user.first_name
@@ -144,7 +146,7 @@ async def cb_oge_year(call: CallbackQuery):
     oge_date = f"{year}-06-19"
 
     now = datetime.now()
-    trial_end = now + timedelta(days=3)   # ← изменено с 7 на 3
+    trial_end = now + timedelta(days=3)   # ← сокращённый триал
 
     update_user(
         call.from_user.id,
@@ -166,12 +168,10 @@ async def cb_oge_year(call: CallbackQuery):
         [InlineKeyboardButton(text="🚀 Открыть ГеоПро", web_app={"url": WEBAPP_URL})],
     ])
     await call.message.edit_text(text, reply_markup=kb)
-
-    # Устанавливаем Reply Keyboard после онбординга
     await set_reply_keyboard(call.message)
 
 # ═══════════════════════════════════════════
-#  ФУНКЦИЯ УСТАНОВКИ КЛАВИАТУРЫ
+#  КЛАВИАТУРА
 # ═══════════════════════════════════════════
 async def set_reply_keyboard(message: Message):
     kb = ReplyKeyboardMarkup(
@@ -197,7 +197,7 @@ async def handle_web_app_data(message: Message):
         elif data.get('action') == 'subscribe':
             tariff_key = data.get('tariff')
             if tariff_key and tariff_key in TARIFFS:
-                await start_payment(message, tariff_key)
+                await start_payment_from_key(message, tariff_key)
             else:
                 await show_tariffs(message)
     except:
@@ -205,7 +205,7 @@ async def handle_web_app_data(message: Message):
     await message.delete()
 
 # ═══════════════════════════════════════════
-#  /reset — только для администратора (Патч 3)
+#  /reset — админ-сброс
 # ═══════════════════════════════════════════
 @dp.message(Command("reset"))
 async def cmd_reset(message: Message):
@@ -317,39 +317,122 @@ async def show_tariffs(message: Message):
         reply_markup=kb
     )
 
+# ── Новый обработчик buy_ ──
 @dp.callback_query(F.data.startswith("buy_"))
-async def cb_buy(call: CallbackQuery):
+async def cb_buy(call: CallbackQuery, state: FSMContext):
+    await call.answer("Обрабатываю...")
     tariff_key = call.data.replace("buy_", "")
-    await start_payment(call.message, tariff_key)
+    user = get_user(call.from_user.id)
 
-async def start_payment(message: Message, tariff_key: str):
+    if user.get("receipt_email"):
+        await start_payment(call.message, tariff_key, user["receipt_email"])
+        return
+
+    await state.update_data(pending_tariff=tariff_key)
+    await state.set_state(PaymentFlow.waiting_for_email)
+    await call.message.edit_text(
+        "📧 Для оформления чека (по закону РФ) укажи свой email.\n\n"
+        "Он нужен только для отправки чека об оплате, никакой рекламы "
+        "и рассылок не будет.\n\n"
+        "Просто напиши email следующим сообщением:"
+    )
+
+@dp.message(PaymentFlow.waiting_for_email)
+async def process_email(message: Message, state: FSMContext):
+    email = message.text.strip()
+    if "@" not in email or "." not in email.split("@")[-1]:
+        await message.answer("Похоже, это не email. Попробуй ещё раз.")
+        return
+
+    data = await state.get_data()
+    tariff_key = data.get("pending_tariff")
+    update_user(message.from_user.id, receipt_email=email)
+    await state.clear()
+    await start_payment(message, tariff_key, email)
+
+# ── Создание платежа с чеком ──
+async def start_payment(message: Message, tariff_key: str, email: str):
     tariff = TARIFFS[tariff_key]
+    # Используем именно user_id, а не chat.id
     user_id = message.from_user.id
 
     idempotence_key = str(uuid.uuid4())
-    payment = Payment.create({
-        "amount": {"value": f"{tariff['price']}.00", "currency": "RUB"},
-        "confirmation": {
-            "type": "redirect",
-            "return_url": f"https://t.me/{(await bot.get_me()).username}"
-        },
-        "capture": True,
-        "description": f"ГеоПро — {tariff['label']}",
-        "metadata": {"user_id": str(user_id), "tariff": tariff_key, "days": tariff["days"]}
-    }, idempotence_key)
+    try:
+        payment = Payment.create({
+            "amount": {
+                "value": f"{tariff['price']}.00",
+                "currency": "RUB"
+            },
+            "confirmation": {
+                "type": "redirect",
+                "return_url": f"https://t.me/{(await bot.get_me()).username}"
+            },
+            "capture": True,
+            "description": f"ГеоПро — {tariff['label']}",
+            "metadata": {
+                "user_id": str(user_id),
+                "tariff": tariff_key,
+                "days": tariff["days"]
+            },
+            "receipt": {
+                "customer": {
+                    "email": email
+                },
+                "items": [
+                    {
+                        "description": f"Доступ к сервису ГеоПро — {tariff['label']}",
+                        "quantity": "1.00",
+                        "amount": {
+                            "value": f"{tariff['price']}.00",
+                            "currency": "RUB"
+                        },
+                        "vat_code": "1",   # Без НДС (проверьте вашу систему налогообложения)
+                        "payment_subject": "service",
+                        "payment_mode": "full_payment"
+                    }
+                ]
+            }
+        }, idempotence_key)
 
-    update_user(user_id, pending_payment_id=payment.id, pending_tariff=tariff_key)
+        update_user(user_id, pending_payment_id=payment.id, pending_tariff=tariff_key)
 
-    kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="💳 Перейти к оплате", url=payment.confirmation.confirmation_url)],
-        [InlineKeyboardButton(text="🔄 Я оплатил (если не открылось)", callback_data=f"check_{payment.id}")],
-    ])
-    await message.answer(
-        f"Тариф: <b>{tariff['label']}</b>\nСумма: <b>{tariff['price']}₽</b>\n\n"
-        f"Нажми кнопку ниже для оплаты. Доступ откроется автоматически после подтверждения платежа.",
-        reply_markup=kb
-    )
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="💳 Перейти к оплате", url=payment.confirmation.confirmation_url)],
+            [InlineKeyboardButton(text="✅ Я оплатил", callback_data=f"check_{payment.id}")],
+        ])
+        await message.answer(
+            f"Тариф: <b>{tariff['label']}</b>\nСумма: <b>{tariff['price']}₽</b>\n\n"
+            f"Чек придёт на <b>{email}</b>\n\n"
+            f"Нажми кнопку ниже для оплаты",
+            reply_markup=kb
+        )
+    except Exception as e:
+        print(f"Ошибка создания платежа: {e}")
+        await message.answer(
+            "⚠️ Не получилось создать платёж. Попробуй ещё раз через минуту "
+            "или напиши в поддержку."
+        )
 
+# ── Обработчик для deep-link ──
+async def start_payment_from_key(message: Message, tariff_key: str):
+    user = get_user(message.from_user.id)
+    if user.get("receipt_email"):
+        await start_payment(message, tariff_key, user["receipt_email"])
+    else:
+        # переходим в режим запроса email
+        await message.answer(
+            "📧 Для оформления чека укажи свой email.\n"
+            "Он нужен только для отправки чека об оплате."
+        )
+        # сохраняем tariff_key в state
+        await dp.storage.set_state(chat=message.chat.id, user=message.from_user.id,
+                                   state=PaymentFlow.waiting_for_email)
+        await dp.storage.set_data(chat=message.chat.id, user=message.from_user.id,
+                                  data={"pending_tariff": tariff_key})
+
+# ═══════════════════════════════════════════
+#  ПОДТВЕРЖДЕНИЕ ОПЛАТЫ (check_)
+# ═══════════════════════════════════════════
 @dp.callback_query(F.data.startswith("check_"))
 async def cb_check_payment(call: CallbackQuery):
     payment_id = call.data.replace("check_", "")
@@ -385,29 +468,20 @@ async def cb_check_payment(call: CallbackQuery):
         await call.message.answer("Погнали дальше!", reply_markup=kb)
 
     elif payment.status == "canceled":
-        await call.answer(
-            "❌ Платёж отменён. Попробуй оформить подписку заново.",
-            show_alert=True
-        )
+        await call.answer("❌ Платёж отменён. Попробуй оформить подписку заново.", show_alert=True)
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔄 Выбрать тариф заново", callback_data="show_tariffs")]
         ])
         await call.message.edit_text("Платёж не прошёл. Выбери тариф ещё раз:", reply_markup=kb)
 
     elif payment.status == "pending":
-        await call.answer(
-            "⏳ Платёж обрабатывается, подожди немного и нажми снова",
-            show_alert=True
-        )
+        await call.answer("⏳ Платёж обрабатывается, подожди немного и нажми снова", show_alert=True)
 
     else:
-        await call.answer(
-            f"Статус платежа: {payment.status}. Обратись в поддержку.",
-            show_alert=True
-        )
+        await call.answer(f"Статус платежа: {payment.status}. Обратись в поддержку.", show_alert=True)
 
 # ═══════════════════════════════════════════
-#  НАПОМИНАНИЯ (с учётом тихих часов и защитой от падений)
+#  НАПОМИНАНИЯ (без изменений)
 # ═══════════════════════════════════════════
 async def check_and_send_reminders():
     if is_quiet_hours():
@@ -442,30 +516,14 @@ async def process_single_user_reminder(user: dict, now: datetime):
     if status == "trial":
         trial_end = datetime.fromisoformat(user["trial_end"])
         days_left = (trial_end - now).days
-
         if days_left == 1 and hours_inactive > 12:
-            message_to_send = (
-                "⏰ Завтра последний день пробного периода!\n\n"
-                "Успей пройти ещё пару тем, пока доступ бесплатный."
-            )
+            message_to_send = "⏰ Завтра последний день пробного периода! Успей пройти ещё пару тем."
         elif hours_inactive > 20:
-            message_to_send = (
-                "📚 Профессор Гео ждёт тебя!\n\n"
-                "Загляни в приложение — продолжим подготовку к ОГЭ."
-            )
-
+            message_to_send = "📚 Профессор Гео ждёт тебя! Продолжим подготовку к ОГЭ."
     elif status == "expired":
-        message_to_send = (
-            "🔓 Твой доступ закончился.\n\n"
-            "Не теряй набранный прогресс — оформи подписку и продолжай подготовку.\n\n"
-            "/subscribe — посмотреть тарифы"
-        )
-
+        message_to_send = "🔓 Твой доступ закончился. Оформи подписку, чтобы продолжить. /subscribe"
     elif status == "active" and hours_inactive > 20 and hours_inactive < 48:
-        message_to_send = (
-            "🔥 Не теряй серию дней!\n\n"
-            "Зайди сегодня и реши хотя бы один вопрос, чтобы сохранить streak."
-        )
+        message_to_send = "🔥 Не теряй серию дней! Зайди сегодня и реши хотя бы один вопрос."
 
     if message_to_send:
         try:
@@ -484,7 +542,7 @@ async def cmd_status(message: Message):
     await message.answer(f"Твой статус: {status_text.get(status, 'неизвестно')}")
 
 # ═══════════════════════════════════════════
-#  ВЕБ-СЕРВЕР ДЛЯ WEBHOOK ЮKASSA (Патч 5)
+#  ВЕБ-СЕРВЕР ДЛЯ WEBHOOK ЮKASSA
 # ═══════════════════════════════════════════
 async def handle_yookassa_webhook(request):
     try:
