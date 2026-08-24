@@ -42,7 +42,7 @@ dp = Dispatcher(storage=storage)
 scheduler = AsyncIOScheduler()
 
 # ═══════════════════════════════════════════
-#  ВРЕМЕННЫЕ КОНСТАНТЫ (Патч 1)
+#  ВРЕМЕННЫЕ КОНСТАНТЫ
 # ═══════════════════════════════════════════
 MOSCOW_TZ_OFFSET = timedelta(hours=3)
 QUIET_HOURS_START = 22
@@ -53,6 +53,18 @@ def is_quiet_hours() -> bool:
     moscow_now = utc_now + MOSCOW_TZ_OFFSET
     hour = moscow_now.hour
     return hour >= QUIET_HOURS_START or hour < QUIET_HOURS_END
+
+# ═══════════════════════════════════════════
+#  ФУНКЦИЯ УВЕДОМЛЕНИЯ АДМИНИСТРАТОРА
+# ═══════════════════════════════════════════
+async def notify_admin(text: str):
+    """Отправляет сообщение администратору, если ADMIN_ID задан."""
+    if not ADMIN_ID:
+        return
+    try:
+        await bot.send_message(ADMIN_ID, text)
+    except Exception as e:
+        print(f"Ошибка отправки уведомления админу: {e}")
 
 # ═══════════════════════════════════════════
 #  ХРАНИЛИЩЕ ПОЛЬЗОВАТЕЛЕЙ
@@ -82,7 +94,9 @@ def get_user(user_id: int) -> dict:
             "subscription_until": None,
             "last_active": None,
             "onboarding_step": "start",
-            "receipt_email": None,   # ← добавлено для чеков
+            "receipt_email": None,
+            "created_at": datetime.now().isoformat(),
+            "is_new": True          # ← флаг для уведомления о новом пользователе
         }
         save_db(db)
     return db[uid]
@@ -112,6 +126,17 @@ class PaymentFlow(StatesGroup):
 async def cmd_start(message: Message, state: FSMContext):
     user = get_user(message.from_user.id)
 
+    # Уведомление о новом пользователе (первый запуск)
+    if user.get("is_new"):
+        await notify_admin(
+            f"👤 <b>Новый пользователь</b>\n"
+            f"Имя: {message.from_user.first_name}\n"
+            f"ID: <code>{message.from_user.id}</code>\n"
+            f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
+        )
+        update_user(message.from_user.id, is_new=False)
+
+    # Проверяем deep-link параметр вида /start buy_1m
     args = message.text.split(maxsplit=1)
     if len(args) > 1 and args[1].startswith("buy_"):
         tariff_key = args[1].replace("buy_", "")
@@ -146,7 +171,7 @@ async def cb_oge_year(call: CallbackQuery):
     oge_date = f"{year}-06-19"
 
     now = datetime.now()
-    trial_end = now + timedelta(days=3)   # ← сокращённый триал
+    trial_end = now + timedelta(days=3)   # ← 3 дня триала
 
     update_user(
         call.from_user.id,
@@ -155,6 +180,15 @@ async def cb_oge_year(call: CallbackQuery):
         trial_end=trial_end.isoformat(),
         onboarding_step="completed",
         last_active=now.isoformat()
+    )
+
+    # Уведомление админа об активации триала
+    await notify_admin(
+        f"🎁 <b>Активирован триал</b>\n"
+        f"Имя: {call.from_user.first_name}\n"
+        f"ID: <code>{call.from_user.id}</code>\n"
+        f"ОГЭ: {year}\n"
+        f"Триал до: {trial_end.strftime('%d.%m.%Y')}"
     )
 
     text = (
@@ -226,6 +260,123 @@ async def cmd_reset(message: Message):
         await message.answer(f"♻️ Пользователь {target_id} сброшен.")
     else:
         await message.answer("Пользователь не найден.")
+
+# ═══════════════════════════════════════════
+#  /stats — статистика (только админ)
+# ═══════════════════════════════════════════
+@dp.message(Command("stats"))
+async def cmd_stats(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("Команда недоступна.")
+        return
+    stats_text = get_stats_text()
+    await message.answer(stats_text)
+
+def get_stats_text() -> str:
+    db = load_db()
+    total_users = len(db)
+    trial_activated = 0
+    active_trial = 0
+    active_sub = 0
+    onboarded = 0
+    active_24h = 0
+
+    now = datetime.now()
+    last_24h = now - timedelta(hours=24)
+
+    users_info = []
+    for uid, user in db.items():
+        if user.get("trial_start"):
+            trial_activated += 1
+            status = get_subscription_status(user)
+            if status == "trial":
+                active_trial += 1
+            elif status == "active":
+                active_sub += 1
+
+        if user.get("onboarding_step") == "completed":
+            onboarded += 1
+
+        last_active = user.get("last_active")
+        if last_active:
+            try:
+                last_dt = datetime.fromisoformat(last_active)
+                if last_dt > last_24h:
+                    active_24h += 1
+            except:
+                pass
+
+        users_info.append({
+            "user_id": user.get("user_id"),
+            "first_name": user.get("first_name", "Без имени"),
+            "created_at": user.get("created_at", "")
+        })
+
+    users_info.sort(key=lambda x: x["created_at"], reverse=True)
+    recent = users_info[:5]
+
+    text = (
+        "📊 <b>Статистика ГеоПро</b>\n\n"
+        f"👥 Всего пользователей: <b>{total_users}</b>\n"
+        f"🚀 Активировали триал: <b>{trial_activated}</b>\n"
+        f"🎁 Активных триалов: <b>{active_trial}</b>\n"
+        f"✅ Активных подписок: <b>{active_sub}</b>\n"
+        f"📅 Завершили онбординг: <b>{onboarded}</b>\n"
+        f"🕐 Активны за 24 часа: <b>{active_24h}</b>\n"
+    )
+
+    if recent:
+        text += "\n<b>Последние пользователи:</b>\n"
+        for i, u in enumerate(recent, 1):
+            created = u["created_at"][:10] if u["created_at"] else "—"
+            text += f"{i}. {u['first_name']} (ID: {u['user_id']}) — {created}\n"
+
+    return text
+
+# ═══════════════════════════════════════════
+#  КОМАНДЫ АДМИНА: /grant и /revoke
+# ═══════════════════════════════════════════
+@dp.message(Command("grant"))
+async def cmd_grant(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("Команда недоступна.")
+        return
+
+    args = message.text.split()
+    if len(args) < 2:
+        await message.answer("Использование: /grant USER_ID [DAYS]\nПо умолчанию выдаётся 3650 дней (10 лет).")
+        return
+
+    try:
+        target_id = int(args[1])
+        days = int(args[2]) if len(args) > 2 else 3650
+    except ValueError:
+        await message.answer("❌ Неверный формат. Используйте: /grant USER_ID [DAYS]")
+        return
+
+    new_end = datetime.now() + timedelta(days=days)
+    update_user(target_id, subscription_until=new_end.isoformat())
+    await message.answer(f"✅ Доступ для пользователя <code>{target_id}</code> выдан до <b>{new_end.strftime('%d.%m.%Y')}</b>.")
+
+@dp.message(Command("revoke"))
+async def cmd_revoke(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("Команда недоступна.")
+        return
+
+    args = message.text.split()
+    if len(args) < 2:
+        await message.answer("Использование: /revoke USER_ID")
+        return
+
+    try:
+        target_id = int(args[1])
+    except ValueError:
+        await message.answer("❌ Неверный формат USER_ID.")
+        return
+
+    update_user(target_id, subscription_until=None)
+    await message.answer(f"🔒 Доступ для пользователя <code>{target_id}</code> отозван.")
 
 # ═══════════════════════════════════════════
 #  Вспомогательные функции
@@ -317,7 +468,7 @@ async def show_tariffs(message: Message):
         reply_markup=kb
     )
 
-# ── Новый обработчик buy_ ──
+# ── Обработчик buy_ ──
 @dp.callback_query(F.data.startswith("buy_"))
 async def cb_buy(call: CallbackQuery, state: FSMContext):
     await call.answer("Обрабатываю...")
@@ -353,7 +504,6 @@ async def process_email(message: Message, state: FSMContext):
 # ── Создание платежа с чеком ──
 async def start_payment(message: Message, tariff_key: str, email: str):
     tariff = TARIFFS[tariff_key]
-    # Используем именно user_id, а не chat.id
     user_id = message.from_user.id
 
     idempotence_key = str(uuid.uuid4())
@@ -386,7 +536,7 @@ async def start_payment(message: Message, tariff_key: str, email: str):
                             "value": f"{tariff['price']}.00",
                             "currency": "RUB"
                         },
-                        "vat_code": "1",   # Без НДС (проверьте вашу систему налогообложения)
+                        "vat_code": "1",
                         "payment_subject": "service",
                         "payment_mode": "full_payment"
                     }
@@ -419,12 +569,11 @@ async def start_payment_from_key(message: Message, tariff_key: str):
     if user.get("receipt_email"):
         await start_payment(message, tariff_key, user["receipt_email"])
     else:
-        # переходим в режим запроса email
+        # Сохраняем tariff_key и переходим в состояние ожидания email
         await message.answer(
             "📧 Для оформления чека укажи свой email.\n"
             "Он нужен только для отправки чека об оплате."
         )
-        # сохраняем tariff_key в state
         await dp.storage.set_state(chat=message.chat.id, user=message.from_user.id,
                                    state=PaymentFlow.waiting_for_email)
         await dp.storage.set_data(chat=message.chat.id, user=message.from_user.id,
@@ -442,6 +591,7 @@ async def cb_check_payment(call: CallbackQuery):
         user_id = call.from_user.id
         user = get_user(user_id)
         days = int(payment.metadata.get("days", 30))
+        tariff_key = payment.metadata.get("tariff", "unknown")
 
         base_date = datetime.now()
         if user.get("trial_end") and not user.get("subscription_until"):
@@ -456,6 +606,15 @@ async def cb_check_payment(call: CallbackQuery):
 
         new_end = base_date + timedelta(days=days)
         update_user(user_id, subscription_until=new_end.isoformat())
+
+        # Уведомление админа об оплате
+        await notify_admin(
+            f"💳 <b>Оплата подтверждена (кнопка)</b>\n"
+            f"Имя: {call.from_user.first_name}\n"
+            f"ID: <code>{user_id}</code>\n"
+            f"Тариф: {tariff_key} ({days} дн.)\n"
+            f"Доступ до: {new_end.strftime('%d.%m.%Y')}"
+        )
 
         await call.message.edit_text(
             f"🎉 Оплата прошла!\n\n"
@@ -481,7 +640,7 @@ async def cb_check_payment(call: CallbackQuery):
         await call.answer(f"Статус платежа: {payment.status}. Обратись в поддержку.", show_alert=True)
 
 # ═══════════════════════════════════════════
-#  НАПОМИНАНИЯ (без изменений)
+#  НАПОМИНАНИЯ
 # ═══════════════════════════════════════════
 async def check_and_send_reminders():
     if is_quiet_hours():
@@ -554,6 +713,7 @@ async def handle_yookassa_webhook(request):
             metadata = payment_object.get("metadata", {})
             user_id = int(metadata.get("user_id"))
             days = int(metadata.get("days", 30))
+            tariff_key = metadata.get("tariff", "unknown")
 
             user = get_user(user_id)
             base_date = datetime.utcnow() + MOSCOW_TZ_OFFSET
@@ -569,6 +729,15 @@ async def handle_yookassa_webhook(request):
 
             new_end = base_date + timedelta(days=days)
             update_user(user_id, subscription_until=new_end.isoformat())
+
+            # Уведомление админа об оплате через webhook
+            await notify_admin(
+                f"💳 <b>Оплата через Webhook</b>\n"
+                f"User ID: <code>{user_id}</code>\n"
+                f"Имя: {user.get('first_name', '—')}\n"
+                f"Тариф: {tariff_key} ({days} дн.)\n"
+                f"Доступ до: {new_end.strftime('%d.%m.%Y')}"
+            )
 
             await bot.send_message(
                 user_id,
@@ -603,6 +772,10 @@ async def main():
         BotCommand(command="subscribe", description="Выбрать тариф и оплатить"),
         BotCommand(command="status", description="Статус подписки"),
         BotCommand(command="help", description="Помощь"),
+        BotCommand(command="stats", description="Статистика (только админ)"),
+        BotCommand(command="grant", description="Выдать доступ (только админ)"),
+        BotCommand(command="revoke", description="Отозвать доступ (только админ)"),
+        BotCommand(command="reset", description="Сброс пользователя (только админ)"),
     ])
 
     scheduler.start()
