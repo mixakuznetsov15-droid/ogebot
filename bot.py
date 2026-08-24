@@ -14,6 +14,8 @@ from aiogram.types import (
     KeyboardButton,
     ContentType,
     BotCommand,
+    BotCommandScopeChat,
+    BotCommandScopeDefault,
 )
 from aiogram.filters import CommandStart, Command
 from aiogram.enums import ParseMode
@@ -88,6 +90,7 @@ def get_user(user_id: int) -> dict:
         db[uid] = {
             "user_id": user_id,
             "first_name": "",
+            "username": None,          # ← добавлено
             "oge_date": None,
             "trial_start": None,
             "trial_end": None,
@@ -96,7 +99,7 @@ def get_user(user_id: int) -> dict:
             "onboarding_step": "start",
             "receipt_email": None,
             "created_at": datetime.now().isoformat(),
-            "is_new": True          # ← флаг для уведомления о новом пользователе
+            "is_new": True
         }
         save_db(db)
     return db[uid]
@@ -126,11 +129,19 @@ class PaymentFlow(StatesGroup):
 async def cmd_start(message: Message, state: FSMContext):
     user = get_user(message.from_user.id)
 
+    # Обновляем имя и username при каждом заходе
+    update_user(
+        message.from_user.id,
+        first_name=message.from_user.first_name,
+        username=message.from_user.username
+    )
+
     # Уведомление о новом пользователе (первый запуск)
     if user.get("is_new"):
         await notify_admin(
             f"👤 <b>Новый пользователь</b>\n"
             f"Имя: {message.from_user.first_name}\n"
+            f"Username: @{message.from_user.username if message.from_user.username else '—'}\n"
             f"ID: <code>{message.from_user.id}</code>\n"
             f"Время: {datetime.now().strftime('%d.%m.%Y %H:%M')}"
         )
@@ -179,13 +190,15 @@ async def cb_oge_year(call: CallbackQuery):
         trial_start=now.isoformat(),
         trial_end=trial_end.isoformat(),
         onboarding_step="completed",
-        last_active=now.isoformat()
+        last_active=now.isoformat(),
+        username=call.from_user.username
     )
 
     # Уведомление админа об активации триала
     await notify_admin(
         f"🎁 <b>Активирован триал</b>\n"
         f"Имя: {call.from_user.first_name}\n"
+        f"Username: @{call.from_user.username if call.from_user.username else '—'}\n"
         f"ID: <code>{call.from_user.id}</code>\n"
         f"ОГЭ: {year}\n"
         f"Триал до: {trial_end.strftime('%d.%m.%Y')}"
@@ -309,6 +322,7 @@ def get_stats_text() -> str:
         users_info.append({
             "user_id": user.get("user_id"),
             "first_name": user.get("first_name", "Без имени"),
+            "username": user.get("username"),
             "created_at": user.get("created_at", "")
         })
 
@@ -329,9 +343,43 @@ def get_stats_text() -> str:
         text += "\n<b>Последние пользователи:</b>\n"
         for i, u in enumerate(recent, 1):
             created = u["created_at"][:10] if u["created_at"] else "—"
-            text += f"{i}. {u['first_name']} (ID: {u['user_id']}) — {created}\n"
+            username = f"@{u['username']}" if u.get('username') else "—"
+            text += f"{i}. {u['first_name']} ({username}) (ID: {u['user_id']}) — {created}\n"
 
     return text
+
+# ═══════════════════════════════════════════
+#  /users — список всех пользователей (только админ)
+# ═══════════════════════════════════════════
+@dp.message(Command("users"))
+async def cmd_users(message: Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("Команда недоступна.")
+        return
+
+    db = load_db()
+    if not db:
+        await message.answer("В базе пока нет пользователей.")
+        return
+
+    users_list = []
+    for uid, user in db.items():
+        username = f"@{user.get('username')}" if user.get("username") else "—"
+        created = user.get("created_at", "")[:10]
+        users_list.append(
+            f"• {user.get('first_name', 'Без имени')} ({username})\n"
+            f"  ID: <code>{user['user_id']}</code> · Регистрация: {created}"
+        )
+
+    if len(users_list) > 100:
+        await message.answer(
+            f"Слишком много пользователей ({len(users_list)}). "
+            "Используй /stats для сводки."
+        )
+        return
+
+    text = "👥 <b>Все пользователи:</b>\n\n" + "\n\n".join(users_list)
+    await message.answer(text)
 
 # ═══════════════════════════════════════════
 #  КОМАНДЫ АДМИНА: /grant и /revoke
@@ -611,6 +659,7 @@ async def cb_check_payment(call: CallbackQuery):
         await notify_admin(
             f"💳 <b>Оплата подтверждена (кнопка)</b>\n"
             f"Имя: {call.from_user.first_name}\n"
+            f"Username: @{call.from_user.username if call.from_user.username else '—'}\n"
             f"ID: <code>{user_id}</code>\n"
             f"Тариф: {tariff_key} ({days} дн.)\n"
             f"Доступ до: {new_end.strftime('%d.%m.%Y')}"
@@ -735,6 +784,7 @@ async def handle_yookassa_webhook(request):
                 f"💳 <b>Оплата через Webhook</b>\n"
                 f"User ID: <code>{user_id}</code>\n"
                 f"Имя: {user.get('first_name', '—')}\n"
+                f"Username: @{user.get('username') if user.get('username') else '—'}\n"
                 f"Тариф: {tariff_key} ({days} дн.)\n"
                 f"Доступ до: {new_end.strftime('%d.%m.%Y')}"
             )
@@ -767,16 +817,32 @@ async def start_web_server():
 #  ЗАПУСК
 # ═══════════════════════════════════════════
 async def main():
-    await bot.set_my_commands([
+    # Базовые команды для всех пользователей
+    default_commands = [
         BotCommand(command="start", description="Главное меню"),
         BotCommand(command="subscribe", description="Выбрать тариф и оплатить"),
         BotCommand(command="status", description="Статус подписки"),
         BotCommand(command="help", description="Помощь"),
-        BotCommand(command="stats", description="Статистика (только админ)"),
-        BotCommand(command="grant", description="Выдать доступ (только админ)"),
-        BotCommand(command="revoke", description="Отозвать доступ (только админ)"),
-        BotCommand(command="reset", description="Сброс пользователя (только админ)"),
-    ])
+    ]
+
+    # Полный набор команд для администратора
+    admin_commands = default_commands + [
+        BotCommand(command="stats", description="Статистика"),
+        BotCommand(command="users", description="Список пользователей"),
+        BotCommand(command="grant", description="Выдать доступ"),
+        BotCommand(command="revoke", description="Отозвать доступ"),
+        BotCommand(command="reset", description="Сброс пользователя"),
+    ]
+
+    # Устанавливаем команды для всех
+    await bot.set_my_commands(default_commands, scope=BotCommandScopeDefault())
+
+    # Переопределяем команды для админа (только для его чата)
+    if ADMIN_ID:
+        await bot.set_my_commands(
+            admin_commands,
+            scope=BotCommandScopeChat(chat_id=ADMIN_ID)
+        )
 
     scheduler.start()
     await asyncio.gather(
