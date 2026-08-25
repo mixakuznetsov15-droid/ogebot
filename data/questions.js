@@ -40,10 +40,35 @@ var QUESTIONS_FILES = [
   { title: "Равнины и горы", key: "lith_05", questions: "data/questions_lith_05.json" },
   { title: "Профили рельефа", key: "lith_06", questions: "data/questions_lith_06.json" },
 
+  // Раздел 5: Атмосфера и климат (новый)
+  { title: "Состав и свойства атмосферы", key: "atm_01", questions: "data/questions_atm_01.json" },
+  { title: "Температура и давление", key: "atm_02", questions: "data/questions_atm_02.json" },
+  { title: "Ветер", key: "atm_03", questions: "data/questions_atm_03.json" },
+  { title: "Влажность и осадки", key: "atm_04", questions: "data/questions_atm_04.json" },
+  { title: "Климатообразующие факторы", key: "atm_05", questions: "data/questions_atm_05.json" },
+  { title: "Климатограммы и карты погоды", key: "atm_06", questions: "data/questions_atm_06.json" },
+  { title: "Комплексные задания ОГЭ по атмосфере", key: "atm_07", questions: "data/questions_atm_07.json" },
+
+  // Раздел 6: Гидросфера (новый)
+  { title: "Мировой океан", key: "hydro_01", questions: "data/questions_hydro_01.json" },
+  { title: "Моря, заливы, проливы", key: "hydro_02", questions: "data/questions_hydro_02.json" },
+  { title: "Реки", key: "hydro_03", questions: "data/questions_hydro_03.json" },
+  { title: "Озёра", key: "hydro_04", questions: "data/questions_hydro_04.json" },
+  { title: "Ледники", key: "hydro_05", questions: "data/questions_hydro_05.json" },
+  { title: "Подземные воды", key: "hydro_06", questions: "data/questions_hydro_06.json" },
+  { title: "Речной режим и питание рек", key: "hydro_07", questions: "data/questions_hydro_07.json" },
+  { title: "Комплексные задания ОГЭ по гидросфере", key: "hydro_08", questions: "data/questions_hydro_08.json" },
+
+  // Раздел 7: Биосфера и почвы (новый)
+  { title: "Почвообразование", key: "bio_01", questions: "data/questions_bio_01.json" },
+  { title: "Типы почв", key: "bio_02", questions: "data/questions_bio_02.json" },
+  { title: "Природные зоны", key: "bio_03", questions: "data/questions_bio_03.json" },
+  { title: "Растительный и животный мир", key: "bio_04", questions: "data/questions_bio_04.json" },
+  { title: "Приспособленность организмов", key: "bio_05", questions: "data/questions_bio_05.json" },
+  { title: "Охрана природы", key: "bio_06", questions: "data/questions_bio_06.json" },
+  { title: "Комплексные задания ОГЭ по биосфере и почвам", key: "bio_07", questions: "data/questions_bio_07.json" },
+
   // Будущие разделы (заглушки)
-  { title: "Атмосфера и климат", key: "atmosphere", comingSoon: true },
-  { title: "Гидросфера", key: "hydrosphere", comingSoon: true },
-  { title: "Биосфера и почвы", key: "biosphere", comingSoon: true },
   { title: "Человечество на Земле", key: "mankind", comingSoon: true },
   { title: "Взаимодействие природы и общества", key: "nature_society", comingSoon: true },
   { title: "География России", key: "russia", comingSoon: true },
@@ -111,10 +136,53 @@ var THEORY_FILES = [
     ]
   },
 
+  // Раздел 5: Атмосфера и климат
+  {
+    title: "Атмосфера и климат",
+    icon: "globe",
+    subtopics: [
+      { title: "Состав и свойства атмосферы", icon: "globe", file: "theory_atm_01.json", key: "atm_01", questions: "data/questions_atm_01.json" },
+      { title: "Температура и давление", icon: "globe", file: "theory_atm_02.json", key: "atm_02", questions: "data/questions_atm_02.json" },
+      { title: "Ветер", icon: "compass", file: "theory_atm_03.json", key: "atm_03", questions: "data/questions_atm_03.json" },
+      { title: "Влажность и осадки", icon: "droplet", file: "theory_atm_04.json", key: "atm_04", questions: "data/questions_atm_04.json" },
+      { title: "Климатообразующие факторы", icon: "globe", file: "theory_atm_05.json", key: "atm_05", questions: "data/questions_atm_05.json" },
+      { title: "Климатограммы и карты погоды", icon: "chart", file: "theory_atm_06.json", key: "atm_06", questions: "data/questions_atm_06.json" },
+      { title: "Комплексные задания ОГЭ по атмосфере", icon: "star", file: "theory_atm_07.json", key: "atm_07", questions: "data/questions_atm_07.json" },
+    ]
+  },
+
+  // Раздел 6: Гидросфера
+  {
+    title: "Гидросфера",
+    icon: "droplet",
+    subtopics: [
+      { title: "Мировой океан", icon: "droplet", file: "theory_hydro_01.json", key: "hydro_01", questions: "data/questions_hydro_01.json" },
+      { title: "Моря, заливы, проливы", icon: "mapPin", file: "theory_hydro_02.json", key: "hydro_02", questions: "data/questions_hydro_02.json" },
+      { title: "Реки", icon: "droplet", file: "theory_hydro_03.json", key: "hydro_03", questions: "data/questions_hydro_03.json" },
+      { title: "Озёра", icon: "droplet", file: "theory_hydro_04.json", key: "hydro_04", questions: "data/questions_hydro_04.json" },
+      { title: "Ледники", icon: "droplet", file: "theory_hydro_05.json", key: "hydro_05", questions: "data/questions_hydro_05.json" },
+      { title: "Подземные воды", icon: "droplet", file: "theory_hydro_06.json", key: "hydro_06", questions: "data/questions_hydro_06.json" },
+      { title: "Речной режим и питание рек", icon: "droplet", file: "theory_hydro_07.json", key: "hydro_07", questions: "data/questions_hydro_07.json" },
+      { title: "Комплексные задания ОГЭ по гидросфере", icon: "star", file: "theory_hydro_08.json", key: "hydro_08", questions: "data/questions_hydro_08.json" },
+    ]
+  },
+
+  // Раздел 7: Биосфера и почвы
+  {
+    title: "Биосфера и почвы",
+    icon: "tree",
+    subtopics: [
+      { title: "Почвообразование", icon: "globe", file: "theory_bio_01.json", key: "bio_01", questions: "data/questions_bio_01.json" },
+      { title: "Типы почв", icon: "globe", file: "theory_bio_02.json", key: "bio_02", questions: "data/questions_bio_02.json" },
+      { title: "Природные зоны", icon: "globe", file: "theory_bio_03.json", key: "bio_03", questions: "data/questions_bio_03.json" },
+      { title: "Растительный и животный мир", icon: "tree", file: "theory_bio_04.json", key: "bio_04", questions: "data/questions_bio_04.json" },
+      { title: "Приспособленность организмов", icon: "zap", file: "theory_bio_05.json", key: "bio_05", questions: "data/questions_bio_05.json" },
+      { title: "Охрана природы", icon: "flag", file: "theory_bio_06.json", key: "bio_06", questions: "data/questions_bio_06.json" },
+      { title: "Комплексные задания ОГЭ по биосфере и почвам", icon: "star", file: "theory_bio_07.json", key: "bio_07", questions: "data/questions_bio_07.json" },
+    ]
+  },
+
   // Будущие разделы (заглушки)
-  { title: "Атмосфера и климат", icon: "globe", comingSoon: true, subtopics: [] },
-  { title: "Гидросфера", icon: "droplet", comingSoon: true, subtopics: [] },
-  { title: "Биосфера и почвы", icon: "tree", comingSoon: true, subtopics: [] },
   { title: "Человечество на Земле", icon: "user", comingSoon: true, subtopics: [] },
   { title: "Взаимодействие природы и общества", icon: "refresh", comingSoon: true, subtopics: [] },
   { title: "География России", icon: "mapPin", comingSoon: true, subtopics: [] }
